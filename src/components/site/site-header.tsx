@@ -11,6 +11,9 @@ import { Button } from "@/components/glass/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/components/glass/dropdown-menu"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/glass/sheet"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/glass/tooltip"
+import { site } from "@/lib/site"
+import { formatStars } from "@/lib/format-stars"
+import { GitHubIcon } from "./brand-icons"
 import { Logo } from "./logo"
 import { PALETTES, usePalette, type Palette } from "./providers"
 import { DocsNav } from "./docs-nav"
@@ -33,7 +36,7 @@ export function PaletteSwatch({ palette, className }: { palette: Palette; classN
   )
 }
 
-export function SiteHeader() {
+export function SiteHeader({ stars }: { stars: number | null }) {
   const pathname = usePathname()
   const { resolvedTheme, setTheme } = useTheme()
   const { palette, setPalette } = usePalette()
@@ -107,6 +110,17 @@ export function SiteHeader() {
             </TooltipTrigger>
             <TooltipContent>Light / dark</TooltipContent>
           </Tooltip>
+          <a
+            href={site.repository}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={stars === null ? "glasscn on GitHub" : `glasscn on GitHub — ${stars} stars`}
+            className="hidden h-8 items-center gap-1.5 rounded-full px-2.5 text-foreground/70 outline-none transition-colors hover:bg-fill hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring sm:inline-flex"
+          >
+            <GitHubIcon className="size-4" />
+            {/* Omitted rather than zeroed when the API says nothing. */}
+            {stars === null ? null : <span className="font-mono text-xs tabular-nums">{formatStars(stars)}</span>}
+          </a>
           <Button asChild size="sm" className="ml-1 hidden sm:inline-flex">
             <Link href="/docs/installation">Get started</Link>
           </Button>

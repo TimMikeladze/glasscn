@@ -5,14 +5,14 @@
  * `registry.json` refers to its own items by URL — the only way a registry
  * dependency can point at a registry other than shadcn's own. The host isn't
  * known until deploy, so the manifest carries `{REGISTRY_URL}` and this script
- * stamps it in (NEXT_PUBLIC_REGISTRY_URL, else the Vercel production URL, else localhost).
+ * stamps it in (NEXT_PUBLIC_REGISTRY_URL, else https://glasscn.app on Vercel, else localhost).
  */
 import { execFileSync } from "node:child_process"
 import { readFileSync, rmSync, writeFileSync } from "node:fs"
 
 const registryUrl = (
   process.env.NEXT_PUBLIC_REGISTRY_URL ??
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000")
+  (process.env.VERCEL ? "https://glasscn.app" : "http://localhost:3000")
 ).replace(/\/$/, "")
 
 const stamped = readFileSync("registry.json", "utf8").replaceAll("{REGISTRY_URL}", registryUrl)

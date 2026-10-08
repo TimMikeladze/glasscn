@@ -3,11 +3,11 @@
 **Glass, for shadcn.** A shadcn-compatible registry of glassmorphic components — frosted surfaces over a living aurora, iOS-grade controls and data pieces — installed as source with the shadcn CLI and themed entirely with CSS variables. Born in the [Kaizen](../kaizen) app; React Native versions included.
 
 ```bash
-pnpm dlx shadcn@latest add https://<your-host>/r/glass-style.json https://<your-host>/r/theme-dusk.json
-pnpm dlx shadcn@latest add https://<your-host>/r/card.json https://<your-host>/r/button.json
+pnpm dlx shadcn@latest add https://glasscn.app/r/glass-style.json https://glasscn.app/r/theme-dusk.json
+pnpm dlx shadcn@latest add https://glasscn.app/r/card.json https://glasscn.app/r/button.json
 ```
 
-Or set the namespace once in `components.json` — `"registries": { "@glasscn": "https://<your-host>/r/{name}.json" }` — and `shadcn add @glasscn/dock`.
+Or set the namespace once in `components.json` — `"registries": { "@glasscn": "https://glasscn.app/r/{name}.json" }` — and `shadcn add @glasscn/dock`.
 
 ## What's in it
 
@@ -61,4 +61,4 @@ node scripts/verify-native.mjs ../kaizen   # native items into a copy of an Expo
 
 ## Build & deploy
 
-`pnpm build` generates, builds the registry into `public/r` (stamping `NEXT_PUBLIC_REGISTRY_URL`, or the Vercel production URL), and builds the docs site. Spec: [`docs/spec.md`](docs/spec.md).
+`pnpm build` generates, builds the registry into `public/r` (stamping `NEXT_PUBLIC_REGISTRY_URL`, else `https://glasscn.app` on Vercel, else localhost), and builds the docs site. Spec: [`docs/spec.md`](docs/spec.md).

@@ -10,11 +10,11 @@ glasscn = shadcn components in frosted glass over a drifting aurora. Same APIs a
 ## Install
 
 ```bash
-npx shadcn@latest add https://<host>/r/glass-style.json https://<host>/r/theme-dusk.json   # foundation + a palette
-npx shadcn@latest add https://<host>/r/aurora.json https://<host>/r/card.json https://<host>/r/button.json
+npx shadcn@latest add https://glasscn.app/r/glass-style.json https://glasscn.app/r/theme-dusk.json   # foundation + a palette
+npx shadcn@latest add https://glasscn.app/r/aurora.json https://glasscn.app/r/card.json https://glasscn.app/r/button.json
 ```
 
-Or add `"registries": { "@glasscn": "https://<host>/r/{name}.json" }` to `components.json` and `npx shadcn add @glasscn/dock`. Components land in `components/glass/`, blocks in `components/glass-blocks/`.
+Or add `"registries": { "@glasscn": "https://glasscn.app/r/{name}.json" }` to `components.json` and `npx shadcn add @glasscn/dock`. Components land in `components/glass/`, blocks in `components/glass-blocks/`.
 
 Put `<Aurora />` once in the root layout — glass needs something to frost.
 
@@ -35,7 +35,7 @@ See `references/recipes.md` for screen recipes.
 - **At runtime / per subtree:** `<ThemeScope palette="ocean" material="liquid" scheme="dark">…</ThemeScope>`, or `theme={createGlassTheme({ palette: { hue: 200, harmony: "triadic" }, shape: "soft", tokens: {...} })}` from `@/lib/glass-theme`.
 - **Fonts:** app fonts are shadcn `registry:font` items — `font-inter`, `font-heading-fraunces`, `font-mono-jetbrains-mono` (the CLI wires next/font). Theme fonts are optional overrides: `<ThemeScope fonts={{ heading: "fraunces" }} loadFonts>` or `[--glass-font-heading:…]`.
 - **Type:** put `type-glass` on `<body>`; use `Heading`/`Text`/`Display` from `typography`, or `type-glass-heading` + `type-step-3` in your own components; `Prose` for Markdown/MDX. A type preset then restyles all of it.
-- **Visually:** the Theme Studio at `https://<host>/themes` exports CSS, a shadcn theme item (`npx shadcn add ./my-theme.json`) or a share link.
+- **Visually:** the Theme Studio at `https://glasscn.app/themes` exports CSS, a shadcn theme item (`npx shadcn add ./my-theme.json`) or a share link.
 
 ## Rules of thumb
 

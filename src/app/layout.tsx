@@ -5,6 +5,7 @@ import { Aurora } from "@/components/glass/aurora"
 import { Providers, paletteScript } from "@/components/site/providers"
 import { SiteHeader } from "@/components/site/site-header"
 import { SiteFooter } from "@/components/site/site-footer"
+import { repoStars } from "@/lib/github"
 import { site } from "@/lib/site"
 import "./globals.css"
 
@@ -14,9 +15,11 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 export const metadata: Metadata = {
   title: { default: `${site.name} — ${site.tagline}`, template: `%s · ${site.name}` },
   description: site.description,
+  metadataBase: new URL(site.url),
 }
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const stars = await repoStars()
   return (
     <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
       <head>
@@ -25,7 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="type-glass min-h-dvh">
         <Providers>
           <Aurora />
-          <SiteHeader />
+          <SiteHeader stars={stars} />
           {children}
           <SiteFooter />
         </Providers>
