@@ -69,8 +69,8 @@ try {
       .join("\n");
     writeFileSync(tsconfigPath, stripped);
   }
-  // the copy gets its own node_modules — a copy-on-write clone on APFS, so it's instant and the app stays untouched
-  run("cp", ["-cR", join(source, "node_modules"), join(app, "node_modules")]);
+  // the copy gets its own node_modules — a copy-on-write clone (APFS on macOS, reflink where Linux supports it), so the app stays untouched
+  run("cp", [...(process.platform === "darwin" ? ["-cR"] : ["-R", "--reflink=auto"]), join(source, "node_modules"), join(app, "node_modules")]);
   writeFileSync(
     join(app, "components.json"),
     JSON.stringify(

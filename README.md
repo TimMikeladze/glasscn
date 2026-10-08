@@ -63,6 +63,8 @@ pnpm verify:native      # native items from the registry into a copy of the sand
 pnpm sandbox:native     # the Expo sandbox (sandbox/native): every native item live — i for iOS, w for web
 ```
 
+CI (`.github/workflows/ci.yml`) runs typecheck, lint and test on every push and PR, then `verify:install` and the native sandbox checks (`npm run typecheck` in `sandbox/native`, `verify:native`).
+
 ## Build & deploy
 
 `pnpm build` generates, builds the registry into `public/r` (stamping `NEXT_PUBLIC_REGISTRY_URL`, else `https://glasscn.app` on Vercel, else localhost), and builds the docs site. Spec: [`docs/spec.md`](docs/spec.md).
