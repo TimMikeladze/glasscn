@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs"
 import { describe, expect, it } from "vitest"
 import { blocks, components, foundations, nativeItems } from "./items.mjs"
-import { DENSITIES, MATERIALS, MOTIONS, PALETTES, SHAPES, TOKENS } from "../src/lib/glass-theme.ts"
+import { DENSITIES, FONTS, MATERIALS, MOTIONS, PALETTES, SHAPES, TOKENS, TYPE_PRESETS } from "../src/lib/glass-theme.ts"
 import { themeTokens } from "./stylesheet.mjs"
 
 const registry = JSON.parse(readFileSync("registry.json", "utf8"))
@@ -9,8 +9,10 @@ const names = new Set(registry.items.map((i) => i.name))
 
 describe("registry.json", () => {
   it("is in sync with registry/items.mjs and the theme presets (run scripts/generate.mjs)", () => {
-    const presets = [PALETTES, MATERIALS, SHAPES, MOTIONS, DENSITIES].reduce((n, p) => n + Object.keys(p).length, 0)
-    const expected = foundations.length + presets + components.length + blocks.length + nativeItems.length
+    const presets = [PALETTES, MATERIALS, SHAPES, MOTIONS, DENSITIES, TYPE_PRESETS].reduce((n, p) => n + Object.keys(p).length, 0)
+    const fonts = registry.items.filter((i) => i.type === "registry:font").length
+    expect(fonts).toBeGreaterThan(20)
+    const expected = foundations.length + presets + fonts + components.length + blocks.length + nativeItems.length
     expect(registry.items).toHaveLength(expected)
   })
   it("has unique names", () => {
@@ -59,9 +61,12 @@ describe("registry.json", () => {
       for (const p of pkgs) expect(item.dependencies ?? [], `${item.name} imports ${p}`).toContain(p)
     }
   })
-  it("gives the foundation every primitive except the accent and charts, in light and dark", () => {
+  it("never ships an optional token as an empty value (an empty var would block its fallback)", () => {
+    for (const item of registry.items) for (const scheme of ["light", "dark"]) for (const [k, v] of Object.entries(item.cssVars?.[scheme] ?? {})) expect(v, `${item.name} ${k}`).not.toBe("")
+  })
+  it("gives the foundation every primitive except the accent, charts and optional fonts, in light and dark", () => {
     const style = registry.items.find((i) => i.name === "glass-style")
-    for (const t of TOKENS) {
+    for (const t of TOKENS.filter((t) => !t.optional)) {
       const accent = ["primary", "primary-foreground", "ring"].includes(t.name) || t.name.startsWith("chart-")
       expect(Boolean(style.cssVars.light[t.name]), t.name).toBe(!accent)
       expect(Boolean(style.cssVars.dark[t.name]), t.name).toBe(!accent)
@@ -73,9 +78,22 @@ describe("registry.json", () => {
     for (const v of [...Object.values(style.cssVars.light), ...Object.values(style.cssVars.dark)]) expect(v).not.toMatch(/var\(/)
     for (const v of Object.values(themeTokens)) expect(v).toMatch(/var\(--/)
   })
+  it("font items follow shadcn's registry:font shape, and every type preset's font dependency exists", () => {
+    for (const item of registry.items.filter((i) => i.type === "registry:font")) {
+      expect(item.font.provider).toBe("google")
+      expect(["--font-sans", "--font-heading", "--font-mono"]).toContain(item.font.variable)
+      expect(item.font.dependency).toMatch(/^@fontsource/)
+      // a code font must not become the whole app's font (the CLI's default for --font-mono)
+      if (item.font.variable === "--font-mono") expect(item.font.selector).toBe("code, kbd, samp, pre")
+    }
+    for (const item of registry.items.filter((i) => i.name.startsWith("type-")))
+      for (const dep of item.registryDependencies ?? []) expect(names.has(dep.match(/\/r\/(.+)\.json$/)[1]), dep).toBe(true)
+    expect(Object.values(FONTS).length).toBeGreaterThan(20)
+  })
   it("references only primitives that exist", () => {
-    const known = new Set([...TOKENS.map((t) => t.name), "glass-bg", "glass-elevation", "glass-draw-from"])
-    const css = JSON.stringify([themeTokens, registry.items.find((i) => i.name === "glass-style").css])
+    // primitives, the two layer hooks, and shadcn's own colour tokens
+    const known = new Set([...TOKENS.map((t) => t.name), "glass-bg", "glass-elevation", "glass-draw-from", "primary", "foreground", "muted-foreground"])
+    const css = JSON.stringify([themeTokens, ...registry.items.filter((i) => i.css).map((i) => i.css)])
     for (const [, name] of css.matchAll(/var\(--([\w-]+)/g)) expect(known.has(name), name).toBe(true)
   })
 })

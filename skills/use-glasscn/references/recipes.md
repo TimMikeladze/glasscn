@@ -15,5 +15,8 @@ Stack `GroupedList`s: header (overline), rows with `GroupedListIcon` tiles colou
 ## Destructive confirmation
 `Dialog` with a `destructive` button and a `glass` cancel. The overlay softens the page; the content is `glass-strong`.
 
+## Article / docs page
+`type-glass` on body · `Text variant="overline"` + `Heading level={1}` + `Text variant="lead"` · body in `<Prose>` (held to `--glass-measure`) · `type-editorial` or `type-classic` for long reading.
+
 ## A themed island
 Wrap a promo, a widget or a preview in `ThemeScope` with its own palette/material — it won't affect the page. Portalled content (dialogs) renders outside the scope.

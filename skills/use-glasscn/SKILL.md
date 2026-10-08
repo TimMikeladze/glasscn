@@ -30,9 +30,11 @@ See `references/recipes.md` for screen recipes.
 
 ## Theme
 
-- **Presets compose** (each replaces only its own group): `theme-<palette>` (dusk ocean rose sage amber graphite lavender mint cherry lagoon sand midnight), `material-<frosted|liquid|crystal|smoked|matte|vapor|neon>`, `shape-<round|soft|sharp|square>`, `motion-<spring|smooth|snappy|still>`, `density-<compact|default|comfortable>`.
+- **Presets compose** (each replaces only its own group): `theme-<palette>` (dusk ocean rose sage amber graphite lavender mint cherry lagoon sand midnight), `material-<frosted|liquid|crystal|smoked|matte|vapor|neon>`, `shape-<round|soft|sharp|square>`, `motion-<spring|smooth|snappy|still>`, `density-<compact|default|comfortable>`, `type-<default|system|modern|editorial|friendly|technical|classic|grotesk>`.
 - **Any primitive, any element:** `<Card className="[--glass-blur:8px] [--glass-opacity:70%]">`, `<section className="[--glass-density:0.85]">`.
 - **At runtime / per subtree:** `<ThemeScope palette="ocean" material="liquid" scheme="dark">…</ThemeScope>`, or `theme={createGlassTheme({ palette: { hue: 200, harmony: "triadic" }, shape: "soft", tokens: {...} })}` from `@/lib/glass-theme`.
+- **Fonts:** app fonts are shadcn `registry:font` items — `font-inter`, `font-heading-fraunces`, `font-mono-jetbrains-mono` (the CLI wires next/font). Theme fonts are optional overrides: `<ThemeScope fonts={{ heading: "fraunces" }} loadFonts>` or `[--glass-font-heading:…]`.
+- **Type:** put `type-glass` on `<body>`; use `Heading`/`Text`/`Display` from `typography`, or `type-glass-heading` + `type-step-3` in your own components; `Prose` for Markdown/MDX. A type preset then restyles all of it.
 - **Visually:** the Theme Studio at `https://<host>/themes` exports CSS, a shadcn theme item (`npx shadcn add ./my-theme.json`) or a share link.
 
 ## Rules of thumb

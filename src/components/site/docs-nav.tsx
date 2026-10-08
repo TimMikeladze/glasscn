@@ -10,6 +10,7 @@ const GUIDES = [
   { href: "/docs", label: "Introduction" },
   { href: "/docs/installation", label: "Installation" },
   { href: "/docs/theming", label: "Theming" },
+  { href: "/docs/fonts", label: "Fonts & type" },
   { href: "/themes", label: "Theme Studio" },
   { href: "/docs/native", label: "React Native" },
 ]

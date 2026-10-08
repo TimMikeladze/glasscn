@@ -86,7 +86,7 @@ function DialogFooter({ className, showCloseButton = false, children, ...props }
 }
 
 function DialogTitle({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Title>) {
-  return <DialogPrimitive.Title data-slot="dialog-title" className={cn("font-heading text-lg leading-tight font-title tracking-title", className)} {...props} />
+  return <DialogPrimitive.Title data-slot="dialog-title" className={cn("type-glass-heading text-lg", className)} {...props} />
 }
 
 function DialogDescription({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Description>) {

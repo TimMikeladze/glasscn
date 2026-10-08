@@ -1,6 +1,6 @@
 ---
 name: extend-theme
-description: Extend glasscn's theme system — add a primitive token, a palette, a material, shape or motion preset, or a new density — through the engine, the stylesheet, the generator and the tests. Use when asked for a new theming option, a new look, more customisation, or a new palette in glasscn.
+description: Extend glasscn's theme system — add a primitive token, a palette, a material, shape, motion or type preset, a font, or a new density — through the engine, the stylesheet, the generator and the tests. Use when asked for a new theming option, a new look, more customisation, or a new palette in glasscn.
 ---
 
 # Extend the theme
@@ -25,6 +25,14 @@ Everything visual is a primitive in `TOKENS` (`src/lib/glass-theme.ts`). Presets
 ## Add a material, shape or motion preset
 
 Add to `MATERIALS` / `SHAPES` / `MOTIONS` with a one-line description. Only set tokens in that preset's groups (Material+Rim+Depth / Shape / Motion + `aurora-speed`). The generator publishes it as `material-<name>` etc. with the whole group filled, so it replaces the previous preset cleanly.
+
+## Add a font
+
+Add to `FONTS` with `gf(family, weights)` (`"variable"` or the static weights next/font offers), a `category` (sans, rounded, serif, display, mono) and a CSS stack. The generator publishes `registry:font` items per role (`font-<key>`, `font-heading-<key>`, `font-mono-<key>`). The "font catalogue vs next/font" test fails if the family or a weight doesn't exist. System stacks (no `google`) are theme-only.
+
+## Add a type preset
+
+Add to `TYPE_PRESETS`: tokens from the Type group plus optional `fonts: { sans, heading, display, mono }` (catalogue keys). Published as `type-<name>`, depending on its Google font items. Look at it in `/docs/fonts` and the studio specimen; check long headings with `heading-case: uppercase` still fit.
 
 ## Add a density
 

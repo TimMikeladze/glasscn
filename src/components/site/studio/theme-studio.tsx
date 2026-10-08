@@ -25,6 +25,7 @@ import {
   PALETTES,
   SHAPES,
   TOKENS,
+  TYPE_PRESETS,
   createGlassTheme,
   decodeTheme,
   encodeTheme,
@@ -51,8 +52,9 @@ interface Recipe {
   shape: string
   motion: string
   density: number
+  type: string
 }
-const START: Recipe = { palette: "dusk", hue: 35, harmony: "analogous", chroma: 0.17, material: "frosted", shape: "round", motion: "spring", density: 1 }
+const START: Recipe = { palette: "dusk", hue: 35, harmony: "analogous", chroma: 0.17, material: "frosted", shape: "round", motion: "spring", density: 1, type: "default" }
 const EMPTY = { light: {} as Tokens, dark: {} as Tokens }
 
 /** Which token groups each preset owns — choosing a preset clears your edits there. */
@@ -62,6 +64,7 @@ const OWNS: Record<string, (t: string) => boolean> = {
   shape: (t) => group(t) === "Shape",
   motion: (t) => group(t) === "Motion" || t === "aurora-speed",
   density: (t) => group(t) === "Density",
+  type: (t) => group(t) === "Type" || group(t) === "Fonts",
 }
 const GROUP_OF = Object.fromEntries(TOKENS.map((t) => [t.name, t.group]))
 const group = (t: string) => GROUP_OF[t] as TokenGroup
@@ -72,6 +75,7 @@ const toOptions = (r: Recipe, o: typeof EMPTY): CreateThemeOptions => ({
   shape: r.shape,
   motion: r.motion,
   density: r.density,
+  ...(r.type !== "default" ? { type: r.type } : {}),
   ...(Object.keys(o.light).length ? { light: o.light } : {}),
   ...(Object.keys(o.dark).length ? { dark: o.dark } : {}),
 })
@@ -132,7 +136,7 @@ function Studio({ initialCode, initialApplied }: { initialCode: string; initialA
   React.useEffect(() => {
     const t = setTimeout(() => {
       history.replaceState(null, "", `#t=${encodeTheme(theme)}`)
-      if (applied) applySiteTheme(themeToCss(theme, { selector: ":root[data-glass-custom]", darkSelector: ":root.dark[data-glass-custom]" }))
+      if (applied) applySiteTheme(themeToCss(theme, { selector: ":root[data-glass-custom]", darkSelector: ":root.dark[data-glass-custom]", fontImport: true }))
     }, 120)
     return () => clearTimeout(t)
   })
@@ -163,7 +167,7 @@ function Studio({ initialCode, initialApplied }: { initialCode: string; initialA
   }
   const toggleSite = (on: boolean) => {
     setApplied(on)
-    applySiteTheme(on ? themeToCss(theme, { selector: ":root[data-glass-custom]", darkSelector: ":root.dark[data-glass-custom]" }) : null)
+    applySiteTheme(on ? themeToCss(theme, { selector: ":root[data-glass-custom]", darkSelector: ":root.dark[data-glass-custom]", fontImport: true }) : null)
     toast(on ? "Applied to the whole site" : "Site back to its palette")
   }
 
@@ -177,7 +181,7 @@ function Studio({ initialCode, initialApplied }: { initialCode: string; initialA
         <Glass className="flex h-full flex-col overflow-hidden">
           <div className="flex items-center gap-2 border-b border-glass-border p-4">
             <div className="min-w-0 flex-1">
-              <h1 className="font-heading text-xl font-title tracking-title">Theme Studio</h1>
+              <h1 className="type-glass-heading text-xl">Theme Studio</h1>
               <p className="text-xs text-muted-foreground">
                 {TOKENS.length} primitives · {changedCount} edited{initialCode ? " · loaded from a link" : ""}
               </p>
@@ -255,6 +259,7 @@ function Studio({ initialCode, initialApplied }: { initialCode: string; initialA
             <Chips label="Material" value={recipe.material} options={MATERIALS} onChange={(v) => choose("material", v, OWNS.material)} />
             <Chips label="Shape" value={recipe.shape} options={SHAPES} onChange={(v) => choose("shape", v, OWNS.shape)} />
             <Chips label="Motion" value={recipe.motion} options={MOTIONS} onChange={(v) => choose("motion", v, OWNS.motion)} />
+            <Chips label="Type" value={recipe.type} options={TYPE_PRESETS} onChange={(v) => choose("type", v, OWNS.type)} />
             <div className="grid gap-2">
               <Label>Density</Label>
               <SegmentedControl size="sm" value={String(recipe.density)} onValueChange={(v) => choose("density", Number(v), OWNS.density)} className="w-full" aria-label="Density">

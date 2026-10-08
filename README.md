@@ -26,7 +26,7 @@ Or set the namespace once in `components.json` — `"registries": { "@glasscn": 
 | React Native | `native-tokens` `native-glass` `native-aurora` `native-press` |
 
 - **shadcn's APIs, in glass.** Button, Card, Dialog, Tabs… keep their props and parts — swapping is `@/components/ui/x` → `@/components/glass/x`. Files land in `components/glass/`, beside shadcn's, never over them.
-- **50 primitives in nine groups** — colour, material (frost, blur, saturation, brightness, sheen, grain), rim, depth (shadow, inner glow), shape, density, motion, aurora, type. Presets compose; any primitive can be overridden on any element (`[--glass-blur:8px]`); `ThemeScope` re-themes a subtree at runtime.
+- **68 primitives in eleven groups** — colour, material (frost, blur, saturation, brightness, sheen, grain), rim, depth (shadow, inner glow), shape, density, motion, aurora, fonts, type. Presets compose; any primitive can be overridden on any element (`[--glass-blur:8px]`); `ThemeScope` re-themes a subtree at runtime.
 - **Theme Studio** at `/themes` — every primitive as a control, a hue-harmony palette generator, randomise, a scoped live preview with its own scheme, a legibility estimate, export to CSS / a shadcn theme item / TypeScript / a share link, and "apply to the whole site".
 - **Standards.** `data-slot` on every part, `cva` variants, `cn`, unified `radix-ui`, `asChild`, Tailwind v4, `prefers-reduced-motion`, a no-`backdrop-filter` fallback.
 

@@ -38,7 +38,7 @@ const brand = createGlassTheme({
 function PresetRow({ title, prefix, presets }: { title: string; prefix: string; presets: Record<string, { title: string; description: string }> }) {
   return (
     <div className="grid gap-3">
-      <h3 className="font-heading text-lg font-title">{title}</h3>
+      <h3 className="type-glass-heading text-lg">{title}</h3>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {Object.entries(presets).map(([k, p]) => (
           <Card key={k} size="sm">
@@ -61,10 +61,10 @@ function PresetRow({ title, prefix, presets }: { title: string; prefix: string; 
 export default function Theming() {
   return (
     <>
-      <PageHeader eyebrow="Guides" title="Theming" description={`${TOKENS.length} primitives in nine groups. Pick presets, turn any knob, theme a single card — all with CSS variables.`} />
+      <PageHeader eyebrow="Guides" title="Theming" description={`${TOKENS.length} primitives in ${GROUPS.length} groups. Pick presets, turn any knob, theme a single card — all with CSS variables.`} />
       <Glass tint="primary" className="flex flex-wrap items-center gap-4 p-5">
         <div className="min-w-0 flex-1">
-          <div className="font-heading text-lg font-title">Theme Studio</div>
+          <div className="type-glass-heading text-lg">Theme Studio</div>
           <p className="text-sm text-muted-foreground">Every primitive as a control, a hue-harmony generator, a live preview, and export to CSS, a shadcn item or a link.</p>
         </div>
         <Button asChild>
@@ -88,7 +88,7 @@ export default function Theming() {
       <InstallCommand args={`add ${itemUrl("theme-lagoon")} ${itemUrl("material-liquid")} ${itemUrl("shape-soft")}`} />
       <div className="mt-6 grid gap-8">
         <div className="grid gap-3">
-          <h3 className="font-heading text-lg font-title">Palettes</h3>
+          <h3 className="type-glass-heading text-lg">Palettes</h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {Object.entries(PALETTES).map(([k, p]) => (
               <ThemeScope key={k} palette={k} className="rounded-surface-sm">
@@ -122,7 +122,7 @@ export default function Theming() {
       <H2>Every primitive</H2>
       {GROUPS.map((g) => (
         <div key={g} className="mb-6">
-          <h3 className="mb-2 font-heading text-base font-title">{g}</h3>
+          <h3 className="mb-2 type-glass-heading text-base">{g}</h3>
           <div className="glass overflow-hidden rounded-surface-sm [--glass-elevation:0_0_#0000]">
             {TOKENS.filter((t) => t.group === g).map((t) => (
               <div key={t.name} className="grid gap-1 border-b border-foreground/5 px-4 py-2.5 last:border-0 sm:grid-cols-[14rem_1fr_auto] sm:gap-4">
@@ -140,7 +140,7 @@ export default function Theming() {
       <H2>Utilities</H2>
       <P>
         <C>glass</C>, <C>glass-strong</C>, <C>glass-subtle</C> for surfaces; colours <C>bg-glass</C>, <C>bg-fill</C>, <C>border-glass-border</C>, <C>bg-aurora-1</C>…; corners <C>rounded-surface</C>,{" "}
-        <C>rounded-control</C>, <C>rounded-button</C>, <C>rounded-badge</C>; sizing <C>h-control</C>, <C>px-pad</C>; motion <C>ease-glass</C>; titles <C>font-title tracking-title</C>. Two hooks
+        <C>rounded-control</C>, <C>rounded-button</C>, <C>rounded-badge</C>; sizing <C>h-control</C>, <C>px-pad</C>; motion <C>ease-glass</C>; type <C>type-glass-heading</C>, <C>type-step-*</C> (see <Link href="/docs/fonts" className="text-primary underline">Fonts &amp; type</Link>). Two hooks
         replace whole layers: <C>--glass-bg</C> and <C>--glass-elevation</C>. No <C>backdrop-filter</C>? Panes go nearly opaque. <C>prefers-reduced-motion</C> stills the aurora and the charts.
       </P>
       <CodeBlock code={snippets.tokens.code} html={snippets.tokens.html} title="what glass-style adds to globals.css" maxHeight={320} />

@@ -18,7 +18,12 @@
 | Transitions | `duration-(--glass-duration) ease-glass` | `duration-200 ease-out` |
 | Press | `active:scale-(--glass-press-scale)` | `active:scale-95` |
 | Focus | `focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/50` | `ring-2` |
-| Titles | `font-title tracking-title` | `font-semibold tracking-tight` |
+| Titles | `type-glass-heading text-lg` | `font-semibold tracking-tight` |
+| Big figures | `type-glass-display text-3xl` | `font-bold tabular-nums` |
+| Code, keys | `font-glass-mono` | `font-mono` |
+| Numbers in text | `numeric-glass` | `tabular-nums` |
+| Sizes on the scale | `type-step-n2 … type-step-6` | `text-step-*` (tailwind-merge drops it) |
+| Body type on a subtree | `type-glass` | `font-sans leading-relaxed` |
 | Raised thumb | `bg-glass-thumb` | `bg-white` |
 | One-off restyle | primitives on the element: `[--glass-blur:8px]`, `[--glass-opacity:70%]`; layers: `[--glass-bg:…]`, `[--glass-elevation:0_0_#0000]` | a new variant |
 | Mount animation | add `data-glass-motion` (reduced motion stills it) | unconditional animation |

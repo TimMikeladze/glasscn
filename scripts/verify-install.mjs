@@ -54,6 +54,9 @@ try {
     "shape-soft",
     "motion-snappy",
     "density-compact",
+    // type preset: pulls font-inter + font-heading-instrument-serif in as registryDependencies
+    "type-editorial",
+    "font-mono-jetbrains-mono",
     ...registry.components.map((i) => i.name),
     ...registry.blocks.map((i) => i.name),
   ]
@@ -62,12 +65,21 @@ try {
 
   // a theme exported from the studio, added from a local file — the "shadcn item" export path
   const { createGlassTheme, themeToRegistryItem } = await import(join(root, "src/lib/glass-theme.ts"))
-  writeFileSync(join(app, "my-glass-theme.json"), JSON.stringify(themeToRegistryItem(createGlassTheme({ palette: { hue: 140, harmony: "triadic" }, material: "neon" }), "my-glass-theme")))
+  writeFileSync(
+    join(app, "my-glass-theme.json"),
+    JSON.stringify(themeToRegistryItem(createGlassTheme({ palette: { hue: 140, harmony: "triadic" }, material: "neon", type: "editorial" }), "my-glass-theme", "My glass theme", { fontItemUrl: (n) => `${url}/r/${n}.json` }))
+  )
   run("pnpm", ["dlx", "shadcn@latest", "add", "./my-glass-theme.json", "-y", "--overwrite"], app)
   const globals = (await import("node:fs")).readFileSync(join(app, "src/app/globals.css"), "utf8")
   // the exported theme was added last, so its values win over the presets added before it
-  for (const needle of ["--glass-glow: 38%", "@utility glass", "--radius-surface:", "--glass-density: 1;"])
+  for (const needle of ["--glass-glow: 38%", "@utility glass", "--radius-surface:", "--glass-density: 1;", "--glass-heading-leading: 1.05", "@utility type-glass-heading", "@utility glass-prose"])
     if (!globals.includes(needle)) throw new Error(`globals.css is missing ${needle}`)
+  // font items: next/font wired into the layout for each role
+  const layout = (await import("node:fs")).readFileSync(join(app, "src/app/layout.tsx"), "utf8")
+  for (const needle of ["Instrument_Serif", "Inter", "JetBrains_Mono"])
+    if (!layout.includes(needle)) throw new Error(`layout.tsx is missing the ${needle} font`)
+  if (layout.includes(`"font-mono"`)) throw new Error("the mono font item made the whole app mono")
+  if (!globals.includes("code, kbd, samp, pre")) throw new Error("the mono font isn't applied to code")
 
   writeFileSync(
     join(app, "src/app/page.tsx"),
@@ -77,6 +89,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/glass/tab
 import { Toaster } from "@/components/glass/toaster"
 import { ProgressRing } from "@/components/glass/progress-ring"
 import { ThemeScope } from "@/components/glass/theme-scope"
+import { Display, Heading, Text } from "@/components/glass/typography"
+import { Prose } from "@/components/glass/prose"
 import { createGlassTheme } from "@/lib/glass-theme"
 import { Dashboard01 } from "@/components/glass-blocks/dashboard-01"
 import { Settings01 } from "@/components/glass-blocks/settings-01"
@@ -86,6 +100,13 @@ export default function Page() {
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-10 p-8">
       <Aurora />
+      <Heading level={1}>Small gains</Heading>
+      <Text variant="lead">Every night.</Text>
+      <Display>1,826</Display>
+      <Prose><h2>Method</h2><p>Name what <a href="#">mattered</a>.</p></Prose>
+      <ThemeScope type="technical" fonts={{ heading: "fraunces" }} loadFonts>
+        <Heading level={2}>Scoped type</Heading>
+      </ThemeScope>
       <Dashboard01 />
       <Tabs defaultValue="settings">
         <TabsList>

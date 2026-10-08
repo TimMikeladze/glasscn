@@ -74,7 +74,7 @@ export function Dashboard01({ today = "2026-10-08" }: { today?: string }) {
                   <span className="size-2 rounded-full" style={{ background: color }} />
                   {k}
                 </dt>
-                <dd className="font-heading text-xl font-bold tabular-nums">{v}</dd>
+                <dd className="font-glass-heading text-xl font-bold tabular-nums">{v}</dd>
               </div>
             ))}
           </dl>
@@ -109,7 +109,7 @@ export function Dashboard01({ today = "2026-10-08" }: { today?: string }) {
           <CardHeader>
             <CardTitle>Sleep</CardTitle>
             <CardDescription>
-              <span className="font-heading text-2xl font-bold text-foreground tabular-nums">{data[data.length - 1]}</span> hours last night
+              <span className="font-glass-heading text-2xl font-bold text-foreground tabular-nums">{data[data.length - 1]}</span> hours last night
             </CardDescription>
             <CardAction>
               <SegmentedControl size="sm" value={range} onValueChange={setRange} aria-label="Range">

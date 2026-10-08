@@ -71,6 +71,9 @@ export const components = [
   ui("glass", "Glass", "A frosted pane — the base every surface is made from. Intensity, tint and elevation variants; asChild.", { deps: ["radix-ui"], categories: ["surfaces"] }),
   ui("card", "Card", "shadcn's Card API on glass: header, title, description, action, content, footer.", { categories: ["surfaces"] }),
   ui("theme-scope", "Theme scope", "Re-theme a subtree at runtime: a different palette, material, shape or scheme for one card, section or preview.", { reg: [at("glass-theme")], categories: ["surfaces"] }),
+  // typography
+  ui("typography", "Typography", "Heading, Text, Display, Blockquote, InlineCode, List and TextLink on the theme's modular scale — fonts, weights, case and numerals from the type tokens.", { deps: ["radix-ui", "class-variance-authority"], categories: ["typography"] }),
+  ui("prose", "Prose", "Rich text (Markdown, MDX, CMS) set in the theme's type: headings, links, lists, quotes, code, tables.", { deps: ["radix-ui"], categories: ["typography"] }),
   // controls
   ui("button", "Button", "shadcn's Button with glass, tinted and secondary variants, capsule or rounded, squash on press.", { deps: ["radix-ui", "class-variance-authority"], categories: ["controls"] }),
   ui("badge", "Badge", "Small capsule labels: solid, tinted, glass, secondary, outline, destructive.", { deps: ["radix-ui", "class-variance-authority"], categories: ["controls"] }),

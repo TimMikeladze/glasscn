@@ -5,15 +5,18 @@ import * as React from "react"
 import { SegmentedControl, SegmentedControlItem } from "@/components/glass/segmented-control"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/glass/tabs"
 import { CodeBlockClient } from "@/components/site/code-block-client"
-import { createGlassTheme, encodeTheme, themeToCss, themeToRegistryItem, type CreateThemeOptions, type GlassTheme } from "@/lib/glass-theme"
+import { createGlassTheme, encodeTheme, fontDependencies, themeToCss, themeToRegistryItem, type CreateThemeOptions, type GlassTheme } from "@/lib/glass-theme"
+import { itemUrl } from "@/lib/site"
 
 /** The theme, four ways out: CSS for globals.css, a shadcn theme item, the TypeScript that rebuilds it, a link. */
 export function ExportPanel({ theme, recipe }: { theme: GlassTheme; recipe: CreateThemeOptions }) {
   const [scope, setScope] = React.useState<"diff" | "full">("diff")
   // the panel only renders in an opened sheet, so the window is there
   const origin = typeof window === "undefined" ? "" : window.location.origin
-  const css = themeToCss(theme, scope === "diff" ? { only: createGlassTheme() } : {})
-  const item = JSON.stringify(themeToRegistryItem(theme, "my-glass-theme", "My glass theme"), null, 2)
+  const css = themeToCss(theme, { fontImport: true, ...(scope === "diff" ? { only: createGlassTheme() } : {}) })
+  // Google fonts become registry dependencies on glasscn's font items — the CLI installs them as app fonts
+  const item = JSON.stringify(themeToRegistryItem(theme, "my-glass-theme", "My glass theme", { fontItemUrl: itemUrl }), null, 2)
+  const fonts = fontDependencies(theme)
   const ts = `import { createGlassTheme } from "@/lib/glass-theme"
 
 export const theme = createGlassTheme(${JSON.stringify(recipe, null, 2)})`
@@ -35,6 +38,11 @@ export const theme = createGlassTheme(${JSON.stringify(recipe, null, 2)})`
           </SegmentedControl>
         </div>
         <CodeBlockClient code={css || "/* nothing differs from the default */"} title="globals.css" />
+        {fonts.length ? (
+          <p className="text-xs text-muted-foreground">
+            Fonts: {fonts.map((f) => `${f.role} ${f.font.label}`).join(" · ")}. The @import loads them from Google Fonts — or use the shadcn item, which installs them with next/font.
+          </p>
+        ) : null}
       </TabsContent>
       <TabsContent value="item" className="grid gap-3">
         <p className="text-sm text-muted-foreground">

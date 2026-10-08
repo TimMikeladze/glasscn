@@ -21,7 +21,7 @@ export default function Home() {
         <Badge variant="glass" className="h-7 px-3">
           shadcn registry · {count} components & blocks
         </Badge>
-        <h1 className="max-w-3xl font-heading text-5xl leading-[1.02] font-bold tracking-tight text-balance sm:text-7xl">
+        <h1 className="max-w-3xl font-glass-heading text-5xl leading-[1.02] font-bold tracking-tight text-balance sm:text-7xl">
           Glass, for <span className="bg-linear-to-r from-primary via-chart-2 to-chart-3 bg-clip-text text-transparent">shadcn</span>.
         </h1>
         <p className="max-w-xl text-lg text-balance text-muted-foreground">
@@ -62,7 +62,7 @@ export default function Home() {
 
       <section className="flex flex-col gap-6">
         <div className="flex flex-col gap-2 text-center">
-          <h2 className="font-heading text-3xl font-bold tracking-tight">Controls that feel like iOS</h2>
+          <h2 className="font-glass-heading text-3xl font-bold tracking-tight">Controls that feel like iOS</h2>
           <p className="text-muted-foreground">Sliding thumbs, springy switches, squash on press. Try them.</p>
         </div>
         <ControlsSampler />
@@ -70,7 +70,7 @@ export default function Home() {
 
       <section className="grid items-start gap-8 lg:grid-cols-2">
         <div className="flex flex-col gap-4">
-          <h2 className="font-heading text-2xl font-bold tracking-tight">Blocks</h2>
+          <h2 className="font-glass-heading text-2xl font-bold tracking-tight">Blocks</h2>
           <p className="text-muted-foreground">Whole screens, ready to wire up: a dashboard, Settings, sign-in.</p>
           <Settings01 />
         </div>
@@ -82,7 +82,7 @@ export default function Home() {
       <section>
         <Card className="items-center text-center">
           <CardContent className="flex flex-col items-center gap-4 py-6">
-            <h2 className="font-heading text-3xl font-bold tracking-tight">Copy it. Own it.</h2>
+            <h2 className="font-glass-heading text-3xl font-bold tracking-tight">Copy it. Own it.</h2>
             <p className="max-w-lg text-muted-foreground">Like every shadcn registry, glasscn writes source into your repo. No package to update, nothing to fight.</p>
             <Button asChild size="lg">
               <Link href="/docs/installation">Install glasscn</Link>

@@ -9,7 +9,7 @@ export default function SparklineDemo() {
         <span className="text-sm text-muted-foreground">Sleep</span>
         <span className="text-sm text-muted-foreground">avg 7.5</span>
       </div>
-      <div className="font-heading text-3xl font-bold tabular-nums">
+      <div className="font-glass-heading text-3xl font-bold tabular-nums">
         7.4 <span className="text-base font-medium text-muted-foreground">hours</span>
       </div>
       <Sparkline data={sleep} height={80} />

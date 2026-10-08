@@ -6,19 +6,24 @@
  */
 import { writeFileSync } from "node:fs"
 import { blocks, components, foundations, nativeItems } from "../registry/items.mjs"
-import { stylesheet, themeTokens } from "../registry/stylesheet.mjs"
-import { DENSITIES, MATERIALS, MOTIONS, PALETTES, SHAPES, TOKENS, createGlassTheme, defaultTheme, themeToCss } from "../src/lib/glass-theme.ts"
+import { proseStylesheet, stylesheet, themeTokens } from "../registry/stylesheet.mjs"
+import { DENSITIES, FONTS, MATERIALS, MOTIONS, PALETTES, SHAPES, TOKENS, TYPE_PRESETS, createGlassTheme, defaultTheme, fontItemName, themeToCss } from "../src/lib/glass-theme.ts"
 
 const base = defaultTheme()
 const groupOf = Object.fromEntries(TOKENS.map((t) => [t.name, t.group]))
-const pickGroups = (tokens, groups, extra = []) => Object.fromEntries(Object.entries(tokens).filter(([k]) => groups.includes(groupOf[k]) || extra.includes(k)))
-const notAccent = (tokens) => Object.fromEntries(Object.entries(tokens).filter(([k]) => !["primary", "primary-foreground", "ring"].includes(k) && !k.startsWith("chart-")))
+// unset optional tokens are omitted, never written empty (an empty var would block its fallback)
+const present = (tokens) => Object.fromEntries(Object.entries(tokens).filter(([, v]) => v !== ""))
+const pickGroups = (tokens, groups, extra = []) => present(Object.fromEntries(Object.entries(tokens).filter(([k]) => groups.includes(groupOf[k]) || extra.includes(k))))
+const notAccent = (tokens) => present(Object.fromEntries(Object.entries(tokens).filter(([k]) => !["primary", "primary-foreground", "ring"].includes(k) && !k.startsWith("chart-"))))
 
 // The foundation: every primitive except the accent and charts (those are the user's
 // shadcn colours until they add a palette), including Dusk's aurora so it works alone.
 const style = foundations.find((f) => f.name === "glass-style")
 style.cssVars = { theme: themeTokens, light: notAccent(base.light), dark: notAccent(base.dark) }
 style.css = stylesheet
+// items that carry their own CSS
+const prose = components.find((c) => c.name === "prose")
+if (prose) prose.css = proseStylesheet
 
 // Preset items. Each carries the WHOLE of its groups, so adding one resets what a previous one set.
 const presetItem = (name, title, description, theme, groups, extra = []) => ({
@@ -40,16 +45,52 @@ const themes = [
   ...Object.entries(MOTIONS).map(([k, m]) =>
     presetItem(`motion-${k}`, `${m.title} motion`, `${m.description} Sets duration, easing, press and aurora speed.`, createGlassTheme({ motion: k }), ["Motion"], ["aurora-speed"])
   ),
+  // type presets: the Type group, plus their Google fonts installed as app fonts (registry:font items)
+  ...Object.entries(TYPE_PRESETS).map(([k, t]) => {
+    const item = presetItem(`type-${k}`, `${t.title} type`, `${t.description} Sets the type scale, leading, weights, case and numerals.`, createGlassTheme({ type: k }), ["Type"])
+    const fonts = Object.entries(t.fonts ?? {}).filter(([role, key]) => FONTS[key]?.google && role !== "display")
+    if (fonts.length) item.registryDependencies = [...new Set(fonts.map(([role, key]) => `{REGISTRY_URL}/r/${fontItemName(role, key)}.json`))]
+    // system stacks need no loading, so a system preset sets them as theme fonts directly
+    const system = Object.entries(t.fonts ?? {}).filter(([, key]) => FONTS[key] && !FONTS[key].google)
+    for (const [role, key] of system) for (const s of ["light", "dark"]) item.cssVars[s][`glass-font-${role}`] = FONTS[key].stack
+    return item
+  }),
   ...Object.entries(DENSITIES).map(([k]) =>
     presetItem(`density-${k}`, `${k[0].toUpperCase()}${k.slice(1)} density`, `Scales control heights, paddings and card spacing (×${DENSITIES[k]}).`, createGlassTheme({ density: k }), ["Density"])
   ),
 ]
 
+// Font items: shadcn's registry:font — the CLI wires next/font (Next) or fontsource (others).
+// sans → --font-sans, heading → --font-heading, mono → --font-mono.
+const fontItems = Object.entries(FONTS).flatMap(([key, f]) => {
+  if (!f.google) return []
+  const roles = f.category === "mono" ? ["mono"] : f.category === "serif" || f.category === "display" ? ["heading", "sans"] : ["sans", "heading"]
+  return roles.map((role) => ({
+    name: fontItemName(role, key),
+    type: "registry:font",
+    title: `${f.label}${role === "sans" ? "" : role === "heading" ? " (headings)" : " (mono)"}`,
+    description: `${f.label} as your app's ${role === "sans" ? "body" : role === "heading" ? "heading" : "monospace"} font (${f.category}).`,
+    categories: ["glass", "fonts"],
+    font: {
+      // fontsource registers variable fonts as "<Family> Variable"; next/font ignores this and uses `import`
+      family: `"${f.google.family}${f.google.weights === "variable" ? " Variable" : ""}", ${f.stack.split(", ").slice(1).join(", ")}`,
+      provider: "google",
+      import: f.google.import,
+      variable: role === "sans" ? "--font-sans" : role === "heading" ? "--font-heading" : "--font-mono",
+      // where the CLI applies it. Without one it puts --font-mono on <html> (shadcn's all-mono look) — ours is a code font.
+      ...(role === "sans" ? {} : { selector: role === "heading" ? "h1, h2, h3, h4, h5, h6" : "code, kbd, samp, pre" }),
+      ...(f.google.weights === "variable" ? {} : { weight: f.google.weights }),
+      subsets: ["latin"],
+      dependency: f.google.dependency,
+    },
+  }))
+})
+
 const registry = {
   $schema: "https://ui.shadcn.com/schema/registry.json",
   name: "glasscn",
   homepage: "{REGISTRY_URL}",
-  items: [...foundations, ...themes, ...components, ...blocks, ...nativeItems],
+  items: [...foundations, ...themes, ...fontItems, ...components, ...blocks, ...nativeItems],
 }
 writeFileSync("registry.json", JSON.stringify(registry, null, 2) + "\n")
 
@@ -74,11 +115,11 @@ const css = [
   `:root {\n${decl(Object.fromEntries(Object.entries(PALETTES).map(([k, p]) => [`swatch-${k}`, p.theme.light.primary])))}\n}`,
   `.dark {\n${decl(Object.fromEntries(Object.entries(PALETTES).map(([k, p]) => [`swatch-${k}`, p.theme.dark.primary])))}\n}`,
   "",
-  ...Object.entries(stylesheet).map(([k, v]) => block(k, v)),
+  ...Object.entries({ ...stylesheet, ...proseStylesheet }).map(([k, v]) => block(k, v)),
   "",
 ].join("\n")
 writeFileSync("src/app/glass.generated.css", css)
-console.log(`registry.json: ${registry.items.length} items (${themes.length} themes) · glass.generated.css written`)
+console.log(`registry.json: ${registry.items.length} items (${themes.length} themes, ${fontItems.length} fonts) · glass.generated.css written`)
 
 // ---- docs: every shipped file and every demo, highlighted once here (shiki dual themes) ----
 const { readFileSync, existsSync } = await import("node:fs")

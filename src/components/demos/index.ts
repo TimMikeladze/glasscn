@@ -30,6 +30,8 @@ import Switch from "./switch"
 import Tabs from "./tabs"
 import Textarea from "./textarea"
 import ThemeScope from "./theme-scope"
+import Typography from "./typography"
+import Prose from "./prose"
 import Toaster from "./toaster"
 import Tooltip from "./tooltip"
 
@@ -39,6 +41,8 @@ export const demos: Record<string, ComponentType> = {
   glass: Glass,
   card: Card,
   "theme-scope": ThemeScope,
+  typography: Typography,
+  prose: Prose,
   button: Button,
   badge: Badge,
   input: Input,

@@ -98,9 +98,23 @@
           "aurora-scale": "1",
           "aurora-speed": "1",
           "aurora-blur": "0px",
+          "glass-ring-width": "3px",
+          "glass-text-scale": "1",
+          "glass-type-ratio": "1.25",
+          "glass-leading": "1.6",
+          "glass-tracking": "0em",
+          "glass-body-weight": "400",
           "glass-heading-weight": "650",
           "glass-heading-tracking": "-0.015em",
-          "glass-ring-width": "3px"
+          "glass-heading-leading": "1.15",
+          "glass-heading-case": "none",
+          "glass-heading-wrap": "balance",
+          "glass-display-weight": "700",
+          "glass-display-tracking": "-0.03em",
+          "glass-numeric": "tabular-nums",
+          "glass-font-features": "normal",
+          "glass-measure": "68ch",
+          "glass-underline-offset": "0.22em"
         },
         "dark": {
           "aurora-1": "oklch(0.48 0.132 31.7)",
@@ -142,9 +156,23 @@
           "aurora-scale": "1",
           "aurora-speed": "1",
           "aurora-blur": "0px",
+          "glass-ring-width": "3px",
+          "glass-text-scale": "1",
+          "glass-type-ratio": "1.25",
+          "glass-leading": "1.6",
+          "glass-tracking": "0em",
+          "glass-body-weight": "400",
           "glass-heading-weight": "650",
           "glass-heading-tracking": "-0.015em",
-          "glass-ring-width": "3px"
+          "glass-heading-leading": "1.15",
+          "glass-heading-case": "none",
+          "glass-heading-wrap": "balance",
+          "glass-display-weight": "700",
+          "glass-display-tracking": "-0.03em",
+          "glass-numeric": "tabular-nums",
+          "glass-font-features": "normal",
+          "glass-measure": "68ch",
+          "glass-underline-offset": "0.22em"
         }
       },
       "css": {
@@ -177,6 +205,71 @@
           "-webkit-backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness))",
           "backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness))",
           "box-shadow": "var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)), inset 0 1px 0 color-mix(in oklch, oklch(1 0 0) var(--glass-highlight-opacity), transparent), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) color-mix(in oklch, var(--primary) var(--glass-glow), transparent)"
+        },
+        "@utility font-glass-sans": {
+          "font-family": "var(--glass-font-sans, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif))"
+        },
+        "@utility font-glass-heading": {
+          "font-family": "var(--glass-font-heading, --theme(--font-heading, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif)))"
+        },
+        "@utility font-glass-display": {
+          "font-family": "var(--glass-font-display, var(--glass-font-heading, --theme(--font-heading, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif))))"
+        },
+        "@utility font-glass-mono": {
+          "font-family": "var(--glass-font-mono, --theme(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace))"
+        },
+        "@utility type-glass": {
+          "font-family": "var(--glass-font-sans, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif))",
+          "line-height": "var(--glass-leading)",
+          "letter-spacing": "var(--glass-tracking)",
+          "font-weight": "var(--glass-body-weight)",
+          "font-feature-settings": "var(--glass-font-features)"
+        },
+        "@utility type-glass-heading": {
+          "font-family": "var(--glass-font-heading, --theme(--font-heading, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif)))",
+          "font-weight": "var(--glass-heading-weight)",
+          "letter-spacing": "var(--glass-heading-tracking)",
+          "line-height": "var(--glass-heading-leading)",
+          "text-transform": "var(--glass-heading-case)",
+          "text-wrap": "var(--glass-heading-wrap)",
+          "font-feature-settings": "var(--glass-font-features)"
+        },
+        "@utility type-glass-display": {
+          "font-family": "var(--glass-font-display, var(--glass-font-heading, --theme(--font-heading, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif))))",
+          "font-weight": "var(--glass-display-weight)",
+          "letter-spacing": "var(--glass-display-tracking)",
+          "font-variant-numeric": "var(--glass-numeric)",
+          "line-height": "1"
+        },
+        "@utility numeric-glass": {
+          "font-variant-numeric": "var(--glass-numeric)"
+        },
+        "@utility type-step-n2": {
+          "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), -2))"
+        },
+        "@utility type-step-n1": {
+          "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), -1))"
+        },
+        "@utility type-step-0": {
+          "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), 0))"
+        },
+        "@utility type-step-1": {
+          "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), 1))"
+        },
+        "@utility type-step-2": {
+          "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), 2))"
+        },
+        "@utility type-step-3": {
+          "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), 3))"
+        },
+        "@utility type-step-4": {
+          "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), 4))"
+        },
+        "@utility type-step-5": {
+          "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), 5))"
+        },
+        "@utility type-step-6": {
+          "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), 6))"
         },
         "@keyframes glass-aurora-1": {
           "0%, 100%": {
@@ -1214,13 +1307,15 @@
           "glass-radius-surface": "1.5rem",
           "glass-radius-control": "0.75rem",
           "glass-radius-button": "9999px",
-          "glass-radius-badge": "9999px"
+          "glass-radius-badge": "9999px",
+          "glass-ring-width": "3px"
         },
         "dark": {
           "glass-radius-surface": "1.5rem",
           "glass-radius-control": "0.75rem",
           "glass-radius-button": "9999px",
-          "glass-radius-badge": "9999px"
+          "glass-radius-badge": "9999px",
+          "glass-ring-width": "3px"
         }
       }
     },
@@ -1238,13 +1333,15 @@
           "glass-radius-surface": "1rem",
           "glass-radius-control": "0.625rem",
           "glass-radius-button": "0.75rem",
-          "glass-radius-badge": "0.5rem"
+          "glass-radius-badge": "0.5rem",
+          "glass-ring-width": "3px"
         },
         "dark": {
           "glass-radius-surface": "1rem",
           "glass-radius-control": "0.625rem",
           "glass-radius-button": "0.75rem",
-          "glass-radius-badge": "0.5rem"
+          "glass-radius-badge": "0.5rem",
+          "glass-ring-width": "3px"
         }
       }
     },
@@ -1262,13 +1359,15 @@
           "glass-radius-surface": "0.5rem",
           "glass-radius-control": "0.375rem",
           "glass-radius-button": "0.375rem",
-          "glass-radius-badge": "0.25rem"
+          "glass-radius-badge": "0.25rem",
+          "glass-ring-width": "3px"
         },
         "dark": {
           "glass-radius-surface": "0.5rem",
           "glass-radius-control": "0.375rem",
           "glass-radius-button": "0.375rem",
-          "glass-radius-badge": "0.25rem"
+          "glass-radius-badge": "0.25rem",
+          "glass-ring-width": "3px"
         }
       }
     },
@@ -1286,13 +1385,15 @@
           "glass-radius-surface": "0rem",
           "glass-radius-control": "0rem",
           "glass-radius-button": "0rem",
-          "glass-radius-badge": "0rem"
+          "glass-radius-badge": "0rem",
+          "glass-ring-width": "3px"
         },
         "dark": {
           "glass-radius-surface": "0rem",
           "glass-radius-control": "0rem",
           "glass-radius-button": "0rem",
-          "glass-radius-badge": "0rem"
+          "glass-radius-badge": "0rem",
+          "glass-ring-width": "3px"
         }
       }
     },
@@ -1393,6 +1494,427 @@
       }
     },
     {
+      "name": "type-default",
+      "type": "registry:theme",
+      "title": "Default type",
+      "description": "Your app's fonts on a major-third scale. Sets the type scale, leading, weights, case and numerals.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-text-scale": "1",
+          "glass-type-ratio": "1.25",
+          "glass-leading": "1.6",
+          "glass-tracking": "0em",
+          "glass-body-weight": "400",
+          "glass-heading-weight": "650",
+          "glass-heading-tracking": "-0.015em",
+          "glass-heading-leading": "1.15",
+          "glass-heading-case": "none",
+          "glass-heading-wrap": "balance",
+          "glass-display-weight": "700",
+          "glass-display-tracking": "-0.03em",
+          "glass-numeric": "tabular-nums",
+          "glass-font-features": "normal",
+          "glass-measure": "68ch",
+          "glass-underline-offset": "0.22em"
+        },
+        "dark": {
+          "glass-text-scale": "1",
+          "glass-type-ratio": "1.25",
+          "glass-leading": "1.6",
+          "glass-tracking": "0em",
+          "glass-body-weight": "400",
+          "glass-heading-weight": "650",
+          "glass-heading-tracking": "-0.015em",
+          "glass-heading-leading": "1.15",
+          "glass-heading-case": "none",
+          "glass-heading-wrap": "balance",
+          "glass-display-weight": "700",
+          "glass-display-tracking": "-0.03em",
+          "glass-numeric": "tabular-nums",
+          "glass-font-features": "normal",
+          "glass-measure": "68ch",
+          "glass-underline-offset": "0.22em"
+        }
+      }
+    },
+    {
+      "name": "type-system",
+      "type": "registry:theme",
+      "title": "System type",
+      "description": "San Francisco everywhere, SF Rounded for figures — native and instant, nothing to load. Sets the type scale, leading, weights, case and numerals.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-text-scale": "1",
+          "glass-type-ratio": "1.25",
+          "glass-leading": "1.6",
+          "glass-tracking": "0em",
+          "glass-body-weight": "400",
+          "glass-heading-weight": "700",
+          "glass-heading-tracking": "-0.02em",
+          "glass-heading-leading": "1.15",
+          "glass-heading-case": "none",
+          "glass-heading-wrap": "balance",
+          "glass-display-weight": "700",
+          "glass-display-tracking": "-0.03em",
+          "glass-numeric": "tabular-nums",
+          "glass-font-features": "normal",
+          "glass-measure": "68ch",
+          "glass-underline-offset": "0.22em",
+          "glass-font-sans": "system-ui, -apple-system, Segoe UI, Roboto, ui-sans-serif, system-ui, sans-serif",
+          "glass-font-heading": "system-ui, -apple-system, Segoe UI, Roboto, ui-sans-serif, system-ui, sans-serif",
+          "glass-font-display": "ui-rounded, SF Pro Rounded, system-ui, ui-sans-serif, system-ui, sans-serif",
+          "glass-font-mono": "ui-monospace, SFMono-Regular, Menlo, monospace"
+        },
+        "dark": {
+          "glass-text-scale": "1",
+          "glass-type-ratio": "1.25",
+          "glass-leading": "1.6",
+          "glass-tracking": "0em",
+          "glass-body-weight": "400",
+          "glass-heading-weight": "700",
+          "glass-heading-tracking": "-0.02em",
+          "glass-heading-leading": "1.15",
+          "glass-heading-case": "none",
+          "glass-heading-wrap": "balance",
+          "glass-display-weight": "700",
+          "glass-display-tracking": "-0.03em",
+          "glass-numeric": "tabular-nums",
+          "glass-font-features": "normal",
+          "glass-measure": "68ch",
+          "glass-underline-offset": "0.22em",
+          "glass-font-sans": "system-ui, -apple-system, Segoe UI, Roboto, ui-sans-serif, system-ui, sans-serif",
+          "glass-font-heading": "system-ui, -apple-system, Segoe UI, Roboto, ui-sans-serif, system-ui, sans-serif",
+          "glass-font-display": "ui-rounded, SF Pro Rounded, system-ui, ui-sans-serif, system-ui, sans-serif",
+          "glass-font-mono": "ui-monospace, SFMono-Regular, Menlo, monospace"
+        }
+      }
+    },
+    {
+      "name": "type-modern",
+      "type": "registry:theme",
+      "title": "Modern type",
+      "description": "Geist and Geist Mono, tight and precise. Sets the type scale, leading, weights, case and numerals.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-text-scale": "1",
+          "glass-type-ratio": "1.2",
+          "glass-leading": "1.6",
+          "glass-tracking": "0em",
+          "glass-body-weight": "400",
+          "glass-heading-weight": "600",
+          "glass-heading-tracking": "-0.025em",
+          "glass-heading-leading": "1.15",
+          "glass-heading-case": "none",
+          "glass-heading-wrap": "balance",
+          "glass-display-weight": "700",
+          "glass-display-tracking": "-0.04em",
+          "glass-numeric": "tabular-nums",
+          "glass-font-features": "normal",
+          "glass-measure": "68ch",
+          "glass-underline-offset": "0.22em"
+        },
+        "dark": {
+          "glass-text-scale": "1",
+          "glass-type-ratio": "1.2",
+          "glass-leading": "1.6",
+          "glass-tracking": "0em",
+          "glass-body-weight": "400",
+          "glass-heading-weight": "600",
+          "glass-heading-tracking": "-0.025em",
+          "glass-heading-leading": "1.15",
+          "glass-heading-case": "none",
+          "glass-heading-wrap": "balance",
+          "glass-display-weight": "700",
+          "glass-display-tracking": "-0.04em",
+          "glass-numeric": "tabular-nums",
+          "glass-font-features": "normal",
+          "glass-measure": "68ch",
+          "glass-underline-offset": "0.22em"
+        }
+      },
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/font-geist.json",
+        "{REGISTRY_URL}/r/font-heading-geist.json",
+        "{REGISTRY_URL}/r/font-mono-geist-mono.json"
+      ]
+    },
+    {
+      "name": "type-editorial",
+      "type": "registry:theme",
+      "title": "Editorial type",
+      "description": "Instrument Serif headlines over Inter, generous leading — for reading. Sets the type scale, leading, weights, case and numerals.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-text-scale": "1",
+          "glass-type-ratio": "1.333",
+          "glass-leading": "1.7",
+          "glass-tracking": "0em",
+          "glass-body-weight": "400",
+          "glass-heading-weight": "400",
+          "glass-heading-tracking": "-0.01em",
+          "glass-heading-leading": "1.05",
+          "glass-heading-case": "none",
+          "glass-heading-wrap": "balance",
+          "glass-display-weight": "400",
+          "glass-display-tracking": "-0.02em",
+          "glass-numeric": "oldstyle-nums",
+          "glass-font-features": "normal",
+          "glass-measure": "68ch",
+          "glass-underline-offset": "0.22em"
+        },
+        "dark": {
+          "glass-text-scale": "1",
+          "glass-type-ratio": "1.333",
+          "glass-leading": "1.7",
+          "glass-tracking": "0em",
+          "glass-body-weight": "400",
+          "glass-heading-weight": "400",
+          "glass-heading-tracking": "-0.01em",
+          "glass-heading-leading": "1.05",
+          "glass-heading-case": "none",
+          "glass-heading-wrap": "balance",
+          "glass-display-weight": "400",
+          "glass-display-tracking": "-0.02em",
+          "glass-numeric": "oldstyle-nums",
+          "glass-font-features": "normal",
+          "glass-measure": "68ch",
+          "glass-underline-offset": "0.22em"
+        }
+      },
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/font-inter.json",
+        "{REGISTRY_URL}/r/font-heading-instrument-serif.json",
+        "{REGISTRY_URL}/r/font-mono-jetbrains-mono.json"
+      ]
+    },
+    {
+      "name": "type-friendly",
+      "type": "registry:theme",
+      "title": "Friendly type",
+      "description": "Rounded Nunito throughout, heavy titles. Sets the type scale, leading, weights, case and numerals.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-text-scale": "1",
+          "glass-type-ratio": "1.25",
+          "glass-leading": "1.6",
+          "glass-tracking": "0em",
+          "glass-body-weight": "500",
+          "glass-heading-weight": "800",
+          "glass-heading-tracking": "-0.01em",
+          "glass-heading-leading": "1.15",
+          "glass-heading-case": "none",
+          "glass-heading-wrap": "balance",
+          "glass-display-weight": "900",
+          "glass-display-tracking": "-0.03em",
+          "glass-numeric": "tabular-nums",
+          "glass-font-features": "normal",
+          "glass-measure": "68ch",
+          "glass-underline-offset": "0.22em"
+        },
+        "dark": {
+          "glass-text-scale": "1",
+          "glass-type-ratio": "1.25",
+          "glass-leading": "1.6",
+          "glass-tracking": "0em",
+          "glass-body-weight": "500",
+          "glass-heading-weight": "800",
+          "glass-heading-tracking": "-0.01em",
+          "glass-heading-leading": "1.15",
+          "glass-heading-case": "none",
+          "glass-heading-wrap": "balance",
+          "glass-display-weight": "900",
+          "glass-display-tracking": "-0.03em",
+          "glass-numeric": "tabular-nums",
+          "glass-font-features": "normal",
+          "glass-measure": "68ch",
+          "glass-underline-offset": "0.22em"
+        }
+      },
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/font-nunito.json",
+        "{REGISTRY_URL}/r/font-heading-nunito.json"
+      ]
+    },
+    {
+      "name": "type-technical",
+      "type": "registry:theme",
+      "title": "Technical type",
+      "description": "IBM Plex Sans, Space Grotesk caps titles, JetBrains Mono figures. Sets the type scale, leading, weights, case and numerals.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-text-scale": "1",
+          "glass-type-ratio": "1.2",
+          "glass-leading": "1.6",
+          "glass-tracking": "0em",
+          "glass-body-weight": "400",
+          "glass-heading-weight": "600",
+          "glass-heading-tracking": "0.04em",
+          "glass-heading-leading": "1.15",
+          "glass-heading-case": "uppercase",
+          "glass-heading-wrap": "balance",
+          "glass-display-weight": "500",
+          "glass-display-tracking": "-0.02em",
+          "glass-numeric": "tabular-nums slashed-zero",
+          "glass-font-features": "normal",
+          "glass-measure": "68ch",
+          "glass-underline-offset": "0.22em"
+        },
+        "dark": {
+          "glass-text-scale": "1",
+          "glass-type-ratio": "1.2",
+          "glass-leading": "1.6",
+          "glass-tracking": "0em",
+          "glass-body-weight": "400",
+          "glass-heading-weight": "600",
+          "glass-heading-tracking": "0.04em",
+          "glass-heading-leading": "1.15",
+          "glass-heading-case": "uppercase",
+          "glass-heading-wrap": "balance",
+          "glass-display-weight": "500",
+          "glass-display-tracking": "-0.02em",
+          "glass-numeric": "tabular-nums slashed-zero",
+          "glass-font-features": "normal",
+          "glass-measure": "68ch",
+          "glass-underline-offset": "0.22em"
+        }
+      },
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/font-ibm-plex-sans.json",
+        "{REGISTRY_URL}/r/font-heading-space-grotesk.json",
+        "{REGISTRY_URL}/r/font-mono-jetbrains-mono.json"
+      ]
+    },
+    {
+      "name": "type-classic",
+      "type": "registry:theme",
+      "title": "Classic type",
+      "description": "Playfair Display over Newsreader — a book page. Sets the type scale, leading, weights, case and numerals.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-text-scale": "1.06",
+          "glass-type-ratio": "1.414",
+          "glass-leading": "1.75",
+          "glass-tracking": "0em",
+          "glass-body-weight": "400",
+          "glass-heading-weight": "700",
+          "glass-heading-tracking": "0em",
+          "glass-heading-leading": "1.15",
+          "glass-heading-case": "none",
+          "glass-heading-wrap": "balance",
+          "glass-display-weight": "700",
+          "glass-display-tracking": "-0.03em",
+          "glass-numeric": "oldstyle-nums",
+          "glass-font-features": "normal",
+          "glass-measure": "68ch",
+          "glass-underline-offset": "0.22em"
+        },
+        "dark": {
+          "glass-text-scale": "1.06",
+          "glass-type-ratio": "1.414",
+          "glass-leading": "1.75",
+          "glass-tracking": "0em",
+          "glass-body-weight": "400",
+          "glass-heading-weight": "700",
+          "glass-heading-tracking": "0em",
+          "glass-heading-leading": "1.15",
+          "glass-heading-case": "none",
+          "glass-heading-wrap": "balance",
+          "glass-display-weight": "700",
+          "glass-display-tracking": "-0.03em",
+          "glass-numeric": "oldstyle-nums",
+          "glass-font-features": "normal",
+          "glass-measure": "68ch",
+          "glass-underline-offset": "0.22em"
+        }
+      },
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/font-newsreader.json",
+        "{REGISTRY_URL}/r/font-heading-playfair-display.json",
+        "{REGISTRY_URL}/r/font-mono-ibm-plex-mono.json"
+      ]
+    },
+    {
+      "name": "type-grotesk",
+      "type": "registry:theme",
+      "title": "Grotesk type",
+      "description": "Bricolage Grotesque headlines, DM Sans body — loud and confident. Sets the type scale, leading, weights, case and numerals.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-text-scale": "1",
+          "glass-type-ratio": "1.333",
+          "glass-leading": "1.6",
+          "glass-tracking": "0em",
+          "glass-body-weight": "400",
+          "glass-heading-weight": "750",
+          "glass-heading-tracking": "-0.035em",
+          "glass-heading-leading": "1.15",
+          "glass-heading-case": "none",
+          "glass-heading-wrap": "balance",
+          "glass-display-weight": "800",
+          "glass-display-tracking": "-0.05em",
+          "glass-numeric": "tabular-nums",
+          "glass-font-features": "normal",
+          "glass-measure": "68ch",
+          "glass-underline-offset": "0.22em"
+        },
+        "dark": {
+          "glass-text-scale": "1",
+          "glass-type-ratio": "1.333",
+          "glass-leading": "1.6",
+          "glass-tracking": "0em",
+          "glass-body-weight": "400",
+          "glass-heading-weight": "750",
+          "glass-heading-tracking": "-0.035em",
+          "glass-heading-leading": "1.15",
+          "glass-heading-case": "none",
+          "glass-heading-wrap": "balance",
+          "glass-display-weight": "800",
+          "glass-display-tracking": "-0.05em",
+          "glass-numeric": "tabular-nums",
+          "glass-font-features": "normal",
+          "glass-measure": "68ch",
+          "glass-underline-offset": "0.22em"
+        }
+      },
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/font-dm-sans.json",
+        "{REGISTRY_URL}/r/font-heading-bricolage-grotesque.json",
+        "{REGISTRY_URL}/r/font-mono-dm-mono.json"
+      ]
+    },
+    {
       "name": "density-compact",
       "type": "registry:theme",
       "title": "Compact density",
@@ -1444,6 +1966,962 @@
         "dark": {
           "glass-density": "1.15"
         }
+      }
+    },
+    {
+      "name": "font-geist",
+      "type": "registry:font",
+      "title": "Geist",
+      "description": "Geist as your app's body font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Geist Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Geist",
+        "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/geist"
+      }
+    },
+    {
+      "name": "font-heading-geist",
+      "type": "registry:font",
+      "title": "Geist (headings)",
+      "description": "Geist as your app's heading font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Geist Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Geist",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/geist"
+      }
+    },
+    {
+      "name": "font-inter",
+      "type": "registry:font",
+      "title": "Inter",
+      "description": "Inter as your app's body font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Inter Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Inter",
+        "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/inter"
+      }
+    },
+    {
+      "name": "font-heading-inter",
+      "type": "registry:font",
+      "title": "Inter (headings)",
+      "description": "Inter as your app's heading font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Inter Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Inter",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/inter"
+      }
+    },
+    {
+      "name": "font-figtree",
+      "type": "registry:font",
+      "title": "Figtree",
+      "description": "Figtree as your app's body font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Figtree Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Figtree",
+        "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/figtree"
+      }
+    },
+    {
+      "name": "font-heading-figtree",
+      "type": "registry:font",
+      "title": "Figtree (headings)",
+      "description": "Figtree as your app's heading font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Figtree Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Figtree",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/figtree"
+      }
+    },
+    {
+      "name": "font-manrope",
+      "type": "registry:font",
+      "title": "Manrope",
+      "description": "Manrope as your app's body font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Manrope Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Manrope",
+        "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/manrope"
+      }
+    },
+    {
+      "name": "font-heading-manrope",
+      "type": "registry:font",
+      "title": "Manrope (headings)",
+      "description": "Manrope as your app's heading font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Manrope Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Manrope",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/manrope"
+      }
+    },
+    {
+      "name": "font-dm-sans",
+      "type": "registry:font",
+      "title": "DM Sans",
+      "description": "DM Sans as your app's body font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"DM Sans Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "DM_Sans",
+        "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/dm-sans"
+      }
+    },
+    {
+      "name": "font-heading-dm-sans",
+      "type": "registry:font",
+      "title": "DM Sans (headings)",
+      "description": "DM Sans as your app's heading font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"DM Sans Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "DM_Sans",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/dm-sans"
+      }
+    },
+    {
+      "name": "font-plus-jakarta-sans",
+      "type": "registry:font",
+      "title": "Plus Jakarta Sans",
+      "description": "Plus Jakarta Sans as your app's body font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Plus Jakarta Sans Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Plus_Jakarta_Sans",
+        "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/plus-jakarta-sans"
+      }
+    },
+    {
+      "name": "font-heading-plus-jakarta-sans",
+      "type": "registry:font",
+      "title": "Plus Jakarta Sans (headings)",
+      "description": "Plus Jakarta Sans as your app's heading font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Plus Jakarta Sans Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Plus_Jakarta_Sans",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/plus-jakarta-sans"
+      }
+    },
+    {
+      "name": "font-outfit",
+      "type": "registry:font",
+      "title": "Outfit",
+      "description": "Outfit as your app's body font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Outfit Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Outfit",
+        "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/outfit"
+      }
+    },
+    {
+      "name": "font-heading-outfit",
+      "type": "registry:font",
+      "title": "Outfit (headings)",
+      "description": "Outfit as your app's heading font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Outfit Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Outfit",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/outfit"
+      }
+    },
+    {
+      "name": "font-sora",
+      "type": "registry:font",
+      "title": "Sora",
+      "description": "Sora as your app's body font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Sora Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Sora",
+        "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/sora"
+      }
+    },
+    {
+      "name": "font-heading-sora",
+      "type": "registry:font",
+      "title": "Sora (headings)",
+      "description": "Sora as your app's heading font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Sora Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Sora",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/sora"
+      }
+    },
+    {
+      "name": "font-onest",
+      "type": "registry:font",
+      "title": "Onest",
+      "description": "Onest as your app's body font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Onest Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Onest",
+        "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/onest"
+      }
+    },
+    {
+      "name": "font-heading-onest",
+      "type": "registry:font",
+      "title": "Onest (headings)",
+      "description": "Onest as your app's heading font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Onest Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Onest",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/onest"
+      }
+    },
+    {
+      "name": "font-ibm-plex-sans",
+      "type": "registry:font",
+      "title": "IBM Plex Sans",
+      "description": "IBM Plex Sans as your app's body font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"IBM Plex Sans Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "IBM_Plex_Sans",
+        "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/ibm-plex-sans"
+      }
+    },
+    {
+      "name": "font-heading-ibm-plex-sans",
+      "type": "registry:font",
+      "title": "IBM Plex Sans (headings)",
+      "description": "IBM Plex Sans as your app's heading font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"IBM Plex Sans Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "IBM_Plex_Sans",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/ibm-plex-sans"
+      }
+    },
+    {
+      "name": "font-nunito",
+      "type": "registry:font",
+      "title": "Nunito",
+      "description": "Nunito as your app's body font (rounded).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Nunito Variable\", ui-rounded, ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Nunito",
+        "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/nunito"
+      }
+    },
+    {
+      "name": "font-heading-nunito",
+      "type": "registry:font",
+      "title": "Nunito (headings)",
+      "description": "Nunito as your app's heading font (rounded).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Nunito Variable\", ui-rounded, ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Nunito",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/nunito"
+      }
+    },
+    {
+      "name": "font-heading-space-grotesk",
+      "type": "registry:font",
+      "title": "Space Grotesk (headings)",
+      "description": "Space Grotesk as your app's heading font (display).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Space Grotesk Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Space_Grotesk",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/space-grotesk"
+      }
+    },
+    {
+      "name": "font-space-grotesk",
+      "type": "registry:font",
+      "title": "Space Grotesk",
+      "description": "Space Grotesk as your app's body font (display).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Space Grotesk Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Space_Grotesk",
+        "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/space-grotesk"
+      }
+    },
+    {
+      "name": "font-heading-bricolage-grotesque",
+      "type": "registry:font",
+      "title": "Bricolage Grotesque (headings)",
+      "description": "Bricolage Grotesque as your app's heading font (display).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Bricolage Grotesque Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Bricolage_Grotesque",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/bricolage-grotesque"
+      }
+    },
+    {
+      "name": "font-bricolage-grotesque",
+      "type": "registry:font",
+      "title": "Bricolage Grotesque",
+      "description": "Bricolage Grotesque as your app's body font (display).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Bricolage Grotesque Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Bricolage_Grotesque",
+        "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/bricolage-grotesque"
+      }
+    },
+    {
+      "name": "font-heading-fraunces",
+      "type": "registry:font",
+      "title": "Fraunces (headings)",
+      "description": "Fraunces as your app's heading font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Fraunces Variable\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "Fraunces",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/fraunces"
+      }
+    },
+    {
+      "name": "font-fraunces",
+      "type": "registry:font",
+      "title": "Fraunces",
+      "description": "Fraunces as your app's body font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Fraunces Variable\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "Fraunces",
+        "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/fraunces"
+      }
+    },
+    {
+      "name": "font-heading-instrument-serif",
+      "type": "registry:font",
+      "title": "Instrument Serif (headings)",
+      "description": "Instrument Serif as your app's heading font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Instrument Serif\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "Instrument_Serif",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "weight": [
+          "400"
+        ],
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource/instrument-serif"
+      }
+    },
+    {
+      "name": "font-instrument-serif",
+      "type": "registry:font",
+      "title": "Instrument Serif",
+      "description": "Instrument Serif as your app's body font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Instrument Serif\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "Instrument_Serif",
+        "variable": "--font-sans",
+        "weight": [
+          "400"
+        ],
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource/instrument-serif"
+      }
+    },
+    {
+      "name": "font-heading-newsreader",
+      "type": "registry:font",
+      "title": "Newsreader (headings)",
+      "description": "Newsreader as your app's heading font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Newsreader Variable\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "Newsreader",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/newsreader"
+      }
+    },
+    {
+      "name": "font-newsreader",
+      "type": "registry:font",
+      "title": "Newsreader",
+      "description": "Newsreader as your app's body font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Newsreader Variable\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "Newsreader",
+        "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/newsreader"
+      }
+    },
+    {
+      "name": "font-heading-playfair-display",
+      "type": "registry:font",
+      "title": "Playfair Display (headings)",
+      "description": "Playfair Display as your app's heading font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Playfair Display Variable\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "Playfair_Display",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/playfair-display"
+      }
+    },
+    {
+      "name": "font-playfair-display",
+      "type": "registry:font",
+      "title": "Playfair Display",
+      "description": "Playfair Display as your app's body font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Playfair Display Variable\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "Playfair_Display",
+        "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/playfair-display"
+      }
+    },
+    {
+      "name": "font-heading-lora",
+      "type": "registry:font",
+      "title": "Lora (headings)",
+      "description": "Lora as your app's heading font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Lora Variable\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "Lora",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/lora"
+      }
+    },
+    {
+      "name": "font-lora",
+      "type": "registry:font",
+      "title": "Lora",
+      "description": "Lora as your app's body font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Lora Variable\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "Lora",
+        "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/lora"
+      }
+    },
+    {
+      "name": "font-heading-source-serif-4",
+      "type": "registry:font",
+      "title": "Source Serif 4 (headings)",
+      "description": "Source Serif 4 as your app's heading font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Source Serif 4 Variable\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "Source_Serif_4",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/source-serif-4"
+      }
+    },
+    {
+      "name": "font-source-serif-4",
+      "type": "registry:font",
+      "title": "Source Serif 4",
+      "description": "Source Serif 4 as your app's body font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Source Serif 4 Variable\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "Source_Serif_4",
+        "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/source-serif-4"
+      }
+    },
+    {
+      "name": "font-heading-ibm-plex-serif",
+      "type": "registry:font",
+      "title": "IBM Plex Serif (headings)",
+      "description": "IBM Plex Serif as your app's heading font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"IBM Plex Serif\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "IBM_Plex_Serif",
+        "variable": "--font-heading",
+        "selector": "h1, h2, h3, h4, h5, h6",
+        "weight": [
+          "400",
+          "500",
+          "600",
+          "700"
+        ],
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource/ibm-plex-serif"
+      }
+    },
+    {
+      "name": "font-ibm-plex-serif",
+      "type": "registry:font",
+      "title": "IBM Plex Serif",
+      "description": "IBM Plex Serif as your app's body font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"IBM Plex Serif\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "IBM_Plex_Serif",
+        "variable": "--font-sans",
+        "weight": [
+          "400",
+          "500",
+          "600",
+          "700"
+        ],
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource/ibm-plex-serif"
+      }
+    },
+    {
+      "name": "font-mono-geist-mono",
+      "type": "registry:font",
+      "title": "Geist Mono (mono)",
+      "description": "Geist Mono as your app's monospace font (mono).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Geist Mono Variable\", ui-monospace, SFMono-Regular, Menlo, monospace",
+        "provider": "google",
+        "import": "Geist_Mono",
+        "variable": "--font-mono",
+        "selector": "code, kbd, samp, pre",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/geist-mono"
+      }
+    },
+    {
+      "name": "font-mono-jetbrains-mono",
+      "type": "registry:font",
+      "title": "JetBrains Mono (mono)",
+      "description": "JetBrains Mono as your app's monospace font (mono).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"JetBrains Mono Variable\", ui-monospace, SFMono-Regular, Menlo, monospace",
+        "provider": "google",
+        "import": "JetBrains_Mono",
+        "variable": "--font-mono",
+        "selector": "code, kbd, samp, pre",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/jetbrains-mono"
+      }
+    },
+    {
+      "name": "font-mono-ibm-plex-mono",
+      "type": "registry:font",
+      "title": "IBM Plex Mono (mono)",
+      "description": "IBM Plex Mono as your app's monospace font (mono).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"IBM Plex Mono\", ui-monospace, SFMono-Regular, Menlo, monospace",
+        "provider": "google",
+        "import": "IBM_Plex_Mono",
+        "variable": "--font-mono",
+        "selector": "code, kbd, samp, pre",
+        "weight": [
+          "400",
+          "500",
+          "600"
+        ],
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource/ibm-plex-mono"
+      }
+    },
+    {
+      "name": "font-mono-dm-mono",
+      "type": "registry:font",
+      "title": "DM Mono (mono)",
+      "description": "DM Mono as your app's monospace font (mono).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, monospace",
+        "provider": "google",
+        "import": "DM_Mono",
+        "variable": "--font-mono",
+        "selector": "code, kbd, samp, pre",
+        "weight": [
+          "400",
+          "500"
+        ],
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource/dm-mono"
+      }
+    },
+    {
+      "name": "font-mono-space-mono",
+      "type": "registry:font",
+      "title": "Space Mono (mono)",
+      "description": "Space Mono as your app's monospace font (mono).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Space Mono\", ui-monospace, SFMono-Regular, Menlo, monospace",
+        "provider": "google",
+        "import": "Space_Mono",
+        "variable": "--font-mono",
+        "selector": "code, kbd, samp, pre",
+        "weight": [
+          "400",
+          "700"
+        ],
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource/space-mono"
       }
     },
     {
@@ -1539,6 +3017,188 @@
           "target": "@components/glass/theme-scope.tsx"
         }
       ]
+    },
+    {
+      "name": "typography",
+      "type": "registry:ui",
+      "title": "Typography",
+      "description": "Heading, Text, Display, Blockquote, InlineCode, List and TextLink on the theme's modular scale — fonts, weights, case and numerals from the type tokens.",
+      "categories": [
+        "glass",
+        "typography"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/typography.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/typography.tsx"
+        }
+      ]
+    },
+    {
+      "name": "prose",
+      "type": "registry:ui",
+      "title": "Prose",
+      "description": "Rich text (Markdown, MDX, CMS) set in the theme's type: headings, links, lists, quotes, code, tables.",
+      "categories": [
+        "glass",
+        "typography"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/prose.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/prose.tsx"
+        }
+      ],
+      "css": {
+        "@utility glass-prose": {
+          "font-family": "var(--glass-font-sans, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif))",
+          "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), 0))",
+          "line-height": "var(--glass-leading)",
+          "letter-spacing": "var(--glass-tracking)",
+          "font-weight": "var(--glass-body-weight)",
+          "font-feature-settings": "var(--glass-font-features)",
+          "max-width": "var(--glass-measure)",
+          "width": "100%",
+          "min-width": "0",
+          "overflow-wrap": "break-word",
+          "color": "var(--foreground)",
+          "& :where(h1, h2, h3, h4, h5, h6)": {
+            "font-family": "var(--glass-font-heading, --theme(--font-heading, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif)))",
+            "font-weight": "var(--glass-heading-weight)",
+            "letter-spacing": "var(--glass-heading-tracking)",
+            "line-height": "var(--glass-heading-leading)",
+            "text-transform": "var(--glass-heading-case)",
+            "text-wrap": "var(--glass-heading-wrap)",
+            "margin-top": "1.7em",
+            "margin-bottom": "0.55em"
+          },
+          "& :where(h1)": {
+            "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), 4))"
+          },
+          "& :where(h2)": {
+            "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), 3))"
+          },
+          "& :where(h3)": {
+            "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), 2))"
+          },
+          "& :where(h4)": {
+            "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), 1))"
+          },
+          "& :where(h5, h6)": {
+            "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), 0))"
+          },
+          "& :where(p, ul, ol, blockquote, pre, table, figure)": {
+            "margin-block": "0.9em"
+          },
+          "& :where(a)": {
+            "color": "var(--primary)",
+            "text-decoration-line": "underline",
+            "text-underline-offset": "var(--glass-underline-offset)",
+            "text-decoration-color": "color-mix(in oklch, var(--primary) 40%, transparent)"
+          },
+          "& :where(a:hover)": {
+            "text-decoration-color": "var(--primary)"
+          },
+          "& :where(strong)": {
+            "font-weight": "650"
+          },
+          "& :where(ul)": {
+            "list-style-type": "disc",
+            "padding-left": "1.4em"
+          },
+          "& :where(ol)": {
+            "list-style-type": "decimal",
+            "padding-left": "1.4em",
+            "font-variant-numeric": "var(--glass-numeric)"
+          },
+          "& :where(li)": {
+            "margin-block": "0.3em"
+          },
+          "& :where(li)::marker": {
+            "color": "var(--primary)"
+          },
+          "& :where(blockquote)": {
+            "border-left": "3px solid var(--primary)",
+            "padding-left": "1em",
+            "font-family": "var(--glass-font-heading, --theme(--font-heading, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif)))",
+            "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), 1))",
+            "line-height": "var(--glass-heading-leading)",
+            "color": "var(--muted-foreground)"
+          },
+          "& :where(code)": {
+            "font-family": "var(--glass-font-mono, --theme(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace))",
+            "font-size": "0.88em",
+            "background-color": "color-mix(in oklch, var(--glass-fill-tint) var(--glass-fill-opacity), transparent)",
+            "border-radius": "calc(var(--glass-radius-control) * 0.5)",
+            "padding": "0.15em 0.4em"
+          },
+          "& :where(pre)": {
+            "font-family": "var(--glass-font-mono, --theme(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace))",
+            "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), -1))",
+            "line-height": "1.6",
+            "background-color": "color-mix(in oklch, var(--glass-tint) var(--glass-opacity-subtle), transparent)",
+            "border": "var(--glass-border-width) solid color-mix(in oklch, var(--glass-border-color) var(--glass-border-opacity), transparent)",
+            "border-radius": "var(--glass-radius-control)",
+            "padding": "1em 1.2em",
+            "overflow-x": "auto"
+          },
+          "& :where(pre code)": {
+            "background-color": "transparent",
+            "padding": "0",
+            "font-size": "inherit"
+          },
+          "& :where(hr)": {
+            "border": "0",
+            "border-top": "1px solid color-mix(in oklch, var(--foreground) 10%, transparent)",
+            "margin-block": "2em"
+          },
+          "& :where(table)": {
+            "width": "100%",
+            "border-collapse": "collapse",
+            "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), -1))",
+            "font-variant-numeric": "var(--glass-numeric)"
+          },
+          "& :where(th, td)": {
+            "padding": "0.55em 0.75em",
+            "border-bottom": "1px solid color-mix(in oklch, var(--foreground) 10%, transparent)",
+            "text-align": "left"
+          },
+          "& :where(th)": {
+            "font-weight": "600"
+          },
+          "& :where(img, video)": {
+            "border-radius": "var(--glass-radius-control)"
+          },
+          "& :where(figcaption)": {
+            "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), -1))",
+            "color": "var(--muted-foreground)",
+            "margin-top": "0.5em"
+          },
+          "& > :first-child": {
+            "margin-top": "0"
+          },
+          "& > :last-child": {
+            "margin-bottom": "0"
+          }
+        }
+      }
     },
     {
       "name": "button",

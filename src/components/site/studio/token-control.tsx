@@ -10,7 +10,16 @@ import { Input } from "@/components/glass/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/glass/popover"
 import { SegmentedControl, SegmentedControlItem } from "@/components/glass/segmented-control"
 import { Slider } from "@/components/glass/slider"
-import { parseOklch, sanitizeValue, type TokenDef } from "@/lib/glass-theme"
+import { FONTS, parseOklch, sanitizeValue, type TokenDef } from "@/lib/glass-theme"
+
+/** Every catalogue Google font, subset to the letters of its own name — a few KB, so the menu can show each font in itself. */
+const FONT_SPECIMEN_URL = (() => {
+  // the site loads Geist and Geist Mono in full; a subset face under the same name would mix glyphs
+  const google = Object.values(FONTS).filter((f) => f.google && !["Geist", "Geist Mono"].includes(f.google.family))
+  const families = google.map((f) => `family=${f.google!.family.replace(/ /g, "+")}`).join("&")
+  const letters = [...new Set(google.map((f) => f.label).join(""))].join("")
+  return `https://fonts.googleapis.com/css2?${families}&text=${encodeURIComponent(letters)}&display=swap`
+})()
 
 const decimals = (step: number) => (String(step).split(".")[1] ?? "").length
 const fmt = (n: number, step: number) => String(Number(n.toFixed(decimals(step))))
@@ -138,10 +147,11 @@ function SelectControl({ def, value, onChange }: { def: TokenDef; value: string;
           <ChevronDownIcon />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width)">
+      <DropdownMenuContent className="max-h-80 w-(--radix-dropdown-menu-trigger-width)">
+        {def.group === "Fonts" ? <link rel="stylesheet" href={FONT_SPECIMEN_URL} precedence="glass-fonts" /> : null}
         <DropdownMenuRadioGroup value={value} onValueChange={onChange}>
           {options.map((o) => (
-            <DropdownMenuRadioItem key={o.label} value={o.value} className="capitalize">
+            <DropdownMenuRadioItem key={o.label} value={o.value} className={def.group === "Fonts" ? "text-[0.95rem]" : "capitalize"} style={def.group === "Fonts" && o.value ? { fontFamily: o.value } : undefined}>
               {o.label}
             </DropdownMenuRadioItem>
           ))}

@@ -50,7 +50,7 @@ function ProgressRing({
           }}
         />
       </svg>
-      <div data-slot="progress-ring-content" className="relative flex items-center justify-center text-center font-semibold tabular-nums" style={{ color }}>
+      <div data-slot="progress-ring-content" className="relative flex items-center justify-center text-center type-glass-display" style={{ color }}>
         {children}
       </div>
     </div>

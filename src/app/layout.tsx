@@ -22,7 +22,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: paletteScript }} />
       </head>
-      <body className="min-h-dvh">
+      <body className="type-glass min-h-dvh">
         <Providers>
           <Aurora />
           <SiteHeader />

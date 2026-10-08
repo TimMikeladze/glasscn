@@ -5,7 +5,7 @@ glasscn is three things in one repo: a **shadcn registry** (source code users in
 ## The pipeline
 
 ```
-src/lib/glass-theme.ts ──┐  TOKENS schema, PALETTES/MATERIALS/SHAPES/MOTIONS/DENSITIES, createGlassTheme
+src/lib/glass-theme.ts ──┐  TOKENS schema, PALETTES/MATERIALS/SHAPES/MOTIONS/DENSITIES/TYPE_PRESETS, FONTS, createGlassTheme
 registry/stylesheet.mjs ─┤  @theme tokens + utilities, all DERIVED from primitives
 registry/items.mjs ──────┤  every item: files, npm deps, registry deps
                          ▼
@@ -33,7 +33,8 @@ That is why `<Card className="[--glass-blur:6px]">`, `ThemeScope`, the studio's 
 | Kind | Type | Examples |
 |---|---|---|
 | Foundation | `registry:lib` / `registry:hook` | `glass-style` (all primitives except accent/charts + stylesheet), `glass-theme`, `glass-charts`, `use-sliding-indicator` |
-| Presets | `registry:theme` | `theme-*` (Colour group), `material-*` (Material+Rim+Depth), `shape-*`, `motion-*`, `density-*` |
+| Presets | `registry:theme` | `theme-*` (Colour group), `material-*` (Material+Rim+Depth), `shape-*`, `motion-*`, `density-*`, `type-*` (Type + font deps) |
+| Fonts | `registry:font` | `font-*`, `font-heading-*`, `font-mono-*` — generated from `FONTS`, installed by the CLI via next/font or fontsource |
 | Components | `registry:ui` | `components/glass/*` |
 | Blocks | `registry:block` | `components/glass-blocks/*` |
 | Native | `registry:ui` | `components/glass/native/*` (Expo) |
@@ -42,11 +43,11 @@ Each preset carries its **whole** group, so adding one replaces the previous cho
 
 ## The engine at runtime
 
-`createGlassTheme()` layers defaults → palette (named or `{ hue, harmony, chroma }`) → material → shape → motion → density → your overrides. Out of it: `themeToCss`, `themeVars`, `themeToRegistryItem`, `encodeTheme`/`decodeTheme`, `legibility`. Every value passes `sanitizeValue` before it becomes CSS. `ThemeScope` writes one scoped `<style>` per subtree.
+`createGlassTheme()` layers defaults → palette (named or `{ hue, harmony, chroma }`) → material → shape → motion → density → type → fonts → your overrides. Out of it: `themeToCss`, `themeVars`, `themeToRegistryItem`, `encodeTheme`/`decodeTheme`, `legibility`. Every value passes `sanitizeValue` before it becomes CSS. `ThemeScope` writes one scoped `<style>` per subtree.
 
 ## The site
 
-- `/` landing, `/docs/*` per item (live demo from `src/components/demos`, install, props from `src/lib/docs.ts`, source from `sources.generated.ts`), `/docs/theming`, `/docs/native`, `/themes` (Theme Studio).
+- `/` landing, `/docs/*` per item (live demo from `src/components/demos`, install, props from `src/lib/docs.ts`, source from `sources.generated.ts`), `/docs/theming`, `/docs/fonts`, `/docs/native`, `/themes` (Theme Studio).
 - The site's palette switcher sets `data-palette` on `<html>`; "apply to site" in the studio writes sanitised CSS under `:root[data-glass-custom]`; both are applied before paint.
 
 ## Verification

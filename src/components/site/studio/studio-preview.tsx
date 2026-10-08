@@ -21,6 +21,8 @@ import { Stat, StatIcon, StatLabel, StatTrend, StatValue } from "@/components/gl
 import { Switch } from "@/components/glass/switch"
 import { Tabs, TabsList, TabsTrigger } from "@/components/glass/tabs"
 import { ThemeScope } from "@/components/glass/theme-scope"
+import { Blockquote, Display, Heading, InlineCode, Text, TextLink } from "@/components/glass/typography"
+import { typeScale } from "@/lib/glass-theme"
 import type { GlassTheme } from "@/lib/glass-theme"
 
 const sleep = [7.5, 6.8, 7.9, 8.2, 6.5, 7.1, 7.8, 8.4, 7.2, 6.9, 7.6, 8.1, 7.4, 7.9]
@@ -30,10 +32,26 @@ const heat = Object.fromEntries(Array.from({ length: 16 * 7 }, (_, i) => [new Da
 /** Everything wearing the studio's theme — scoped, with its own aurora and scheme, independent of the page. */
 export function StudioPreview({ theme, scheme }: { theme: GlassTheme; scheme: "light" | "dark" }) {
   const [tab, setTab] = React.useState("today")
+  const scale = Object.entries(typeScale(theme, scheme))
+    .filter(([n]) => Number(n) >= 0)
+    .map(([, px]) => Math.round(px))
   return (
-    <ThemeScope theme={theme} scheme={scheme} className="relative isolate overflow-hidden rounded-[calc(var(--glass-radius-surface)*1.25)] text-foreground">
+    <ThemeScope theme={theme} scheme={scheme} loadFonts className="relative isolate overflow-hidden rounded-[calc(var(--glass-radius-surface)*1.25)] text-foreground">
       <Aurora className="absolute" />
       <div className="relative grid gap-4 p-4 sm:p-6 xl:grid-cols-[1.15fr_1fr]">
+          <Card className="xl:col-span-2">
+            <CardContent className="grid gap-4">
+              <Text variant="overline">Type specimen · scale {scale.join(" · ")}px</Text>
+              <Heading level={1}>Small gains, every night.</Heading>
+              <Text variant="lead">
+                Name what mattered today and decide how it changes tomorrow. Read the <TextLink href="#">method</TextLink>, or store the answer as <InlineCode>carryId</InlineCode>.
+              </Text>
+              <div className="flex flex-wrap items-end gap-x-8 gap-y-3">
+                <Display>1,826</Display>
+                <Blockquote className="max-w-sm">“Breathe twice before engaging.”</Blockquote>
+              </div>
+            </CardContent>
+          </Card>
         <div className="grid content-start gap-4">
           <Card>
             <CardHeader>
@@ -171,7 +189,7 @@ export function StudioPreview({ theme, scheme }: { theme: GlassTheme; scheme: "l
             </GroupedListContent>
           </GroupedList>
           <div className="glass-strong grid gap-3 rounded-surface p-5" role="dialog" aria-label="Example dialog">
-            <div className="font-heading text-lg font-title tracking-title">Erase every night?</div>
+            <div className="type-glass-heading text-lg">Erase every night?</div>
             <p className="text-sm text-muted-foreground">311 nights will be removed from this device.</p>
             <div className="flex justify-end gap-2">
               <Button variant="glass" size="sm">

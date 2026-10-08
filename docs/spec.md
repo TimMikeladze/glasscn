@@ -19,7 +19,7 @@ shadcn's standard is Tailwind v4 + CSS variables + Radix + `cn`, copied into the
 
 ## Theming
 
-See [`theming.md`](theming.md): 50 primitives in nine groups, composable presets (12 palettes, 7 materials, 4 shapes, 4 motions, 3 densities), the theme engine (`glass-theme`), `ThemeScope`, and the Theme Studio at `/themes`. Agents: [`architecture.md`](architecture.md), [`rules/`](rules/README.md), `skills/`.
+See [`theming.md`](theming.md): 68 primitives in eleven groups, composable presets (12 palettes, 7 materials, 4 shapes, 4 motions, 3 densities, 8 type presets), 45 `registry:font` items ([`typography.md`](typography.md)), the theme engine (`glass-theme`), `ThemeScope`, and the Theme Studio at `/themes`. Agents: [`architecture.md`](architecture.md), [`rules/`](rules/README.md), `skills/`.
 
 ## Foundations (v1 notes)
 
@@ -31,7 +31,8 @@ See [`theming.md`](theming.md): 50 primitives in nine groups, composable presets
 
 | Group | Items |
 |---|---|
-| Surfaces | `aurora`, `glass` (`Glass`), `card` |
+| Surfaces | `aurora`, `glass` (`Glass`), `card`, `theme-scope` |
+| Typography | `typography` (`Heading`, `Text`, `Display`, `Blockquote`, `InlineCode`, `List`, `TextLink`), `prose` |
 | Controls | `button`, `badge`, `input`, `textarea`, `label`, `switch`, `segmented-control`, `tabs`, `slider`, `progress`, `kbd`, `separator` |
 | Overlays | `dialog`, `sheet`, `popover`, `tooltip`, `dropdown-menu`, `toaster` (sonner) |
 | Navigation | `dock` (floating capsule bar, sliding pill, action button), `grouped-list` (Settings-style rows, icon tiles) |
@@ -42,7 +43,7 @@ Pure maths (`ring` arcs, smooth paths, heatmap grid) lives in `lib/glass-charts.
 
 ## Site
 
-Next 16 docs site in the same repo: landing (aurora hero, live dashboard, palette switcher, install), `/docs` index, `/docs/[slug]` (live demo, install command, usage, props, source), `/docs/theming` (token model, presets, ThemeScope, every primitive), `/themes` (Theme Studio), `/docs/installation`, `/docs/native`.
+Next 16 docs site in the same repo: landing (aurora hero, live dashboard, palette switcher, install), `/docs` index, `/docs/[slug]` (live demo, install command, usage, props, source), `/docs/theming` (token model, presets, ThemeScope, every primitive), `/docs/fonts` (font catalogue, type presets, scale), `/themes` (Theme Studio), `/docs/installation`, `/docs/native`.
 
 ## Verification
 

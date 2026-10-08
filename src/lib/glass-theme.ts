@@ -13,7 +13,7 @@ export interface GlassTheme {
   dark: Tokens
 }
 
-export type TokenGroup = "Colour" | "Material" | "Rim" | "Depth" | "Shape" | "Density" | "Motion" | "Aurora" | "Type"
+export type TokenGroup = "Colour" | "Material" | "Rim" | "Depth" | "Shape" | "Density" | "Motion" | "Aurora" | "Fonts" | "Type"
 
 export type TokenControl =
   | { type: "colour" }
@@ -28,6 +28,8 @@ export interface TokenDef {
   light: string
   dark: string
   control: TokenControl
+  /** Optional tokens default to "" (unset): the app's own value applies until one is chosen. */
+  optional?: boolean
 }
 
 const range = (min: number, max: number, step: number, unit: string): TokenControl => ({ type: "range", min, max, step, unit })
@@ -59,6 +61,96 @@ export const EASINGS: Record<string, string> = {
   smooth: "cubic-bezier(0.4, 0, 0.2, 1)",
   snappy: "cubic-bezier(0.3, 1.4, 0.5, 1)",
   linear: "linear",
+}
+
+// ---------------------------------------------------------------------------
+// fonts: a curated catalogue — system stacks and Google fonts
+// ---------------------------------------------------------------------------
+
+export type FontRole = "sans" | "heading" | "display" | "mono"
+export type FontCategory = "sans" | "serif" | "mono" | "rounded" | "display"
+
+export interface FontDef {
+  label: string
+  category: FontCategory
+  /** The CSS stack — unquoted where names allow, so it passes sanitizeValue as-is. */
+  stack: string
+  /** Google Fonts metadata; absent for system stacks. */
+  google?: {
+    /** The family as Google Fonts names it. */
+    family: string
+    /** next/font/google export name. */
+    import: string
+    /** Weights to request; "variable" fonts load the full axis. */
+    weights: string[] | "variable"
+    /** fontsource package for non-Next projects. */
+    dependency: string
+  }
+}
+
+const gf = (family: string, weights: string[] | "variable", dependency?: string) => ({
+  family,
+  import: family.replace(/ /g, "_"),
+  weights,
+  dependency: dependency ?? (weights === "variable" ? `@fontsource-variable/${family.toLowerCase().replace(/ /g, "-")}` : `@fontsource/${family.toLowerCase().replace(/ /g, "-")}`),
+})
+const SANS_FALLBACK = "ui-sans-serif, system-ui, sans-serif"
+const SERIF_FALLBACK = "ui-serif, Georgia, serif"
+const MONO_FALLBACK = "ui-monospace, SFMono-Regular, Menlo, monospace"
+
+export const FONTS: Record<string, FontDef> = {
+  // system — no loading
+  system: { label: "System UI", category: "sans", stack: `system-ui, -apple-system, Segoe UI, Roboto, ${SANS_FALLBACK}` },
+  "system-rounded": { label: "System Rounded", category: "rounded", stack: `ui-rounded, SF Pro Rounded, system-ui, ${SANS_FALLBACK}` },
+  "system-serif": { label: "System Serif", category: "serif", stack: `ui-serif, New York, Iowan Old Style, ${SERIF_FALLBACK}` },
+  "system-mono": { label: "System Mono", category: "mono", stack: MONO_FALLBACK },
+  // sans
+  geist: { label: "Geist", category: "sans", stack: `Geist, ${SANS_FALLBACK}`, google: gf("Geist", "variable") },
+  inter: { label: "Inter", category: "sans", stack: `Inter, ${SANS_FALLBACK}`, google: gf("Inter", "variable") },
+  figtree: { label: "Figtree", category: "sans", stack: `Figtree, ${SANS_FALLBACK}`, google: gf("Figtree", "variable") },
+  manrope: { label: "Manrope", category: "sans", stack: `Manrope, ${SANS_FALLBACK}`, google: gf("Manrope", "variable") },
+  "dm-sans": { label: "DM Sans", category: "sans", stack: `DM Sans, ${SANS_FALLBACK}`, google: gf("DM Sans", "variable") },
+  "plus-jakarta-sans": { label: "Plus Jakarta Sans", category: "sans", stack: `Plus Jakarta Sans, ${SANS_FALLBACK}`, google: gf("Plus Jakarta Sans", "variable") },
+  outfit: { label: "Outfit", category: "sans", stack: `Outfit, ${SANS_FALLBACK}`, google: gf("Outfit", "variable") },
+  sora: { label: "Sora", category: "sans", stack: `Sora, ${SANS_FALLBACK}`, google: gf("Sora", "variable") },
+  onest: { label: "Onest", category: "sans", stack: `Onest, ${SANS_FALLBACK}`, google: gf("Onest", "variable") },
+  "ibm-plex-sans": { label: "IBM Plex Sans", category: "sans", stack: `IBM Plex Sans, ${SANS_FALLBACK}`, google: gf("IBM Plex Sans", "variable") },
+  nunito: { label: "Nunito", category: "rounded", stack: `Nunito, ui-rounded, ${SANS_FALLBACK}`, google: gf("Nunito", "variable") },
+  // display
+  "space-grotesk": { label: "Space Grotesk", category: "display", stack: `Space Grotesk, ${SANS_FALLBACK}`, google: gf("Space Grotesk", "variable") },
+  "bricolage-grotesque": { label: "Bricolage Grotesque", category: "display", stack: `Bricolage Grotesque, ${SANS_FALLBACK}`, google: gf("Bricolage Grotesque", "variable") },
+  // serif
+  fraunces: { label: "Fraunces", category: "serif", stack: `Fraunces, ${SERIF_FALLBACK}`, google: gf("Fraunces", "variable") },
+  "instrument-serif": { label: "Instrument Serif", category: "serif", stack: `Instrument Serif, ${SERIF_FALLBACK}`, google: gf("Instrument Serif", ["400"]) },
+  newsreader: { label: "Newsreader", category: "serif", stack: `Newsreader, ${SERIF_FALLBACK}`, google: gf("Newsreader", "variable") },
+  "playfair-display": { label: "Playfair Display", category: "serif", stack: `Playfair Display, ${SERIF_FALLBACK}`, google: gf("Playfair Display", "variable") },
+  lora: { label: "Lora", category: "serif", stack: `Lora, ${SERIF_FALLBACK}`, google: gf("Lora", "variable") },
+  "source-serif-4": { label: "Source Serif 4", category: "serif", stack: `"Source Serif 4", ${SERIF_FALLBACK}`, google: gf("Source Serif 4", "variable") },
+  "ibm-plex-serif": { label: "IBM Plex Serif", category: "serif", stack: `IBM Plex Serif, ${SERIF_FALLBACK}`, google: gf("IBM Plex Serif", ["400", "500", "600", "700"]) },
+  // mono
+  "geist-mono": { label: "Geist Mono", category: "mono", stack: `Geist Mono, ${MONO_FALLBACK}`, google: gf("Geist Mono", "variable") },
+  "jetbrains-mono": { label: "JetBrains Mono", category: "mono", stack: `JetBrains Mono, ${MONO_FALLBACK}`, google: gf("JetBrains Mono", "variable") },
+  "ibm-plex-mono": { label: "IBM Plex Mono", category: "mono", stack: `IBM Plex Mono, ${MONO_FALLBACK}`, google: gf("IBM Plex Mono", ["400", "500", "600"]) },
+  "dm-mono": { label: "DM Mono", category: "mono", stack: `DM Mono, ${MONO_FALLBACK}`, google: gf("DM Mono", ["400", "500"]) },
+  "space-mono": { label: "Space Mono", category: "mono", stack: `Space Mono, ${MONO_FALLBACK}`, google: gf("Space Mono", ["400", "700"]) },
+}
+
+const fontOptions = (categories: FontCategory[]) => [
+  { label: "app font", value: "" },
+  ...Object.entries(FONTS)
+    .filter(([, f]) => categories.includes(f.category))
+    .map(([key, f]) => ({ label: f.label, value: f.stack, key })),
+]
+
+export const TYPE_RATIOS: Record<string, string> = {
+  "minor second": "1.067",
+  "major second": "1.125",
+  "minor third": "1.2",
+  "major third": "1.25",
+  "perfect fourth": "1.333",
+  "augmented fourth": "1.414",
+  "perfect fifth": "1.5",
+  golden: "1.618",
 }
 
 // ---------------------------------------------------------------------------
@@ -137,14 +229,35 @@ export const TOKENS: TokenDef[] = [
   { name: "aurora-speed", group: "Aurora", label: "Aurora speed", description: "Drift speed multiplier.", light: "1", dark: "1", control: range(0.1, 4, 0.1, "") },
   { name: "aurora-blur", group: "Aurora", label: "Aurora softness", description: "Extra blur on the blobs.", light: "0px", dark: "0px", control: range(0, 120, 2, "px") },
 
-  // Type & focus
-  { name: "glass-heading-weight", group: "Type", label: "Title weight", description: "Card, dialog and sheet titles; stat values.", light: "650", dark: "650", control: range(300, 900, 50, "") },
-  { name: "glass-heading-tracking", group: "Type", label: "Title tracking", description: "Letter spacing of titles.", light: "-0.015em", dark: "-0.015em", control: range(-0.06, 0.06, 0.005, "em") },
-  { name: "glass-ring-width", group: "Type", label: "Focus ring", description: "Keyboard focus ring thickness.", light: "3px", dark: "3px", control: range(0, 6, 0.5, "px") },
+  { name: "glass-ring-width", group: "Shape", label: "Focus ring", description: "Keyboard focus ring thickness.", light: "3px", dark: "3px", control: range(0, 6, 0.5, "px") },
+
+  // Fonts — optional: unset means your app's --font-sans / --font-heading / --font-mono
+  { name: "glass-font-sans", group: "Fonts", label: "Body font", description: "Text on glass. Unset: your app's --font-sans.", light: "", dark: "", optional: true, control: { type: "select", options: fontOptions(["sans", "rounded", "serif", "display"]) } },
+  { name: "glass-font-heading", group: "Fonts", label: "Heading font", description: "Titles and headings. Unset: your app's --font-heading.", light: "", dark: "", optional: true, control: { type: "select", options: fontOptions(["sans", "rounded", "serif", "display"]) } },
+  { name: "glass-font-display", group: "Fonts", label: "Display font", description: "Big figures: stats, rings, Display. Unset: the heading font.", light: "", dark: "", optional: true, control: { type: "select", options: fontOptions(["sans", "rounded", "serif", "display", "mono"]) } },
+  { name: "glass-font-mono", group: "Fonts", label: "Mono font", description: "Code and keycaps. Unset: your app's --font-mono.", light: "", dark: "", optional: true, control: { type: "select", options: fontOptions(["mono"]) } },
+
+  // Type — the scale and its texture
+  { name: "glass-text-scale", group: "Type", label: "Base size", description: "Multiplies every step of the type scale (1 = 16px).", light: "1", dark: "1", control: range(0.8, 1.3, 0.01, "") },
+  { name: "glass-type-ratio", group: "Type", label: "Scale ratio", description: "How fast headings grow, step to step.", light: TYPE_RATIOS["major third"], dark: TYPE_RATIOS["major third"], control: { type: "select", options: Object.entries(TYPE_RATIOS).map(([label, value]) => ({ label, value })) } },
+  { name: "glass-leading", group: "Type", label: "Line height", description: "Body text line height.", light: "1.6", dark: "1.6", control: range(1.2, 2.1, 0.05, "") },
+  { name: "glass-tracking", group: "Type", label: "Letter spacing", description: "Body text letter spacing.", light: "0em", dark: "0em", control: range(-0.03, 0.06, 0.005, "em") },
+  { name: "glass-body-weight", group: "Type", label: "Body weight", description: "Body text weight.", light: "400", dark: "400", control: range(300, 600, 10, "") },
+  { name: "glass-heading-weight", group: "Type", label: "Title weight", description: "Card, dialog and sheet titles; headings.", light: "650", dark: "650", control: range(300, 900, 50, "") },
+  { name: "glass-heading-tracking", group: "Type", label: "Title tracking", description: "Letter spacing of titles and headings.", light: "-0.015em", dark: "-0.015em", control: range(-0.06, 0.12, 0.005, "em") },
+  { name: "glass-heading-leading", group: "Type", label: "Title line height", description: "Line height of titles and headings.", light: "1.15", dark: "1.15", control: range(0.9, 1.5, 0.01, "") },
+  { name: "glass-heading-case", group: "Type", label: "Title case", description: "Text transform for titles and headings.", light: "none", dark: "none", control: { type: "select", options: [{ label: "as written", value: "none" }, { label: "UPPER", value: "uppercase" }, { label: "Capitalised", value: "capitalize" }, { label: "lower", value: "lowercase" }] } },
+  { name: "glass-heading-wrap", group: "Type", label: "Title wrapping", description: "Balance lines, avoid orphans, or wrap normally.", light: "balance", dark: "balance", control: { type: "select", options: [{ label: "balance", value: "balance" }, { label: "pretty", value: "pretty" }, { label: "normal", value: "wrap" }] } },
+  { name: "glass-display-weight", group: "Type", label: "Display weight", description: "Big figures: stats, rings, Display.", light: "700", dark: "700", control: range(100, 900, 50, "") },
+  { name: "glass-display-tracking", group: "Type", label: "Display tracking", description: "Letter spacing of big figures.", light: "-0.03em", dark: "-0.03em", control: range(-0.08, 0.05, 0.005, "em") },
+  { name: "glass-numeric", group: "Type", label: "Numerals", description: "Figures in stats, rings and tables.", light: "tabular-nums", dark: "tabular-nums", control: { type: "select", options: [{ label: "tabular", value: "tabular-nums" }, { label: "proportional", value: "proportional-nums" }, { label: "old-style", value: "oldstyle-nums" }, { label: "slashed zero", value: "tabular-nums slashed-zero" }] } },
+  { name: "glass-font-features", group: "Type", label: "OpenType features", description: "font-feature-settings for body and headings.", light: "normal", dark: "normal", control: { type: "select", options: [{ label: "default", value: "normal" }, { label: "stylistic set 1", value: '"ss01" 1' }, { label: "alt digits (cv11)", value: '"cv11" 1' }, { label: "ss01 + cv11", value: '"ss01" 1, "cv11" 1' }, { label: "no ligatures", value: '"liga" 0, "calt" 0' }] } },
+  { name: "glass-measure", group: "Type", label: "Measure", description: "Max line length of long-form text (Prose, Text lead).", light: "68ch", dark: "68ch", control: range(40, 100, 1, "ch") },
+  { name: "glass-underline-offset", group: "Type", label: "Underline offset", description: "Link underline distance.", light: "0.22em", dark: "0.22em", control: range(0, 0.5, 0.01, "em") },
 ]
 
 export const TOKEN_NAMES = TOKENS.map((t) => t.name)
-export const GROUPS: TokenGroup[] = ["Colour", "Material", "Rim", "Depth", "Shape", "Density", "Motion", "Aurora", "Type"]
+export const GROUPS: TokenGroup[] = ["Colour", "Material", "Rim", "Depth", "Shape", "Density", "Motion", "Aurora", "Fonts", "Type"]
 
 export const defaultTheme = (): GlassTheme => ({
   light: Object.fromEntries(TOKENS.map((t) => [t.name, t.light])),
@@ -366,6 +479,57 @@ export const MOTIONS: Record<string, PresetDef> = {
 
 export const DENSITIES: Record<string, number> = { compact: 0.85, default: 1, comfortable: 1.15 }
 
+export interface TypePresetDef extends PresetDef {
+  /** Catalogue fonts per role. Installed as app fonts by the registry item; applied as theme fonts by createGlassTheme. */
+  fonts?: Partial<Record<FontRole, string>>
+}
+
+export const TYPE_PRESETS: Record<string, TypePresetDef> = {
+  default: { title: "Default", description: "Your app's fonts on a major-third scale." },
+  system: {
+    title: "System",
+    description: "San Francisco everywhere, SF Rounded for figures — native and instant, nothing to load.",
+    fonts: { sans: "system", heading: "system", display: "system-rounded", mono: "system-mono" },
+    tokens: { "glass-heading-weight": "700", "glass-heading-tracking": "-0.02em", "glass-display-weight": "700" },
+  },
+  modern: {
+    title: "Modern",
+    description: "Geist and Geist Mono, tight and precise.",
+    fonts: { sans: "geist", heading: "geist", mono: "geist-mono" },
+    tokens: { "glass-type-ratio": TYPE_RATIOS["minor third"], "glass-heading-weight": "600", "glass-heading-tracking": "-0.025em", "glass-display-tracking": "-0.04em" },
+  },
+  editorial: {
+    title: "Editorial",
+    description: "Instrument Serif headlines over Inter, generous leading — for reading.",
+    fonts: { sans: "inter", heading: "instrument-serif", display: "instrument-serif", mono: "jetbrains-mono" },
+    tokens: { "glass-type-ratio": TYPE_RATIOS["perfect fourth"], "glass-heading-weight": "400", "glass-heading-tracking": "-0.01em", "glass-heading-leading": "1.05", "glass-display-weight": "400", "glass-display-tracking": "-0.02em", "glass-leading": "1.7", "glass-numeric": "oldstyle-nums" },
+  },
+  friendly: {
+    title: "Friendly",
+    description: "Rounded Nunito throughout, heavy titles.",
+    fonts: { sans: "nunito", heading: "nunito", display: "nunito" },
+    tokens: { "glass-heading-weight": "800", "glass-heading-tracking": "-0.01em", "glass-display-weight": "900", "glass-body-weight": "500" },
+  },
+  technical: {
+    title: "Technical",
+    description: "IBM Plex Sans, Space Grotesk caps titles, JetBrains Mono figures.",
+    fonts: { sans: "ibm-plex-sans", heading: "space-grotesk", display: "jetbrains-mono", mono: "jetbrains-mono" },
+    tokens: { "glass-type-ratio": TYPE_RATIOS["minor third"], "glass-heading-case": "uppercase", "glass-heading-tracking": "0.04em", "glass-heading-weight": "600", "glass-display-weight": "500", "glass-display-tracking": "-0.02em", "glass-numeric": "tabular-nums slashed-zero" },
+  },
+  classic: {
+    title: "Classic",
+    description: "Playfair Display over Newsreader — a book page.",
+    fonts: { sans: "newsreader", heading: "playfair-display", display: "playfair-display", mono: "ibm-plex-mono" },
+    tokens: { "glass-type-ratio": TYPE_RATIOS["augmented fourth"], "glass-heading-weight": "700", "glass-heading-tracking": "0em", "glass-leading": "1.75", "glass-numeric": "oldstyle-nums", "glass-text-scale": "1.06" },
+  },
+  grotesk: {
+    title: "Grotesk",
+    description: "Bricolage Grotesque headlines, DM Sans body — loud and confident.",
+    fonts: { sans: "dm-sans", heading: "bricolage-grotesque", display: "bricolage-grotesque", mono: "dm-mono" },
+    tokens: { "glass-type-ratio": TYPE_RATIOS["perfect fourth"], "glass-heading-weight": "750", "glass-heading-tracking": "-0.035em", "glass-display-weight": "800", "glass-display-tracking": "-0.05em" },
+  },
+}
+
 // ---------------------------------------------------------------------------
 // composition
 // ---------------------------------------------------------------------------
@@ -376,6 +540,10 @@ export interface CreateThemeOptions {
   shape?: keyof typeof SHAPES | string
   motion?: keyof typeof MOTIONS | string
   density?: number | keyof typeof DENSITIES
+  /** A type preset: the Type group, plus its fonts as theme fonts. */
+  type?: keyof typeof TYPE_PRESETS | string
+  /** Theme fonts per role, by catalogue key (or a raw CSS stack). */
+  fonts?: Partial<Record<FontRole, string>>
   /** Overrides for both schemes. */
   tokens?: Tokens
   light?: Tokens
@@ -388,7 +556,16 @@ const applyPreset = (t: GlassTheme, p?: PresetDef) => {
   Object.assign(t.dark, p.tokens, p.dark)
 }
 
-/** Defaults, then palette, material, shape, motion, density, then your overrides — later wins. */
+const ROLE_TOKEN: Record<FontRole, string> = { sans: "glass-font-sans", heading: "glass-font-heading", display: "glass-font-display", mono: "glass-font-mono" }
+
+/** A catalogue key or a raw stack → the stack. */
+export const fontStack = (keyOrStack: string) => FONTS[keyOrStack]?.stack ?? keyOrStack
+
+const applyFonts = (t: GlassTheme, fonts?: Partial<Record<FontRole, string>>) => {
+  for (const [role, key] of Object.entries(fonts ?? {}) as [FontRole, string][]) t.light[ROLE_TOKEN[role]] = t.dark[ROLE_TOKEN[role]] = key ? fontStack(key) : ""
+}
+
+/** Defaults, then palette, material, shape, motion, density, type, fonts, then your overrides — later wins. */
 export function createGlassTheme(options: CreateThemeOptions = {}): GlassTheme {
   const theme = defaultTheme()
   const palette = typeof options.palette === "object" ? paletteFromHue(options.palette) : PALETTES[options.palette ?? "dusk"]?.theme
@@ -403,6 +580,10 @@ export function createGlassTheme(options: CreateThemeOptions = {}): GlassTheme {
     const d = typeof options.density === "number" ? options.density : DENSITIES[options.density] ?? 1
     theme.light["glass-density"] = theme.dark["glass-density"] = String(d)
   }
+  const type = TYPE_PRESETS[options.type ?? "default"]
+  applyPreset(theme, type)
+  applyFonts(theme, type?.fonts)
+  applyFonts(theme, options.fonts)
   Object.assign(theme.light, options.tokens, options.light)
   Object.assign(theme.dark, options.tokens, options.dark)
   return theme
@@ -412,15 +593,22 @@ export function createGlassTheme(options: CreateThemeOptions = {}): GlassTheme {
 // safety: every value is checked before it becomes CSS
 // ---------------------------------------------------------------------------
 
-const SAFE = /^[a-z0-9\s.%(),#/+*-]*$/i
+const SAFE = /^[a-z0-9\s.%(),#/+*"-]*$/i
 const SAFE_URL = /^url\(data:image\/svg\+xml;base64,[a-z0-9+/=]+\)$/i
 
-/** A token value that is safe to write into a stylesheet, or null. Blocks `;`, braces, quotes, `<`, `\` and anything but inert URLs. */
+/**
+ * A token value that is safe to write into a stylesheet, or null. Blocks `;`, braces,
+ * `<`, `\`, single quotes and anything but inert URLs; double quotes only in balanced
+ * pairs (font names, OpenType tags).
+ */
 export function sanitizeValue(value: unknown): string | null {
   if (typeof value !== "string" && typeof value !== "number") return null
   const v = String(value).trim()
   if (!v || v.length > 4000) return null
   if (SAFE_URL.test(v)) return v
+  // no fetching functions except the inert base64 SVG above
+  if (/\b(url|src|image|image-set|cross-fade|element)\s*\(/i.test(v)) return null
+  if ((v.match(/"/g)?.length ?? 0) % 2) return null
   return SAFE.test(v) ? v : null
 }
 
@@ -446,12 +634,16 @@ const declarations = (tokens: Tokens, indent = "  ") =>
     .map(([k, v]) => `${indent}--${k}: ${v};`)
     .join("\n")
 
-/** The theme as CSS. Pass `only` to emit just the tokens that differ from another theme (e.g. the default). */
-export function themeToCss(theme: GlassTheme, { selector = ":root", darkSelector = ".dark", only }: { selector?: string; darkSelector?: string; only?: GlassTheme } = {}): string {
+/**
+ * The theme as CSS. `only` emits just the tokens that differ from another theme (e.g. the
+ * default); `fontImport` prepends a Google Fonts `@import` for the theme's fonts.
+ */
+export function themeToCss(theme: GlassTheme, { selector = ":root", darkSelector = ".dark", only, fontImport = false }: { selector?: string; darkSelector?: string; only?: GlassTheme; fontImport?: boolean } = {}): string {
   const diff = (s: Scheme) => (only ? Object.fromEntries(Object.entries(theme[s]).filter(([k, v]) => only[s][k] !== v)) : theme[s])
   const light = declarations(diff("light"))
   const dark = declarations(diff("dark"))
-  return [light ? `${selector} {\n${light}\n}` : "", dark ? `${darkSelector} {\n${dark}\n}` : ""].filter(Boolean).join("\n\n")
+  const url = fontImport ? fontStylesheetUrl(theme) : null
+  return [url ? `@import url("${url}");` : "", light ? `${selector} {\n${light}\n}` : "", dark ? `${darkSelector} {\n${dark}\n}` : ""].filter(Boolean).join("\n\n")
 }
 
 /** CSS variables for a `style` prop. */
@@ -459,15 +651,67 @@ export function themeVars(theme: GlassTheme, scheme: Scheme): Record<string, str
   return Object.fromEntries(Object.entries(sanitizeTokens(theme[scheme])).map(([k, v]) => [`--${k}`, v]))
 }
 
-/** A shadcn `registry:theme` item: host it, or save it and run `shadcn add ./my-theme.json`. */
-export function themeToRegistryItem(theme: GlassTheme, name = "glass-custom-theme", title = "Custom glass theme") {
+/** Which catalogue fonts a theme uses, per role (from its light scheme; fonts are scheme-agnostic). */
+export function fontDependencies(theme: GlassTheme): { role: FontRole; key: string; font: FontDef }[] {
+  const out: { role: FontRole; key: string; font: FontDef }[] = []
+  for (const role of Object.keys(ROLE_TOKEN) as FontRole[]) {
+    const stack = theme.light[ROLE_TOKEN[role]]
+    const entry = Object.entries(FONTS).find(([, f]) => f.stack === stack)
+    if (entry) out.push({ role, key: entry[0], font: entry[1] })
+  }
+  return out
+}
+
+/** A Google Fonts stylesheet URL for every Google font a theme uses, or null if none. Load it to see theme fonts. */
+export function fontStylesheetUrl(theme: GlassTheme): string | null {
+  const families = new Map<string, string>()
+  for (const { font } of fontDependencies(theme)) {
+    if (!font.google) continue
+    const { family, weights } = font.google
+    const spec = weights === "variable" ? `${family.replace(/ /g, "+")}:wght@100..900` : `${family.replace(/ /g, "+")}:wght@${weights.join(";")}`
+    families.set(family, spec)
+  }
+  if (!families.size) return null
+  return `https://fonts.googleapis.com/css2?${[...families.values()].map((f) => `family=${f}`).join("&")}&display=swap`
+}
+
+/** The registry font item a role + font maps to: `font-inter`, `font-heading-fraunces`, `font-mono-jetbrains-mono`. */
+export const fontItemName = (role: FontRole, key: string) => (role === "sans" ? `font-${key}` : role === "mono" ? `font-mono-${key}` : `font-heading-${key}`)
+
+/** Font sizes per step of the theme's scale, in px — for docs, previews and tests. */
+export function typeScale(theme: GlassTheme, scheme: Scheme = "light"): Record<number, number> {
+  const scale = Number(theme[scheme]["glass-text-scale"] ?? 1)
+  const ratio = Number(theme[scheme]["glass-type-ratio"] ?? 1.25)
+  const out: Record<number, number> = {}
+  for (let n = -2; n <= 6; n++) out[n] = round(16 * scale * ratio ** n, 2)
+  return out
+}
+
+/**
+ * A shadcn `registry:theme` item: host it, or save it and run `shadcn add ./my-theme.json`.
+ * Pass `fontItemUrl` and catalogue Google fonts become `registryDependencies` on glasscn's
+ * font items (the CLI installs them as app fonts) instead of theme fonts you'd load yourself.
+ */
+export function themeToRegistryItem(theme: GlassTheme, name = "glass-custom-theme", title = "Custom glass theme", { fontItemUrl }: { fontItemUrl?: (item: string) => string } = {}) {
+  const light = sanitizeTokens(theme.light)
+  const dark = sanitizeTokens(theme.dark)
+  const registryDependencies: string[] = []
+  if (fontItemUrl) {
+    for (const { role, key, font } of fontDependencies(theme)) {
+      if (!font.google || role === "display") continue
+      registryDependencies.push(fontItemUrl(fontItemName(role, key)))
+      delete light[ROLE_TOKEN[role]]
+      delete dark[ROLE_TOKEN[role]]
+    }
+  }
   return {
     $schema: "https://ui.shadcn.com/schema/registry-item.json",
     name,
     type: "registry:theme",
     title,
     description: "Made in the glasscn Theme Studio.",
-    cssVars: { light: sanitizeTokens(theme.light), dark: sanitizeTokens(theme.dark) },
+    ...(registryDependencies.length ? { registryDependencies } : {}),
+    cssVars: { light, dark },
   }
 }
 
@@ -572,6 +816,7 @@ export function randomTheme(seed = Math.random()): GlassTheme {
     material: pick(Object.keys(MATERIALS)),
     shape: pick(Object.keys(SHAPES)),
     motion: pick(["spring", "smooth", "snappy"]),
+    type: pick(Object.keys(TYPE_PRESETS)),
     density: round(0.85 + next() * 0.3, 2),
   })
 }

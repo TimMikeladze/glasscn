@@ -11,10 +11,10 @@ export interface PropRow {
   description: string
 }
 
-export type Group = "Surfaces" | "Controls" | "Overlays" | "Navigation" | "Data" | "Blocks"
-export const GROUPS: Group[] = ["Surfaces", "Controls", "Overlays", "Navigation", "Data", "Blocks"]
+export type Group = "Surfaces" | "Typography" | "Controls" | "Overlays" | "Navigation" | "Data" | "Blocks"
+export const GROUPS: Group[] = ["Surfaces", "Typography", "Controls", "Overlays", "Navigation", "Data", "Blocks"]
 
-const GROUP_OF: Record<string, Group> = { surfaces: "Surfaces", controls: "Controls", overlays: "Overlays", navigation: "Navigation", data: "Data", blocks: "Blocks" }
+const GROUP_OF: Record<string, Group> = { surfaces: "Surfaces", typography: "Typography", controls: "Controls", overlays: "Overlays", navigation: "Navigation", data: "Data", blocks: "Blocks" }
 
 export interface DocEntry {
   slug: string
@@ -44,9 +44,30 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
     ],
     notes: ["Colours come from --aurora-1, --aurora-2, --aurora-3 over --aurora-base — set by the theme items, or by you."],
   },
+  typography: {
+    props: [
+      { name: "level / size (Heading)", type: "1–6 / display | 1–6", default: "2 / the level", description: "level sets the element (h1–h6), size the look — so an h2 can look like an h1." },
+      { name: "variant (Text)", type: `"body" | "lead" | "large" | "small" | "muted" | "overline" | "caption"`, default: `"body"`, description: "lead is held to --glass-measure." },
+      { name: "size (Display)", type: `"sm" | "md" | "lg" | "xl"`, default: `"lg"`, description: "Steps 4, 5, 6 and 8 of the scale." },
+      { name: "ordered (List)", type: "boolean", default: "false", description: "Numbered, with the theme's numerals." },
+      { name: "asChild", type: "boolean", default: "false", description: "On Heading, Text, Display and TextLink — e.g. a Next Link as a TextLink." },
+    ],
+    notes: [
+      "Sizes are type-step-n2 … type-step-6: 1rem × --glass-text-scale × --glass-type-ratio^n (CSS pow()). Use them in your own components too.",
+      "Fonts: font-glass-sans | heading | display | mono — a theme font if one is set, otherwise your app's --font-sans / --font-heading / --font-mono.",
+    ],
+  },
+  prose: {
+    notes: [
+      "Wrap rendered Markdown/MDX: <Prose dangerouslySetInnerHTML={{ __html }} /> or <Prose><MDXContent /></Prose>.",
+      "Line length follows --glass-measure; className=\"max-w-none\" to fill the container. Everything else comes from the type, colour and shape tokens.",
+    ],
+  },
   "theme-scope": {
     props: [
-      { name: "palette / material / shape / motion / density", type: "string | HueSpec | number", description: "Preset names (or a hue spec for the palette) — composed with createGlassTheme." },
+      { name: "palette / material / shape / motion / density / type", type: "string | HueSpec | number", description: "Preset names (or a hue spec for the palette) — composed with createGlassTheme." },
+      { name: "fonts", type: "{ sans?, heading?, display?, mono? }", description: "Theme fonts by catalogue key (inter, fraunces, jetbrains-mono…) or raw CSS stacks." },
+      { name: "loadFonts", type: "boolean", default: "false", description: "Add one Google Fonts stylesheet for the theme's fonts." },
       { name: "theme", type: "GlassTheme", description: "A finished theme instead, e.g. from createGlassTheme or decodeTheme." },
       { name: "scheme", type: `"light" | "dark"`, description: "Force a scheme for this subtree; omit to follow the page's .dark." },
     ],

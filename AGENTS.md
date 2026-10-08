@@ -18,7 +18,7 @@ A shadcn registry of glass components, the theme engine behind it, and its docs 
 
 1. **Never edit generated files** — `registry.json`, `src/app/glass.generated.css`, `src/lib/sources.generated.ts`. Edit `registry/items.mjs`, `registry/stylesheet.mjs`, `src/lib/glass-theme.ts`; run `pnpm generate`.
 2. **Primitives are plain values; derived values are computed where used** (utilities, `@theme inline`, component classes) — never on `:root`. Otherwise per-element and `ThemeScope` theming silently stop working. Tested.
-3. **Tokens only in components** — `rounded-surface|control|button|badge`, `h-control*`, `px-pad*`, `bg-fill`, `border-glass-border`, `ease-glass`, `font-title`. No hex, no fixed radii/heights on themed parts.
+3. **Tokens only in components** — `rounded-surface|control|button|badge`, `h-control*`, `px-pad*`, `bg-fill`, `border-glass-border`, `ease-glass`; type via `type-glass-heading`, `type-glass-display`, `font-glass-*`, `type-step-*`. No hex, no fixed radii/heights on themed parts.
 4. **Shipped file base names are unique** — the shadcn CLI rewrites imports by file name. Tested.
 5. **Liquid Glass (native) never sits under a fading ancestor.**
 

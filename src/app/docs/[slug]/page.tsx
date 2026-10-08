@@ -64,7 +64,7 @@ async function Doc({ params }: { params: PageProps<"/docs/[slug]">["params"] }) 
             </Badge>
           ))}
         </div>
-        <h1 className="font-heading text-4xl font-bold tracking-tight">{doc.title}</h1>
+        <h1 className="font-glass-heading text-4xl font-bold tracking-tight">{doc.title}</h1>
         <p className="max-w-2xl text-lg text-muted-foreground">{doc.description}</p>
       </div>
 
