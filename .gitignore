@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# install verification sandbox
+/.verify
+# stamped build manifest
+registry.build.json
+src/lib/sources.generated.ts
+src/app/glass.generated.css
+.verify-*.txt
+# built registry (stamped with the deploy URL by pnpm build)
+/public/r

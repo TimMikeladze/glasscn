@@ -1,0 +1,1251 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "glasscn",
+  "homepage": "{REGISTRY_URL}",
+  "items": [
+    {
+      "name": "glass-style",
+      "type": "registry:lib",
+      "title": "Glass style",
+      "description": "The design tokens (frost, rim, highlight, shadow, blur, saturation, fill, aurora), the glass / glass-strong / glass-subtle utilities, aurora and draw keyframes, a no-backdrop-filter fallback, and glassVariants — the cva every surface shares.",
+      "categories": [
+        "glass",
+        "foundations"
+      ],
+      "dependencies": [
+        "cn",
+        "class-variance-authority"
+      ],
+      "files": [
+        {
+          "path": "src/lib/glass-variants.ts",
+          "type": "registry:lib",
+          "target": "@lib/glass-variants.ts"
+        }
+      ],
+      "cssVars": {
+        "theme": {
+          "color-glass": "var(--glass)",
+          "color-glass-strong": "var(--glass-strong)",
+          "color-glass-subtle": "var(--glass-subtle)",
+          "color-glass-border": "var(--glass-border)",
+          "color-glass-highlight": "var(--glass-highlight)",
+          "color-fill": "var(--glass-fill)",
+          "color-fill-strong": "var(--glass-fill-strong)",
+          "color-glass-thumb": "var(--glass-thumb)",
+          "color-aurora-base": "var(--aurora-base)",
+          "color-aurora-1": "var(--aurora-1)",
+          "color-aurora-2": "var(--aurora-2)",
+          "color-aurora-3": "var(--aurora-3)"
+        },
+        "light": {
+          "glass": "oklch(1 0 0 / 52%)",
+          "glass-strong": "oklch(1 0 0 / 74%)",
+          "glass-subtle": "oklch(1 0 0 / 28%)",
+          "glass-border": "oklch(1 0 0 / 85%)",
+          "glass-highlight": "oklch(1 0 0 / 92%)",
+          "glass-shadow": "oklch(0.3 0.05 270 / 12%)",
+          "glass-fill": "oklch(0.55 0.01 285 / 12%)",
+          "glass-fill-strong": "oklch(0.55 0.01 285 / 20%)",
+          "glass-thumb": "oklch(1 0 0)",
+          "glass-blur": "28px",
+          "glass-saturate": "180%",
+          "aurora-base": "oklch(0.955 0.007 268.5)",
+          "aurora-1": "oklch(0.829 0.098 37.8)",
+          "aurora-2": "oklch(0.809 0.109 296.4)",
+          "aurora-3": "oklch(0.907 0.07 70.2)"
+        },
+        "dark": {
+          "glass": "oklch(0.27 0.012 285 / 42%)",
+          "glass-strong": "oklch(0.22 0.012 285 / 72%)",
+          "glass-subtle": "oklch(0.3 0.012 285 / 22%)",
+          "glass-border": "oklch(1 0 0 / 12%)",
+          "glass-highlight": "oklch(1 0 0 / 14%)",
+          "glass-shadow": "oklch(0 0 0 / 45%)",
+          "glass-fill": "oklch(0.6 0.01 285 / 24%)",
+          "glass-fill-strong": "oklch(0.6 0.01 285 / 36%)",
+          "glass-thumb": "oklch(1 0 0 / 20%)",
+          "glass-blur": "28px",
+          "glass-saturate": "180%",
+          "aurora-base": "oklch(0.116 0.006 285.4)",
+          "aurora-1": "oklch(0.48 0.132 31.7)",
+          "aurora-2": "oklch(0.401 0.159 289.2)",
+          "aurora-3": "oklch(0.456 0.088 60.9)"
+        }
+      },
+      "css": {
+        "@utility glass": {
+          "background-color": "var(--glass-bg, var(--glass))",
+          "border-width": "1px",
+          "border-style": "solid",
+          "border-color": "var(--glass-border)",
+          "-webkit-backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
+          "backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
+          "box-shadow": "var(--glass-elevation, 0 10px 30px var(--glass-shadow)), inset 0 1px 0 var(--glass-highlight)"
+        },
+        "@utility glass-strong": {
+          "background-color": "var(--glass-bg, var(--glass-strong))",
+          "border-width": "1px",
+          "border-style": "solid",
+          "border-color": "var(--glass-border)",
+          "-webkit-backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
+          "backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
+          "box-shadow": "var(--glass-elevation, 0 10px 30px var(--glass-shadow)), inset 0 1px 0 var(--glass-highlight)"
+        },
+        "@utility glass-subtle": {
+          "background-color": "var(--glass-bg, var(--glass-subtle))",
+          "border-width": "1px",
+          "border-style": "solid",
+          "border-color": "var(--glass-border)",
+          "-webkit-backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
+          "backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
+          "box-shadow": "var(--glass-elevation, 0 10px 30px var(--glass-shadow)), inset 0 1px 0 var(--glass-highlight)"
+        },
+        "@keyframes glass-aurora-1": {
+          "0%, 100%": {
+            "transform": "translate3d(0, 0, 0) scale(1)"
+          },
+          "50%": {
+            "transform": "translate3d(6%, 4%, 0) scale(1.08)"
+          }
+        },
+        "@keyframes glass-aurora-2": {
+          "0%, 100%": {
+            "transform": "translate3d(0, 0, 0) scale(1)"
+          },
+          "50%": {
+            "transform": "translate3d(-5%, 6%, 0) scale(1.06)"
+          }
+        },
+        "@keyframes glass-aurora-3": {
+          "0%, 100%": {
+            "transform": "translate3d(0, 0, 0) scale(1.04)"
+          },
+          "50%": {
+            "transform": "translate3d(4%, -6%, 0) scale(1)"
+          }
+        },
+        "@keyframes glass-draw": {
+          "from": {
+            "stroke-dashoffset": "var(--glass-draw-from, 1)"
+          }
+        },
+        "@keyframes glass-fade": {
+          "from": {
+            "opacity": "0"
+          }
+        },
+        "@keyframes glass-pulse": {
+          "0%": {
+            "transform": "scale(1)",
+            "opacity": "0.7"
+          },
+          "100%": {
+            "transform": "scale(1.7)",
+            "opacity": "0"
+          }
+        },
+        "@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))": {
+          ":root": {
+            "--glass": "var(--glass-strong)",
+            "--glass-subtle": "var(--glass-strong)"
+          }
+        },
+        "@media (prefers-reduced-motion: reduce)": {
+          "[data-slot=aurora-blob], [data-glass-motion]": {
+            "animation": "none !important",
+            "transition": "none !important"
+          }
+        }
+      }
+    },
+    {
+      "name": "use-sliding-indicator",
+      "type": "registry:hook",
+      "title": "useSlidingIndicator",
+      "description": "Exposes the selected child's box as CSS variables so one element can slide between items — the moving thumb in segmented controls, tabs and the dock.",
+      "categories": [
+        "glass",
+        "foundations"
+      ],
+      "files": [
+        {
+          "path": "src/hooks/use-sliding-indicator.ts",
+          "type": "registry:hook",
+          "target": "@hooks/use-sliding-indicator.ts"
+        }
+      ]
+    },
+    {
+      "name": "glass-charts",
+      "type": "registry:lib",
+      "title": "Chart maths",
+      "description": "Pure maths for the data components: ring radii and arcs, scaled series, smooth Catmull-Rom paths and areas, and the heatmap week grid.",
+      "categories": [
+        "glass",
+        "foundations"
+      ],
+      "files": [
+        {
+          "path": "src/lib/glass-charts.ts",
+          "type": "registry:lib",
+          "target": "@lib/glass-charts.ts"
+        }
+      ]
+    },
+    {
+      "name": "theme-dusk",
+      "type": "registry:theme",
+      "title": "Dusk theme",
+      "description": "Coral over violet and peach — the default. Sets the accent, ring, aurora and chart colours for light and dark.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "primary": "oklch(0.657 0.19 34.8)",
+          "primary-foreground": "oklch(0.99 0 0)",
+          "ring": "oklch(0.657 0.19 34.8)",
+          "aurora-1": "oklch(0.829 0.098 37.8)",
+          "aurora-2": "oklch(0.809 0.109 296.4)",
+          "aurora-3": "oklch(0.907 0.07 70.2)",
+          "chart-1": "oklch(0.657 0.19 34.8)",
+          "chart-2": "oklch(0.685 0.189 296.4)",
+          "chart-3": "oklch(0.803 0.159 69.8)"
+        },
+        "dark": {
+          "primary": "oklch(0.728 0.171 36.5)",
+          "primary-foreground": "oklch(0.18 0.02 30)",
+          "ring": "oklch(0.728 0.171 36.5)",
+          "aurora-1": "oklch(0.48 0.132 31.7)",
+          "aurora-2": "oklch(0.401 0.159 289.2)",
+          "aurora-3": "oklch(0.456 0.088 60.9)",
+          "chart-1": "oklch(0.728 0.171 36.5)",
+          "chart-2": "oklch(0.685 0.189 296.4)",
+          "chart-3": "oklch(0.803 0.159 69.8)"
+        }
+      }
+    },
+    {
+      "name": "theme-ocean",
+      "type": "registry:theme",
+      "title": "Ocean theme",
+      "description": "Blue, teal and periwinkle. Sets the accent, ring, aurora and chart colours for light and dark.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "primary": "oklch(0.583 0.203 259)",
+          "primary-foreground": "oklch(0.99 0 0)",
+          "ring": "oklch(0.583 0.203 259)",
+          "aurora-1": "oklch(0.817 0.093 256.2)",
+          "aurora-2": "oklch(0.899 0.073 185.2)",
+          "aurora-3": "oklch(0.828 0.094 291.7)",
+          "chart-1": "oklch(0.583 0.203 259)",
+          "chart-2": "oklch(0.773 0.127 186.5)",
+          "chart-3": "oklch(0.665 0.187 286.4)"
+        },
+        "dark": {
+          "primary": "oklch(0.705 0.159 252.4)",
+          "primary-foreground": "oklch(0.18 0.02 30)",
+          "ring": "oklch(0.705 0.159 252.4)",
+          "aurora-1": "oklch(0.389 0.133 260.3)",
+          "aurora-2": "oklch(0.442 0.071 205.5)",
+          "aurora-3": "oklch(0.36 0.154 280)",
+          "chart-1": "oklch(0.705 0.159 252.4)",
+          "chart-2": "oklch(0.773 0.127 186.5)",
+          "chart-3": "oklch(0.665 0.187 286.4)"
+        }
+      }
+    },
+    {
+      "name": "theme-rose",
+      "type": "registry:theme",
+      "title": "Rose theme",
+      "description": "Pink over lilac. Sets the accent, ring, aurora and chart colours for light and dark.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "primary": "oklch(0.618 0.194 9.9)",
+          "primary-foreground": "oklch(0.99 0 0)",
+          "ring": "oklch(0.618 0.194 9.9)",
+          "aurora-1": "oklch(0.844 0.092 1.1)",
+          "aurora-2": "oklch(0.843 0.106 311.1)",
+          "aurora-3": "oklch(0.907 0.051 1.4)",
+          "chart-1": "oklch(0.618 0.194 9.9)",
+          "chart-2": "oklch(0.698 0.191 302)",
+          "chart-3": "oklch(0.771 0.143 43.5)"
+        },
+        "dark": {
+          "primary": "oklch(0.719 0.182 8.2)",
+          "primary-foreground": "oklch(0.18 0.02 30)",
+          "ring": "oklch(0.719 0.182 8.2)",
+          "aurora-1": "oklch(0.431 0.14 4.8)",
+          "aurora-2": "oklch(0.407 0.146 306.5)",
+          "aurora-3": "oklch(0.339 0.122 309.2)",
+          "chart-1": "oklch(0.719 0.182 8.2)",
+          "chart-2": "oklch(0.698 0.191 302)",
+          "chart-3": "oklch(0.771 0.143 43.5)"
+        }
+      }
+    },
+    {
+      "name": "theme-sage",
+      "type": "registry:theme",
+      "title": "Sage theme",
+      "description": "Green, lime and sea glass. Sets the accent, ring, aurora and chart colours for light and dark.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "primary": "oklch(0.589 0.126 157.8)",
+          "primary-foreground": "oklch(0.99 0 0)",
+          "ring": "oklch(0.589 0.126 157.8)",
+          "aurora-1": "oklch(0.89 0.071 160.3)",
+          "aurora-2": "oklch(0.927 0.098 121.8)",
+          "aurora-3": "oklch(0.87 0.057 211.5)",
+          "chart-1": "oklch(0.589 0.126 157.8)",
+          "chart-2": "oklch(0.779 0.178 129)",
+          "chart-3": "oklch(0.711 0.118 221.5)"
+        },
+        "dark": {
+          "primary": "oklch(0.769 0.149 158.2)",
+          "primary-foreground": "oklch(0.18 0.02 30)",
+          "ring": "oklch(0.769 0.149 158.2)",
+          "aurora-1": "oklch(0.456 0.091 159.1)",
+          "aurora-2": "oklch(0.47 0.105 130.5)",
+          "aurora-3": "oklch(0.432 0.068 211.9)",
+          "chart-1": "oklch(0.769 0.149 158.2)",
+          "chart-2": "oklch(0.779 0.178 129)",
+          "chart-3": "oklch(0.711 0.118 221.5)"
+        }
+      }
+    },
+    {
+      "name": "theme-amber",
+      "type": "registry:theme",
+      "title": "Amber theme",
+      "description": "Honey, apricot and lemon. Sets the accent, ring, aurora and chart colours for light and dark.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "primary": "oklch(0.65 0.144 65.8)",
+          "primary-foreground": "oklch(0.99 0 0)",
+          "ring": "oklch(0.65 0.144 65.8)",
+          "aurora-1": "oklch(0.901 0.092 79.5)",
+          "aurora-2": "oklch(0.849 0.086 40.3)",
+          "aurora-3": "oklch(0.953 0.079 95.9)",
+          "chart-1": "oklch(0.65 0.144 65.8)",
+          "chart-2": "oklch(0.712 0.183 34)",
+          "chart-3": "oklch(0.823 0.164 94.1)"
+        },
+        "dark": {
+          "primary": "oklch(0.82 0.152 73.2)",
+          "primary-foreground": "oklch(0.18 0.02 30)",
+          "ring": "oklch(0.82 0.152 73.2)",
+          "aurora-1": "oklch(0.471 0.094 74)",
+          "aurora-2": "oklch(0.414 0.106 35.8)",
+          "aurora-3": "oklch(0.448 0.085 102.3)",
+          "chart-1": "oklch(0.82 0.152 73.2)",
+          "chart-2": "oklch(0.712 0.183 34)",
+          "chart-3": "oklch(0.823 0.164 94.1)"
+        }
+      }
+    },
+    {
+      "name": "theme-graphite",
+      "type": "registry:theme",
+      "title": "Graphite theme",
+      "description": "Monochrome — ink on frost. Sets the accent, ring, aurora and chart colours for light and dark.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "primary": "oklch(0.227 0.004 286.1)",
+          "primary-foreground": "oklch(0.99 0 0)",
+          "ring": "oklch(0.227 0.004 286.1)",
+          "aurora-1": "oklch(0.881 0.015 264.5)",
+          "aurora-2": "oklch(0.911 0.025 301.1)",
+          "aurora-3": "oklch(0.892 0.024 227.8)",
+          "chart-1": "oklch(0.227 0.004 286.1)",
+          "chart-2": "oklch(0.589 0.012 286)",
+          "chart-3": "oklch(0.753 0.008 286.2)"
+        },
+        "dark": {
+          "primary": "oklch(0.963 0.007 286.3)",
+          "primary-foreground": "oklch(0.15 0 0)",
+          "ring": "oklch(0.963 0.007 286.3)",
+          "aurora-1": "oklch(0.326 0.02 269.5)",
+          "aurora-2": "oklch(0.339 0.032 300)",
+          "aurora-3": "oklch(0.315 0.028 236.2)",
+          "chart-1": "oklch(0.963 0.007 286.3)",
+          "chart-2": "oklch(0.589 0.012 286)",
+          "chart-3": "oklch(0.753 0.008 286.2)"
+        }
+      }
+    },
+    {
+      "name": "aurora",
+      "type": "registry:ui",
+      "title": "Aurora",
+      "description": "The living ground: three palette blobs drifting over the base colour. Pure CSS, reduced-motion aware.",
+      "categories": [
+        "glass",
+        "surfaces"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/aurora.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/aurora.tsx"
+        }
+      ]
+    },
+    {
+      "name": "glass",
+      "type": "registry:ui",
+      "title": "Glass",
+      "description": "A frosted pane — the base every surface is made from. Intensity, tint and elevation variants; asChild.",
+      "categories": [
+        "glass",
+        "surfaces"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/glass.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/glass.tsx"
+        }
+      ]
+    },
+    {
+      "name": "card",
+      "type": "registry:ui",
+      "title": "Card",
+      "description": "shadcn's Card API on glass: header, title, description, action, content, footer.",
+      "categories": [
+        "glass",
+        "surfaces"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/card.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "shadcn's Button with glass, tinted and secondary variants, capsule or rounded, squash on press.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/button.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/button.tsx"
+        }
+      ]
+    },
+    {
+      "name": "badge",
+      "type": "registry:ui",
+      "title": "Badge",
+      "description": "Small capsule labels: solid, tinted, glass, secondary, outline, destructive.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/badge.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/badge.tsx"
+        }
+      ]
+    },
+    {
+      "name": "input",
+      "type": "registry:ui",
+      "title": "Input",
+      "description": "A filled field for glass: soft fill, accent caret and focus ring.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/input.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/input.tsx"
+        }
+      ]
+    },
+    {
+      "name": "textarea",
+      "type": "registry:ui",
+      "title": "Textarea",
+      "description": "A filled, auto-growing text area for glass.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/textarea.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/textarea.tsx"
+        }
+      ]
+    },
+    {
+      "name": "label",
+      "type": "registry:ui",
+      "title": "Label",
+      "description": "An accessible label.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/label.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/label.tsx"
+        }
+      ]
+    },
+    {
+      "name": "switch",
+      "type": "registry:ui",
+      "title": "Switch",
+      "description": "The iOS switch: capsule track fills with the accent, white knob springs across.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/switch.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/switch.tsx"
+        }
+      ]
+    },
+    {
+      "name": "segmented-control",
+      "type": "registry:ui",
+      "title": "Segmented control",
+      "description": "The iOS segmented control: one raised thumb slides to the chosen segment; always has a selection.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/use-sliding-indicator.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/segmented-control.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/segmented-control.tsx"
+        }
+      ]
+    },
+    {
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "Tabs",
+      "description": "Tabs with a sliding pill (glass capsule, plain) or a sliding underline.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/use-sliding-indicator.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/tabs.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/tabs.tsx"
+        }
+      ]
+    },
+    {
+      "name": "slider",
+      "type": "registry:ui",
+      "title": "Slider",
+      "description": "A soft track, accent range and white glass knobs. Ranges supported.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/slider.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/slider.tsx"
+        }
+      ]
+    },
+    {
+      "name": "progress",
+      "type": "registry:ui",
+      "title": "Progress",
+      "description": "A capsule bar filling from the second chart colour into the accent.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/progress.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/progress.tsx"
+        }
+      ]
+    },
+    {
+      "name": "kbd",
+      "type": "registry:ui",
+      "title": "Kbd",
+      "description": "Keycaps on glass, singly or grouped.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/kbd.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/kbd.tsx"
+        }
+      ]
+    },
+    {
+      "name": "separator",
+      "type": "registry:ui",
+      "title": "Separator",
+      "description": "A hairline that reads on glass.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/separator.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/separator.tsx"
+        }
+      ]
+    },
+    {
+      "name": "dialog",
+      "type": "registry:ui",
+      "title": "Dialog",
+      "description": "A strong-glass modal over a dimmed, softened page.",
+      "categories": [
+        "glass",
+        "overlays"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/button.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/dialog.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/dialog.tsx"
+        }
+      ]
+    },
+    {
+      "name": "sheet",
+      "type": "registry:ui",
+      "title": "Sheet",
+      "description": "A floating glass panel that slides in from any edge, inset like an iPad sheet.",
+      "categories": [
+        "glass",
+        "overlays"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/button.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/sheet.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/sheet.tsx"
+        }
+      ]
+    },
+    {
+      "name": "popover",
+      "type": "registry:ui",
+      "title": "Popover",
+      "description": "Floating glass content anchored to a trigger.",
+      "categories": [
+        "glass",
+        "overlays"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/popover.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/popover.tsx"
+        }
+      ]
+    },
+    {
+      "name": "tooltip",
+      "type": "registry:ui",
+      "title": "Tooltip",
+      "description": "A small glass capsule on hover and focus.",
+      "categories": [
+        "glass",
+        "overlays"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/tooltip.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/tooltip.tsx"
+        }
+      ]
+    },
+    {
+      "name": "dropdown-menu",
+      "type": "registry:ui",
+      "title": "Dropdown menu",
+      "description": "A glass menu: items, checkbox and radio items, labels, shortcuts, submenus.",
+      "categories": [
+        "glass",
+        "overlays"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/dropdown-menu.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/dropdown-menu.tsx"
+        }
+      ]
+    },
+    {
+      "name": "toaster",
+      "type": "registry:ui",
+      "title": "Toaster",
+      "description": "Sonner toasts dressed in glass.",
+      "categories": [
+        "glass",
+        "overlays"
+      ],
+      "dependencies": [
+        "cn",
+        "sonner",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/toaster.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/toaster.tsx"
+        }
+      ]
+    },
+    {
+      "name": "dock",
+      "type": "registry:ui",
+      "title": "Dock",
+      "description": "The floating tab bar: a glass capsule of destinations with a sliding pill, plus a round action button.",
+      "categories": [
+        "glass",
+        "navigation"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/use-sliding-indicator.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/dock.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/dock.tsx"
+        }
+      ]
+    },
+    {
+      "name": "grouped-list",
+      "type": "registry:ui",
+      "title": "Grouped list",
+      "description": "iOS Settings-style inset grouped rows on glass: headers, footers, icon tiles, values, chevrons.",
+      "categories": [
+        "glass",
+        "navigation"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/grouped-list.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/grouped-list.tsx"
+        }
+      ]
+    },
+    {
+      "name": "activity-rings",
+      "type": "registry:ui",
+      "title": "Activity rings",
+      "description": "Concentric Activity-style rings that sweep in and lap past 100%. Server-component safe.",
+      "categories": [
+        "glass",
+        "data"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-charts.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/activity-rings.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/activity-rings.tsx"
+        }
+      ]
+    },
+    {
+      "name": "progress-ring",
+      "type": "registry:ui",
+      "title": "Progress ring",
+      "description": "One ring that closes around its content — a goal, a countdown, a seal.",
+      "categories": [
+        "glass",
+        "data"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-charts.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/progress-ring.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/progress-ring.tsx"
+        }
+      ]
+    },
+    {
+      "name": "sparkline",
+      "type": "registry:ui",
+      "title": "Sparkline",
+      "description": "A smooth measure over time that draws itself, with a soft area and the latest point lit.",
+      "categories": [
+        "glass",
+        "data"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-charts.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/sparkline.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/sparkline.tsx"
+        }
+      ]
+    },
+    {
+      "name": "stat",
+      "type": "registry:ui",
+      "title": "Stat",
+      "description": "A figure on a glass tile: icon, value, label, trend.",
+      "categories": [
+        "glass",
+        "data"
+      ],
+      "dependencies": [
+        "cn",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/stat.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/stat.tsx"
+        }
+      ]
+    },
+    {
+      "name": "heatmap",
+      "type": "registry:ui",
+      "title": "Heatmap",
+      "description": "Days in week columns coloured by intensity — a contribution graph with month and weekday labels and a legend.",
+      "categories": [
+        "glass",
+        "data"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-charts.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/heatmap.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/heatmap.tsx"
+        }
+      ]
+    },
+    {
+      "name": "dashboard-01",
+      "type": "registry:block",
+      "title": "Dashboard",
+      "description": "Activity rings, stat tiles, a ranged sparkline and a 39-week heatmap.",
+      "categories": [
+        "glass",
+        "blocks"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/activity-rings.json",
+        "{REGISTRY_URL}/r/button.json",
+        "{REGISTRY_URL}/r/card.json",
+        "{REGISTRY_URL}/r/dropdown-menu.json",
+        "{REGISTRY_URL}/r/heatmap.json",
+        "{REGISTRY_URL}/r/segmented-control.json",
+        "{REGISTRY_URL}/r/sparkline.json",
+        "{REGISTRY_URL}/r/stat.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/blocks/dashboard-01.tsx",
+          "type": "registry:component",
+          "target": "@components/glass-blocks/dashboard-01.tsx"
+        }
+      ]
+    },
+    {
+      "name": "settings-01",
+      "type": "registry:block",
+      "title": "Settings",
+      "description": "iOS Settings in glass: grouped rows, icon tiles, a switch, a segmented control and a slider.",
+      "categories": [
+        "glass",
+        "blocks"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/grouped-list.json",
+        "{REGISTRY_URL}/r/segmented-control.json",
+        "{REGISTRY_URL}/r/slider.json",
+        "{REGISTRY_URL}/r/switch.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/blocks/settings-01.tsx",
+          "type": "registry:component",
+          "target": "@components/glass-blocks/settings-01.tsx"
+        }
+      ]
+    },
+    {
+      "name": "auth-01",
+      "type": "registry:block",
+      "title": "Sign in",
+      "description": "A strong-glass sign-in card with email, password and a passkey option.",
+      "categories": [
+        "glass",
+        "blocks"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/button.json",
+        "{REGISTRY_URL}/r/card.json",
+        "{REGISTRY_URL}/r/input.json",
+        "{REGISTRY_URL}/r/label.json",
+        "{REGISTRY_URL}/r/separator.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/blocks/auth-01.tsx",
+          "type": "registry:component",
+          "target": "@components/glass-blocks/auth-01.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-tokens",
+      "type": "registry:ui",
+      "title": "Native tokens",
+      "description": "The glasscn palettes and tokens for React Native, a GlassThemeProvider and useGlassTheme().",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/native/tokens.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/tokens.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-glass",
+      "type": "registry:ui",
+      "title": "Native glass",
+      "description": "Frosted glass for Expo: Liquid Glass on iOS 26, blur on older iOS, backdrop-filter on web, a fill on Android.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "expo-blur",
+        "expo-glass-effect"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-tokens.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/glass.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/glass.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-aurora",
+      "type": "registry:ui",
+      "title": "Native aurora",
+      "description": "The drifting aurora for React Native, drawn with react-native-svg on the native driver.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "react-native-svg"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-tokens.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/aurora.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/aurora.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-press",
+      "type": "registry:ui",
+      "title": "Native press",
+      "description": "The pressable everything is built on: spring squash, dim, haptic, hover lift.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "expo-haptics"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/native/press.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/press.tsx"
+        }
+      ]
+    }
+  ]
+}
