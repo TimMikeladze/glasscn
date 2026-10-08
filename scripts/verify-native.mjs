@@ -2,19 +2,21 @@
 /**
  * Install the native-* items into an Expo app and type-check it.
  *
- *   node scripts/verify-native.mjs [path-to-expo-app]   (default ../kaizen)
+ *   node scripts/verify-native.mjs [path-to-expo-app]   (default sandbox/native)
  *
- * The app is copied (sources only, node_modules linked) into .verify/native,
+ * The app is copied (sources only, node_modules cloned) into .verify/native,
  * given a components.json, and `shadcn add`s every native item from a local
- * server — the app itself is never touched (its node_modules are cloned, not linked).
+ * server — the app itself is never touched. For the sandbox, the alias that
+ * points `@/components/glass/native` at registry/native is dropped first, so
+ * its screens type-check against the files the registry actually ships.
  */
-import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { execFileSync, spawn } from "node:child_process";
 import { createServer } from "node:net";
 import { join, resolve } from "node:path";
 
 const root = resolve(".");
-const source = resolve(process.argv[2] ?? "../kaizen");
+const source = resolve(process.argv[2] ?? "sandbox/native");
 const app = join(root, ".verify", "native");
 const run = (cmd, args, cwd = root, env = {}) =>
   execFileSync(cmd, args, {
@@ -55,6 +57,18 @@ try {
   ])
     if (existsSync(join(source, f)))
       cpSync(join(source, f), join(app, f), { recursive: true });
+  if (!existsSync(join(source, "node_modules")))
+    throw new Error(`${source} has no node_modules — run npm install there first`);
+  // the sandbox reads registry/native live through a tsconfig alias; the copy must use what shadcn installs instead
+  const tsconfigPath = join(app, "tsconfig.json");
+  if (existsSync(tsconfigPath)) {
+    const raw = readFileSync(tsconfigPath, "utf8");
+    const stripped = raw
+      .split("\n")
+      .filter((line) => !line.includes("registry/native"))
+      .join("\n");
+    writeFileSync(tsconfigPath, stripped);
+  }
   // the copy gets its own node_modules — a copy-on-write clone on APFS, so it's instant and the app stays untouched
   run("cp", ["-cR", join(source, "node_modules"), join(app, "node_modules")]);
   writeFileSync(

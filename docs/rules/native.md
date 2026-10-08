@@ -6,4 +6,4 @@
 4. **Tint Liquid Glass.** Untinted it nearly vanishes on a pale aurora; `Glass` lays in `glassTint` by default.
 5. **Bars never use Liquid Glass.** Chrome that fades with scroll uses `bar` (UIVisualEffect blur).
 6. **`Press` takes a plain style.** Animated drops Pressable's function-style form.
-7. **Verify on a device class.** `node scripts/verify-native.mjs ../kaizen` type-checks the install; behaviour needs the iOS 26 simulator.
+7. **Verify on a device class.** `pnpm verify:native` type-checks the install; behaviour needs the sandbox (`sandbox/native`, [`../sandbox.md`](../sandbox.md)) on the iOS 26 simulator.

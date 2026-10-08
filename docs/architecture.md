@@ -54,4 +54,5 @@ Each preset carries its **whole** group, so adding one replaces the previous cho
 
 - `pnpm test` — engine, chart maths, registry integrity (files exist, deps declared, unique file names, no derived primitives, every var reference known).
 - `pnpm verify:install` — a fresh Next app installs every web item, presets and a local exported theme, then type-checks and builds.
-- `node scripts/verify-native.mjs ../kaizen` — native items into a copy of an Expo app, type-checked.
+- `pnpm verify:native` — native items from the registry into a copy of the Expo sandbox, type-checked against its screens.
+- `sandbox/native` — an Expo app rendering every native item live from `registry/native` (iOS simulator, Expo Go, web). See [`sandbox.md`](sandbox.md).

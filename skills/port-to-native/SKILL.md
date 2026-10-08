@@ -13,7 +13,8 @@ The native track lives in `registry/native/*.tsx`, ships as `native-*` items int
 2. **Build on `Glass` and `Press`.** Surfaces are `<Glass>` (it picks Liquid Glass / blur / backdrop-filter / fill); tappables are `<Press>`. Don't reach for `BlurView` or `GlassView` directly.
 3. **Motion without fades on iOS 26.** Liquid Glass doesn't render under an ancestor whose opacity starts below 1. Entrances translate/scale; check `canFade()` before any opacity animation, tab transition or screen fade.
 4. **Register** with `native(name, title, description, deps, reg)` in `registry/items.mjs`; deps are Expo packages (`expo-blur`, `expo-glass-effect`, `expo-haptics`, `react-native-svg`).
-5. **Verify:** `node scripts/verify-native.mjs ../kaizen` (installs into a copy of the Kaizen app and type-checks). Then run it on the iOS 26 simulator — type-checking can't see a vanished pane.
+5. **Add a sandbox screen.** `sandbox/native/src/app/<name>.tsx` exercising every prop, linked from `ITEMS` in `src/app/index.tsx` and named in `src/app/_layout.tsx`; add the item to `items` in `scripts/verify-native.mjs`. The sandbox imports `registry/native` live — see `docs/sandbox.md`.
+6. **Verify:** `pnpm verify:native` (installs from the registry into a copy of the sandbox and type-checks). Then `cd sandbox/native && npm run ios` on the iOS 26 simulator, and `npm run web` — type-checking can't see a vanished pane.
 
 ## Debugging "the glass is invisible on iOS"
 

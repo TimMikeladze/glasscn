@@ -15,7 +15,7 @@ pnpm typecheck                     # includes next typegen
 pnpm lint
 pnpm test                          # engine, chart maths, registry integrity
 pnpm verify:install                # fresh Next app: shadcn init → add every web item + presets + a local theme → tsc → next build
-node scripts/verify-native.mjs ../kaizen   # native items into a copy of an Expo app → tsc
+pnpm verify:native                 # native items from the registry into a copy of sandbox/native → tsc
 NEXT_PUBLIC_REGISTRY_URL=https://glasscn.app pnpm build
 ```
 

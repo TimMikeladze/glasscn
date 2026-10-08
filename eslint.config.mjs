@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // the Expo sandbox has its own toolchain (npm, tsc, expo lint)
+    "sandbox/**",
+    ".verify/**",
   ]),
 ]);
 
