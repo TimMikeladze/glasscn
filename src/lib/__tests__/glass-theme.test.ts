@@ -217,7 +217,12 @@ describe("font catalogue vs next/font", () => {
       if (!f.google) continue
       const entry = data[f.google.family]
       expect(entry, f.google.family).toBeTruthy()
-      if (f.google.weights === "variable") expect(entry.weights, f.google.family).toContain("variable")
+      if (f.google.weights === "variable") {
+        expect(entry.weights, f.google.family).toContain("variable")
+        // the URL asks for exactly this range — wider and Google Fonts answers 400
+        const wght = (entry as { axes?: { tag: string; min: number; max: number }[] }).axes?.find((a) => a.tag === "wght")
+        expect(f.google.axis, f.google.family).toEqual([wght!.min, wght!.max])
+      }
       else for (const w of f.google.weights) expect(entry.weights, `${f.google.family} ${w}`).toContain(w)
     }
   })

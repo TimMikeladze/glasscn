@@ -81,13 +81,17 @@ export interface FontDef {
     family: string
     /** next/font/google export name. */
     import: string
-    /** Weights to request; "variable" fonts load the full axis. */
+    /** Weights to request; "variable" fonts load their whole `axis`. */
     weights: string[] | "variable"
+    /** A variable font's weight range. Google Fonts rejects (400) a range wider than the font's own. */
+    axis?: [number, number]
     /** fontsource package for non-Next projects. */
     dependency: string
   }
 }
 
+/** A variable Google font and its weight axis (checked against next/font's data by a test). */
+const vf = (family: string, min: number, max: number) => ({ ...gf(family, "variable"), axis: [min, max] as [number, number] })
 const gf = (family: string, weights: string[] | "variable", dependency?: string) => ({
   family,
   import: family.replace(/ /g, "_"),
@@ -105,31 +109,31 @@ export const FONTS: Record<string, FontDef> = {
   "system-serif": { label: "System Serif", category: "serif", stack: `ui-serif, New York, Iowan Old Style, ${SERIF_FALLBACK}` },
   "system-mono": { label: "System Mono", category: "mono", stack: MONO_FALLBACK },
   // sans
-  geist: { label: "Geist", category: "sans", stack: `Geist, ${SANS_FALLBACK}`, google: gf("Geist", "variable") },
-  inter: { label: "Inter", category: "sans", stack: `Inter, ${SANS_FALLBACK}`, google: gf("Inter", "variable") },
-  figtree: { label: "Figtree", category: "sans", stack: `Figtree, ${SANS_FALLBACK}`, google: gf("Figtree", "variable") },
-  manrope: { label: "Manrope", category: "sans", stack: `Manrope, ${SANS_FALLBACK}`, google: gf("Manrope", "variable") },
-  "dm-sans": { label: "DM Sans", category: "sans", stack: `DM Sans, ${SANS_FALLBACK}`, google: gf("DM Sans", "variable") },
-  "plus-jakarta-sans": { label: "Plus Jakarta Sans", category: "sans", stack: `Plus Jakarta Sans, ${SANS_FALLBACK}`, google: gf("Plus Jakarta Sans", "variable") },
-  outfit: { label: "Outfit", category: "sans", stack: `Outfit, ${SANS_FALLBACK}`, google: gf("Outfit", "variable") },
-  sora: { label: "Sora", category: "sans", stack: `Sora, ${SANS_FALLBACK}`, google: gf("Sora", "variable") },
-  onest: { label: "Onest", category: "sans", stack: `Onest, ${SANS_FALLBACK}`, google: gf("Onest", "variable") },
-  "ibm-plex-sans": { label: "IBM Plex Sans", category: "sans", stack: `IBM Plex Sans, ${SANS_FALLBACK}`, google: gf("IBM Plex Sans", "variable") },
-  nunito: { label: "Nunito", category: "rounded", stack: `Nunito, ui-rounded, ${SANS_FALLBACK}`, google: gf("Nunito", "variable") },
+  geist: { label: "Geist", category: "sans", stack: `Geist, ${SANS_FALLBACK}`, google: vf("Geist", 100, 900) },
+  inter: { label: "Inter", category: "sans", stack: `Inter, ${SANS_FALLBACK}`, google: vf("Inter", 100, 900) },
+  figtree: { label: "Figtree", category: "sans", stack: `Figtree, ${SANS_FALLBACK}`, google: vf("Figtree", 300, 900) },
+  manrope: { label: "Manrope", category: "sans", stack: `Manrope, ${SANS_FALLBACK}`, google: vf("Manrope", 200, 800) },
+  "dm-sans": { label: "DM Sans", category: "sans", stack: `DM Sans, ${SANS_FALLBACK}`, google: vf("DM Sans", 100, 1000) },
+  "plus-jakarta-sans": { label: "Plus Jakarta Sans", category: "sans", stack: `Plus Jakarta Sans, ${SANS_FALLBACK}`, google: vf("Plus Jakarta Sans", 200, 800) },
+  outfit: { label: "Outfit", category: "sans", stack: `Outfit, ${SANS_FALLBACK}`, google: vf("Outfit", 100, 900) },
+  sora: { label: "Sora", category: "sans", stack: `Sora, ${SANS_FALLBACK}`, google: vf("Sora", 100, 800) },
+  onest: { label: "Onest", category: "sans", stack: `Onest, ${SANS_FALLBACK}`, google: vf("Onest", 100, 900) },
+  "ibm-plex-sans": { label: "IBM Plex Sans", category: "sans", stack: `IBM Plex Sans, ${SANS_FALLBACK}`, google: vf("IBM Plex Sans", 100, 700) },
+  nunito: { label: "Nunito", category: "rounded", stack: `Nunito, ui-rounded, ${SANS_FALLBACK}`, google: vf("Nunito", 200, 1000) },
   // display
-  "space-grotesk": { label: "Space Grotesk", category: "display", stack: `Space Grotesk, ${SANS_FALLBACK}`, google: gf("Space Grotesk", "variable") },
-  "bricolage-grotesque": { label: "Bricolage Grotesque", category: "display", stack: `Bricolage Grotesque, ${SANS_FALLBACK}`, google: gf("Bricolage Grotesque", "variable") },
+  "space-grotesk": { label: "Space Grotesk", category: "display", stack: `Space Grotesk, ${SANS_FALLBACK}`, google: vf("Space Grotesk", 300, 700) },
+  "bricolage-grotesque": { label: "Bricolage Grotesque", category: "display", stack: `Bricolage Grotesque, ${SANS_FALLBACK}`, google: vf("Bricolage Grotesque", 200, 800) },
   // serif
-  fraunces: { label: "Fraunces", category: "serif", stack: `Fraunces, ${SERIF_FALLBACK}`, google: gf("Fraunces", "variable") },
+  fraunces: { label: "Fraunces", category: "serif", stack: `Fraunces, ${SERIF_FALLBACK}`, google: vf("Fraunces", 100, 900) },
   "instrument-serif": { label: "Instrument Serif", category: "serif", stack: `Instrument Serif, ${SERIF_FALLBACK}`, google: gf("Instrument Serif", ["400"]) },
-  newsreader: { label: "Newsreader", category: "serif", stack: `Newsreader, ${SERIF_FALLBACK}`, google: gf("Newsreader", "variable") },
-  "playfair-display": { label: "Playfair Display", category: "serif", stack: `Playfair Display, ${SERIF_FALLBACK}`, google: gf("Playfair Display", "variable") },
-  lora: { label: "Lora", category: "serif", stack: `Lora, ${SERIF_FALLBACK}`, google: gf("Lora", "variable") },
-  "source-serif-4": { label: "Source Serif 4", category: "serif", stack: `"Source Serif 4", ${SERIF_FALLBACK}`, google: gf("Source Serif 4", "variable") },
+  newsreader: { label: "Newsreader", category: "serif", stack: `Newsreader, ${SERIF_FALLBACK}`, google: vf("Newsreader", 200, 800) },
+  "playfair-display": { label: "Playfair Display", category: "serif", stack: `Playfair Display, ${SERIF_FALLBACK}`, google: vf("Playfair Display", 400, 900) },
+  lora: { label: "Lora", category: "serif", stack: `Lora, ${SERIF_FALLBACK}`, google: vf("Lora", 400, 700) },
+  "source-serif-4": { label: "Source Serif 4", category: "serif", stack: `"Source Serif 4", ${SERIF_FALLBACK}`, google: vf("Source Serif 4", 200, 900) },
   "ibm-plex-serif": { label: "IBM Plex Serif", category: "serif", stack: `IBM Plex Serif, ${SERIF_FALLBACK}`, google: gf("IBM Plex Serif", ["400", "500", "600", "700"]) },
   // mono
-  "geist-mono": { label: "Geist Mono", category: "mono", stack: `Geist Mono, ${MONO_FALLBACK}`, google: gf("Geist Mono", "variable") },
-  "jetbrains-mono": { label: "JetBrains Mono", category: "mono", stack: `JetBrains Mono, ${MONO_FALLBACK}`, google: gf("JetBrains Mono", "variable") },
+  "geist-mono": { label: "Geist Mono", category: "mono", stack: `Geist Mono, ${MONO_FALLBACK}`, google: vf("Geist Mono", 100, 900) },
+  "jetbrains-mono": { label: "JetBrains Mono", category: "mono", stack: `JetBrains Mono, ${MONO_FALLBACK}`, google: vf("JetBrains Mono", 100, 800) },
   "ibm-plex-mono": { label: "IBM Plex Mono", category: "mono", stack: `IBM Plex Mono, ${MONO_FALLBACK}`, google: gf("IBM Plex Mono", ["400", "500", "600"]) },
   "dm-mono": { label: "DM Mono", category: "mono", stack: `DM Mono, ${MONO_FALLBACK}`, google: gf("DM Mono", ["400", "500"]) },
   "space-mono": { label: "Space Mono", category: "mono", stack: `Space Mono, ${MONO_FALLBACK}`, google: gf("Space Mono", ["400", "700"]) },
@@ -668,7 +672,8 @@ export function fontStylesheetUrl(theme: GlassTheme): string | null {
   for (const { font } of fontDependencies(theme)) {
     if (!font.google) continue
     const { family, weights } = font.google
-    const spec = weights === "variable" ? `${family.replace(/ /g, "+")}:wght@100..900` : `${family.replace(/ /g, "+")}:wght@${weights.join(";")}`
+    const axis = font.google.axis ?? [100, 900]
+    const spec = `${family.replace(/ /g, "+")}:wght@${weights === "variable" ? `${axis[0]}..${axis[1]}` : weights.join(";")}`
     families.set(family, spec)
   }
   if (!families.size) return null

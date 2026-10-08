@@ -11,7 +11,7 @@ import { Button } from "@/components/glass/button"
 import { Glass } from "@/components/glass/glass"
 import { Label } from "@/components/glass/label"
 import { SegmentedControl, SegmentedControlItem } from "@/components/glass/segmented-control"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/glass/sheet"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/glass/dialog"
 import { Slider } from "@/components/glass/slider"
 import { Switch } from "@/components/glass/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/glass/tabs"
@@ -330,22 +330,23 @@ function Studio({ initialCode, initialApplied }: { initialCode: string; initialA
             Apply to site
             <Switch size="sm" checked={applied} onCheckedChange={toggleSite} aria-label="Apply to the whole site" />
           </label>
-          <Sheet>
-            <SheetTrigger asChild>
+          <Dialog>
+            <DialogTrigger asChild>
               <Button size="sm">
                 <DownloadIcon data-icon="inline-start" /> Export
               </Button>
-            </SheetTrigger>
-            <SheetContent className="w-[calc(100%-1.5rem)] overflow-y-auto sm:max-w-xl">
-              <SheetHeader>
-                <SheetTitle>Export theme</SheetTitle>
-                <SheetDescription>Take it to your project.</SheetDescription>
-              </SheetHeader>
-              <div className="px-5 pb-5">
+            </DialogTrigger>
+            {/* header stays put; the panel scrolls inside a fixed-height dialog */}
+            <DialogContent className="flex max-h-[min(85dvh,52rem)] flex-col gap-4 sm:max-w-3xl">
+              <DialogHeader>
+                <DialogTitle>Export theme</DialogTitle>
+                <DialogDescription>Take it to your project.</DialogDescription>
+              </DialogHeader>
+              <div className="-mx-6 min-h-0 flex-1 overflow-y-auto px-6 pb-1">
                 <ExportPanel theme={theme} recipe={options} />
               </div>
-            </SheetContent>
-          </Sheet>
+            </DialogContent>
+          </Dialog>
         </Glass>
         <StudioPreview theme={theme} scheme={scheme} />
       </section>

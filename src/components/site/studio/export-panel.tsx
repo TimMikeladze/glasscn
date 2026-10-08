@@ -11,7 +11,7 @@ import { itemUrl } from "@/lib/site"
 /** The theme, four ways out: CSS for globals.css, a shadcn theme item, the TypeScript that rebuilds it, a link. */
 export function ExportPanel({ theme, recipe }: { theme: GlassTheme; recipe: CreateThemeOptions }) {
   const [scope, setScope] = React.useState<"diff" | "full">("diff")
-  // the panel only renders in an opened sheet, so the window is there
+  // the panel only renders in an opened dialog, so the window is there
   const origin = typeof window === "undefined" ? "" : window.location.origin
   const css = themeToCss(theme, { fontImport: true, ...(scope === "diff" ? { only: createGlassTheme() } : {}) })
   // Google fonts become registry dependencies on glasscn's font items — the CLI installs them as app fonts
