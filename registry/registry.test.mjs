@@ -1,14 +1,16 @@
 import { existsSync, readFileSync } from "node:fs"
 import { describe, expect, it } from "vitest"
 import { blocks, components, foundations, nativeItems } from "./items.mjs"
-import { palettes } from "./tokens.mjs"
+import { DENSITIES, MATERIALS, MOTIONS, PALETTES, SHAPES, TOKENS } from "../src/lib/glass-theme.ts"
+import { themeTokens } from "./stylesheet.mjs"
 
 const registry = JSON.parse(readFileSync("registry.json", "utf8"))
 const names = new Set(registry.items.map((i) => i.name))
 
 describe("registry.json", () => {
-  it("is in sync with registry/items.mjs and tokens.mjs (run scripts/generate.mjs)", () => {
-    const expected = foundations.length + Object.keys(palettes).length + components.length + blocks.length + nativeItems.length
+  it("is in sync with registry/items.mjs and the theme presets (run scripts/generate.mjs)", () => {
+    const presets = [PALETTES, MATERIALS, SHAPES, MOTIONS, DENSITIES].reduce((n, p) => n + Object.keys(p).length, 0)
+    const expected = foundations.length + presets + components.length + blocks.length + nativeItems.length
     expect(registry.items).toHaveLength(expected)
   })
   it("has unique names", () => {
@@ -57,12 +59,23 @@ describe("registry.json", () => {
       for (const p of pkgs) expect(item.dependencies ?? [], `${item.name} imports ${p}`).toContain(p)
     }
   })
-  it("gives the foundation every glass token in light and dark", () => {
+  it("gives the foundation every primitive except the accent and charts, in light and dark", () => {
     const style = registry.items.find((i) => i.name === "glass-style")
-    for (const k of ["glass", "glass-strong", "glass-border", "glass-blur", "aurora-base", "aurora-1"]) {
-      expect(style.cssVars.light[k], k).toBeTruthy()
-      expect(style.cssVars.dark[k], k).toBeTruthy()
+    for (const t of TOKENS) {
+      const accent = ["primary", "primary-foreground", "ring"].includes(t.name) || t.name.startsWith("chart-")
+      expect(Boolean(style.cssVars.light[t.name]), t.name).toBe(!accent)
+      expect(Boolean(style.cssVars.dark[t.name]), t.name).toBe(!accent)
     }
     expect(Object.keys(style.css)).toContain("@utility glass")
+  })
+  it("never stores a derived value as a primitive — derived values live in the theme tokens and utilities only", () => {
+    const style = registry.items.find((i) => i.name === "glass-style")
+    for (const v of [...Object.values(style.cssVars.light), ...Object.values(style.cssVars.dark)]) expect(v).not.toMatch(/var\(/)
+    for (const v of Object.values(themeTokens)) expect(v).toMatch(/var\(--/)
+  })
+  it("references only primitives that exist", () => {
+    const known = new Set([...TOKENS.map((t) => t.name), "glass-bg", "glass-elevation", "glass-draw-from"])
+    const css = JSON.stringify([themeTokens, registry.items.find((i) => i.name === "glass-style").css])
+    for (const [, name] of css.matchAll(/var\(--([\w-]+)/g)) expect(known.has(name), name).toBe(true)
   })
 })

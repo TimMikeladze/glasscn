@@ -18,7 +18,7 @@ function Card({
       data-size={size}
       className={cn(
         glassVariants({ intensity, tint, elevation }),
-        "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-3xl py-(--card-spacing) text-sm text-card-foreground [--card-spacing:--spacing(5)] has-data-[slot=card-footer]:pb-0 data-[size=sm]:[--card-spacing:--spacing(4)] data-[size=sm]:rounded-2xl data-[size=sm]:has-data-[slot=card-footer]:pb-0",
+        "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-surface py-(--card-spacing) text-sm text-card-foreground [--card-spacing:calc(1.25rem*var(--glass-density))] has-data-[slot=card-footer]:pb-0 data-[size=sm]:[--card-spacing:calc(1rem*var(--glass-density))] data-[size=sm]:rounded-surface-sm data-[size=sm]:has-data-[slot=card-footer]:pb-0",
         className
       )}
       {...props}
@@ -43,7 +43,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-title"
-      className={cn("font-heading text-base leading-snug font-semibold tracking-tight group-data-[size=sm]/card:text-sm", className)}
+      className={cn("font-heading text-base leading-snug font-title tracking-title group-data-[size=sm]/card:text-sm", className)}
       {...props}
     />
   )

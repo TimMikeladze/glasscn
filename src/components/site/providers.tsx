@@ -5,9 +5,10 @@ import { ThemeProvider } from "next-themes"
 
 import { TooltipProvider } from "@/components/glass/tooltip"
 import { Toaster } from "@/components/glass/toaster"
+import { PALETTES as PALETTE_DEFS } from "@/lib/glass-theme"
 
-export const PALETTES = ["dusk", "ocean", "rose", "sage", "amber", "graphite"] as const
-export type Palette = (typeof PALETTES)[number]
+export const PALETTES = Object.keys(PALETTE_DEFS)
+export type Palette = string
 const KEY = "glasscn-palette"
 
 const PaletteContext = React.createContext<{ palette: Palette; setPalette: (p: Palette) => void }>({ palette: "dusk", setPalette: () => {} })
@@ -15,7 +16,7 @@ const PaletteContext = React.createContext<{ palette: Palette; setPalette: (p: P
 function readPalette(): Palette {
   try {
     const v = localStorage.getItem(KEY)
-    return PALETTES.includes(v as Palette) ? (v as Palette) : "dusk"
+    return v && PALETTES.includes(v) ? v : "dusk"
   } catch {
     return "dusk"
   }
@@ -36,7 +37,7 @@ export function usePalette() {
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const palette = React.useSyncExternalStore(subscribe, readPalette, () => "dusk" as Palette)
+  const palette = React.useSyncExternalStore(subscribe, readPalette, () => "dusk")
   const setPalette = React.useCallback((p: Palette) => {
     try {
       localStorage.setItem(KEY, p)
@@ -61,5 +62,40 @@ function ToasterThemed() {
   return <Toaster position="bottom-center" />
 }
 
-/** Runs before paint: no flash of the wrong palette. */
-export const paletteScript = `try{var p=localStorage.getItem("${KEY}");if(p)document.documentElement.dataset.palette=p}catch(e){}`
+const CUSTOM = "glasscn-custom-css"
+
+/**
+ * A theme from the studio, applied to the whole site: sanitised CSS (from themeToCss)
+ * scoped to :root[data-glass-custom], stored so it survives reloads. null removes it.
+ */
+export function applySiteTheme(css: string | null) {
+  const root = document.documentElement
+  let el = document.getElementById("glasscn-custom") as HTMLStyleElement | null
+  try {
+    if (css) localStorage.setItem(CUSTOM, css)
+    else localStorage.removeItem(CUSTOM)
+  } catch {}
+  if (!css) {
+    el?.remove()
+    root.removeAttribute("data-glass-custom")
+    return
+  }
+  if (!el) {
+    el = document.createElement("style")
+    el.id = "glasscn-custom"
+    document.head.appendChild(el)
+  }
+  el.textContent = css
+  root.setAttribute("data-glass-custom", "")
+}
+
+export const hasSiteTheme = () => {
+  try {
+    return !!localStorage.getItem(CUSTOM)
+  } catch {
+    return false
+  }
+}
+
+/** Runs before paint: no flash of the wrong palette or custom theme. */
+export const paletteScript = `try{var d=document.documentElement,p=localStorage.getItem("${KEY}");if(p)d.dataset.palette=p;var c=localStorage.getItem("${CUSTOM}");if(c){var s=document.createElement("style");s.id="glasscn-custom";s.textContent=c;document.head.appendChild(s);d.setAttribute("data-glass-custom","")}}catch(e){}`

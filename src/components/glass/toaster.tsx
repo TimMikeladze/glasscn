@@ -21,15 +21,15 @@ function Toaster({ ...props }: ToasterProps) {
       }}
       style={
         {
-          "--normal-bg": "var(--glass-strong)",
+          "--normal-bg": "color-mix(in oklch, var(--glass-tint) var(--glass-opacity-strong), transparent)",
           "--normal-text": "var(--popover-foreground)",
-          "--normal-border": "var(--glass-border)",
-          "--border-radius": "1.25rem",
+          "--normal-border": "color-mix(in oklch, var(--glass-border-color) var(--glass-border-opacity), transparent)",
+          "--border-radius": "var(--glass-radius-surface)",
         } as React.CSSProperties
       }
       toastOptions={{
         classNames: {
-          toast: "glass-strong! shadow-[0_10px_30px_var(--glass-shadow)]!",
+          toast: "glass-strong!",
           description: "text-muted-foreground!",
         },
       }}

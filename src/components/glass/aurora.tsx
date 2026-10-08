@@ -3,32 +3,50 @@ import { cn } from "cn"
 
 /**
  * The living ground glass sits on: three soft palette blobs drifting over the
- * base colour. Pure CSS (radial gradients + transforms), so it costs no JS and
- * stops for `prefers-reduced-motion`. Colours come from `--aurora-1..3` and
- * `--aurora-base`; place it behind content with `fixed inset-0 -z-10` (the default).
+ * base colour. Pure CSS (radial gradients + transforms) — no JS, stills for
+ * `prefers-reduced-motion`. Themed by `--aurora-1..3`, `--aurora-base`,
+ * `--aurora-opacity`, `--aurora-scale`, `--aurora-speed` and `--aurora-blur`;
+ * the props below override those for one instance. Fixed behind the page by
+ * default (`fixed inset-0 -z-10`); pass `className="absolute"` to fill a container.
  */
 function Aurora({
   className,
-  speed = 1,
-  intensity = 1,
+  style,
+  speed,
+  intensity,
+  scale,
+  blur,
   animate = true,
   ...props
 }: React.ComponentProps<"div"> & {
-  /** Drift speed multiplier — 0.5 is slower, 2 is faster. */
+  /** Drift speed multiplier (--aurora-speed). */
   speed?: number
-  /** Blob opacity, 0–1. */
+  /** Blob opacity 0–1 (--aurora-opacity). */
   intensity?: number
+  /** Blob size multiplier (--aurora-scale). */
+  scale?: number
+  /** Extra blur on the blobs, px (--aurora-blur). */
+  blur?: number
   animate?: boolean
 }) {
-  const blob = (i: 1 | 2 | 3, position: string, size: string, duration: number) => (
+  const overrides: Record<string, string> = {}
+  if (speed !== undefined) overrides["--aurora-speed"] = String(speed)
+  if (intensity !== undefined) overrides["--aurora-opacity"] = `${intensity * 100}%`
+  if (scale !== undefined) overrides["--aurora-scale"] = String(scale)
+  if (blur !== undefined) overrides["--aurora-blur"] = `${blur}px`
+
+  const blob = (i: 1 | 2 | 3, position: string, size: number, minPx: number, seconds: number) => (
     <div
       data-slot="aurora-blob"
       aria-hidden
-      className={cn("absolute aspect-square rounded-full will-change-transform", position, size)}
+      className={cn("absolute aspect-square rounded-full will-change-transform", position)}
       style={{
+        width: `calc(${size}% * var(--aurora-scale, 1))`,
+        minWidth: `calc(${minPx}px * var(--aurora-scale, 1))`,
         background: `radial-gradient(closest-side, var(--aurora-${i}), color-mix(in oklch, var(--aurora-${i}) 55%, transparent) 45%, transparent)`,
-        opacity: intensity,
-        animation: animate ? `glass-aurora-${i} ${duration / speed}s ease-in-out infinite` : undefined,
+        opacity: "var(--aurora-opacity, 100%)",
+        filter: "blur(var(--aurora-blur, 0px))",
+        animation: animate ? `glass-aurora-${i} calc(${seconds}s / var(--aurora-speed, 1)) ease-in-out infinite` : undefined,
       }}
     />
   )
@@ -37,11 +55,12 @@ function Aurora({
       data-slot="aurora"
       aria-hidden
       className={cn("pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-aurora-base", className)}
+      style={{ ...overrides, ...style }}
       {...props}
     >
-      {blob(1, "-left-[25%] -top-[15%]", "w-[125%] min-w-[560px]", 34)}
-      {blob(2, "left-[40%] top-[10%]", "w-[105%] min-w-[480px]", 42)}
-      {blob(3, "-left-[10%] top-[55%]", "w-[120%] min-w-[540px]", 38)}
+      {blob(1, "-left-[25%] -top-[15%]", 125, 560, 34)}
+      {blob(2, "left-[40%] top-[10%]", 105, 480, 42)}
+      {blob(3, "-left-[10%] top-[55%]", 120, 540, 38)}
     </div>
   )
 }

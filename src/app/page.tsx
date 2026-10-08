@@ -35,7 +35,7 @@ export default function Home() {
             </Link>
           </Button>
           <Button asChild size="lg" variant="glass">
-            <Link href="/docs/theming">Make it yours</Link>
+            <Link href="/themes">Make it yours</Link>
           </Button>
         </div>
       </section>

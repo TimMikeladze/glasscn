@@ -57,7 +57,7 @@ function SheetContent({
         data-slot="sheet-content"
         data-side={side}
         className={cn(
-          "glass-strong fixed z-50 flex flex-col gap-4 rounded-3xl text-sm text-popover-foreground transition ease-out data-open:animate-in data-open:duration-300 data-closed:animate-out data-closed:duration-200",
+          "glass-strong fixed z-50 flex flex-col gap-4 rounded-surface text-sm text-popover-foreground transition ease-out data-open:animate-in data-open:duration-300 data-closed:animate-out data-closed:duration-200",
           "data-[side=right]:inset-y-3 data-[side=right]:right-3 data-[side=right]:w-[calc(100%-1.5rem)] data-[side=right]:sm:max-w-sm data-[side=right]:data-open:slide-in-from-right data-[side=right]:data-closed:slide-out-to-right",
           "data-[side=left]:inset-y-3 data-[side=left]:left-3 data-[side=left]:w-[calc(100%-1.5rem)] data-[side=left]:sm:max-w-sm data-[side=left]:data-open:slide-in-from-left data-[side=left]:data-closed:slide-out-to-left",
           "data-[side=top]:inset-x-3 data-[side=top]:top-3 data-[side=top]:h-auto data-[side=top]:data-open:slide-in-from-top data-[side=top]:data-closed:slide-out-to-top",
@@ -89,7 +89,7 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function SheetTitle({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Title>) {
-  return <SheetPrimitive.Title data-slot="sheet-title" className={cn("font-heading text-lg font-semibold tracking-tight", className)} {...props} />
+  return <SheetPrimitive.Title data-slot="sheet-title" className={cn("font-heading text-lg font-title tracking-title", className)} {...props} />
 }
 
 function SheetDescription({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Description>) {

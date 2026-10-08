@@ -49,12 +49,25 @@ try {
   const registry = (await import(join(root, "registry", "items.mjs")))
   const web = [
     ...registry.foundations.map((i) => i.name),
-    "theme-dusk",
+    "theme-lagoon",
+    "material-liquid",
+    "shape-soft",
+    "motion-snappy",
+    "density-compact",
     ...registry.components.map((i) => i.name),
     ...registry.blocks.map((i) => i.name),
   ]
   console.log(`\n▸ shadcn add ${web.length} items`)
   run("pnpm", ["dlx", "shadcn@latest", "add", ...web.map((n) => `${url}/r/${n}.json`), "-y", "--overwrite"], app)
+
+  // a theme exported from the studio, added from a local file — the "shadcn item" export path
+  const { createGlassTheme, themeToRegistryItem } = await import(join(root, "src/lib/glass-theme.ts"))
+  writeFileSync(join(app, "my-glass-theme.json"), JSON.stringify(themeToRegistryItem(createGlassTheme({ palette: { hue: 140, harmony: "triadic" }, material: "neon" }), "my-glass-theme")))
+  run("pnpm", ["dlx", "shadcn@latest", "add", "./my-glass-theme.json", "-y", "--overwrite"], app)
+  const globals = (await import("node:fs")).readFileSync(join(app, "src/app/globals.css"), "utf8")
+  // the exported theme was added last, so its values win over the presets added before it
+  for (const needle of ["--glass-glow: 38%", "@utility glass", "--radius-surface:", "--glass-density: 1;"])
+    if (!globals.includes(needle)) throw new Error(`globals.css is missing ${needle}`)
 
   writeFileSync(
     join(app, "src/app/page.tsx"),
@@ -63,6 +76,8 @@ import { Dock, DockAction, DockBar, DockItem } from "@/components/glass/dock"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/glass/tabs"
 import { Toaster } from "@/components/glass/toaster"
 import { ProgressRing } from "@/components/glass/progress-ring"
+import { ThemeScope } from "@/components/glass/theme-scope"
+import { createGlassTheme } from "@/lib/glass-theme"
 import { Dashboard01 } from "@/components/glass-blocks/dashboard-01"
 import { Settings01 } from "@/components/glass-blocks/settings-01"
 import { Auth01 } from "@/components/glass-blocks/auth-01"
@@ -81,6 +96,12 @@ export default function Page() {
         <TabsContent value="auth"><Auth01 /></TabsContent>
       </Tabs>
       <ProgressRing value={0.6}>60%</ProgressRing>
+      <ThemeScope palette="cherry" material="crystal" scheme="dark">
+        <Auth01 />
+      </ThemeScope>
+      <ThemeScope theme={createGlassTheme({ palette: { hue: 200, harmony: "split" }, shape: "square" })}>
+        <ProgressRing value={0.3}>30%</ProgressRing>
+      </ThemeScope>
       <Dock>
         <DockBar defaultValue="a">
           <DockItem value="a">A</DockItem>

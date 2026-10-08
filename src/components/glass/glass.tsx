@@ -21,7 +21,7 @@ function Glass({
     <Comp
       data-slot="glass"
       data-intensity={intensity ?? "default"}
-      className={cn(glassVariants({ intensity, tint, elevation }), "rounded-3xl", className)}
+      className={cn(glassVariants({ intensity, tint, elevation }), "rounded-surface", className)}
       {...props}
     />
   )

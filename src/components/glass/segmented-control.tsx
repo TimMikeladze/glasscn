@@ -46,7 +46,7 @@ function SegmentedControl({
         onValueChange?.(v)
       }}
       className={cn(
-        "group/segmented relative inline-flex w-fit items-stretch rounded-xl bg-fill p-0.5 data-[size=default]:h-9 data-[size=lg]:h-11 data-[size=sm]:h-7",
+        "group/segmented relative inline-flex w-fit items-stretch rounded-control bg-fill p-0.5 data-[size=default]:h-[calc(2.25rem*var(--glass-density))] data-[size=lg]:h-[calc(2.75rem*var(--glass-density))] data-[size=sm]:h-[calc(1.75rem*var(--glass-density))]",
         className
       )}
       {...props}
@@ -56,7 +56,7 @@ function SegmentedControl({
         aria-hidden
         className={cn(
           slidingIndicatorClass,
-          "rounded-[10px] bg-glass-thumb shadow-[0_3px_8px_rgb(0_0_0/0.12),0_0_1px_rgb(0_0_0/0.1)] dark:shadow-none"
+          "rounded-control-sm bg-glass-thumb shadow-[0_3px_8px_rgb(0_0_0/0.12),0_0_1px_rgb(0_0_0/0.1)] dark:shadow-none"
         )}
       />
       {children}
@@ -69,7 +69,7 @@ function SegmentedControlItem({ className, ...props }: React.ComponentProps<type
     <ToggleGroupPrimitive.Item
       data-slot="segmented-control-item"
       className={cn(
-        "relative z-10 inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-[10px] px-3 text-sm font-medium whitespace-nowrap text-foreground/70 transition-colors outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-40 data-[state=on]:font-semibold data-[state=on]:text-foreground group-data-[size=lg]/segmented:text-base group-data-[size=sm]/segmented:px-2 group-data-[size=sm]/segmented:text-xs [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
+        "relative z-10 inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-control-sm px-3 text-sm font-medium whitespace-nowrap text-foreground/70 transition-colors outline-none hover:text-foreground focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-40 data-[state=on]:font-semibold data-[state=on]:text-foreground group-data-[size=lg]/segmented:text-base group-data-[size=sm]/segmented:px-2 group-data-[size=sm]/segmented:text-xs [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}

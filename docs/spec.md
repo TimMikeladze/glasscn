@@ -17,7 +17,11 @@ shadcn's standard is Tailwind v4 + CSS variables + Radix + `cn`, copied into the
 - Files install to `@components/glass/<name>.tsx` (import from `@/components/glass/button`) so they live beside, not over, shadcn's `components/ui`.
 - Namespace-ready: `npx shadcn add @glasscn/button` once `registries.@glasscn` is set.
 
-## Foundations
+## Theming
+
+See [`theming.md`](theming.md): 50 primitives in nine groups, composable presets (12 palettes, 7 materials, 4 shapes, 4 motions, 3 densities), the theme engine (`glass-theme`), `ThemeScope`, and the Theme Studio at `/themes`. Agents: [`architecture.md`](architecture.md), [`rules/`](rules/README.md), `skills/`.
+
+## Foundations (v1 notes)
 
 - `glass-style` (`registry:lib`): `lib/glass.ts` (`glassVariants` cva shared by every surface) + CSS variables (light/dark) + `@utility glass | glass-strong | glass-subtle` + aurora keyframes + reduced-motion + a `@supports not (backdrop-filter)` fallback.
   - `--glass`, `--glass-strong`, `--glass-subtle`, `--glass-border`, `--glass-highlight`, `--glass-shadow`, `--glass-blur`, `--glass-saturate`, `--glass-fill`, `--aurora-base`, `--aurora-1..3`; Tailwind colours `bg-glass`, `bg-fill`, `border-glass-border`, `text-aurora-1`…
@@ -38,7 +42,7 @@ Pure maths (`ring` arcs, smooth paths, heatmap grid) lives in `lib/glass-charts.
 
 ## Site
 
-Next 16 docs site in the same repo: landing (aurora hero, live dashboard, palette switcher, install), `/docs` index, `/docs/[slug]` (live demo, install command, usage, props, source), `/docs/theming` (token table + live customizer that writes CSS to copy), `/docs/installation`, `/docs/native`.
+Next 16 docs site in the same repo: landing (aurora hero, live dashboard, palette switcher, install), `/docs` index, `/docs/[slug]` (live demo, install command, usage, props, source), `/docs/theming` (token model, presets, ThemeScope, every primitive), `/themes` (Theme Studio), `/docs/installation`, `/docs/native`.
 
 ## Verification
 

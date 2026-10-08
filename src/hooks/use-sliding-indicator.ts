@@ -52,4 +52,4 @@ export function useSlidingIndicator<T extends HTMLElement>(selector: string) {
 
 /** Classes for the sliding element itself. */
 export const slidingIndicatorClass =
-  "pointer-events-none absolute top-0 left-0 h-(--indicator-h) w-(--indicator-w) [transform:translate(var(--indicator-x),var(--indicator-y))] opacity-(--indicator-opacity) in-data-indicator-ready:transition-[transform,width,height,opacity] in-data-indicator-ready:duration-300 in-data-indicator-ready:ease-[cubic-bezier(0.2,0.9,0.3,1.12)] motion-reduce:transition-none"
+  "pointer-events-none absolute top-0 left-0 h-(--indicator-h) w-(--indicator-w) [transform:translate(var(--indicator-x),var(--indicator-y))] opacity-(--indicator-opacity) in-data-indicator-ready:transition-[transform,width,height,opacity] in-data-indicator-ready:duration-[calc(var(--glass-duration)*1.5)] in-data-indicator-ready:ease-glass motion-reduce:transition-none"

@@ -18,7 +18,7 @@ function DropdownMenuTrigger({ ...props }: React.ComponentProps<typeof DropdownM
 }
 
 const menuSurface =
-  "glass-strong z-50 min-w-44 overflow-x-hidden overflow-y-auto rounded-2xl p-1.5 text-popover-foreground duration-150 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95"
+  "glass-strong z-50 min-w-44 overflow-x-hidden overflow-y-auto rounded-surface-sm p-1.5 text-popover-foreground duration-150 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95"
 
 function DropdownMenuContent({ className, align = "start", sideOffset = 6, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
   return (
@@ -39,7 +39,7 @@ function DropdownMenuGroup({ ...props }: React.ComponentProps<typeof DropdownMen
 }
 
 const itemClass =
-  "relative flex cursor-default items-center gap-2.5 rounded-xl px-2.5 py-2 text-sm outline-hidden select-none focus:bg-fill-strong data-disabled:pointer-events-none data-disabled:opacity-50 data-inset:pl-8.5 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground"
+  "relative flex cursor-default items-center gap-2.5 rounded-control-sm px-2.5 py-2 text-sm outline-hidden select-none focus:bg-fill-strong data-disabled:pointer-events-none data-disabled:opacity-50 data-inset:pl-8.5 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground"
 
 function DropdownMenuItem({
   className,

@@ -49,3 +49,7 @@ src/app/glass.generated.css
 .verify-*.txt
 # built registry (stamped with the deploy URL by pnpm build)
 /public/r
+
+# skill mirrors (generated from skills/ by scripts/setup-skills.mjs)
+/.claude/skills/
+/.agents/skills/

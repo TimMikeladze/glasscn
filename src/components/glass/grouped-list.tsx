@@ -37,7 +37,7 @@ function GroupedListContent({ className, ...props }: React.ComponentProps<"div">
       data-slot="grouped-list-content"
       role="list"
       className={cn(
-        "glass flex flex-col overflow-hidden rounded-2xl [&>[data-slot=grouped-list-item]+[data-slot=grouped-list-item]]:shadow-[inset_0_1px_0_color-mix(in_oklch,var(--foreground)_9%,transparent)]",
+        "glass flex flex-col overflow-hidden rounded-surface-sm [&>[data-slot=grouped-list-item]+[data-slot=grouped-list-item]]:shadow-[inset_0_1px_0_color-mix(in_oklch,var(--foreground)_9%,transparent)]",
         className
       )}
       {...props}
@@ -53,7 +53,7 @@ function GroupedListItem({ className, asChild = false, ...props }: React.Compone
       data-slot="grouped-list-item"
       role="listitem"
       className={cn(
-        "flex min-h-13 w-full items-center gap-3.5 px-4 py-2.5 text-left text-sm outline-none transition-colors [a&]:hover:bg-fill [button&]:hover:bg-fill focus-visible:bg-fill-strong aria-selected:bg-fill",
+        "flex min-h-[calc(3.25rem*var(--glass-density))] w-full items-center gap-3.5 px-4 py-2.5 text-left text-sm outline-none transition-colors [a&]:hover:bg-fill [button&]:hover:bg-fill focus-visible:bg-fill-strong aria-selected:bg-fill",
         className
       )}
       {...props}
@@ -66,7 +66,7 @@ function GroupedListIcon({ className, ...props }: React.ComponentProps<"span">) 
   return (
     <span
       data-slot="grouped-list-icon"
-      className={cn("inline-flex size-7.5 shrink-0 items-center justify-center rounded-[0.55rem] bg-primary text-white [&_svg:not([class*='size-'])]:size-4", className)}
+      className={cn("inline-flex size-7.5 shrink-0 items-center justify-center rounded-[calc(var(--glass-radius-control)*0.75)] bg-primary text-white [&_svg:not([class*='size-'])]:size-4", className)}
       {...props}
     />
   )

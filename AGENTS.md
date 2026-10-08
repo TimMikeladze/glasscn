@@ -1,14 +1,35 @@
 # glasscn — agent notes
 
-shadcn registry of glass components + its docs site (Next 16, Tailwind v4, Radix via `radix-ui`, pnpm). Spec: `docs/spec.md`.
+A shadcn registry of glass components, the theme engine behind it, and its docs site (Next 16, Tailwind v4, `radix-ui`, pnpm).
 
-- **Never edit `registry.json`, `src/app/glass.generated.css` or `src/lib/sources.generated.ts`** — `scripts/generate.mjs` writes them from `registry/items.mjs` and `registry/tokens.mjs`.
-- New item: component in `src/components/glass/<name>.tsx`, entry in `registry/items.mjs` (declare npm deps and `{REGISTRY_URL}` registry deps — `pnpm test` checks both), demo in `src/components/demos/<name>.tsx` + `demos/index.ts`, props in `src/lib/docs.ts`.
-- Shipped file base names must be unique: the shadcn CLI rewrites imports by file name (a `lib/glass.ts` beside `components/glass/glass.tsx` broke installs). `pnpm test` guards it.
-- Components: `data-slot`, `cva`, `cn` from `cn`, tokens only (no hex/palette classes), className last. Surfaces use the `glass*` utilities or `glassVariants`; customise with `--glass-bg` / `--glass-elevation`, not new variants.
-- Native items (`registry/native/*`) are excluded from this tsconfig; verify with `node scripts/verify-native.mjs ../kaizen`. Liquid Glass must never sit under an ancestor that fades in.
-- Dynamic docs routes wrap `await params` in `<Suspense>` (instant navigation).
-- Before done: `pnpm typecheck && pnpm lint && pnpm test`, and `pnpm verify:install` when items change.
+**Start here:** [`docs/architecture.md`](docs/architecture.md) (how it works) · [`docs/rules/`](docs/rules/README.md) (what you must follow) · [`docs/theming.md`](docs/theming.md) (the token model) · [`docs/spec.md`](docs/spec.md) (what's in it).
+
+## Skills (in `skills/`, mirrored to `.claude/skills` and `.agents/skills` on install)
+
+| Task | Skill |
+|---|---|
+| Add or rebuild a component or block | `build-glass-component` |
+| New token, palette, material, shape, motion or density | `extend-theme` |
+| Release / deploy | `ship-registry` |
+| React Native item or token sync | `port-to-native` |
+| Building an app *with* glasscn | `use-glasscn` |
+
+## The five rules that break things if ignored
+
+1. **Never edit generated files** — `registry.json`, `src/app/glass.generated.css`, `src/lib/sources.generated.ts`. Edit `registry/items.mjs`, `registry/stylesheet.mjs`, `src/lib/glass-theme.ts`; run `pnpm generate`.
+2. **Primitives are plain values; derived values are computed where used** (utilities, `@theme inline`, component classes) — never on `:root`. Otherwise per-element and `ThemeScope` theming silently stop working. Tested.
+3. **Tokens only in components** — `rounded-surface|control|button|badge`, `h-control*`, `px-pad*`, `bg-fill`, `border-glass-border`, `ease-glass`, `font-title`. No hex, no fixed radii/heights on themed parts.
+4. **Shipped file base names are unique** — the shadcn CLI rewrites imports by file name. Tested.
+5. **Liquid Glass (native) never sits under a fading ancestor.**
+
+## Before you're done
+
+```bash
+pnpm typecheck && pnpm lint && pnpm test
+pnpm verify:install          # when items, files, deps or the stylesheet change (~3 min)
+```
+
+Then look at it: `pnpm dev` → the item's `/docs/<name>` page and `/themes` (a few palettes, both schemes, `shape-square`, `density-compact`, `matte`).
 
 <!-- BEGIN:nextjs-agent-rules -->
 

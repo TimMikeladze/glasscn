@@ -18,6 +18,7 @@ import { DocsNav } from "./docs-nav"
 const NAV = [
   { href: "/docs", label: "Docs" },
   { href: "/docs/button", label: "Components" },
+  { href: "/themes", label: "Themes" },
   { href: "/docs/theming", label: "Theming" },
   { href: "/docs/native", label: "Native" },
 ]
@@ -85,7 +86,7 @@ export function SiteHeader() {
               </TooltipTrigger>
               <TooltipContent>Palette</TooltipContent>
             </Tooltip>
-            <DropdownMenuContent align="end" className="w-44">
+            <DropdownMenuContent align="end" className="max-h-96 w-44">
               <DropdownMenuLabel>Palette</DropdownMenuLabel>
               <DropdownMenuRadioGroup value={palette} onValueChange={(v) => setPalette(v as Palette)}>
                 {PALETTES.map((p) => (

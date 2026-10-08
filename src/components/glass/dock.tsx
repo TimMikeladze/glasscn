@@ -54,10 +54,10 @@ function DockBar({ className, value, defaultValue, onValueChange, children, ...p
         setInner(v)
         onValueChange?.(v)
       }}
-      className={cn("glass relative flex items-center rounded-full p-1.5", className)}
+      className={cn("glass relative flex items-center rounded-button p-1.5", className)}
       {...props}
     >
-      <span data-slot="dock-indicator" aria-hidden className={cn(slidingIndicatorClass, "rounded-full bg-fill")} />
+      <span data-slot="dock-indicator" aria-hidden className={cn(slidingIndicatorClass, "rounded-button bg-fill")} />
       {children}
     </ToggleGroupPrimitive.Root>
   )
@@ -68,7 +68,7 @@ function DockItem({ className, ...props }: React.ComponentProps<typeof ToggleGro
     <ToggleGroupPrimitive.Item
       data-slot="dock-item"
       className={cn(
-        "relative z-10 flex h-13 min-w-18 flex-col items-center justify-center gap-0.5 rounded-full px-3 text-[0.65rem] font-semibold text-foreground transition-[color,transform] outline-none active:scale-95 focus-visible:ring-3 focus-visible:ring-ring/50 data-[state=on]:text-primary [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-[1.35rem]",
+        "relative z-10 flex h-[calc(3.25rem*var(--glass-density))] min-w-18 flex-col items-center justify-center gap-0.5 rounded-button px-3 text-[0.65rem] font-semibold text-foreground transition-[color,transform] duration-(--glass-duration) ease-glass outline-none active:scale-(--glass-press-scale) focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/50 data-[state=on]:text-primary [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-[1.35rem]",
         className
       )}
       {...props}
@@ -83,7 +83,7 @@ function DockAction({ className, asChild = false, ...props }: React.ComponentPro
     <Comp
       data-slot="dock-action"
       className={cn(
-        "inline-flex size-15 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_10px_24px_color-mix(in_oklch,var(--primary)_35%,transparent),inset_0_1px_0_oklch(1_0_0/35%)] transition-transform outline-none active:scale-92 focus-visible:ring-3 focus-visible:ring-ring/50 [&_svg:not([class*='size-'])]:size-6",
+        "inline-flex size-[calc(3.75rem*var(--glass-density))] shrink-0 items-center justify-center rounded-button bg-primary text-primary-foreground shadow-[0_10px_24px_color-mix(in_oklch,var(--primary)_35%,transparent),inset_0_1px_0_oklch(1_0_0/35%)] transition-transform duration-(--glass-duration) ease-glass outline-none active:scale-(--glass-press-scale) focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/50 [&_svg:not([class*='size-'])]:size-6",
         className
       )}
       {...props}

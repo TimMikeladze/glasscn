@@ -13,9 +13,11 @@ Or set the namespace once in `components.json` — `"registries": { "@glasscn": 
 
 | | Items |
 |---|---|
-| Foundation | `glass-style` — tokens, `glass` / `glass-strong` / `glass-subtle` utilities, keyframes, fallbacks, `glassVariants`; `use-sliding-indicator`; `glass-charts` |
-| Palettes | `theme-dusk` `theme-ocean` `theme-rose` `theme-sage` `theme-amber` `theme-graphite` |
-| Surfaces | `aurora` `glass` `card` |
+| Foundation | `glass-style` — 50 primitives, `glass` / `glass-strong` / `glass-subtle` utilities, theme tokens, keyframes, fallbacks, `glassVariants`; `glass-theme` (the theme engine); `glass-charts`; `use-sliding-indicator` |
+| Palettes (12) | `theme-dusk` `-ocean` `-rose` `-sage` `-amber` `-graphite` `-lavender` `-mint` `-cherry` `-lagoon` `-sand` `-midnight` |
+| Materials (7) | `material-frosted` `-liquid` `-crystal` `-smoked` `-matte` `-vapor` `-neon` |
+| Shape · Motion · Density | `shape-round` `-soft` `-sharp` `-square` · `motion-spring` `-smooth` `-snappy` `-still` · `density-compact` `-default` `-comfortable` |
+| Surfaces | `aurora` `glass` `card` `theme-scope` |
 | Controls | `button` `badge` `input` `textarea` `label` `switch` `segmented-control` `tabs` `slider` `progress` `kbd` `separator` |
 | Overlays | `dialog` `sheet` `popover` `tooltip` `dropdown-menu` `toaster` |
 | Navigation | `dock` `grouped-list` |
@@ -24,8 +26,15 @@ Or set the namespace once in `components.json` — `"registries": { "@glasscn": 
 | React Native | `native-tokens` `native-glass` `native-aurora` `native-press` |
 
 - **shadcn's APIs, in glass.** Button, Card, Dialog, Tabs… keep their props and parts — swapping is `@/components/ui/x` → `@/components/glass/x`. Files land in `components/glass/`, beside shadcn's, never over them.
-- **Tokens all the way down.** `--glass`, `--glass-border`, `--glass-blur`, `--glass-saturate`, `--aurora-1..3`… Two hooks restyle any surface from a class: `--glass-bg` (fill) and `--glass-elevation` (shadow).
+- **50 primitives in nine groups** — colour, material (frost, blur, saturation, brightness, sheen, grain), rim, depth (shadow, inner glow), shape, density, motion, aurora, type. Presets compose; any primitive can be overridden on any element (`[--glass-blur:8px]`); `ThemeScope` re-themes a subtree at runtime.
+- **Theme Studio** at `/themes` — every primitive as a control, a hue-harmony palette generator, randomise, a scoped live preview with its own scheme, a legibility estimate, export to CSS / a shadcn theme item / TypeScript / a share link, and "apply to the whole site".
 - **Standards.** `data-slot` on every part, `cva` variants, `cn`, unified `radix-ui`, `asChild`, Tailwind v4, `prefers-reduced-motion`, a no-`backdrop-filter` fallback.
+
+## For agents and contributors
+
+- [`docs/architecture.md`](docs/architecture.md) — how the pipeline, tokens and registry fit together
+- [`docs/rules/`](docs/rules/README.md) — design, components, tokens, registry, accessibility, performance, native
+- [`skills/`](skills) — `build-glass-component`, `extend-theme`, `ship-registry`, `port-to-native`, `use-glasscn` (mirrored into `.claude/skills` and `.agents/skills` on `pnpm install`)
 
 ## Develop
 
@@ -35,7 +44,8 @@ pnpm dev                 # generate + docs site on :3000 (registry served from /
 ```
 
 - `registry/items.mjs` — every item (edit this, not registry.json)
-- `registry/tokens.mjs` — every token and palette; generates the foundation's CSS vars, the themes, and the site's CSS
+- `src/lib/glass-theme.ts` — the theme engine: the schema of every primitive, palettes and presets, generator, exports (ships as `glass-theme`)
+- `registry/stylesheet.mjs` — utilities and Tailwind tokens, all derived from primitives
 - `src/components/glass/*` — web components · `src/components/blocks/*` — blocks · `registry/native/*` — React Native
 - `src/components/demos/*` — one live example per item (shown as "Code" in the docs)
 
@@ -44,8 +54,8 @@ pnpm dev                 # generate + docs site on :3000 (registry served from /
 ```bash
 pnpm typecheck
 pnpm lint
-pnpm test                # chart maths + registry integrity (files exist, deps resolve, unique file names)
-pnpm verify:install      # fresh Next app → shadcn init → shadcn add every web item → tsc → next build
+pnpm test                # theme engine, chart maths, registry integrity (files, deps, unique names, no derived primitives)
+pnpm verify:install      # fresh Next app → shadcn init → add every web item, presets and a local exported theme → tsc → next build
 node scripts/verify-native.mjs ../kaizen   # native items into a copy of an Expo app → tsc
 ```
 

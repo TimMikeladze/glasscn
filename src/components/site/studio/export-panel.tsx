@@ -1,0 +1,56 @@
+"use client"
+
+import * as React from "react"
+
+import { SegmentedControl, SegmentedControlItem } from "@/components/glass/segmented-control"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/glass/tabs"
+import { CodeBlockClient } from "@/components/site/code-block-client"
+import { createGlassTheme, encodeTheme, themeToCss, themeToRegistryItem, type CreateThemeOptions, type GlassTheme } from "@/lib/glass-theme"
+
+/** The theme, four ways out: CSS for globals.css, a shadcn theme item, the TypeScript that rebuilds it, a link. */
+export function ExportPanel({ theme, recipe }: { theme: GlassTheme; recipe: CreateThemeOptions }) {
+  const [scope, setScope] = React.useState<"diff" | "full">("diff")
+  // the panel only renders in an opened sheet, so the window is there
+  const origin = typeof window === "undefined" ? "" : window.location.origin
+  const css = themeToCss(theme, scope === "diff" ? { only: createGlassTheme() } : {})
+  const item = JSON.stringify(themeToRegistryItem(theme, "my-glass-theme", "My glass theme"), null, 2)
+  const ts = `import { createGlassTheme } from "@/lib/glass-theme"
+
+export const theme = createGlassTheme(${JSON.stringify(recipe, null, 2)})`
+  const link = `${origin}/themes#t=${encodeTheme(theme)}`
+  return (
+    <Tabs defaultValue="css" className="gap-3">
+      <TabsList className="w-full">
+        <TabsTrigger value="css">CSS</TabsTrigger>
+        <TabsTrigger value="item">shadcn item</TabsTrigger>
+        <TabsTrigger value="ts">TypeScript</TabsTrigger>
+        <TabsTrigger value="link">Link</TabsTrigger>
+      </TabsList>
+      <TabsContent value="css" className="grid gap-3">
+        <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
+          <span>Paste into globals.css after the glass-style foundation.</span>
+          <SegmentedControl size="sm" value={scope} onValueChange={(v) => setScope(v as "diff" | "full")} aria-label="Which tokens">
+            <SegmentedControlItem value="diff">Changes</SegmentedControlItem>
+            <SegmentedControlItem value="full">Everything</SegmentedControlItem>
+          </SegmentedControl>
+        </div>
+        <CodeBlockClient code={css || "/* nothing differs from the default */"} title="globals.css" />
+      </TabsContent>
+      <TabsContent value="item" className="grid gap-3">
+        <p className="text-sm text-muted-foreground">
+          Save as <code className="rounded-md bg-fill px-1.5 font-mono text-xs">my-glass-theme.json</code>, then{" "}
+          <code className="rounded-md bg-fill px-1.5 font-mono text-xs">npx shadcn@latest add ./my-glass-theme.json</code> — or host it and share the URL.
+        </p>
+        <CodeBlockClient code={item} title="my-glass-theme.json" />
+      </TabsContent>
+      <TabsContent value="ts" className="grid gap-3">
+        <p className="text-sm text-muted-foreground">Rebuild it at runtime with the theme engine, then wrap any subtree in a ThemeScope.</p>
+        <CodeBlockClient code={ts} title="theme.ts" />
+      </TabsContent>
+      <TabsContent value="link" className="grid gap-3">
+        <p className="text-sm text-muted-foreground">Opens this studio with the theme loaded.</p>
+        <CodeBlockClient code={link} title="share link" />
+      </TabsContent>
+    </Tabs>
+  )
+}

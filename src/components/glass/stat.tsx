@@ -15,7 +15,7 @@ import { glassVariants, type GlassVariantProps } from "@/lib/glass-variants"
  *   </Stat>
  */
 function Stat({ className, intensity, tint, elevation, ...props }: React.ComponentProps<"div"> & GlassVariantProps) {
-  return <div data-slot="stat" className={cn(glassVariants({ intensity, tint, elevation }), "flex min-w-0 flex-col gap-2 rounded-2xl p-4", className)} {...props} />
+  return <div data-slot="stat" className={cn(glassVariants({ intensity, tint, elevation }), "flex min-w-0 flex-col gap-2 rounded-surface-sm p-[calc(1rem*var(--glass-density))]", className)} {...props} />
 }
 
 function StatIcon({ className, ...props }: React.ComponentProps<"span">) {
@@ -23,7 +23,7 @@ function StatIcon({ className, ...props }: React.ComponentProps<"span">) {
 }
 
 function StatValue({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="stat-value" className={cn("truncate font-heading text-3xl leading-none font-bold tracking-tight tabular-nums", className)} {...props} />
+  return <div data-slot="stat-value" className={cn("truncate font-heading text-3xl leading-none font-title tracking-title tabular-nums", className)} {...props} />
 }
 
 function StatLabel({ className, ...props }: React.ComponentProps<"div">) {
@@ -36,7 +36,7 @@ function StatTrend({ className, direction = "up", children, ...props }: React.Co
       data-slot="stat-trend"
       data-direction={direction}
       className={cn(
-        "inline-flex w-fit items-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-semibold tabular-nums data-[direction=down]:bg-destructive/12 data-[direction=down]:text-destructive data-[direction=up]:bg-primary/14 data-[direction=up]:text-primary",
+        "inline-flex w-fit items-center gap-0.5 rounded-badge px-1.5 py-0.5 text-xs font-semibold tabular-nums data-[direction=down]:bg-destructive/12 data-[direction=down]:text-destructive data-[direction=up]:bg-primary/14 data-[direction=up]:text-primary",
         className
       )}
       {...props}

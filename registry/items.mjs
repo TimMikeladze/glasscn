@@ -36,7 +36,16 @@ export const foundations = [
     categories: ["glass", "foundations"],
     dependencies: ["cn", "class-variance-authority"],
     files: [{ path: "src/lib/glass-variants.ts", type: "registry:lib", target: "@lib/glass-variants.ts" }],
-    // cssVars + css are filled in from registry/tokens.mjs
+    // cssVars + css are filled in by scripts/generate.mjs from src/lib/glass-theme.ts and registry/stylesheet.mjs
+  },
+  {
+    name: "glass-theme",
+    type: "registry:lib",
+    title: "Theme engine",
+    description:
+      "The schema of every glass primitive, the palettes and presets, a hue-harmony palette generator, and exports to CSS, inline style, a shadcn theme item and a share code — with value sanitising and a legibility estimate.",
+    categories: ["glass", "foundations"],
+    files: [{ path: "src/lib/glass-theme.ts", type: "registry:lib", target: "@lib/glass-theme.ts" }],
   },
   {
     name: "use-sliding-indicator",
@@ -61,6 +70,7 @@ export const components = [
   ui("aurora", "Aurora", "The living ground: three palette blobs drifting over the base colour. Pure CSS, reduced-motion aware.", { categories: ["surfaces"] }),
   ui("glass", "Glass", "A frosted pane — the base every surface is made from. Intensity, tint and elevation variants; asChild.", { deps: ["radix-ui"], categories: ["surfaces"] }),
   ui("card", "Card", "shadcn's Card API on glass: header, title, description, action, content, footer.", { categories: ["surfaces"] }),
+  ui("theme-scope", "Theme scope", "Re-theme a subtree at runtime: a different palette, material, shape or scheme for one card, section or preview.", { reg: [at("glass-theme")], categories: ["surfaces"] }),
   // controls
   ui("button", "Button", "shadcn's Button with glass, tinted and secondary variants, capsule or rounded, squash on press.", { deps: ["radix-ui", "class-variance-authority"], categories: ["controls"] }),
   ui("badge", "Badge", "Small capsule labels: solid, tinted, glass, secondary, outline, destructive.", { deps: ["radix-ui", "class-variance-authority"], categories: ["controls"] }),

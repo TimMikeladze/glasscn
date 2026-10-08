@@ -1,0 +1,11 @@
+---
+description: glasscn conventions — read before changing components, tokens or the registry
+alwaysApply: true
+---
+
+Follow AGENTS.md and docs/rules/*.md. Procedures live in skills/*/SKILL.md (build-glass-component, extend-theme, ship-registry, port-to-native, use-glasscn).
+
+- Never edit registry.json or *.generated.* files — run `pnpm generate`.
+- Primitives are plain values; derived values are computed where used, never on :root.
+- Components use tokens only: rounded-surface|control|button|badge, h-control*, px-pad*, bg-fill, border-glass-border, ease-glass, font-title.
+- Done = `pnpm typecheck && pnpm lint && pnpm test` (+ `pnpm verify:install` when items change).

@@ -35,12 +35,24 @@ const glassProps: PropRow[] = [
 const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
   aurora: {
     props: [
-      { name: "speed", type: "number", default: "1", description: "Drift speed multiplier." },
-      { name: "intensity", type: "number", default: "1", description: "Blob opacity, 0–1." },
+      { name: "speed", type: "number", default: "--aurora-speed (1)", description: "Drift speed multiplier." },
+      { name: "intensity", type: "number", default: "--aurora-opacity (1)", description: "Blob opacity, 0–1." },
+      { name: "scale", type: "number", default: "--aurora-scale (1)", description: "Blob size multiplier." },
+      { name: "blur", type: "number", default: "--aurora-blur (0)", description: "Extra blur on the blobs, px." },
       { name: "animate", type: "boolean", default: "true", description: "Drift or hold still. Always still under prefers-reduced-motion." },
       { name: "className", type: "string", default: `"fixed inset-0 -z-10"`, description: "Use `absolute` to fill a positioned container instead of the viewport." },
     ],
     notes: ["Colours come from --aurora-1, --aurora-2, --aurora-3 over --aurora-base — set by the theme items, or by you."],
+  },
+  "theme-scope": {
+    props: [
+      { name: "palette / material / shape / motion / density", type: "string | HueSpec | number", description: "Preset names (or a hue spec for the palette) — composed with createGlassTheme." },
+      { name: "theme", type: "GlassTheme", description: "A finished theme instead, e.g. from createGlassTheme or decodeTheme." },
+      { name: "scheme", type: `"light" | "dark"`, description: "Force a scheme for this subtree; omit to follow the page's .dark." },
+    ],
+    notes: [
+      "Writes one sanitised, scoped <style> for its own subtree. Portalled content (dialogs, menus, tooltips) renders outside it — wrap the portal target, or theme the page instead.",
+    ],
   },
   glass: { props: [...glassProps, { name: "asChild", type: "boolean", default: "false", description: "Render the child element as the pane." }] },
   card: {

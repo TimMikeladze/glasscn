@@ -11,7 +11,9 @@
     "registry:build": "node scripts/build-registry.mjs",
     "verify:install": "node scripts/verify-install.mjs",
     "test": "node scripts/generate.mjs && vitest run",
-    "typecheck": "node scripts/generate.mjs && next typegen && tsc --noEmit"
+    "typecheck": "node scripts/generate.mjs && next typegen && tsc --noEmit",
+    "postinstall": "node scripts/setup-skills.mjs",
+    "skills": "node scripts/setup-skills.mjs"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
@@ -39,5 +41,6 @@
     "typescript": "^5",
     "vitest": "^4.1.11"
   },
-  "packageManager": "pnpm@11.24.0"
+  "packageManager": "pnpm@11.24.0",
+  "type": "module"
 }

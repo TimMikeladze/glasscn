@@ -25,81 +25,158 @@
       ],
       "cssVars": {
         "theme": {
-          "color-glass": "var(--glass)",
-          "color-glass-strong": "var(--glass-strong)",
-          "color-glass-subtle": "var(--glass-subtle)",
-          "color-glass-border": "var(--glass-border)",
-          "color-glass-highlight": "var(--glass-highlight)",
-          "color-fill": "var(--glass-fill)",
-          "color-fill-strong": "var(--glass-fill-strong)",
+          "color-glass": "color-mix(in oklch, var(--glass-tint) var(--glass-opacity), transparent)",
+          "color-glass-strong": "color-mix(in oklch, var(--glass-tint) var(--glass-opacity-strong), transparent)",
+          "color-glass-subtle": "color-mix(in oklch, var(--glass-tint) var(--glass-opacity-subtle), transparent)",
+          "color-glass-border": "color-mix(in oklch, var(--glass-border-color) var(--glass-border-opacity), transparent)",
+          "color-glass-highlight": "color-mix(in oklch, oklch(1 0 0) var(--glass-highlight-opacity), transparent)",
+          "color-glass-shadow": "color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)",
+          "color-fill": "color-mix(in oklch, var(--glass-fill-tint) var(--glass-fill-opacity), transparent)",
+          "color-fill-strong": "color-mix(in oklch, var(--glass-fill-tint) var(--glass-fill-opacity-strong), transparent)",
           "color-glass-thumb": "var(--glass-thumb)",
           "color-aurora-base": "var(--aurora-base)",
           "color-aurora-1": "var(--aurora-1)",
           "color-aurora-2": "var(--aurora-2)",
-          "color-aurora-3": "var(--aurora-3)"
+          "color-aurora-3": "var(--aurora-3)",
+          "radius-surface": "var(--glass-radius-surface)",
+          "radius-surface-sm": "calc(var(--glass-radius-surface) * 0.75)",
+          "radius-control": "var(--glass-radius-control)",
+          "radius-control-sm": "calc(var(--glass-radius-control) * 0.7)",
+          "radius-button": "var(--glass-radius-button)",
+          "radius-badge": "var(--glass-radius-badge)",
+          "spacing-control-xs": "calc(1.75rem * var(--glass-density))",
+          "spacing-control-sm": "calc(2rem * var(--glass-density))",
+          "spacing-control": "calc(2.5rem * var(--glass-density))",
+          "spacing-control-lg": "calc(3rem * var(--glass-density))",
+          "spacing-pad-xs": "calc(0.625rem * var(--glass-density))",
+          "spacing-pad-sm": "calc(0.875rem * var(--glass-density))",
+          "spacing-pad": "calc(1.25rem * var(--glass-density))",
+          "spacing-pad-lg": "calc(1.75rem * var(--glass-density))",
+          "spacing-card": "calc(1.25rem * var(--glass-density))",
+          "spacing-card-sm": "calc(1rem * var(--glass-density))",
+          "ease-glass": "var(--glass-ease)",
+          "font-weight-title": "var(--glass-heading-weight)",
+          "tracking-title": "var(--glass-heading-tracking)"
         },
         "light": {
-          "glass": "oklch(1 0 0 / 52%)",
-          "glass-strong": "oklch(1 0 0 / 74%)",
-          "glass-subtle": "oklch(1 0 0 / 28%)",
-          "glass-border": "oklch(1 0 0 / 85%)",
-          "glass-highlight": "oklch(1 0 0 / 92%)",
-          "glass-shadow": "oklch(0.3 0.05 270 / 12%)",
-          "glass-fill": "oklch(0.55 0.01 285 / 12%)",
-          "glass-fill-strong": "oklch(0.55 0.01 285 / 20%)",
-          "glass-thumb": "oklch(1 0 0)",
-          "glass-blur": "28px",
-          "glass-saturate": "180%",
-          "aurora-base": "oklch(0.955 0.007 268.5)",
           "aurora-1": "oklch(0.829 0.098 37.8)",
           "aurora-2": "oklch(0.809 0.109 296.4)",
-          "aurora-3": "oklch(0.907 0.07 70.2)"
-        },
-        "dark": {
-          "glass": "oklch(0.27 0.012 285 / 42%)",
-          "glass-strong": "oklch(0.22 0.012 285 / 72%)",
-          "glass-subtle": "oklch(0.3 0.012 285 / 22%)",
-          "glass-border": "oklch(1 0 0 / 12%)",
-          "glass-highlight": "oklch(1 0 0 / 14%)",
-          "glass-shadow": "oklch(0 0 0 / 45%)",
-          "glass-fill": "oklch(0.6 0.01 285 / 24%)",
-          "glass-fill-strong": "oklch(0.6 0.01 285 / 36%)",
-          "glass-thumb": "oklch(1 0 0 / 20%)",
+          "aurora-3": "oklch(0.907 0.07 70.2)",
+          "aurora-base": "oklch(0.955 0.007 268.5)",
+          "glass-tint": "oklch(1 0 0)",
+          "glass-opacity": "52%",
+          "glass-opacity-strong": "74%",
+          "glass-opacity-subtle": "28%",
           "glass-blur": "28px",
           "glass-saturate": "180%",
-          "aurora-base": "oklch(0.116 0.006 285.4)",
+          "glass-brightness": "100%",
+          "glass-sheen": "10%",
+          "glass-sheen-angle": "160deg",
+          "glass-texture": "none",
+          "glass-fill-tint": "oklch(0.55 0.01 285)",
+          "glass-fill-opacity": "12%",
+          "glass-fill-opacity-strong": "20%",
+          "glass-thumb": "oklch(1 0 0)",
+          "glass-border-color": "oklch(1 0 0)",
+          "glass-border-opacity": "85%",
+          "glass-border-width": "1px",
+          "glass-highlight-opacity": "92%",
+          "glass-shadow-color": "oklch(0.3 0.05 270)",
+          "glass-shadow-opacity": "12%",
+          "glass-shadow-y": "10px",
+          "glass-shadow-blur": "30px",
+          "glass-glow": "0%",
+          "glass-radius-surface": "1.5rem",
+          "glass-radius-control": "0.75rem",
+          "glass-radius-button": "9999px",
+          "glass-radius-badge": "9999px",
+          "glass-density": "1",
+          "glass-duration": "200ms",
+          "glass-ease": "cubic-bezier(0.2, 0.9, 0.3, 1.12)",
+          "glass-press-scale": "0.97",
+          "aurora-opacity": "100%",
+          "aurora-scale": "1",
+          "aurora-speed": "1",
+          "aurora-blur": "0px",
+          "glass-heading-weight": "650",
+          "glass-heading-tracking": "-0.015em",
+          "glass-ring-width": "3px"
+        },
+        "dark": {
           "aurora-1": "oklch(0.48 0.132 31.7)",
           "aurora-2": "oklch(0.401 0.159 289.2)",
-          "aurora-3": "oklch(0.456 0.088 60.9)"
+          "aurora-3": "oklch(0.456 0.088 60.9)",
+          "aurora-base": "oklch(0.116 0.006 285.4)",
+          "glass-tint": "oklch(0.24 0.012 285)",
+          "glass-opacity": "45%",
+          "glass-opacity-strong": "72%",
+          "glass-opacity-subtle": "24%",
+          "glass-blur": "28px",
+          "glass-saturate": "180%",
+          "glass-brightness": "100%",
+          "glass-sheen": "5%",
+          "glass-sheen-angle": "160deg",
+          "glass-texture": "none",
+          "glass-fill-tint": "oklch(0.6 0.01 285)",
+          "glass-fill-opacity": "24%",
+          "glass-fill-opacity-strong": "36%",
+          "glass-thumb": "oklch(1 0 0 / 20%)",
+          "glass-border-color": "oklch(1 0 0)",
+          "glass-border-opacity": "12%",
+          "glass-border-width": "1px",
+          "glass-highlight-opacity": "14%",
+          "glass-shadow-color": "oklch(0 0 0)",
+          "glass-shadow-opacity": "45%",
+          "glass-shadow-y": "10px",
+          "glass-shadow-blur": "30px",
+          "glass-glow": "0%",
+          "glass-radius-surface": "1.5rem",
+          "glass-radius-control": "0.75rem",
+          "glass-radius-button": "9999px",
+          "glass-radius-badge": "9999px",
+          "glass-density": "1",
+          "glass-duration": "200ms",
+          "glass-ease": "cubic-bezier(0.2, 0.9, 0.3, 1.12)",
+          "glass-press-scale": "0.97",
+          "aurora-opacity": "100%",
+          "aurora-scale": "1",
+          "aurora-speed": "1",
+          "aurora-blur": "0px",
+          "glass-heading-weight": "650",
+          "glass-heading-tracking": "-0.015em",
+          "glass-ring-width": "3px"
         }
       },
       "css": {
         "@utility glass": {
-          "background-color": "var(--glass-bg, var(--glass))",
-          "border-width": "1px",
+          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tint) var(--glass-opacity), transparent))",
+          "background-image": "linear-gradient(var(--glass-sheen-angle), color-mix(in oklch, oklch(1 0 0) var(--glass-sheen), transparent), transparent 55%), var(--glass-texture)",
+          "border-width": "var(--glass-border-width)",
           "border-style": "solid",
-          "border-color": "var(--glass-border)",
-          "-webkit-backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
-          "backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
-          "box-shadow": "var(--glass-elevation, 0 10px 30px var(--glass-shadow)), inset 0 1px 0 var(--glass-highlight)"
+          "border-color": "color-mix(in oklch, var(--glass-border-color) var(--glass-border-opacity), transparent)",
+          "-webkit-backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness))",
+          "backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness))",
+          "box-shadow": "var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)), inset 0 1px 0 color-mix(in oklch, oklch(1 0 0) var(--glass-highlight-opacity), transparent), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) color-mix(in oklch, var(--primary) var(--glass-glow), transparent)"
         },
         "@utility glass-strong": {
-          "background-color": "var(--glass-bg, var(--glass-strong))",
-          "border-width": "1px",
+          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tint) var(--glass-opacity-strong), transparent))",
+          "background-image": "linear-gradient(var(--glass-sheen-angle), color-mix(in oklch, oklch(1 0 0) var(--glass-sheen), transparent), transparent 55%), var(--glass-texture)",
+          "border-width": "var(--glass-border-width)",
           "border-style": "solid",
-          "border-color": "var(--glass-border)",
-          "-webkit-backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
-          "backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
-          "box-shadow": "var(--glass-elevation, 0 10px 30px var(--glass-shadow)), inset 0 1px 0 var(--glass-highlight)"
+          "border-color": "color-mix(in oklch, var(--glass-border-color) var(--glass-border-opacity), transparent)",
+          "-webkit-backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness))",
+          "backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness))",
+          "box-shadow": "var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)), inset 0 1px 0 color-mix(in oklch, oklch(1 0 0) var(--glass-highlight-opacity), transparent), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) color-mix(in oklch, var(--primary) var(--glass-glow), transparent)"
         },
         "@utility glass-subtle": {
-          "background-color": "var(--glass-bg, var(--glass-subtle))",
-          "border-width": "1px",
+          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tint) var(--glass-opacity-subtle), transparent))",
+          "background-image": "linear-gradient(var(--glass-sheen-angle), color-mix(in oklch, oklch(1 0 0) var(--glass-sheen), transparent), transparent 55%), var(--glass-texture)",
+          "border-width": "var(--glass-border-width)",
           "border-style": "solid",
-          "border-color": "var(--glass-border)",
-          "-webkit-backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
-          "backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
-          "box-shadow": "var(--glass-elevation, 0 10px 30px var(--glass-shadow)), inset 0 1px 0 var(--glass-highlight)"
+          "border-color": "color-mix(in oklch, var(--glass-border-color) var(--glass-border-opacity), transparent)",
+          "-webkit-backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness))",
+          "backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness))",
+          "box-shadow": "var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)), inset 0 1px 0 color-mix(in oklch, oklch(1 0 0) var(--glass-highlight-opacity), transparent), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) color-mix(in oklch, var(--primary) var(--glass-glow), transparent)"
         },
         "@keyframes glass-aurora-1": {
           "0%, 100%": {
@@ -146,9 +223,8 @@
           }
         },
         "@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))": {
-          ":root": {
-            "--glass": "var(--glass-strong)",
-            "--glass-subtle": "var(--glass-strong)"
+          ".glass, .glass-strong, .glass-subtle": {
+            "--glass-bg": "color-mix(in oklch, var(--glass-tint) 92%, transparent)"
           }
         },
         "@media (prefers-reduced-motion: reduce)": {
@@ -158,6 +234,23 @@
           }
         }
       }
+    },
+    {
+      "name": "glass-theme",
+      "type": "registry:lib",
+      "title": "Theme engine",
+      "description": "The schema of every glass primitive, the palettes and presets, a hue-harmony palette generator, and exports to CSS, inline style, a shadcn theme item and a share code — with value sanitising and a legibility estimate.",
+      "categories": [
+        "glass",
+        "foundations"
+      ],
+      "files": [
+        {
+          "path": "src/lib/glass-theme.ts",
+          "type": "registry:lib",
+          "target": "@lib/glass-theme.ts"
+        }
+      ]
     },
     {
       "name": "use-sliding-indicator",
@@ -196,8 +289,8 @@
     {
       "name": "theme-dusk",
       "type": "registry:theme",
-      "title": "Dusk theme",
-      "description": "Coral over violet and peach — the default. Sets the accent, ring, aurora and chart colours for light and dark.",
+      "title": "Dusk palette",
+      "description": "Coral over violet and peach — the default. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
       "categories": [
         "glass",
         "themes"
@@ -207,31 +300,37 @@
           "primary": "oklch(0.657 0.19 34.8)",
           "primary-foreground": "oklch(0.99 0 0)",
           "ring": "oklch(0.657 0.19 34.8)",
+          "chart-1": "oklch(0.657 0.19 34.8)",
+          "chart-2": "oklch(0.685 0.189 296.4)",
+          "chart-3": "oklch(0.803 0.159 69.8)",
+          "chart-4": "oklch(0.55 0.128 95)",
+          "chart-5": "oklch(0.85 0.096 335)",
           "aurora-1": "oklch(0.829 0.098 37.8)",
           "aurora-2": "oklch(0.809 0.109 296.4)",
           "aurora-3": "oklch(0.907 0.07 70.2)",
-          "chart-1": "oklch(0.657 0.19 34.8)",
-          "chart-2": "oklch(0.685 0.189 296.4)",
-          "chart-3": "oklch(0.803 0.159 69.8)"
+          "aurora-base": "oklch(0.955 0.007 268.5)"
         },
         "dark": {
           "primary": "oklch(0.728 0.171 36.5)",
           "primary-foreground": "oklch(0.18 0.02 30)",
           "ring": "oklch(0.728 0.171 36.5)",
+          "chart-1": "oklch(0.728 0.171 36.5)",
+          "chart-2": "oklch(0.685 0.189 296.4)",
+          "chart-3": "oklch(0.803 0.159 69.8)",
+          "chart-4": "oklch(0.66 0.128 95)",
+          "chart-5": "oklch(0.86 0.096 335)",
           "aurora-1": "oklch(0.48 0.132 31.7)",
           "aurora-2": "oklch(0.401 0.159 289.2)",
           "aurora-3": "oklch(0.456 0.088 60.9)",
-          "chart-1": "oklch(0.728 0.171 36.5)",
-          "chart-2": "oklch(0.685 0.189 296.4)",
-          "chart-3": "oklch(0.803 0.159 69.8)"
+          "aurora-base": "oklch(0.116 0.006 285.4)"
         }
       }
     },
     {
       "name": "theme-ocean",
       "type": "registry:theme",
-      "title": "Ocean theme",
-      "description": "Blue, teal and periwinkle. Sets the accent, ring, aurora and chart colours for light and dark.",
+      "title": "Ocean palette",
+      "description": "Blue, teal and periwinkle. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
       "categories": [
         "glass",
         "themes"
@@ -241,31 +340,37 @@
           "primary": "oklch(0.583 0.203 259)",
           "primary-foreground": "oklch(0.99 0 0)",
           "ring": "oklch(0.583 0.203 259)",
+          "chart-1": "oklch(0.583 0.203 259)",
+          "chart-2": "oklch(0.773 0.127 186.5)",
+          "chart-3": "oklch(0.665 0.187 286.4)",
+          "chart-4": "oklch(0.55 0.128 319)",
+          "chart-5": "oklch(0.85 0.096 199)",
           "aurora-1": "oklch(0.817 0.093 256.2)",
           "aurora-2": "oklch(0.899 0.073 185.2)",
           "aurora-3": "oklch(0.828 0.094 291.7)",
-          "chart-1": "oklch(0.583 0.203 259)",
-          "chart-2": "oklch(0.773 0.127 186.5)",
-          "chart-3": "oklch(0.665 0.187 286.4)"
+          "aurora-base": "oklch(0.955 0.007 268.5)"
         },
         "dark": {
           "primary": "oklch(0.705 0.159 252.4)",
           "primary-foreground": "oklch(0.18 0.02 30)",
           "ring": "oklch(0.705 0.159 252.4)",
+          "chart-1": "oklch(0.705 0.159 252.4)",
+          "chart-2": "oklch(0.773 0.127 186.5)",
+          "chart-3": "oklch(0.665 0.187 286.4)",
+          "chart-4": "oklch(0.66 0.128 319)",
+          "chart-5": "oklch(0.86 0.096 199)",
           "aurora-1": "oklch(0.389 0.133 260.3)",
           "aurora-2": "oklch(0.442 0.071 205.5)",
           "aurora-3": "oklch(0.36 0.154 280)",
-          "chart-1": "oklch(0.705 0.159 252.4)",
-          "chart-2": "oklch(0.773 0.127 186.5)",
-          "chart-3": "oklch(0.665 0.187 286.4)"
+          "aurora-base": "oklch(0.116 0.006 285.4)"
         }
       }
     },
     {
       "name": "theme-rose",
       "type": "registry:theme",
-      "title": "Rose theme",
-      "description": "Pink over lilac. Sets the accent, ring, aurora and chart colours for light and dark.",
+      "title": "Rose palette",
+      "description": "Pink over lilac. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
       "categories": [
         "glass",
         "themes"
@@ -275,31 +380,37 @@
           "primary": "oklch(0.618 0.194 9.9)",
           "primary-foreground": "oklch(0.99 0 0)",
           "ring": "oklch(0.618 0.194 9.9)",
+          "chart-1": "oklch(0.618 0.194 9.9)",
+          "chart-2": "oklch(0.698 0.191 302)",
+          "chart-3": "oklch(0.771 0.143 43.5)",
+          "chart-4": "oklch(0.55 0.128 70)",
+          "chart-5": "oklch(0.85 0.096 310)",
           "aurora-1": "oklch(0.844 0.092 1.1)",
           "aurora-2": "oklch(0.843 0.106 311.1)",
           "aurora-3": "oklch(0.907 0.051 1.4)",
-          "chart-1": "oklch(0.618 0.194 9.9)",
-          "chart-2": "oklch(0.698 0.191 302)",
-          "chart-3": "oklch(0.771 0.143 43.5)"
+          "aurora-base": "oklch(0.955 0.007 268.5)"
         },
         "dark": {
           "primary": "oklch(0.719 0.182 8.2)",
           "primary-foreground": "oklch(0.18 0.02 30)",
           "ring": "oklch(0.719 0.182 8.2)",
+          "chart-1": "oklch(0.719 0.182 8.2)",
+          "chart-2": "oklch(0.698 0.191 302)",
+          "chart-3": "oklch(0.771 0.143 43.5)",
+          "chart-4": "oklch(0.66 0.128 70)",
+          "chart-5": "oklch(0.86 0.096 310)",
           "aurora-1": "oklch(0.431 0.14 4.8)",
           "aurora-2": "oklch(0.407 0.146 306.5)",
           "aurora-3": "oklch(0.339 0.122 309.2)",
-          "chart-1": "oklch(0.719 0.182 8.2)",
-          "chart-2": "oklch(0.698 0.191 302)",
-          "chart-3": "oklch(0.771 0.143 43.5)"
+          "aurora-base": "oklch(0.116 0.006 285.4)"
         }
       }
     },
     {
       "name": "theme-sage",
       "type": "registry:theme",
-      "title": "Sage theme",
-      "description": "Green, lime and sea glass. Sets the accent, ring, aurora and chart colours for light and dark.",
+      "title": "Sage palette",
+      "description": "Green, lime and sea glass. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
       "categories": [
         "glass",
         "themes"
@@ -309,31 +420,37 @@
           "primary": "oklch(0.589 0.126 157.8)",
           "primary-foreground": "oklch(0.99 0 0)",
           "ring": "oklch(0.589 0.126 157.8)",
+          "chart-1": "oklch(0.589 0.126 157.8)",
+          "chart-2": "oklch(0.779 0.178 129)",
+          "chart-3": "oklch(0.711 0.118 221.5)",
+          "chart-4": "oklch(0.55 0.128 218)",
+          "chart-5": "oklch(0.85 0.096 98)",
           "aurora-1": "oklch(0.89 0.071 160.3)",
           "aurora-2": "oklch(0.927 0.098 121.8)",
           "aurora-3": "oklch(0.87 0.057 211.5)",
-          "chart-1": "oklch(0.589 0.126 157.8)",
-          "chart-2": "oklch(0.779 0.178 129)",
-          "chart-3": "oklch(0.711 0.118 221.5)"
+          "aurora-base": "oklch(0.955 0.007 268.5)"
         },
         "dark": {
           "primary": "oklch(0.769 0.149 158.2)",
           "primary-foreground": "oklch(0.18 0.02 30)",
           "ring": "oklch(0.769 0.149 158.2)",
+          "chart-1": "oklch(0.769 0.149 158.2)",
+          "chart-2": "oklch(0.779 0.178 129)",
+          "chart-3": "oklch(0.711 0.118 221.5)",
+          "chart-4": "oklch(0.66 0.128 218)",
+          "chart-5": "oklch(0.86 0.096 98)",
           "aurora-1": "oklch(0.456 0.091 159.1)",
           "aurora-2": "oklch(0.47 0.105 130.5)",
           "aurora-3": "oklch(0.432 0.068 211.9)",
-          "chart-1": "oklch(0.769 0.149 158.2)",
-          "chart-2": "oklch(0.779 0.178 129)",
-          "chart-3": "oklch(0.711 0.118 221.5)"
+          "aurora-base": "oklch(0.116 0.006 285.4)"
         }
       }
     },
     {
       "name": "theme-amber",
       "type": "registry:theme",
-      "title": "Amber theme",
-      "description": "Honey, apricot and lemon. Sets the accent, ring, aurora and chart colours for light and dark.",
+      "title": "Amber palette",
+      "description": "Honey, apricot and lemon. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
       "categories": [
         "glass",
         "themes"
@@ -343,31 +460,37 @@
           "primary": "oklch(0.65 0.144 65.8)",
           "primary-foreground": "oklch(0.99 0 0)",
           "ring": "oklch(0.65 0.144 65.8)",
+          "chart-1": "oklch(0.65 0.144 65.8)",
+          "chart-2": "oklch(0.712 0.183 34)",
+          "chart-3": "oklch(0.823 0.164 94.1)",
+          "chart-4": "oklch(0.55 0.128 126)",
+          "chart-5": "oklch(0.85 0.096 6)",
           "aurora-1": "oklch(0.901 0.092 79.5)",
           "aurora-2": "oklch(0.849 0.086 40.3)",
           "aurora-3": "oklch(0.953 0.079 95.9)",
-          "chart-1": "oklch(0.65 0.144 65.8)",
-          "chart-2": "oklch(0.712 0.183 34)",
-          "chart-3": "oklch(0.823 0.164 94.1)"
+          "aurora-base": "oklch(0.955 0.007 268.5)"
         },
         "dark": {
           "primary": "oklch(0.82 0.152 73.2)",
           "primary-foreground": "oklch(0.18 0.02 30)",
           "ring": "oklch(0.82 0.152 73.2)",
+          "chart-1": "oklch(0.82 0.152 73.2)",
+          "chart-2": "oklch(0.712 0.183 34)",
+          "chart-3": "oklch(0.823 0.164 94.1)",
+          "chart-4": "oklch(0.66 0.128 126)",
+          "chart-5": "oklch(0.86 0.096 6)",
           "aurora-1": "oklch(0.471 0.094 74)",
           "aurora-2": "oklch(0.414 0.106 35.8)",
           "aurora-3": "oklch(0.448 0.085 102.3)",
-          "chart-1": "oklch(0.82 0.152 73.2)",
-          "chart-2": "oklch(0.712 0.183 34)",
-          "chart-3": "oklch(0.823 0.164 94.1)"
+          "aurora-base": "oklch(0.116 0.006 285.4)"
         }
       }
     },
     {
       "name": "theme-graphite",
       "type": "registry:theme",
-      "title": "Graphite theme",
-      "description": "Monochrome — ink on frost. Sets the accent, ring, aurora and chart colours for light and dark.",
+      "title": "Graphite palette",
+      "description": "Monochrome — ink on frost. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
       "categories": [
         "glass",
         "themes"
@@ -377,23 +500,949 @@
           "primary": "oklch(0.227 0.004 286.1)",
           "primary-foreground": "oklch(0.99 0 0)",
           "ring": "oklch(0.227 0.004 286.1)",
+          "chart-1": "oklch(0.227 0.004 286.1)",
+          "chart-2": "oklch(0.589 0.012 286)",
+          "chart-3": "oklch(0.753 0.008 286.2)",
+          "chart-4": "oklch(0.55 0.016 346)",
+          "chart-5": "oklch(0.85 0.012 226)",
           "aurora-1": "oklch(0.881 0.015 264.5)",
           "aurora-2": "oklch(0.911 0.025 301.1)",
           "aurora-3": "oklch(0.892 0.024 227.8)",
-          "chart-1": "oklch(0.227 0.004 286.1)",
-          "chart-2": "oklch(0.589 0.012 286)",
-          "chart-3": "oklch(0.753 0.008 286.2)"
+          "aurora-base": "oklch(0.955 0.007 268.5)"
         },
         "dark": {
           "primary": "oklch(0.963 0.007 286.3)",
           "primary-foreground": "oklch(0.15 0 0)",
           "ring": "oklch(0.963 0.007 286.3)",
+          "chart-1": "oklch(0.963 0.007 286.3)",
+          "chart-2": "oklch(0.589 0.012 286)",
+          "chart-3": "oklch(0.753 0.008 286.2)",
+          "chart-4": "oklch(0.66 0.016 346)",
+          "chart-5": "oklch(0.86 0.012 226)",
           "aurora-1": "oklch(0.326 0.02 269.5)",
           "aurora-2": "oklch(0.339 0.032 300)",
           "aurora-3": "oklch(0.315 0.028 236.2)",
-          "chart-1": "oklch(0.963 0.007 286.3)",
-          "chart-2": "oklch(0.589 0.012 286)",
-          "chart-3": "oklch(0.753 0.008 286.2)"
+          "aurora-base": "oklch(0.116 0.006 285.4)"
+        }
+      }
+    },
+    {
+      "name": "theme-lavender",
+      "type": "registry:theme",
+      "title": "Lavender palette",
+      "description": "Soft violet with lilac and periwinkle. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "primary": "oklch(0.6 0.15 300)",
+          "primary-foreground": "oklch(0.99 0 0)",
+          "ring": "oklch(0.6 0.15 300)",
+          "chart-1": "oklch(0.6 0.15 300)",
+          "chart-2": "oklch(0.66 0.15 338)",
+          "chart-3": "oklch(0.78 0.128 266)",
+          "chart-4": "oklch(0.55 0.12 0)",
+          "chart-5": "oklch(0.85 0.09 240)",
+          "aurora-1": "oklch(0.84 0.083 300)",
+          "aurora-2": "oklch(0.83 0.09 338)",
+          "aurora-3": "oklch(0.9 0.063 266)",
+          "aurora-base": "oklch(0.955 0.012 300)"
+        },
+        "dark": {
+          "primary": "oklch(0.74 0.138 300)",
+          "primary-foreground": "oklch(0.18 0.03 300)",
+          "ring": "oklch(0.74 0.138 300)",
+          "chart-1": "oklch(0.74 0.138 300)",
+          "chart-2": "oklch(0.72 0.15 338)",
+          "chart-3": "oklch(0.82 0.128 266)",
+          "chart-4": "oklch(0.66 0.12 0)",
+          "chart-5": "oklch(0.86 0.09 240)",
+          "aurora-1": "oklch(0.44 0.117 300)",
+          "aurora-2": "oklch(0.38 0.135 338)",
+          "aurora-3": "oklch(0.42 0.09 266)",
+          "aurora-base": "oklch(0.12 0.012 300)"
+        }
+      }
+    },
+    {
+      "name": "theme-mint",
+      "type": "registry:theme",
+      "title": "Mint palette",
+      "description": "Fresh green against blue sky. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "primary": "oklch(0.6 0.13 165)",
+          "primary-foreground": "oklch(0.99 0 0)",
+          "ring": "oklch(0.6 0.13 165)",
+          "chart-1": "oklch(0.6 0.13 165)",
+          "chart-2": "oklch(0.66 0.13 315)",
+          "chart-3": "oklch(0.78 0.111 15)",
+          "chart-4": "oklch(0.55 0.104 225)",
+          "chart-5": "oklch(0.85 0.078 105)",
+          "aurora-1": "oklch(0.84 0.072 165)",
+          "aurora-2": "oklch(0.83 0.078 315)",
+          "aurora-3": "oklch(0.9 0.055 15)",
+          "aurora-base": "oklch(0.955 0.012 165)"
+        },
+        "dark": {
+          "primary": "oklch(0.74 0.12 165)",
+          "primary-foreground": "oklch(0.18 0.03 165)",
+          "ring": "oklch(0.74 0.12 165)",
+          "chart-1": "oklch(0.74 0.12 165)",
+          "chart-2": "oklch(0.72 0.13 315)",
+          "chart-3": "oklch(0.82 0.111 15)",
+          "chart-4": "oklch(0.66 0.104 225)",
+          "chart-5": "oklch(0.86 0.078 105)",
+          "aurora-1": "oklch(0.44 0.101 165)",
+          "aurora-2": "oklch(0.38 0.117 315)",
+          "aurora-3": "oklch(0.42 0.078 15)",
+          "aurora-base": "oklch(0.12 0.012 165)"
+        }
+      }
+    },
+    {
+      "name": "theme-cherry",
+      "type": "registry:theme",
+      "title": "Cherry palette",
+      "description": "Red with a cool complement. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "primary": "oklch(0.6 0.2 22)",
+          "primary-foreground": "oklch(0.99 0 0)",
+          "ring": "oklch(0.6 0.2 22)",
+          "chart-1": "oklch(0.6 0.2 22)",
+          "chart-2": "oklch(0.66 0.2 202)",
+          "chart-3": "oklch(0.78 0.17 46)",
+          "chart-4": "oklch(0.55 0.16 82)",
+          "chart-5": "oklch(0.85 0.12 322)",
+          "aurora-1": "oklch(0.84 0.11 22)",
+          "aurora-2": "oklch(0.83 0.12 202)",
+          "aurora-3": "oklch(0.9 0.084 46)",
+          "aurora-base": "oklch(0.955 0.012 22)"
+        },
+        "dark": {
+          "primary": "oklch(0.74 0.184 22)",
+          "primary-foreground": "oklch(0.18 0.03 22)",
+          "ring": "oklch(0.74 0.184 22)",
+          "chart-1": "oklch(0.74 0.184 22)",
+          "chart-2": "oklch(0.72 0.2 202)",
+          "chart-3": "oklch(0.82 0.17 46)",
+          "chart-4": "oklch(0.66 0.16 82)",
+          "chart-5": "oklch(0.86 0.12 322)",
+          "aurora-1": "oklch(0.44 0.156 22)",
+          "aurora-2": "oklch(0.38 0.18 202)",
+          "aurora-3": "oklch(0.42 0.12 46)",
+          "aurora-base": "oklch(0.12 0.012 22)"
+        }
+      }
+    },
+    {
+      "name": "theme-lagoon",
+      "type": "registry:theme",
+      "title": "Lagoon palette",
+      "description": "Teal, aqua and deep blue. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "primary": "oklch(0.6 0.14 200)",
+          "primary-foreground": "oklch(0.99 0 0)",
+          "ring": "oklch(0.6 0.14 200)",
+          "chart-1": "oklch(0.6 0.14 200)",
+          "chart-2": "oklch(0.66 0.14 238)",
+          "chart-3": "oklch(0.78 0.119 166)",
+          "chart-4": "oklch(0.55 0.112 260)",
+          "chart-5": "oklch(0.85 0.084 140)",
+          "aurora-1": "oklch(0.84 0.077 200)",
+          "aurora-2": "oklch(0.83 0.084 238)",
+          "aurora-3": "oklch(0.9 0.059 166)",
+          "aurora-base": "oklch(0.955 0.012 200)"
+        },
+        "dark": {
+          "primary": "oklch(0.74 0.129 200)",
+          "primary-foreground": "oklch(0.18 0.03 200)",
+          "ring": "oklch(0.74 0.129 200)",
+          "chart-1": "oklch(0.74 0.129 200)",
+          "chart-2": "oklch(0.72 0.14 238)",
+          "chart-3": "oklch(0.82 0.119 166)",
+          "chart-4": "oklch(0.66 0.112 260)",
+          "chart-5": "oklch(0.86 0.084 140)",
+          "aurora-1": "oklch(0.44 0.109 200)",
+          "aurora-2": "oklch(0.38 0.126 238)",
+          "aurora-3": "oklch(0.42 0.084 166)",
+          "aurora-base": "oklch(0.12 0.012 200)"
+        }
+      }
+    },
+    {
+      "name": "theme-sand",
+      "type": "registry:theme",
+      "title": "Sand palette",
+      "description": "Warm neutrals, barely tinted. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "primary": "oklch(0.6 0.07 70)",
+          "primary-foreground": "oklch(0.99 0 0)",
+          "ring": "oklch(0.6 0.07 70)",
+          "chart-1": "oklch(0.6 0.07 70)",
+          "chart-2": "oklch(0.66 0.07 78)",
+          "chart-3": "oklch(0.78 0.06 62)",
+          "chart-4": "oklch(0.55 0.056 130)",
+          "chart-5": "oklch(0.85 0.042 10)",
+          "aurora-1": "oklch(0.8 0.039 70)",
+          "aurora-2": "oklch(0.88 0.042 78)",
+          "aurora-3": "oklch(0.92 0.029 62)",
+          "aurora-base": "oklch(0.955 0.012 70)"
+        },
+        "dark": {
+          "primary": "oklch(0.74 0.064 70)",
+          "primary-foreground": "oklch(0.18 0.03 70)",
+          "ring": "oklch(0.74 0.064 70)",
+          "chart-1": "oklch(0.74 0.064 70)",
+          "chart-2": "oklch(0.72 0.07 78)",
+          "chart-3": "oklch(0.82 0.06 62)",
+          "chart-4": "oklch(0.66 0.056 130)",
+          "chart-5": "oklch(0.86 0.042 10)",
+          "aurora-1": "oklch(0.44 0.055 70)",
+          "aurora-2": "oklch(0.38 0.063 78)",
+          "aurora-3": "oklch(0.42 0.042 62)",
+          "aurora-base": "oklch(0.12 0.012 70)"
+        }
+      }
+    },
+    {
+      "name": "theme-midnight",
+      "type": "registry:theme",
+      "title": "Midnight palette",
+      "description": "Indigo, magenta and cyan — made for dark. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "primary": "oklch(0.6 0.19 275)",
+          "primary-foreground": "oklch(0.99 0 0)",
+          "ring": "oklch(0.6 0.19 275)",
+          "chart-1": "oklch(0.6 0.19 275)",
+          "chart-2": "oklch(0.66 0.19 35)",
+          "chart-3": "oklch(0.78 0.162 155)",
+          "chart-4": "oklch(0.55 0.152 335)",
+          "chart-5": "oklch(0.85 0.114 215)",
+          "aurora-1": "oklch(0.84 0.105 275)",
+          "aurora-2": "oklch(0.83 0.114 35)",
+          "aurora-3": "oklch(0.9 0.08 155)",
+          "aurora-base": "oklch(0.955 0.012 275)"
+        },
+        "dark": {
+          "primary": "oklch(0.74 0.175 275)",
+          "primary-foreground": "oklch(0.18 0.03 275)",
+          "ring": "oklch(0.74 0.175 275)",
+          "chart-1": "oklch(0.74 0.175 275)",
+          "chart-2": "oklch(0.72 0.19 35)",
+          "chart-3": "oklch(0.82 0.162 155)",
+          "chart-4": "oklch(0.66 0.152 335)",
+          "chart-5": "oklch(0.86 0.114 215)",
+          "aurora-1": "oklch(0.44 0.148 275)",
+          "aurora-2": "oklch(0.38 0.171 35)",
+          "aurora-3": "oklch(0.42 0.114 155)",
+          "aurora-base": "oklch(0.12 0.012 275)"
+        }
+      }
+    },
+    {
+      "name": "material-frosted",
+      "type": "registry:theme",
+      "title": "Frosted material",
+      "description": "Soft frost, a light rim — the default. Sets frost, blur, saturation, sheen, grain, rim and depth.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-tint": "oklch(1 0 0)",
+          "glass-opacity": "52%",
+          "glass-opacity-strong": "74%",
+          "glass-opacity-subtle": "28%",
+          "glass-blur": "28px",
+          "glass-saturate": "180%",
+          "glass-brightness": "100%",
+          "glass-sheen": "10%",
+          "glass-sheen-angle": "160deg",
+          "glass-texture": "none",
+          "glass-fill-tint": "oklch(0.55 0.01 285)",
+          "glass-fill-opacity": "12%",
+          "glass-fill-opacity-strong": "20%",
+          "glass-thumb": "oklch(1 0 0)",
+          "glass-border-color": "oklch(1 0 0)",
+          "glass-border-opacity": "85%",
+          "glass-border-width": "1px",
+          "glass-highlight-opacity": "92%",
+          "glass-shadow-color": "oklch(0.3 0.05 270)",
+          "glass-shadow-opacity": "12%",
+          "glass-shadow-y": "10px",
+          "glass-shadow-blur": "30px",
+          "glass-glow": "0%"
+        },
+        "dark": {
+          "glass-tint": "oklch(0.24 0.012 285)",
+          "glass-opacity": "45%",
+          "glass-opacity-strong": "72%",
+          "glass-opacity-subtle": "24%",
+          "glass-blur": "28px",
+          "glass-saturate": "180%",
+          "glass-brightness": "100%",
+          "glass-sheen": "5%",
+          "glass-sheen-angle": "160deg",
+          "glass-texture": "none",
+          "glass-fill-tint": "oklch(0.6 0.01 285)",
+          "glass-fill-opacity": "24%",
+          "glass-fill-opacity-strong": "36%",
+          "glass-thumb": "oklch(1 0 0 / 20%)",
+          "glass-border-color": "oklch(1 0 0)",
+          "glass-border-opacity": "12%",
+          "glass-border-width": "1px",
+          "glass-highlight-opacity": "14%",
+          "glass-shadow-color": "oklch(0 0 0)",
+          "glass-shadow-opacity": "45%",
+          "glass-shadow-y": "10px",
+          "glass-shadow-blur": "30px",
+          "glass-glow": "0%"
+        }
+      }
+    },
+    {
+      "name": "material-liquid",
+      "type": "registry:theme",
+      "title": "Liquid material",
+      "description": "Clear and vivid: little frost, strong saturation, a bright sheen. Sets frost, blur, saturation, sheen, grain, rim and depth.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-tint": "oklch(1 0 0)",
+          "glass-opacity": "28%",
+          "glass-opacity-strong": "55%",
+          "glass-opacity-subtle": "14%",
+          "glass-blur": "16px",
+          "glass-saturate": "240%",
+          "glass-brightness": "100%",
+          "glass-sheen": "22%",
+          "glass-sheen-angle": "135deg",
+          "glass-texture": "none",
+          "glass-fill-tint": "oklch(0.55 0.01 285)",
+          "glass-fill-opacity": "12%",
+          "glass-fill-opacity-strong": "20%",
+          "glass-thumb": "oklch(1 0 0)",
+          "glass-border-color": "oklch(1 0 0)",
+          "glass-border-opacity": "85%",
+          "glass-border-width": "1px",
+          "glass-highlight-opacity": "92%",
+          "glass-shadow-color": "oklch(0.3 0.05 270)",
+          "glass-shadow-opacity": "12%",
+          "glass-shadow-y": "10px",
+          "glass-shadow-blur": "30px",
+          "glass-glow": "0%"
+        },
+        "dark": {
+          "glass-tint": "oklch(0.24 0.012 285)",
+          "glass-opacity": "26%",
+          "glass-opacity-strong": "55%",
+          "glass-opacity-subtle": "12%",
+          "glass-blur": "16px",
+          "glass-saturate": "240%",
+          "glass-brightness": "100%",
+          "glass-sheen": "10%",
+          "glass-sheen-angle": "135deg",
+          "glass-texture": "none",
+          "glass-fill-tint": "oklch(0.6 0.01 285)",
+          "glass-fill-opacity": "24%",
+          "glass-fill-opacity-strong": "36%",
+          "glass-thumb": "oklch(1 0 0 / 20%)",
+          "glass-border-color": "oklch(1 0 0)",
+          "glass-border-opacity": "12%",
+          "glass-border-width": "1px",
+          "glass-highlight-opacity": "14%",
+          "glass-shadow-color": "oklch(0 0 0)",
+          "glass-shadow-opacity": "45%",
+          "glass-shadow-y": "10px",
+          "glass-shadow-blur": "30px",
+          "glass-glow": "0%"
+        }
+      }
+    },
+    {
+      "name": "material-crystal",
+      "type": "registry:theme",
+      "title": "Crystal material",
+      "description": "Little blur, a crisp double-strength rim and a hard highlight. Sets frost, blur, saturation, sheen, grain, rim and depth.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-tint": "oklch(1 0 0)",
+          "glass-opacity": "38%",
+          "glass-opacity-strong": "74%",
+          "glass-opacity-subtle": "28%",
+          "glass-blur": "10px",
+          "glass-saturate": "150%",
+          "glass-brightness": "100%",
+          "glass-sheen": "16%",
+          "glass-sheen-angle": "120deg",
+          "glass-texture": "none",
+          "glass-fill-tint": "oklch(0.55 0.01 285)",
+          "glass-fill-opacity": "12%",
+          "glass-fill-opacity-strong": "20%",
+          "glass-thumb": "oklch(1 0 0)",
+          "glass-border-color": "oklch(1 0 0)",
+          "glass-border-opacity": "100%",
+          "glass-border-width": "1.5px",
+          "glass-highlight-opacity": "100%",
+          "glass-shadow-color": "oklch(0.3 0.05 270)",
+          "glass-shadow-opacity": "12%",
+          "glass-shadow-y": "10px",
+          "glass-shadow-blur": "30px",
+          "glass-glow": "0%"
+        },
+        "dark": {
+          "glass-tint": "oklch(0.24 0.012 285)",
+          "glass-opacity": "34%",
+          "glass-opacity-strong": "72%",
+          "glass-opacity-subtle": "24%",
+          "glass-blur": "10px",
+          "glass-saturate": "150%",
+          "glass-brightness": "100%",
+          "glass-sheen": "16%",
+          "glass-sheen-angle": "120deg",
+          "glass-texture": "none",
+          "glass-fill-tint": "oklch(0.6 0.01 285)",
+          "glass-fill-opacity": "24%",
+          "glass-fill-opacity-strong": "36%",
+          "glass-thumb": "oklch(1 0 0 / 20%)",
+          "glass-border-color": "oklch(1 0 0)",
+          "glass-border-opacity": "28%",
+          "glass-border-width": "1.5px",
+          "glass-highlight-opacity": "30%",
+          "glass-shadow-color": "oklch(0 0 0)",
+          "glass-shadow-opacity": "45%",
+          "glass-shadow-y": "10px",
+          "glass-shadow-blur": "30px",
+          "glass-glow": "0%"
+        }
+      }
+    },
+    {
+      "name": "material-smoked",
+      "type": "registry:theme",
+      "title": "Smoked material",
+      "description": "Dark tinted glass in both schemes. Sets frost, blur, saturation, sheen, grain, rim and depth.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-tint": "oklch(0.2 0.01 270)",
+          "glass-opacity": "58%",
+          "glass-opacity-strong": "82%",
+          "glass-opacity-subtle": "40%",
+          "glass-blur": "30px",
+          "glass-saturate": "140%",
+          "glass-brightness": "85%",
+          "glass-sheen": "6%",
+          "glass-sheen-angle": "160deg",
+          "glass-texture": "none",
+          "glass-fill-tint": "oklch(0.55 0.01 285)",
+          "glass-fill-opacity": "12%",
+          "glass-fill-opacity-strong": "20%",
+          "glass-thumb": "oklch(1 0 0)",
+          "glass-border-color": "oklch(1 0 0)",
+          "glass-border-opacity": "16%",
+          "glass-border-width": "1px",
+          "glass-highlight-opacity": "18%",
+          "glass-shadow-color": "oklch(0.3 0.05 270)",
+          "glass-shadow-opacity": "30%",
+          "glass-shadow-y": "10px",
+          "glass-shadow-blur": "30px",
+          "glass-glow": "0%"
+        },
+        "dark": {
+          "glass-tint": "oklch(0.2 0.01 270)",
+          "glass-opacity": "60%",
+          "glass-opacity-strong": "84%",
+          "glass-opacity-subtle": "24%",
+          "glass-blur": "30px",
+          "glass-saturate": "140%",
+          "glass-brightness": "85%",
+          "glass-sheen": "6%",
+          "glass-sheen-angle": "160deg",
+          "glass-texture": "none",
+          "glass-fill-tint": "oklch(0.6 0.01 285)",
+          "glass-fill-opacity": "24%",
+          "glass-fill-opacity-strong": "36%",
+          "glass-thumb": "oklch(1 0 0 / 20%)",
+          "glass-border-color": "oklch(1 0 0)",
+          "glass-border-opacity": "12%",
+          "glass-border-width": "1px",
+          "glass-highlight-opacity": "14%",
+          "glass-shadow-color": "oklch(0 0 0)",
+          "glass-shadow-opacity": "45%",
+          "glass-shadow-y": "10px",
+          "glass-shadow-blur": "30px",
+          "glass-glow": "0%"
+        }
+      }
+    },
+    {
+      "name": "material-matte",
+      "type": "registry:theme",
+      "title": "Matte material",
+      "description": "No blur at all — opaque panes. The fastest option on slow devices. Sets frost, blur, saturation, sheen, grain, rim and depth.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-tint": "oklch(1 0 0)",
+          "glass-opacity": "90%",
+          "glass-opacity-strong": "96%",
+          "glass-opacity-subtle": "75%",
+          "glass-blur": "0px",
+          "glass-saturate": "100%",
+          "glass-brightness": "100%",
+          "glass-sheen": "0%",
+          "glass-sheen-angle": "160deg",
+          "glass-texture": "none",
+          "glass-fill-tint": "oklch(0.55 0.01 285)",
+          "glass-fill-opacity": "12%",
+          "glass-fill-opacity-strong": "20%",
+          "glass-thumb": "oklch(1 0 0)",
+          "glass-border-color": "oklch(1 0 0)",
+          "glass-border-opacity": "85%",
+          "glass-border-width": "1px",
+          "glass-highlight-opacity": "92%",
+          "glass-shadow-color": "oklch(0.3 0.05 270)",
+          "glass-shadow-opacity": "12%",
+          "glass-shadow-y": "10px",
+          "glass-shadow-blur": "30px",
+          "glass-glow": "0%"
+        },
+        "dark": {
+          "glass-tint": "oklch(0.24 0.012 285)",
+          "glass-opacity": "90%",
+          "glass-opacity-strong": "96%",
+          "glass-opacity-subtle": "75%",
+          "glass-blur": "0px",
+          "glass-saturate": "100%",
+          "glass-brightness": "100%",
+          "glass-sheen": "0%",
+          "glass-sheen-angle": "160deg",
+          "glass-texture": "none",
+          "glass-fill-tint": "oklch(0.6 0.01 285)",
+          "glass-fill-opacity": "24%",
+          "glass-fill-opacity-strong": "36%",
+          "glass-thumb": "oklch(1 0 0 / 20%)",
+          "glass-border-color": "oklch(1 0 0)",
+          "glass-border-opacity": "12%",
+          "glass-border-width": "1px",
+          "glass-highlight-opacity": "14%",
+          "glass-shadow-color": "oklch(0 0 0)",
+          "glass-shadow-opacity": "45%",
+          "glass-shadow-y": "10px",
+          "glass-shadow-blur": "30px",
+          "glass-glow": "0%"
+        }
+      }
+    },
+    {
+      "name": "material-vapor",
+      "type": "registry:theme",
+      "title": "Vapor material",
+      "description": "Heavy, misty blur with almost no edge. Sets frost, blur, saturation, sheen, grain, rim and depth.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-tint": "oklch(1 0 0)",
+          "glass-opacity": "40%",
+          "glass-opacity-strong": "74%",
+          "glass-opacity-subtle": "28%",
+          "glass-blur": "56px",
+          "glass-saturate": "200%",
+          "glass-brightness": "100%",
+          "glass-sheen": "0%",
+          "glass-sheen-angle": "160deg",
+          "glass-texture": "none",
+          "glass-fill-tint": "oklch(0.55 0.01 285)",
+          "glass-fill-opacity": "12%",
+          "glass-fill-opacity-strong": "20%",
+          "glass-thumb": "oklch(1 0 0)",
+          "glass-border-color": "oklch(1 0 0)",
+          "glass-border-opacity": "35%",
+          "glass-border-width": "1px",
+          "glass-highlight-opacity": "50%",
+          "glass-shadow-color": "oklch(0.3 0.05 270)",
+          "glass-shadow-opacity": "12%",
+          "glass-shadow-y": "10px",
+          "glass-shadow-blur": "60px",
+          "glass-glow": "0%"
+        },
+        "dark": {
+          "glass-tint": "oklch(0.24 0.012 285)",
+          "glass-opacity": "35%",
+          "glass-opacity-strong": "72%",
+          "glass-opacity-subtle": "24%",
+          "glass-blur": "56px",
+          "glass-saturate": "200%",
+          "glass-brightness": "100%",
+          "glass-sheen": "0%",
+          "glass-sheen-angle": "160deg",
+          "glass-texture": "none",
+          "glass-fill-tint": "oklch(0.6 0.01 285)",
+          "glass-fill-opacity": "24%",
+          "glass-fill-opacity-strong": "36%",
+          "glass-thumb": "oklch(1 0 0 / 20%)",
+          "glass-border-color": "oklch(1 0 0)",
+          "glass-border-opacity": "6%",
+          "glass-border-width": "1px",
+          "glass-highlight-opacity": "8%",
+          "glass-shadow-color": "oklch(0 0 0)",
+          "glass-shadow-opacity": "45%",
+          "glass-shadow-y": "10px",
+          "glass-shadow-blur": "60px",
+          "glass-glow": "0%"
+        }
+      }
+    },
+    {
+      "name": "material-neon",
+      "type": "registry:theme",
+      "title": "Neon material",
+      "description": "Dark frost lit from inside by the accent. Sets frost, blur, saturation, sheen, grain, rim and depth.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-tint": "oklch(1 0 0)",
+          "glass-opacity": "48%",
+          "glass-opacity-strong": "74%",
+          "glass-opacity-subtle": "28%",
+          "glass-blur": "24px",
+          "glass-saturate": "220%",
+          "glass-brightness": "100%",
+          "glass-sheen": "8%",
+          "glass-sheen-angle": "160deg",
+          "glass-texture": "none",
+          "glass-fill-tint": "oklch(0.55 0.01 285)",
+          "glass-fill-opacity": "12%",
+          "glass-fill-opacity-strong": "20%",
+          "glass-thumb": "oklch(1 0 0)",
+          "glass-border-color": "oklch(1 0 0)",
+          "glass-border-opacity": "70%",
+          "glass-border-width": "1px",
+          "glass-highlight-opacity": "92%",
+          "glass-shadow-color": "oklch(0.3 0.05 270)",
+          "glass-shadow-opacity": "12%",
+          "glass-shadow-y": "10px",
+          "glass-shadow-blur": "30px",
+          "glass-glow": "38%"
+        },
+        "dark": {
+          "glass-tint": "oklch(0.24 0.012 285)",
+          "glass-opacity": "40%",
+          "glass-opacity-strong": "72%",
+          "glass-opacity-subtle": "24%",
+          "glass-blur": "24px",
+          "glass-saturate": "220%",
+          "glass-brightness": "100%",
+          "glass-sheen": "8%",
+          "glass-sheen-angle": "160deg",
+          "glass-texture": "none",
+          "glass-fill-tint": "oklch(0.6 0.01 285)",
+          "glass-fill-opacity": "24%",
+          "glass-fill-opacity-strong": "36%",
+          "glass-thumb": "oklch(1 0 0 / 20%)",
+          "glass-border-color": "oklch(1 0 0)",
+          "glass-border-opacity": "22%",
+          "glass-border-width": "1px",
+          "glass-highlight-opacity": "14%",
+          "glass-shadow-color": "oklch(0 0 0)",
+          "glass-shadow-opacity": "45%",
+          "glass-shadow-y": "10px",
+          "glass-shadow-blur": "30px",
+          "glass-glow": "38%"
+        }
+      }
+    },
+    {
+      "name": "shape-round",
+      "type": "registry:theme",
+      "title": "Round shape",
+      "description": "Capsule buttons, generous corners — the default. Sets every corner radius.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-radius-surface": "1.5rem",
+          "glass-radius-control": "0.75rem",
+          "glass-radius-button": "9999px",
+          "glass-radius-badge": "9999px"
+        },
+        "dark": {
+          "glass-radius-surface": "1.5rem",
+          "glass-radius-control": "0.75rem",
+          "glass-radius-button": "9999px",
+          "glass-radius-badge": "9999px"
+        }
+      }
+    },
+    {
+      "name": "shape-soft",
+      "type": "registry:theme",
+      "title": "Soft shape",
+      "description": "Rounded rectangles everywhere. Sets every corner radius.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-radius-surface": "1rem",
+          "glass-radius-control": "0.625rem",
+          "glass-radius-button": "0.75rem",
+          "glass-radius-badge": "0.5rem"
+        },
+        "dark": {
+          "glass-radius-surface": "1rem",
+          "glass-radius-control": "0.625rem",
+          "glass-radius-button": "0.75rem",
+          "glass-radius-badge": "0.5rem"
+        }
+      }
+    },
+    {
+      "name": "shape-sharp",
+      "type": "registry:theme",
+      "title": "Sharp shape",
+      "description": "Tight corners, still not square. Sets every corner radius.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-radius-surface": "0.5rem",
+          "glass-radius-control": "0.375rem",
+          "glass-radius-button": "0.375rem",
+          "glass-radius-badge": "0.25rem"
+        },
+        "dark": {
+          "glass-radius-surface": "0.5rem",
+          "glass-radius-control": "0.375rem",
+          "glass-radius-button": "0.375rem",
+          "glass-radius-badge": "0.25rem"
+        }
+      }
+    },
+    {
+      "name": "shape-square",
+      "type": "registry:theme",
+      "title": "Square shape",
+      "description": "No rounding at all. Sets every corner radius.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-radius-surface": "0rem",
+          "glass-radius-control": "0rem",
+          "glass-radius-button": "0rem",
+          "glass-radius-badge": "0rem"
+        },
+        "dark": {
+          "glass-radius-surface": "0rem",
+          "glass-radius-control": "0rem",
+          "glass-radius-button": "0rem",
+          "glass-radius-badge": "0rem"
+        }
+      }
+    },
+    {
+      "name": "motion-spring",
+      "type": "registry:theme",
+      "title": "Spring motion",
+      "description": "A little overshoot — the default. Sets duration, easing, press and aurora speed.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-duration": "200ms",
+          "glass-ease": "cubic-bezier(0.2, 0.9, 0.3, 1.12)",
+          "glass-press-scale": "0.97",
+          "aurora-speed": "1"
+        },
+        "dark": {
+          "glass-duration": "200ms",
+          "glass-ease": "cubic-bezier(0.2, 0.9, 0.3, 1.12)",
+          "glass-press-scale": "0.97",
+          "aurora-speed": "1"
+        }
+      }
+    },
+    {
+      "name": "motion-smooth",
+      "type": "registry:theme",
+      "title": "Smooth motion",
+      "description": "Material-style easing, no overshoot. Sets duration, easing, press and aurora speed.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-duration": "220ms",
+          "glass-ease": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "glass-press-scale": "0.98",
+          "aurora-speed": "1"
+        },
+        "dark": {
+          "glass-duration": "220ms",
+          "glass-ease": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "glass-press-scale": "0.98",
+          "aurora-speed": "1"
+        }
+      }
+    },
+    {
+      "name": "motion-snappy",
+      "type": "registry:theme",
+      "title": "Snappy motion",
+      "description": "Quick with a bounce. Sets duration, easing, press and aurora speed.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-duration": "160ms",
+          "glass-ease": "cubic-bezier(0.3, 1.4, 0.5, 1)",
+          "glass-press-scale": "0.94",
+          "aurora-speed": "1"
+        },
+        "dark": {
+          "glass-duration": "160ms",
+          "glass-ease": "cubic-bezier(0.3, 1.4, 0.5, 1)",
+          "glass-press-scale": "0.94",
+          "aurora-speed": "1"
+        }
+      }
+    },
+    {
+      "name": "motion-still",
+      "type": "registry:theme",
+      "title": "Still motion",
+      "description": "No transitions, no press squash, a frozen aurora. Sets duration, easing, press and aurora speed.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-duration": "0ms",
+          "glass-ease": "cubic-bezier(0.2, 0.9, 0.3, 1.12)",
+          "glass-press-scale": "1",
+          "aurora-speed": "0.0001"
+        },
+        "dark": {
+          "glass-duration": "0ms",
+          "glass-ease": "cubic-bezier(0.2, 0.9, 0.3, 1.12)",
+          "glass-press-scale": "1",
+          "aurora-speed": "0.0001"
+        }
+      }
+    },
+    {
+      "name": "density-compact",
+      "type": "registry:theme",
+      "title": "Compact density",
+      "description": "Scales control heights, paddings and card spacing (×0.85).",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-density": "0.85"
+        },
+        "dark": {
+          "glass-density": "0.85"
+        }
+      }
+    },
+    {
+      "name": "density-default",
+      "type": "registry:theme",
+      "title": "Default density",
+      "description": "Scales control heights, paddings and card spacing (×1).",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-density": "1"
+        },
+        "dark": {
+          "glass-density": "1"
+        }
+      }
+    },
+    {
+      "name": "density-comfortable",
+      "type": "registry:theme",
+      "title": "Comfortable density",
+      "description": "Scales control heights, paddings and card spacing (×1.15).",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "glass-density": "1.15"
+        },
+        "dark": {
+          "glass-density": "1.15"
         }
       }
     },
@@ -464,6 +1513,30 @@
           "path": "src/components/glass/card.tsx",
           "type": "registry:ui",
           "target": "@components/glass/card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "theme-scope",
+      "type": "registry:ui",
+      "title": "Theme scope",
+      "description": "Re-theme a subtree at runtime: a different palette, material, shape or scheme for one card, section or preview.",
+      "categories": [
+        "glass",
+        "surfaces"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-theme.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/theme-scope.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/theme-scope.tsx"
         }
       ]
     },
