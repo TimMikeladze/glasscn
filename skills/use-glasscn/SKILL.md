@@ -23,8 +23,11 @@ Put `<Aurora />` once in the root layout — glass needs something to frost.
 - Swap shadcn imports: `@/components/ui/card` → `@/components/glass/card`. Same parts and props.
 - Floating layers (dialogs, menus, popovers, toasts) are already `glass-strong`. In-flow cards are `glass`. Quiet panes: `<Glass intensity="subtle">`.
 - Inside a pane, use fills (`bg-fill`), not another pane. Two levels of glass at most.
-- iOS-style pieces with no shadcn equivalent: `SegmentedControl`, `Dock` (floating tab bar + action), `GroupedList` (Settings rows), `ActivityRings`, `ProgressRing`, `Sparkline`, `Stat`, `Heatmap`.
-- Blocks to start from: `dashboard-01`, `settings-01`, `auth-01`.
+- iOS-style pieces with no shadcn equivalent: `SegmentedControl`, `Dock` (floating tab bar + action), `GroupedList` (Settings rows), `ActivityRings`, `ProgressRing`, `Sparkline`, `Stat`, `Heatmap`, `BarList`, `Gauge`, `Tracker`, `CategoryBar`.
+- Charts: `AreaChart`, `BarChart`, `LineChart`, `DonutChart` (TanStack Charts) take your rows unmodified plus typed accessors — `x={(d) => d.day}`, `series={[{ id, label, value: (d) => d.minutes }]}` — and a required `ariaLabel`. For anything else, build a TanStack `defineChart` and render it in `ChartContainer` from `chart`: series colours come from `--chart-1..5`, the tooltip is glass.
+- Tables: `Table` is shadcn's markup; `DataTable` (TanStack Table v9) adds sort, search, pagination, selection — build columns with `createDataTableColumnHelper<Row>()`.
+- Chat: `ChatThread` › `ChatMessage from="user|assistant"` › `ChatBubble`, plus `ChatTyping`, `ChatSuggestions`, `ChatComposer onSubmit`. It renders state; wire it to AI SDK `useChat` (`status === "submitted"` → `ChatTyping`).
+- Blocks to start from: `dashboard-01`, `analytics-01`, `chat-01`, `settings-01`, `auth-01`.
 
 See `references/recipes.md` for screen recipes.
 

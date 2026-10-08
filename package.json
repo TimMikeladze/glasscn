@@ -10,14 +10,19 @@
     "generate": "node scripts/generate.mjs",
     "registry:build": "node scripts/build-registry.mjs",
     "verify:install": "node scripts/verify-install.mjs",
+    "verify:native": "node scripts/verify-native.mjs",
+    "sandbox:native": "npm --prefix sandbox/native install && npm --prefix sandbox/native start",
     "test": "node scripts/generate.mjs && vitest run",
     "typecheck": "node scripts/generate.mjs && next typegen && tsc --noEmit",
     "postinstall": "node scripts/setup-skills.mjs",
     "skills": "node scripts/setup-skills.mjs"
   },
   "dependencies": {
+    "@tanstack/charts": "^1.0.0",
+    "@tanstack/react-table": "^9.2.6",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
+    "d3-scale": "^4.0.2",
     "lucide-react": "^1.52.0",
     "next": "16.4.0",
     "next-themes": "^0.4.6",
@@ -30,6 +35,7 @@
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
+    "@types/d3-scale": "^4.0.9",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

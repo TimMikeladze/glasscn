@@ -134,9 +134,17 @@ export const stylesheet = {
   "@keyframes glass-fade": {
     from: { opacity: "0" },
   },
+  "@keyframes glass-grow": {
+    from: { transform: "scaleX(0)" },
+  },
   "@keyframes glass-pulse": {
     "0%": { transform: "scale(1)", opacity: "0.7" },
     "100%": { transform: "scale(1.7)", opacity: "0" },
+  },
+  // Chat's typing dots — the one looping animation besides the aurora; stilled by reduced motion.
+  "@keyframes glass-typing": {
+    "0%, 60%, 100%": { transform: "translateY(0)", opacity: "0.45" },
+    "30%": { transform: "translateY(-0.25rem)", opacity: "1" },
   },
   // No backdrop-filter (old browsers, some WebViews): panes become nearly opaque.
   "@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))": {

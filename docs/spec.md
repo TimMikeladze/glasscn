@@ -33,13 +33,16 @@ See [`theming.md`](theming.md): 68 primitives in eleven groups, composable prese
 |---|---|
 | Surfaces | `aurora`, `glass` (`Glass`), `card`, `theme-scope` |
 | Typography | `typography` (`Heading`, `Text`, `Display`, `Blockquote`, `InlineCode`, `List`, `TextLink`), `prose` |
-| Controls | `button`, `badge`, `input`, `textarea`, `label`, `switch`, `segmented-control`, `tabs`, `slider`, `progress`, `kbd`, `separator` |
+| Controls | `button`, `badge`, `input`, `textarea`, `label`, `checkbox`, `switch`, `segmented-control`, `tabs`, `slider`, `progress`, `kbd`, `separator`, `avatar` |
 | Overlays | `dialog`, `sheet`, `popover`, `tooltip`, `dropdown-menu`, `toaster` (sonner) |
 | Navigation | `dock` (floating capsule bar, sliding pill, action button), `grouped-list` (Settings-style rows, icon tiles) |
-| Data | `activity-rings`, `progress-ring`, `sparkline`, `stat`, `heatmap` |
-| Blocks | `dashboard-01` (rings + stats + 39-week heatmap + sparkline), `settings-01` (grouped lists), `auth-01` (glass sign-in) |
+| Data | `activity-rings`, `progress-ring`, `sparkline`, `stat`, `heatmap`, `bar-list`, `gauge`, `tracker`, `category-bar` |
+| Charts (TanStack Charts) | `chart` (themed host + legend), `area-chart`, `bar-chart`, `line-chart`, `donut-chart` |
+| Tables (TanStack Table v9) | `table`, `data-table` |
+| Chat | `chat` (thread, message, bubble, meta, divider, typing, suggestions, composer) |
+| Blocks | `dashboard-01` (rings + stats + 39-week heatmap + sparkline), `analytics-01` (charts + bar list + data table), `chat-01` (coach conversation), `settings-01` (grouped lists), `auth-01` (glass sign-in) |
 
-Pure maths (`ring` arcs, smooth paths, heatmap grid) lives in `lib/glass-charts.ts` (tested).
+Pure maths (`ring` arcs, smooth paths, heatmap grid, bar shares, gauge arcs, category segments) lives in `lib/glass-charts.ts` (tested). Charts and tables: [`data-and-chat.md`](data-and-chat.md).
 
 ## Site
 

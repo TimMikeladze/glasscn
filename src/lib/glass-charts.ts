@@ -1,6 +1,8 @@
 /**
  * Pure maths behind the glasscn data components: ring arcs, smooth sparkline
- * paths and the heatmap grid. No React, no DOM — tested on its own.
+ * paths, the heatmap grid, bar-list widths, gauge arcs, category segments, and
+ * the axis/stack/curve helpers behind the chart presets.
+ * No React, no DOM — tested on its own.
  */
 
 export interface Point {
@@ -134,4 +136,148 @@ export function monthLabels(cols: HeatCell[][], locale = "en-US"): (string | nul
     prev = m
     return changed ? parseDate(col[0].date).toLocaleString(locale, { month: "short" }) : null
   })
+}
+
+// ---- bar list ----
+
+/** Each value's share of the largest (or of `max`), 0–100, for bar widths. Negative and non-finite values are 0. */
+export function barShares(values: number[], max?: number): number[] {
+  const clean = values.map((v) => (Number.isFinite(v) && v > 0 ? v : 0))
+  const top = max ?? Math.max(0, ...clean)
+  if (top <= 0) return clean.map(() => 0)
+  return clean.map((v) => Math.min(100, (v / top) * 100))
+}
+
+// ---- gauge ----
+
+/** Where `value` falls between `min` and `max`, clamped to 0–1. */
+export function fraction(value: number, min = 0, max = 1): number {
+  if (!Number.isFinite(value) || max === min) return 0
+  return Math.min(1, Math.max(0, (value - min) / (max - min)))
+}
+
+/** A point on a circle; angle in radians, 0 = 12 o'clock, clockwise. */
+export function polarPoint(cx: number, cy: number, r: number, angle: number): Point {
+  return { x: cx + r * Math.sin(angle), y: cy - r * Math.cos(angle) }
+}
+
+/** An SVG arc from `start` to `end` (radians, 0 = 12 o'clock, clockwise). Empty when the sweep is 0. */
+export function arcPath(cx: number, cy: number, r: number, start: number, end: number): string {
+  if (end - start <= 0) return ""
+  const f = (n: number) => Number(n.toFixed(2))
+  const a = polarPoint(cx, cy, r, start)
+  const b = polarPoint(cx, cy, r, end)
+  const large = end - start > Math.PI ? 1 : 0
+  return `M${f(a.x)},${f(a.y)} A${f(r)},${f(r)} 0 ${large} 1 ${f(b.x)},${f(b.y)}`
+}
+
+// ---- category bar ----
+
+export interface Segment {
+  /** Left edge, % of the whole bar. */
+  start: number
+  /** Width, % of the whole bar. */
+  width: number
+}
+
+/** Consecutive segments for `values` (sizes, not edges), as percentages of their sum. */
+export function segments(values: number[]): Segment[] {
+  const clean = values.map((v) => (Number.isFinite(v) && v > 0 ? v : 0))
+  const total = clean.reduce((a, b) => a + b, 0)
+  let start = 0
+  return clean.map((v) => {
+    const width = total > 0 ? (v / total) * 100 : 0
+    const seg = { start, width }
+    start += width
+    return seg
+  })
+}
+
+/** Index of the segment containing `at` (a % along the bar); the last segment owns 100%. */
+export function segmentAt(segs: Segment[], at: number): number {
+  for (let i = 0; i < segs.length; i++) if (at < segs[i].start + segs[i].width) return i
+  return segs.length - 1
+}
+
+// ---- charts (area / bar / line presets) ----
+
+/** Which kind of x axis a column of values wants: dates → time, numbers → linear, anything else → category. Gaps are skipped. */
+export function axisKind(values: Iterable<unknown>): "time" | "linear" | "category" {
+  for (const v of values) {
+    if (v == null) continue
+    if (v instanceof Date) return "time"
+    return typeof v === "number" ? "linear" : "category"
+  }
+  return "category"
+}
+
+/** Running totals of a row's series values (gaps count as 0) — the top edge of each layer in a stack. */
+export function runningTotals(values: (number | null | undefined)[]): number[] {
+  let sum = 0
+  return values.map((v) => (sum += typeof v === "number" && Number.isFinite(v) ? v : 0))
+}
+
+type XY = readonly (readonly [number, number])[]
+
+/** Tangents for a monotone cubic through `pts` (Steffen's method, as d3's curveMonotoneX): never overshoots a peak. */
+function monotoneTangents(pts: XY): number[] {
+  const n = pts.length
+  const slope = (i: number) => {
+    const h = pts[i + 1][0] - pts[i][0]
+    return h ? (pts[i + 1][1] - pts[i][1]) / h : 0
+  }
+  const t: number[] = []
+  for (let i = 0; i < n; i++) {
+    if (i === 0 || i === n - 1) continue
+    const h0 = pts[i][0] - pts[i - 1][0]
+    const h1 = pts[i + 1][0] - pts[i][0]
+    const s0 = slope(i - 1)
+    const s1 = slope(i)
+    const p = h0 + h1 ? (s0 * h1 + s1 * h0) / (h0 + h1) : 0
+    t[i] = (Math.sign(s0) + Math.sign(s1)) * Math.min(Math.abs(s0), Math.abs(s1), 0.5 * Math.abs(p)) || 0
+  }
+  if (n > 1) {
+    const end = (a: number, b: number, inner: number | undefined) => {
+      const h = pts[b][0] - pts[a][0]
+      const s = h ? (pts[b][1] - pts[a][1]) / h : 0
+      return inner === undefined ? s : (3 * s - inner) / 2
+    }
+    t[0] = end(0, 1, n > 2 ? t[1] : undefined)
+    t[n - 1] = end(n - 2, n - 1, n > 2 ? t[n - 2] : undefined)
+  }
+  return t
+}
+
+/** The curve segments through `pts` (no leading move). */
+function monotoneSegments(pts: XY): string {
+  const f = (n: number) => Number(n.toFixed(2))
+  const t = monotoneTangents(pts)
+  let d = ""
+  for (let i = 0; i < pts.length - 1; i++) {
+    const [x0, y0] = pts[i]
+    const [x1, y1] = pts[i + 1]
+    const dx = (x1 - x0) / 3
+    d += ` C${f(x0 + dx)},${f(y0 + dx * t[i])} ${f(x1 - dx)},${f(y1 - dx * t[i + 1])} ${f(x1)},${f(y1)}`
+  }
+  return d
+}
+
+/**
+ * A smooth, monotone-in-x curve for chart lines and areas — the `{ line, area }`
+ * contract TanStack Charts accepts as `curve`. Unlike Catmull-Rom it never
+ * swings above a peak or below a trough, so the stroke stays honest to the data.
+ */
+export const monotoneCurve = {
+  line(points: XY): string {
+    if (!points.length) return ""
+    const f = (n: number) => Number(n.toFixed(2))
+    return `M${f(points[0][0])},${f(points[0][1])}${monotoneSegments(points)}`
+  },
+  area(top: XY, bottom: XY): string {
+    if (!top.length) return ""
+    const f = (n: number) => Number(n.toFixed(2))
+    const back = [...bottom].reverse()
+    const start = back[0] ?? top[top.length - 1]
+    return `${monotoneCurve.line(top)} L${f(start[0])},${f(start[1])}${monotoneSegments(back)} Z`
+  },
 }

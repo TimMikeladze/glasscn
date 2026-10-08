@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { addDays, areaPath, heatmapWeeks, levelOf, monthLabels, ringArc, ringRadii, scaleSeries, smoothPath } from "../glass-charts"
+import { addDays, arcPath, areaPath, barShares, fraction, heatmapWeeks, levelOf, monthLabels, polarPoint, ringArc, ringRadii, scaleSeries, segmentAt, segments, smoothPath } from "../glass-charts"
 
 describe("rings", () => {
   it("fits concentric radii inside the size and drops rings that would collapse", () => {
@@ -60,5 +60,50 @@ describe("heatmap", () => {
   it("labels a column only when its month changes", () => {
     const cols = heatmapWeeks({}, { today: "2026-10-08", weeks: 3, weekStart: 1 })
     expect(monthLabels(cols)).toEqual(["Sep", null, "Oct"])
+  })
+})
+
+describe("bar list", () => {
+  it("sizes bars against the largest value, or a given max", () => {
+    expect(barShares([50, 100, 25])).toEqual([50, 100, 25])
+    expect(barShares([50, 200], 100)).toEqual([50, 100])
+  })
+  it("treats negatives, NaN and an all-zero list as empty", () => {
+    expect(barShares([-5, Number.NaN, 10])).toEqual([0, 0, 100])
+    expect(barShares([0, 0])).toEqual([0, 0])
+  })
+})
+
+describe("gauge", () => {
+  it("clamps the value into 0–1 of its range", () => {
+    expect(fraction(75, 50, 100)).toBe(0.5)
+    expect(fraction(120, 0, 100)).toBe(1)
+    expect(fraction(-1)).toBe(0)
+    expect(fraction(5, 3, 3)).toBe(0)
+  })
+  it("measures angles clockwise from 12 o'clock", () => {
+    const p = polarPoint(50, 50, 10, Math.PI / 2)
+    expect(p.x).toBeCloseTo(60)
+    expect(p.y).toBeCloseTo(50)
+  })
+  it("draws a half-circle arc and nothing for an empty sweep", () => {
+    expect(arcPath(50, 50, 40, -Math.PI / 2, Math.PI / 2)).toBe("M10,50 A40,40 0 0 1 90,50")
+    expect(arcPath(50, 50, 40, 1, 1)).toBe("")
+  })
+})
+
+describe("category bar", () => {
+  it("lays segments end to end as shares of the total", () => {
+    expect(segments([1, 1, 2])).toEqual([
+      { start: 0, width: 25 },
+      { start: 25, width: 25 },
+      { start: 50, width: 50 },
+    ])
+  })
+  it("finds the segment under a marker; the last owns the end", () => {
+    const segs = segments([1, 1, 2])
+    expect(segmentAt(segs, 10)).toBe(0)
+    expect(segmentAt(segs, 25)).toBe(1)
+    expect(segmentAt(segs, 100)).toBe(2)
   })
 })

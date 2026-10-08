@@ -18,11 +18,14 @@ Or set the namespace once in `components.json` — `"registries": { "@glasscn": 
 | Materials (7) | `material-frosted` `-liquid` `-crystal` `-smoked` `-matte` `-vapor` `-neon` |
 | Shape · Motion · Density | `shape-round` `-soft` `-sharp` `-square` · `motion-spring` `-smooth` `-snappy` `-still` · `density-compact` `-default` `-comfortable` |
 | Surfaces | `aurora` `glass` `card` `theme-scope` |
-| Controls | `button` `badge` `input` `textarea` `label` `switch` `segmented-control` `tabs` `slider` `progress` `kbd` `separator` |
+| Controls | `button` `badge` `input` `textarea` `label` `checkbox` `switch` `segmented-control` `tabs` `slider` `progress` `kbd` `separator` `avatar` |
 | Overlays | `dialog` `sheet` `popover` `tooltip` `dropdown-menu` `toaster` |
 | Navigation | `dock` `grouped-list` |
-| Data | `activity-rings` `progress-ring` `sparkline` `stat` `heatmap` |
-| Blocks | `dashboard-01` `settings-01` `auth-01` |
+| Data | `activity-rings` `progress-ring` `sparkline` `stat` `heatmap` `bar-list` `gauge` `tracker` `category-bar` |
+| Charts | `chart` `area-chart` `bar-chart` `line-chart` `donut-chart` (TanStack Charts) |
+| Tables | `table` `data-table` (TanStack Table v9) |
+| Chat | `chat` |
+| Blocks | `dashboard-01` `analytics-01` `settings-01` `auth-01` `chat-01` |
 | React Native | `native-tokens` `native-glass` `native-aurora` `native-press` |
 
 - **shadcn's APIs, in glass.** Button, Card, Dialog, Tabs… keep their props and parts — swapping is `@/components/ui/x` → `@/components/glass/x`. Files land in `components/glass/`, beside shadcn's, never over them.
@@ -56,7 +59,8 @@ pnpm typecheck
 pnpm lint
 pnpm test                # theme engine, chart maths, registry integrity (files, deps, unique names, no derived primitives)
 pnpm verify:install      # fresh Next app → shadcn init → add every web item, presets and a local exported theme → tsc → next build
-node scripts/verify-native.mjs ../kaizen   # native items into a copy of an Expo app → tsc
+pnpm verify:native      # native items from the registry into a copy of the sandbox → tsc
+pnpm sandbox:native     # the Expo sandbox (sandbox/native): every native item live — i for iOS, w for web
 ```
 
 ## Build & deploy

@@ -305,6 +305,11 @@
             "opacity": "0"
           }
         },
+        "@keyframes glass-grow": {
+          "from": {
+            "transform": "scaleX(0)"
+          }
+        },
         "@keyframes glass-pulse": {
           "0%": {
             "transform": "scale(1)",
@@ -313,6 +318,16 @@
           "100%": {
             "transform": "scale(1.7)",
             "opacity": "0"
+          }
+        },
+        "@keyframes glass-typing": {
+          "0%, 60%, 100%": {
+            "transform": "translateY(0)",
+            "opacity": "0.45"
+          },
+          "30%": {
+            "transform": "translateY(-0.25rem)",
+            "opacity": "1"
           }
         },
         "@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))": {
@@ -366,7 +381,7 @@
       "name": "glass-charts",
       "type": "registry:lib",
       "title": "Chart maths",
-      "description": "Pure maths for the data components: ring radii and arcs, scaled series, smooth Catmull-Rom paths and areas, and the heatmap week grid.",
+      "description": "Pure maths for the data components: ring radii and arcs, scaled series, smooth Catmull-Rom paths and areas, the heatmap week grid, bar shares, gauge arcs and category segments.",
       "categories": [
         "glass",
         "foundations"
@@ -3345,6 +3360,31 @@
       ]
     },
     {
+      "name": "checkbox",
+      "type": "registry:ui",
+      "title": "Checkbox",
+      "description": "shadcn's Checkbox on glass: a soft box that fills with the accent, with an indeterminate dash.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/checkbox.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/checkbox.tsx"
+        }
+      ]
+    },
+    {
       "name": "segmented-control",
       "type": "registry:ui",
       "title": "Segmented control",
@@ -3487,6 +3527,31 @@
           "path": "src/components/glass/separator.tsx",
           "type": "registry:ui",
           "target": "@components/glass/separator.tsx"
+        }
+      ]
+    },
+    {
+      "name": "avatar",
+      "type": "registry:ui",
+      "title": "Avatar",
+      "description": "shadcn's Avatar on glass: a round photo with a hairline rim, initials on a soft fill, and overlapping groups.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/avatar.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/avatar.tsx"
         }
       ]
     },
@@ -3787,6 +3852,101 @@
       ]
     },
     {
+      "name": "bar-list",
+      "type": "registry:ui",
+      "title": "Bar list",
+      "description": "Ranked horizontal bars with the label inside and the value at the end — top habits, sources, pages.",
+      "categories": [
+        "glass",
+        "data"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-charts.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/bar-list.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/bar-list.tsx"
+        }
+      ]
+    },
+    {
+      "name": "gauge",
+      "type": "registry:ui",
+      "title": "Gauge",
+      "description": "A three-quarter meter with an optional target tick and the figure in its bowl. Server-component safe.",
+      "categories": [
+        "glass",
+        "data"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-charts.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/gauge.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/gauge.tsx"
+        }
+      ]
+    },
+    {
+      "name": "tracker",
+      "type": "registry:ui",
+      "title": "Tracker",
+      "description": "A row of status blocks — uptime, or a habit's last 30 days.",
+      "categories": [
+        "glass",
+        "data"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/tracker.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/tracker.tsx"
+        }
+      ]
+    },
+    {
+      "name": "category-bar",
+      "type": "registry:ui",
+      "title": "Category bar",
+      "description": "A range split into coloured bands with a marker — a readiness score, a budget.",
+      "categories": [
+        "glass",
+        "data"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-charts.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/category-bar.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/category-bar.tsx"
+        }
+      ]
+    },
+    {
       "name": "heatmap",
       "type": "registry:ui",
       "title": "Heatmap",
@@ -3807,6 +3967,212 @@
           "path": "src/components/glass/heatmap.tsx",
           "type": "registry:ui",
           "target": "@components/glass/heatmap.tsx"
+        }
+      ]
+    },
+    {
+      "name": "chart",
+      "type": "registry:ui",
+      "title": "Chart",
+      "description": "The chart host: TanStack Charts in a container that maps glass tokens — series colours from --chart-*, a glass-strong tooltip, inherited type — plus an HTML legend and chartColor().",
+      "categories": [
+        "glass",
+        "data"
+      ],
+      "dependencies": [
+        "cn",
+        "@tanstack/charts",
+        "d3-scale"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-charts.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/chart.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "area-chart",
+      "type": "registry:ui",
+      "title": "Area chart",
+      "description": "Volume over time: gradient areas under a line per series, optionally stacked, with a grouped glass tooltip.",
+      "categories": [
+        "glass",
+        "data"
+      ],
+      "dependencies": [
+        "cn",
+        "@tanstack/charts"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/chart.json",
+        "{REGISTRY_URL}/r/glass-charts.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/area-chart.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/area-chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "bar-chart",
+      "type": "registry:ui",
+      "title": "Bar chart",
+      "description": "Amounts per category, grouped or stacked, vertical or horizontal, with theme-rounded bar ends.",
+      "categories": [
+        "glass",
+        "data"
+      ],
+      "dependencies": [
+        "cn",
+        "@tanstack/charts"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/chart.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/bar-chart.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/bar-chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "line-chart",
+      "type": "registry:ui",
+      "title": "Line chart",
+      "description": "Measures over time, one smooth line per series, with a grouped glass tooltip and a crosshair.",
+      "categories": [
+        "glass",
+        "data"
+      ],
+      "dependencies": [
+        "cn",
+        "@tanstack/charts"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/chart.json",
+        "{REGISTRY_URL}/r/glass-charts.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/line-chart.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/line-chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "donut-chart",
+      "type": "registry:ui",
+      "title": "Donut chart",
+      "description": "Parts of a whole as a ring of rounded slices, with content in the hole and a legend.",
+      "categories": [
+        "glass",
+        "data"
+      ],
+      "dependencies": [
+        "cn",
+        "@tanstack/charts"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/chart.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/donut-chart.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/donut-chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "table",
+      "type": "registry:ui",
+      "title": "Table",
+      "description": "shadcn's Table for glass: hairline rows, fill on hover and selection, muted headers, density-aware cells.",
+      "categories": [
+        "glass",
+        "data"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/table.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/table.tsx"
+        }
+      ]
+    },
+    {
+      "name": "data-table",
+      "type": "registry:ui",
+      "title": "Data table",
+      "description": "A sortable, searchable, paginated table with row selection — TanStack Table v9 on the glass table.",
+      "categories": [
+        "glass",
+        "data"
+      ],
+      "dependencies": [
+        "cn",
+        "@tanstack/react-table",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/table.json",
+        "{REGISTRY_URL}/r/input.json",
+        "{REGISTRY_URL}/r/button.json",
+        "{REGISTRY_URL}/r/checkbox.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/data-table.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/data-table.tsx"
+        }
+      ]
+    },
+    {
+      "name": "chat",
+      "type": "registry:ui",
+      "title": "Chat",
+      "description": "A conversation in parts: a thread that sticks to the latest message, user and assistant bubbles that group into runs, receipts, day dividers, typing dots, quick replies and a composer where Enter sends.",
+      "categories": [
+        "glass",
+        "chat"
+      ],
+      "dependencies": [
+        "cn",
+        "lucide-react",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/button.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/chat.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/chat.tsx"
         }
       ]
     },
@@ -3837,6 +4203,35 @@
           "path": "src/components/blocks/dashboard-01.tsx",
           "type": "registry:component",
           "target": "@components/glass-blocks/dashboard-01.tsx"
+        }
+      ]
+    },
+    {
+      "name": "analytics-01",
+      "type": "registry:block",
+      "title": "Analytics",
+      "description": "Stacked active minutes over a range, the training mix as a donut, a recovery gauge, top habits and a sortable table of recent sessions.",
+      "categories": [
+        "glass",
+        "blocks"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/area-chart.json",
+        "{REGISTRY_URL}/r/bar-list.json",
+        "{REGISTRY_URL}/r/card.json",
+        "{REGISTRY_URL}/r/data-table.json",
+        "{REGISTRY_URL}/r/donut-chart.json",
+        "{REGISTRY_URL}/r/gauge.json",
+        "{REGISTRY_URL}/r/segmented-control.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/blocks/analytics-01.tsx",
+          "type": "registry:component",
+          "target": "@components/glass-blocks/analytics-01.tsx"
         }
       ]
     },
@@ -3890,6 +4285,32 @@
           "path": "src/components/blocks/auth-01.tsx",
           "type": "registry:component",
           "target": "@components/glass-blocks/auth-01.tsx"
+        }
+      ]
+    },
+    {
+      "name": "chat-01",
+      "type": "registry:block",
+      "title": "Coach chat",
+      "description": "A coach conversation on glass: grouped turns with avatars, a read receipt, typing that resolves into a reply, quick replies and a floating composer.",
+      "categories": [
+        "glass",
+        "blocks"
+      ],
+      "dependencies": [
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/avatar.json",
+        "{REGISTRY_URL}/r/button.json",
+        "{REGISTRY_URL}/r/card.json",
+        "{REGISTRY_URL}/r/chat.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/blocks/chat-01.tsx",
+          "type": "registry:component",
+          "target": "@components/glass-blocks/chat-01.tsx"
         }
       ]
     },
