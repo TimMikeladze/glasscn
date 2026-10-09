@@ -11,7 +11,7 @@ export const site = {
   name: "glasscn",
   url: siteUrl,
   repository: "https://github.com/TimMikeladze/glasscn",
-  discord: "https://discord.gg/linesofcode",
+  discord: "https://discord.com/users/414145877335080960",
   author: {
     name: "Tim Mikeladze",
     twitter: "https://twitter.com/linesofcode",
