@@ -80,7 +80,7 @@ export function SiteHeader({ stars }: { stars: number | null }) {
             )
           })}
         </nav>
-        <div className="ml-auto flex items-center gap-1">
+        <div className="ml-auto flex items-center gap-0.5">
           <DropdownMenu>
             <Tooltip>
               <TooltipTrigger asChild>

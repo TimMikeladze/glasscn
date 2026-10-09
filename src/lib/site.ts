@@ -11,10 +11,12 @@ export const site = {
   name: "glasscn",
   url: siteUrl,
   repository: "https://github.com/TimMikeladze/glasscn",
+  discord: "https://discord.gg/linesofcode",
   author: {
     name: "Tim Mikeladze",
     twitter: "https://twitter.com/linesofcode",
     linkedin: "https://www.linkedin.com/in/tim-mikeladze",
+    portfolio: "https://linesofcode.dev",
   },
   tagline: "Glass components for shadcn.",
   description:
