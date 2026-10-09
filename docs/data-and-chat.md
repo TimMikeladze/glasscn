@@ -31,7 +31,7 @@ Expands glasscn's data components (today: rings, sparkline, stat, heatmap) into 
 | `avatar` | ui | shadcn `Avatar`, `AvatarImage`, `AvatarFallback`, + `AvatarGroup` | `radix-ui` |
 | `chat` | ui | `ChatThread` (sticks to bottom), `ChatMessage` (`from="user" \| "assistant" \| "system"`), `ChatBubble`, `ChatMeta`, `ChatDivider`, `ChatTyping`, `ChatSuggestions`/`ChatSuggestion`, `ChatComposer` (auto-grow, Enter sends) | `lucide-react` · reg `avatar`, `button` |
 | `analytics-01` | block | area chart + donut + bar list + data table | — |
-| `chat-01` | block | a coach conversation: thread, typing, suggestions, composer | — |
+| `chat-01` | block | a conversation: thread, typing, suggestions, composer | — |
 
 ## Rules that apply
 

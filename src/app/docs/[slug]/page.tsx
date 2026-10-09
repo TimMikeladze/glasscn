@@ -13,6 +13,7 @@ import { H2, P } from "@/components/site/prose"
 import { docBySlug, docs } from "@/lib/docs"
 import { demoSources, sources } from "@/lib/sources.generated"
 import { itemUrl } from "@/lib/site"
+import { pageMetadata } from "@/lib/metadata"
 
 export function generateStaticParams() {
   return docs.map((d) => ({ slug: d.slug }))
@@ -21,7 +22,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/docs/[slug]">) {
   const { slug } = await params
   const doc = docBySlug(slug)
-  return doc ? { title: doc.title, description: doc.description } : {}
+  return doc ? pageMetadata({ title: doc.title, description: doc.description, path: `/docs/${slug}` }) : {}
 }
 
 /** The page's static shell: a skeleton while the slug resolves, so navigation between items is instant. */

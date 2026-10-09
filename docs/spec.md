@@ -40,7 +40,7 @@ See [`theming.md`](theming.md): 68 primitives in eleven groups, composable prese
 | Charts (TanStack Charts) | `chart` (themed host + legend), `area-chart`, `bar-chart`, `line-chart`, `donut-chart` |
 | Tables (TanStack Table v9) | `table`, `data-table` |
 | Chat | `chat` (thread, message, bubble, meta, divider, typing, suggestions, composer) |
-| Blocks | `dashboard-01` (rings + stats + 39-week heatmap + sparkline), `analytics-01` (charts + bar list + data table), `chat-01` (coach conversation), `settings-01` (grouped lists), `auth-01` (glass sign-in) |
+| Blocks | `dashboard-01` (rings + stats + 39-week heatmap + sparkline), `analytics-01` (charts + bar list + data table), `chat-01` (conversation), `settings-01` (grouped lists), `auth-01` (glass sign-in) |
 
 Pure maths (`ring` arcs, smooth paths, heatmap grid, bar shares, gauge arcs, category segments) lives in `lib/glass-charts.ts` (tested). Charts and tables: [`data-and-chat.md`](data-and-chat.md).
 

@@ -4291,8 +4291,8 @@
     {
       "name": "chat-01",
       "type": "registry:block",
-      "title": "Coach chat",
-      "description": "A coach conversation on glass: grouped turns with avatars, a read receipt, typing that resolves into a reply, quick replies and a floating composer.",
+      "title": "Chat",
+      "description": "A conversation on glass: grouped turns with avatars, a read receipt, typing that resolves into a reply, quick replies and a floating composer.",
       "categories": [
         "glass",
         "blocks"

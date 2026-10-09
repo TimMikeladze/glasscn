@@ -2,8 +2,10 @@ import { CodeBlock } from "@/components/site/code-block"
 import { InstallCommand } from "@/components/site/install-command"
 import { C, H2, P, PageHeader, Step } from "@/components/site/prose"
 import { itemUrl, registryUrl } from "@/lib/site"
+import { pageMetadata } from "@/lib/metadata"
+import { PAGES } from "@/lib/og/pages"
 
-export const metadata = { title: "Installation" }
+export const metadata = pageMetadata(PAGES.installation)
 
 const componentsJson = `{
   "registries": {

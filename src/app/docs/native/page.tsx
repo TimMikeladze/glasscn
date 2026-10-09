@@ -4,8 +4,10 @@ import { C, H2, P, PageHeader } from "@/components/site/prose"
 import { nativeItems } from "@/lib/docs"
 import { sources } from "@/lib/sources.generated"
 import { itemUrl } from "@/lib/site"
+import { pageMetadata } from "@/lib/metadata"
+import { PAGES } from "@/lib/og/pages"
 
-export const metadata = { title: "React Native" }
+export const metadata = pageMetadata(PAGES.native)
 
 const usage = `import { View, Text } from "react-native"
 import { Aurora } from "@/components/glass/native/aurora"

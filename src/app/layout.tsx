@@ -6,17 +6,13 @@ import { Providers, paletteScript } from "@/components/site/providers"
 import { SiteHeader } from "@/components/site/site-header"
 import { SiteFooter } from "@/components/site/site-footer"
 import { repoStars } from "@/lib/github"
-import { site } from "@/lib/site"
+import { rootMetadata } from "@/lib/metadata"
 import "./globals.css"
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })
 
-export const metadata: Metadata = {
-  title: { default: `${site.name} — ${site.tagline}`, template: `%s · ${site.name}` },
-  description: site.description,
-  metadataBase: new URL(site.url),
-}
+export const metadata: Metadata = rootMetadata
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const stars = await repoStars()

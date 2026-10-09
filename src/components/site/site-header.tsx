@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
 import { cn } from "cn"
-import { MenuIcon, MoonIcon, PaletteIcon, SunIcon } from "lucide-react"
+import { MenuIcon, MoonIcon, PaletteIcon, StarIcon, SunIcon } from "lucide-react"
 
 import { Button } from "@/components/glass/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/components/glass/dropdown-menu"
@@ -117,12 +117,17 @@ export function SiteHeader({ stars }: { stars: number | null }) {
             href={site.repository}
             target="_blank"
             rel="noreferrer"
-            aria-label={stars === null ? "glasscn on GitHub" : `glasscn on GitHub — ${stars} stars`}
-            className={socialLink}
+            aria-label={stars ? `glasscn on GitHub — ${stars} stars` : "glasscn on GitHub"}
+            className={cn(socialLink, stars ? "gap-1.5 pr-3" : null)}
           >
             <GitHubIcon className="size-4" />
-            {/* Omitted rather than zeroed when the API says nothing. */}
-            {stars === null ? null : <span className="font-mono text-xs tabular-nums">{formatStars(stars)}</span>}
+            {/* Omitted when unknown or zero — a lone "0" reads as broken, not humble. */}
+            {stars ? (
+              <span className="flex items-center gap-1 text-xs font-medium tabular-nums">
+                <StarIcon className="size-3 fill-current opacity-70" aria-hidden />
+                {formatStars(stars)}
+              </span>
+            ) : null}
           </a>
           <a href={site.author.twitter} target="_blank" rel="noreferrer" aria-label="Author on X" className={socialLink}>
             <XIcon className="size-4" />

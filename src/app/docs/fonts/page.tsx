@@ -8,8 +8,10 @@ import { InstallCommand } from "@/components/site/install-command"
 import { C, H2, P, PageHeader } from "@/components/site/prose"
 import { FONTS, TYPE_PRESETS, createGlassTheme, fontItemName, typeScale, type FontDef } from "@/lib/glass-theme"
 import { itemUrl } from "@/lib/site"
+import { pageMetadata } from "@/lib/metadata"
+import { PAGES } from "@/lib/og/pages"
 
-export const metadata = { title: "Fonts & type", description: "Fonts, a modular type scale, and type presets for glasscn." }
+export const metadata = pageMetadata(PAGES.fonts)
 
 const SAMPLE = "Small gains, every night 0123456789"
 const SITE_FONTS = ["Geist", "Geist Mono"]

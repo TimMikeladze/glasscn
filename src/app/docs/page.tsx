@@ -4,8 +4,10 @@ import { Badge } from "@/components/glass/badge"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/glass/card"
 import { C, H2, P, PageHeader } from "@/components/site/prose"
 import { GROUPS, docs } from "@/lib/docs"
+import { pageMetadata } from "@/lib/metadata"
+import { PAGES } from "@/lib/og/pages"
 
-export const metadata = { title: "Introduction" }
+export const metadata = pageMetadata(PAGES.docs)
 
 export default function DocsIndex() {
   return (

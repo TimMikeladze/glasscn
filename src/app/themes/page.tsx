@@ -1,6 +1,8 @@
 import { ThemeStudio } from "@/components/site/studio/theme-studio"
+import { pageMetadata } from "@/lib/metadata"
+import { PAGES } from "@/lib/og/pages"
 
-export const metadata = { title: "Theme Studio", description: "Every glass primitive as a control: palettes, materials, shapes, motion, density — exported as CSS, a shadcn theme item or a link." }
+export const metadata = pageMetadata(PAGES.themes)
 
 export default function ThemesPage() {
   return <ThemeStudio />

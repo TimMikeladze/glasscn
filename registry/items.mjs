@@ -136,7 +136,7 @@ export const blocks = [
   block("analytics-01", "Analytics", "Stacked active minutes over a range, the training mix as a donut, a recovery gauge, top habits and a sortable table of recent sessions.", ["area-chart", "bar-list", "card", "data-table", "donut-chart", "gauge", "segmented-control"]),
   block("settings-01", "Settings", "iOS Settings in glass: grouped rows, icon tiles, a switch, a segmented control and a slider.", ["grouped-list", "segmented-control", "slider", "switch"]),
   block("auth-01", "Sign in", "A strong-glass sign-in card with email, password and a passkey option.", ["button", "card", "input", "label", "separator"]),
-  block("chat-01", "Coach chat", "A coach conversation on glass: grouped turns with avatars, a read receipt, typing that resolves into a reply, quick replies and a floating composer.", ["avatar", "button", "card", "chat"]),
+  block("chat-01", "Chat", "A conversation on glass: grouped turns with avatars, a read receipt, typing that resolves into a reply, quick replies and a floating composer.", ["avatar", "button", "card", "chat"]),
 ]
 
 const native = (name, title, description, deps, reg = []) => ({

@@ -52,7 +52,7 @@ const coach = (
   </Avatar>
 )
 
-/** A coach conversation: day divider, grouped turns, read receipt, typing that resolves into a reply, quick replies and a floating composer. */
+/** A conversation: day divider, grouped turns, read receipt, typing that resolves into a reply, quick replies and a floating composer. */
 export function Chat01() {
   const [messages, setMessages] = React.useState(SEED)
   const [suggestions, setSuggestions] = React.useState(SUGGESTIONS)

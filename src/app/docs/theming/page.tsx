@@ -12,8 +12,10 @@ import { C, H2, P, PageHeader } from "@/components/site/prose"
 import { GROUPS, MATERIALS, MOTIONS, PALETTES, SHAPES, TOKENS } from "@/lib/glass-theme"
 import { snippets } from "@/lib/sources.generated"
 import { itemUrl } from "@/lib/site"
+import { pageMetadata } from "@/lib/metadata"
+import { PAGES } from "@/lib/og/pages"
 
-export const metadata = { title: "Theming" }
+export const metadata = pageMetadata(PAGES.theming)
 
 const code = (s: string) => ({ code: s, html: `<pre><code>${s.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</code></pre>` })
 
