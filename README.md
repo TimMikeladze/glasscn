@@ -1,6 +1,6 @@
 # glasscn
 
-**Glass, for shadcn.** A shadcn-compatible registry of glassmorphic components — frosted surfaces over a living aurora, iOS-grade controls and data pieces — installed as source with the shadcn CLI and themed entirely with CSS variables. Born in the [Kaizen](../kaizen) app; React Native versions included.
+**Glass, for shadcn.** A shadcn-compatible registry of glassmorphic components — frosted surfaces over a living aurora, iOS-grade controls and data pieces — installed as source with the shadcn CLI and themed entirely with CSS variables. Born in the Kaizen app; React Native versions included.
 
 ```bash
 pnpm dlx shadcn@latest add https://glasscn.app/r/glass-style.json https://glasscn.app/r/theme-dusk.json
@@ -68,3 +68,7 @@ CI (`.github/workflows/ci.yml`) runs typecheck, lint and test on every push and 
 ## Build & deploy
 
 `pnpm build` generates, builds the registry into `public/r` (stamping `NEXT_PUBLIC_REGISTRY_URL`, else `https://glasscn.app` on Vercel, else localhost), and builds the docs site. Spec: [`docs/spec.md`](docs/spec.md).
+
+## License
+
+[MIT](LICENSE)

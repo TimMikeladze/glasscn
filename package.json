@@ -48,5 +48,12 @@
     "vitest": "^4.1.11"
   },
   "packageManager": "pnpm@11.24.0",
-  "type": "module"
+  "type": "module",
+  "description": "Glass, for shadcn. A shadcn registry of glassmorphic React components with a CSS-variable theme engine.",
+  "homepage": "https://glasscn.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TimMikeladze/glasscn.git"
+  },
+  "license": "MIT"
 }
