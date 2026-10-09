@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { cn } from "cn"
 import { BellIcon, BookOpenIcon, CheckIcon, FlameIcon, MoonIcon, PenIcon, SearchIcon, BarChart3Icon, DropletIcon, ClockIcon } from "lucide-react"
 
 import { ActivityRings } from "@/components/glass/activity-rings"
@@ -22,12 +23,25 @@ import { Switch } from "@/components/glass/switch"
 import { Tabs, TabsList, TabsTrigger } from "@/components/glass/tabs"
 import { ThemeScope } from "@/components/glass/theme-scope"
 import { Blockquote, Display, Heading, InlineCode, Text, TextLink } from "@/components/glass/typography"
+import { demos } from "@/components/demos"
+import { GROUPS, docs } from "@/lib/docs"
 import { typeScale } from "@/lib/glass-theme"
 import type { GlassTheme } from "@/lib/glass-theme"
 
 const sleep = [7.5, 6.8, 7.9, 8.2, 6.5, 7.1, 7.8, 8.4, 7.2, 6.9, 7.6, 8.1, 7.4, 7.9]
 const today = "2026-10-08"
 const heat = Object.fromEntries(Array.from({ length: 16 * 7 }, (_, i) => [new Date(Date.UTC(2026, 9, 8 - i)).toISOString().slice(0, 10), Math.round((Math.sin(i * 1.3) + Math.cos(i * 0.37) + 1.2) * 1.6)]))
+
+/**
+ * Every item in the registry, each with its docs demo — built from the same sources as the
+ * docs, so a new component shows up here without anyone editing the studio. Demos are
+ * memoised: they take no props, so a token drag re-renders only these wrappers (the theme
+ * arrives through the scope's <style>, not through React).
+ */
+const CATALOGUE = GROUPS.map((group) => ({
+  group,
+  items: docs.filter((d) => d.group === group && demos[d.slug]).map((d) => ({ slug: d.slug, title: d.title, Demo: React.memo(demos[d.slug]) })),
+})).filter((g) => g.items.length > 0)
 
 /** Everything wearing the studio's theme — scoped, with its own aurora and scheme, independent of the page. */
 export function StudioPreview({ theme, scheme }: { theme: GlassTheme; scheme: "light" | "dark" }) {
@@ -220,6 +234,27 @@ export function StudioPreview({ theme, scheme }: { theme: GlassTheme; scheme: "l
             </DockAction>
           </Dock>
         </div>
+      </div>
+      <div className="relative grid gap-6 border-t border-glass-border p-4 pt-6 sm:p-6">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <Heading level={2}>Every item, on your theme.</Heading>
+          <Text variant="small">Straight from the registry — every component and block, with its docs demo.</Text>
+        </div>
+        {CATALOGUE.map(({ group, items }) => (
+          <section key={group} className="grid gap-3" aria-label={group}>
+            <Text variant="overline">{group}</Text>
+            <div className="grid items-start gap-4 md:grid-cols-2">
+              {items.map(({ slug, title, Demo }) => (
+                <figure key={slug} className={cn("glass-subtle grid gap-4 rounded-surface p-4 [--glass-elevation:0_0_#0000] sm:p-5", group === "Blocks" && "md:col-span-2")}>
+                  <figcaption className="type-glass-heading text-sm">{title}</figcaption>
+                  <div className="flex min-h-32 items-center justify-center overflow-x-auto">
+                    <Demo />
+                  </div>
+                </figure>
+              ))}
+            </div>
+          </section>
+        ))}
       </div>
     </ThemeScope>
   )

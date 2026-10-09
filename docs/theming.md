@@ -50,4 +50,4 @@ Tailwind gets named tokens over them: `bg-glass`, `border-glass-border`, `bg-fil
 
 ## Site
 
-`/themes` — the Theme Studio: every primitive as a control, presets, hue harmony generator, randomise, a scoped live preview (with its own scheme), legibility badge, export as CSS / registry item / TypeScript / share link, and "apply to the whole site".
+`/themes` — the Theme Studio: every primitive as a control, presets, hue harmony generator, randomise, a scoped live preview (with its own scheme) that continues into a catalogue of every registry item — components and blocks, each with its docs demo, straight from the registry ([`studio-catalogue.md`](studio-catalogue.md)) — legibility badge, export as CSS / registry item / TypeScript / share link, and "apply to the whole site".
