@@ -1,0 +1,13 @@
+{
+  "name": "glasscn-video",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "capture": "node capture.mjs",
+    "render": "node render.mjs",
+    "build": "node capture.mjs && node render.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.58.2"
+  }
+}

@@ -1,0 +1,220 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>glasscn promo stage</title>
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: #0b0a12; }
+  body { font-family: -apple-system, "SF Pro Display", "Helvetica Neue", sans-serif; color: #fff; -webkit-font-smoothing: antialiased; }
+  #bg { position: absolute; inset: -200px; filter: blur(80px) saturate(140%); }
+  .blob { position: absolute; width: 1100px; height: 1100px; border-radius: 50%; opacity: .55; }
+  .scene { position: absolute; inset: 0; opacity: 0; will-change: opacity, transform; }
+  .glass { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); backdrop-filter: blur(24px) saturate(180%);
+           box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 30px 80px rgba(0,0,0,.45); }
+  .pill { position: absolute; padding: 16px 30px; border-radius: 999px; font-size: 30px; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; }
+  .caption { position: absolute; left: 0; right: 0; text-align: center; font-size: 64px; font-weight: 700; letter-spacing: -.035em; }
+  .caption small { display: block; font-size: 28px; font-weight: 500; letter-spacing: -.01em; opacity: .7; margin-top: 10px; }
+
+  /* title */
+  #title h1 { position: absolute; top: 360px; width: 100%; text-align: center; font-size: 230px; font-weight: 800; letter-spacing: -.06em; }
+  #title .pill { top: 660px; left: 50%; }
+
+  /* wall */
+  #wall .plane { position: absolute; left: 50%; top: 0; width: 2500px; transform-origin: 50% 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 28px; }
+  #wall .tile { border-radius: 28px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.5); border: 1px solid rgba(255,255,255,.15); }
+  #wall .tile img { display: block; width: 100%; }
+  #wall .count { top: 860px; left: 80px; font-variant-numeric: tabular-nums; font-size: 44px; padding: 20px 36px; }
+
+  /* browser */
+  .browser { position: absolute; width: 1440px; height: 900px; left: 240px; top: 110px; border-radius: 22px; overflow: hidden; background: #111; }
+  .browser .bar { height: 52px; display: flex; align-items: center; gap: 10px; padding: 0 20px; background: rgba(30,30,36,.92); border-bottom: 1px solid rgba(255,255,255,.08); }
+  .browser .dot { width: 14px; height: 14px; border-radius: 50%; }
+  .browser .url { margin: 0 auto; width: 520px; height: 32px; border-radius: 9px; background: rgba(255,255,255,.08); font-size: 16px; display: grid; place-items: center; color: rgba(255,255,255,.75); }
+  .browser .view { position: absolute; top: 52px; left: 0; right: 0; bottom: 0; overflow: hidden; }
+  .browser .view img { position: absolute; left: 0; top: 0; width: 1440px; }
+
+  /* laptop */
+  .laptop { position: absolute; left: 50%; top: 70px; width: 1500px; transform-origin: 50% 100%; }
+  .laptop .lid { position: relative; width: 1500px; height: 900px; border-radius: 34px 34px 10px 10px; background: #1a1a1f; padding: 26px; border: 2px solid #3a3a42; box-shadow: 0 40px 120px rgba(0,0,0,.6); }
+  .laptop .screen { position: relative; width: 100%; height: 100%; border-radius: 10px; overflow: hidden; background: #000; }
+  .laptop .screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .laptop .base { width: 1720px; margin-left: -110px; height: 34px; border-radius: 0 0 40px 40px; background: linear-gradient(#cfd0d6, #8d8e96); position: relative; }
+  .laptop .base::after { content: ""; position: absolute; left: 50%; top: 0; width: 240px; height: 12px; margin-left: -120px; border-radius: 0 0 14px 14px; background: #75767e; }
+  .laptop .notch { position: absolute; top: 26px; left: 50%; width: 180px; height: 26px; margin-left: -90px; background: #1a1a1f; border-radius: 0 0 14px 14px; z-index: 2; }
+  #laptop .pill { top: 960px; left: 50%; }
+
+  /* phones */
+  .phone { position: absolute; top: 90px; width: 400px; height: 860px; border-radius: 68px; background: #0d0d10; padding: 14px; border: 3px solid #4a4a52;
+           box-shadow: inset 0 0 0 2px #1d1d22, 0 50px 120px rgba(0,0,0,.6); }
+  .phone .screen { position: relative; width: 100%; height: 100%; border-radius: 54px; overflow: hidden; background: #000; }
+  .phone .screen img { position: absolute; left: 0; top: 0; width: 100%; }
+  .phone .island { position: absolute; top: 14px; left: 50%; width: 120px; height: 34px; margin-left: -60px; border-radius: 20px; background: #000; z-index: 2; }
+  .phone .label { position: absolute; bottom: -78px; left: 50%; transform: translateX(-50%); font-size: 24px; padding: 10px 22px; }
+
+  /* outro */
+  #outro .cmd { position: absolute; left: 50%; top: 470px; width: 1480px; margin-left: -740px; border-radius: 28px; padding: 40px 50px; font: 500 30px/1.5 "SF Mono", ui-monospace, Menlo, monospace; white-space: pre; }
+  #outro .cmd .p { color: #a78bfa; }
+  #outro .cursor { display: inline-block; width: 16px; height: 34px; background: #fff; vertical-align: -6px; }
+</style>
+</head>
+<body>
+<div id="bg">
+  <div class="blob" style="background:#7c3aed"></div>
+  <div class="blob" style="background:#ec4899"></div>
+  <div class="blob" style="background:#0ea5e9"></div>
+</div>
+
+<section class="scene" id="title">
+  <h1>glasscn</h1>
+  <div class="pill glass">Glass, for shadcn.</div>
+</section>
+
+<section class="scene" id="wall">
+  <div class="plane"></div>
+  <div class="pill glass count"></div>
+</section>
+
+<section class="scene" id="browser">
+  <div class="browser glass">
+    <div class="bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><div class="url">glasscn.app</div></div>
+    <div class="view"><img id="homeA"><img id="homeB"></div>
+  </div>
+</section>
+
+<section class="scene" id="laptop">
+  <div class="laptop"><div class="lid"><div class="notch"></div><div class="screen"></div></div><div class="base"></div></div>
+  <div class="pill glass"></div>
+</section>
+
+<section class="scene" id="phones"></section>
+
+<section class="scene" id="outro">
+  <div class="caption" style="top:240px">Install like any shadcn component.<small>Free, open source, MIT.</small></div>
+  <div class="cmd glass"></div>
+  <div class="caption" style="top:760px;font-size:80px">glasscn.app</div>
+</section>
+
+<script>
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x))
+const lerp = (a, b, k) => a + (b - a) * k
+const ease = (k) => (k = clamp(k), k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2)
+const out = (k) => 1 - Math.pow(1 - clamp(k), 3)
+const back = (k) => { k = clamp(k); const c = 1.7; return 1 + (c + 1) * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2) }
+const prog = (t, a, b) => clamp((t - a) / (b - a))
+/** 0→1 fade in over [a, a+f], 1→0 out over [b-f, b]. */
+const win = (t, a, b, f = .5) => Math.min(prog(t, a, a + f), 1 - prog(t, b - f, b))
+const $ = (s) => document.querySelector(s)
+
+const M = window.MANIFEST
+const THEMES = M.themes
+const label = (th) => [th.palette, ...th.presets.map((p) => p.split("-")[1]), th.scheme].map((s) => s[0].toUpperCase() + s.slice(1)).join(" · ")
+const imgs = []
+const img = (src) => { const i = new Image(); i.src = src; imgs.push(i); return i }
+
+// wall
+const plane = $("#wall .plane")
+const tiles = M.components.map((c) => { const d = document.createElement("div"); d.className = "tile"; d.appendChild(img(`shots/c/${c.name}.png`)); plane.appendChild(d); return d })
+// browser
+$("#homeA").src = "p/home-dusk-frosted.jpg"; $("#homeB").src = "p/home-ocean-liquid.jpg"; imgs.push($("#homeA"), $("#homeB"))
+// laptop
+const screen = $(".laptop .screen")
+const lapImgs = THEMES.map((th) => { const i = img(`shots/dashboard-01-${th.id}.png`); screen.appendChild(i); return i })
+// phones
+const PHONES = [
+  { page: "home", theme: THEMES[2], x: 330 },
+  { page: "chat", theme: THEMES[1], x: 760 },
+  { page: "button", theme: THEMES[4], x: 1190 },
+]
+const phoneEls = PHONES.map((p) => {
+  const d = document.createElement("div"); d.className = "phone"; d.style.left = p.x + "px"
+  d.innerHTML = `<div class="island"></div><div class="screen"></div><div class="label pill glass">${label(p.theme)}</div>`
+  const i = img(`p/m-${p.page}-${p.theme.id}.jpg`); d.querySelector(".screen").appendChild(i)
+  $("#phones").appendChild(d); return { d, i }
+})
+const CMD = "$ pnpm dlx shadcn@latest add https://glasscn.app/r/glass-style.json\n$ pnpm dlx shadcn@latest add https://glasscn.app/r/card.json"
+
+window.DURATION = 40
+window.ready = Promise.all(imgs.map((i) => i.decode().catch(() => {})))
+
+window.seek = (t) => {
+  // background drift
+  document.querySelectorAll(".blob").forEach((b, n) => {
+    const a = t * .25 + n * 2.1
+    b.style.transform = `translate(${900 + Math.cos(a) * 600 - 300 * n}px, ${500 + Math.sin(a * 1.3) * 350}px)`
+  })
+
+  // 1. title 0–3.4
+  let k = win(t, 0, 3.4, .6)
+  $("#title").style.opacity = k
+  $("#title h1").style.transform = `translateY(${(1 - out(prog(t, 0, 1.2))) * 60}px) scale(${lerp(.92, 1, out(prog(t, 0, 1.4))) * lerp(1, 1.08, prog(t, 2.6, 3.4))})`
+  $("#title h1").style.letterSpacing = `${lerp(.05, -.06, out(prog(t, 0, 1.6)))}em`
+  $("#title .pill").style.transform = `translate(-50%, ${(1 - back(prog(t, .7, 1.5))) * 40}px)`
+  $("#title .pill").style.opacity = prog(t, .7, 1.2)
+
+  // 2. wall 3–13.4
+  k = win(t, 3, 13.4, .6)
+  $("#wall").style.opacity = k
+  const w = prog(t, 3, 13.4)
+  plane.style.transform = `translateX(-50%) perspective(2400px) rotateX(28deg) rotateZ(-10deg) translateY(${lerp(250, -700, ease(w))}px) scale(${lerp(.9, .75, w)})`
+  tiles.forEach((el, n) => {
+    const s = 3.1 + n * .14
+    const q = back(prog(t, s, s + .6))
+    el.style.opacity = prog(t, s, s + .25)
+    el.style.transform = `translateZ(${(1 - q) * 300}px) scale(${lerp(.6, 1, q)})`
+  })
+  const shown = M.components.filter((_, n) => t >= 3.1 + n * .14 + .1).length
+  $("#wall .count").textContent = `${shown} components · 5 blocks · 1 theme engine`
+  $("#wall .count").style.opacity = prog(t, 3.6, 4.2)
+
+  // 3. browser 13–20.4
+  k = win(t, 13, 20.4, .6)
+  $("#browser").style.opacity = k
+  const br = prog(t, 13, 20.4)
+  $(".browser").style.transform = `perspective(2000px) rotateY(${lerp(-14, 6, ease(br))}deg) rotateX(${lerp(8, 0, out(br))}deg) scale(${lerp(.86, .98, out(br))})`
+  const scroll = lerp(0, 2600, ease(prog(t, 13.8, 19.6)))
+  $("#homeA").style.transform = $("#homeB").style.transform = `translateY(${-scroll}px)`
+  $("#homeB").style.opacity = ease(prog(t, 16.4, 17))
+
+  // 4. laptop 20–28.4
+  k = win(t, 20, 28.4, .6)
+  $("#laptop").style.opacity = k
+  const lp = prog(t, 20, 28.4)
+  $(".laptop").style.transform = `translateX(-50%) perspective(2400px) rotateX(${lerp(14, 4, out(lp))}deg) rotateY(${lerp(10, -8, ease(lp))}deg) scale(${lerp(.82, .9, ease(lp))})`
+  const per = 7.8 / THEMES.length
+  const idx = clamp(Math.floor((t - 20.3) / per), 0, THEMES.length - 1)
+  lapImgs.forEach((i, n) => {
+    const s = 20.3 + n * per
+    // theme switch: a circular wipe from the bottom centre, like the site's palette dock
+    const r = n === 0 ? 200 : ease(prog(t, s - .45, s + .15)) * 130
+    i.style.clipPath = `circle(${r}% at 50% 100%)`
+  })
+  const lpill = $("#laptop .pill")
+  lpill.textContent = label(THEMES[idx])
+  const ls = 20.3 + idx * per
+  lpill.style.transform = `translate(-50%, ${(1 - back(prog(t, ls - .1, ls + .4))) * 30}px)`
+
+  // 5. phones 28–35.4
+  k = win(t, 28, 35.4, .6)
+  $("#phones").style.opacity = k
+  phoneEls.forEach(({ d, i }, n) => {
+    const s = 28.1 + n * .25
+    const q = back(prog(t, s, s + .9))
+    const tilt = (n - 1) * 6
+    d.style.transform = `translateY(${(1 - q) * 700 + Math.sin(t * 1.4 + n) * 8}px) rotate(${tilt * (1 - prog(t, s, s + 2)) + (n - 1) * 2}deg)`
+    const sc = i.naturalHeight ? i.naturalHeight * (372 / i.naturalWidth) - 832 : 0
+    i.style.transform = `translateY(${-Math.max(0, Math.min(sc, [1500, 900, 600][n])) * ease(prog(t, s + .9, 35.2))}px)`
+  })
+
+  // 6. outro 35–40
+  k = win(t, 35, 40.5, .6)
+  $("#outro").style.opacity = k
+  const chars = Math.floor(lerp(0, CMD.length, prog(t, 35.6, 38.4)))
+  const cmd = CMD.slice(0, chars).replace(/\$/g, '<span class="p">$</span>')
+  $("#outro .cmd").innerHTML = cmd + (Math.floor(t * 2.5) % 2 || chars < CMD.length ? '<span class="cursor"></span>' : "")
+  $("#outro .cmd").style.transform = `translateY(${(1 - out(prog(t, 35.2, 36))) * 40}px)`
+}
+window.seek(0)
+</script>
+</body>
+</html>
