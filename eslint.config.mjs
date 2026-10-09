@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
     // the Expo sandbox has its own toolchain (npm, tsc, expo lint)
     "sandbox/**",
     ".verify/**",
+    // prebuilt deployment output from `vercel build`
+    ".vercel/**",
   ]),
 ]);
 

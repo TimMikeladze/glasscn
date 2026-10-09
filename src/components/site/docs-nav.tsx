@@ -11,7 +11,7 @@ const GUIDES = [
   { href: "/docs/installation", label: "Installation" },
   { href: "/docs/theming", label: "Theming" },
   { href: "/docs/fonts", label: "Fonts & type" },
-  { href: "/themes", label: "Theme Studio" },
+  { href: "/themes", label: "Studio" },
   { href: "/docs/native", label: "React Native" },
 ]
 

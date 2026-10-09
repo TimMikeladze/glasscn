@@ -13,7 +13,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/glass/tooltip"
 import { site } from "@/lib/site"
 import { formatStars } from "@/lib/format-stars"
-import { GitHubIcon } from "./brand-icons"
+import { GitHubIcon, LinkedInIcon, XIcon } from "./brand-icons"
 import { Logo } from "./logo"
 import { PALETTES, usePalette, type Palette } from "./providers"
 import { DocsNav } from "./docs-nav"
@@ -21,10 +21,13 @@ import { DocsNav } from "./docs-nav"
 const NAV = [
   { href: "/docs", label: "Docs" },
   { href: "/docs/button", label: "Components" },
-  { href: "/themes", label: "Themes" },
+  { href: "/themes", label: "Studio" },
   { href: "/docs/theming", label: "Theming" },
   { href: "/docs/native", label: "Native" },
 ]
+
+const socialLink =
+  "hidden h-8 items-center rounded-full px-2.5 text-foreground/70 outline-none transition-colors hover:bg-fill hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring sm:inline-flex"
 
 export function PaletteSwatch({ palette, className }: { palette: Palette; className?: string }) {
   return (
@@ -115,11 +118,17 @@ export function SiteHeader({ stars }: { stars: number | null }) {
             target="_blank"
             rel="noreferrer"
             aria-label={stars === null ? "glasscn on GitHub" : `glasscn on GitHub — ${stars} stars`}
-            className="hidden h-8 items-center gap-1.5 rounded-full px-2.5 text-foreground/70 outline-none transition-colors hover:bg-fill hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring sm:inline-flex"
+            className={socialLink}
           >
             <GitHubIcon className="size-4" />
             {/* Omitted rather than zeroed when the API says nothing. */}
             {stars === null ? null : <span className="font-mono text-xs tabular-nums">{formatStars(stars)}</span>}
+          </a>
+          <a href={site.author.twitter} target="_blank" rel="noreferrer" aria-label="Author on X" className={socialLink}>
+            <XIcon className="size-4" />
+          </a>
+          <a href={site.author.linkedin} target="_blank" rel="noreferrer" aria-label="Author on LinkedIn" className={socialLink}>
+            <LinkedInIcon className="size-4" />
           </a>
           <Button asChild size="sm" className="ml-1 hidden sm:inline-flex">
             <Link href="/docs/installation">Get started</Link>

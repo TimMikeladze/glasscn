@@ -11,6 +11,11 @@ export const site = {
   name: "glasscn",
   url: siteUrl,
   repository: "https://github.com/TimMikeladze/glasscn",
+  author: {
+    name: "Tim Mikeladze",
+    twitter: "https://twitter.com/linesofcode",
+    linkedin: "https://www.linkedin.com/in/tim-mikeladze",
+  },
   tagline: "Glass components for shadcn.",
   description:
     "A shadcn registry of glassmorphic components — frosted surfaces over a living aurora, iOS-grade controls and data pieces — installed as source and themed with CSS variables.",
