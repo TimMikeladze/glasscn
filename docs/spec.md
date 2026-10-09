@@ -1,10 +1,10 @@
 # glasscn — spec
 
-A shadcn-compatible registry of glassmorphic components: frosted surfaces over a living aurora, iOS-grade controls, and the data pieces (activity rings, sparklines, heatmap) from the Kaizen app — installed as source with `npx shadcn add`, themed entirely with CSS variables.
+A shadcn-compatible registry of glassmorphic components: frosted surfaces over a living aurora, iOS-grade controls, and the data pieces (activity rings, sparklines, heatmap) — installed as source with `npx shadcn add`, themed entirely with CSS variables.
 
 ## Why a registry, and why web-first
 
-shadcn's standard is Tailwind v4 + CSS variables + Radix + `cn`, copied into the user's repo. The Kaizen components are React Native; their *design* ports cleanly to CSS (`backdrop-filter` is what react-native-web already used). So:
+shadcn's standard is Tailwind v4 + CSS variables + Radix + `cn`, copied into the user's repo. The original components were React Native; their *design* ports cleanly to CSS (`backdrop-filter` is what react-native-web already used). So:
 
 - **Web track** (`registry:ui`): idiomatic shadcn components — same APIs as shadcn's where one exists (`Button`, `Card`, `Dialog`, …) so swapping is an import-path change; new glass-native pieces where none does (`Aurora`, `Glass`, `Dock`, `ActivityRings`, …).
 - **Native track** (`native-*`): the Expo originals (Liquid Glass → blur → fill `Glass`, `Aurora`, `Press`) made standalone, for Expo apps with a `components.json`.
@@ -52,5 +52,5 @@ Next 16 docs site in the same repo: landing (aurora hero, live dashboard, palett
 
 - `pnpm typecheck`, `pnpm lint`, `pnpm test` (vitest: chart maths, registry integrity — files exist, dependencies resolve, every item documented and demoed).
 - `pnpm registry:build` then `scripts/verify-install.mjs`: serve `public/r`, scaffold a fresh Next app, `shadcn init`, `shadcn add` **every** item, type-check and build it.
-- Native items: installed into a copy of the Kaizen Expo app and type-checked.
+- Native items: installed into the `sandbox/native` Expo app and type-checked.
 - Site checked in a browser, light/dark, phone and desktop.

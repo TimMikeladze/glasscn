@@ -25,7 +25,7 @@ Sizes are steps on the scale: `type-step-n2 … type-step-6` = `1rem × scale ×
 - **Why `type-step-*`, not `text-step-*`**: tailwind-merge reads an unknown `text-*` as a colour, so `cn("text-step-3", "text-muted-foreground")` would drop the size.
 - **Components**: `typography` (`Heading`, `Text`, `Display`, `Blockquote`, `InlineCode`, `List`, `TextLink`), `prose` (`Prose` for Markdown/MDX).
 - **Font items** (`registry:font`, 45 — `font-<x>`, `font-heading-<x>`, `font-mono-<x>`): body, heading and mono roles over a curated catalogue checked against next/font by a test (Geist, Inter, Figtree, Manrope, DM Sans, Plus Jakarta Sans, Outfit, Sora, Onest, Nunito, IBM Plex, Space Grotesk, Bricolage Grotesque, Fraunces, Instrument Serif, Newsreader, Playfair Display, Lora, Source Serif 4, JetBrains Mono, Geist Mono, IBM Plex Mono, DM Mono, Space Mono).
-- **Type presets** (`registry:theme`): `type-default`, `type-system` (SF, SF Rounded figures — the Kaizen look), `type-modern`, `type-editorial`, `type-friendly`, `type-technical`, `type-classic`, `type-grotesk`. Each sets the Type group and depends on the font items it needs.
+- **Type presets** (`registry:theme`): `type-default`, `type-system` (SF, SF Rounded figures — the Apple look), `type-modern`, `type-editorial`, `type-friendly`, `type-technical`, `type-classic`, `type-grotesk`. Each sets the Type group and depends on the font items it needs.
 
 ## Engine
 

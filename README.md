@@ -1,6 +1,6 @@
 # glasscn
 
-**Glass, for shadcn.** A shadcn-compatible registry of glassmorphic components — frosted surfaces over a living aurora, iOS-grade controls and data pieces — installed as source with the shadcn CLI and themed entirely with CSS variables. Born in the Kaizen app; React Native versions included.
+**Glass, for shadcn.** A shadcn-compatible registry of glassmorphic components — frosted surfaces over a living aurora, iOS-grade controls and data pieces — installed as source with the shadcn CLI and themed entirely with CSS variables. React Native versions included.
 
 ```bash
 pnpm dlx shadcn@latest add https://glasscn.app/r/glass-style.json https://glasscn.app/r/theme-dusk.json

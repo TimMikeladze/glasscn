@@ -111,7 +111,7 @@ export default function Typography() {
 
       <H2>Type presets</H2>
       <P>
-        A type preset sets the scale, leading, weights, tracking, case and numerals — and installs its fonts. <C>type-system</C> is the Kaizen look: San Francisco with SF Rounded figures, nothing to load.
+        A type preset sets the scale, leading, weights, tracking, case and numerals — and installs its fonts. <C>type-system</C> is the Apple look: San Francisco with SF Rounded figures, nothing to load.
       </P>
       <InstallCommand args={`add ${itemUrl("type-editorial")}`} />
       <div className="mt-6 grid gap-3 lg:grid-cols-2">

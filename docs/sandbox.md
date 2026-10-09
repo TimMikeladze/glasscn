@@ -1,6 +1,6 @@
 # Native sandbox
 
-An Expo app in `sandbox/native/` that renders every `native-*` item, so the native track can be seen and checked without the Kaizen app.
+An Expo app in `sandbox/native/` that renders every `native-*` item, so the native track can be seen and checked.
 
 ## Decisions
 
