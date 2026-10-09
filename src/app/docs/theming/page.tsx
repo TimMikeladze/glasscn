@@ -67,7 +67,7 @@ export default function Theming() {
       <Glass tint="primary" className="flex flex-wrap items-center gap-4 p-5">
         <div className="min-w-0 flex-1">
           <div className="type-glass-heading text-lg">Theme Studio</div>
-          <p className="text-sm text-muted-foreground">Every primitive as a control, a hue-harmony generator, a live preview, and export to CSS, a shadcn item or a link.</p>
+          <p className="text-sm text-muted-foreground">Every primitive as a control, a hue-harmony generator, a live preview, and export as a one-line shadcn CLI install, CSS, a shadcn item or a link.</p>
         </div>
         <Button asChild>
           <Link href="/themes">

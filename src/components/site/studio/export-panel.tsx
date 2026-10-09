@@ -6,9 +6,9 @@ import { SegmentedControl, SegmentedControlItem } from "@/components/glass/segme
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/glass/tabs"
 import { CodeBlockClient } from "@/components/site/code-block-client"
 import { createGlassTheme, encodeTheme, fontDependencies, themeToCss, themeToRegistryItem, type CreateThemeOptions, type GlassTheme } from "@/lib/glass-theme"
-import { itemUrl } from "@/lib/site"
+import { itemUrl, registryUrl } from "@/lib/site"
 
-/** The theme, four ways out: CSS for globals.css, a shadcn theme item, the TypeScript that rebuilds it, a link. */
+/** The theme, five ways out: a one-line CLI install, CSS for globals.css, a shadcn theme item, the TypeScript that rebuilds it, a link. */
 export function ExportPanel({ theme, recipe }: { theme: GlassTheme; recipe: CreateThemeOptions }) {
   const [scope, setScope] = React.useState<"diff" | "full">("diff")
   // the panel only renders in an opened dialog, so the window is there
@@ -20,15 +20,23 @@ export function ExportPanel({ theme, recipe }: { theme: GlassTheme; recipe: Crea
   const ts = `import { createGlassTheme } from "@/lib/glass-theme"
 
 export const theme = createGlassTheme(${JSON.stringify(recipe, null, 2)})`
-  const link = `${origin}/themes#t=${encodeTheme(theme)}`
+  const code = encodeTheme(theme)
+  const link = `${origin}/themes#t=${code}`
+  // served by app/r/theme/[code] — the registry host, so the command works from any copy of the site
+  const cli = `npx shadcn@latest add ${registryUrl}/r/theme/${code}.json`
   return (
-    <Tabs defaultValue="css" className="gap-3">
+    <Tabs defaultValue="cli" className="gap-3">
       <TabsList className="w-full">
+        <TabsTrigger value="cli">CLI</TabsTrigger>
         <TabsTrigger value="css">CSS</TabsTrigger>
         <TabsTrigger value="item">shadcn item</TabsTrigger>
         <TabsTrigger value="ts">TypeScript</TabsTrigger>
         <TabsTrigger value="link">Link</TabsTrigger>
       </TabsList>
+      <TabsContent value="cli" className="grid gap-3">
+        <p className="text-sm text-muted-foreground">Run in your project — installs the theme (and its fonts) with the shadcn CLI.</p>
+        <CodeBlockClient code={cli} title="terminal" />
+      </TabsContent>
       <TabsContent value="css" className="grid gap-3">
         <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
           <span>Paste into globals.css after the glass-style foundation.</span>
