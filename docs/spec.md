@@ -7,7 +7,7 @@ A shadcn-compatible registry of glassmorphic components: frosted surfaces over a
 shadcn's standard is Tailwind v4 + CSS variables + Radix + `cn`, copied into the user's repo. The original components were React Native; their *design* ports cleanly to CSS (`backdrop-filter` is what react-native-web already used). So:
 
 - **Web track** (`registry:ui`): idiomatic shadcn components — same APIs as shadcn's where one exists (`Button`, `Card`, `Dialog`, …) so swapping is an import-path change; new glass-native pieces where none does (`Aurora`, `Glass`, `Dock`, `ActivityRings`, …).
-- **Native track** (`native-*`): the Expo originals (Liquid Glass → blur → fill `Glass`, `Aurora`, `Press`) made standalone, for Expo apps with a `components.json`.
+- **Native track** (`native-*`): the Expo foundation (Liquid Glass → blur → fill `Glass`, `Aurora`, `Press`, tokens, `native-ui`) plus a `native-<name>` twin of every component and block — one React Native file that renders on iOS, Android and, through react-native-web, the web. Each installs standalone into an Expo app with a `components.json`. See [`native.md`](native.md).
 - Both read the same token names and palettes.
 
 ## Standards followed
@@ -52,5 +52,5 @@ Next 16 docs site in the same repo: landing (aurora hero, live dashboard, palett
 
 - `pnpm typecheck`, `pnpm lint`, `pnpm test` (vitest: chart maths, registry integrity — files exist, dependencies resolve, every item documented and demoed).
 - `pnpm registry:build` then `scripts/verify-install.mjs`: serve `public/r`, scaffold a fresh Next app, `shadcn init`, `shadcn add` **every** item, type-check and build it.
-- Native items: installed into the `sandbox/native` Expo app and type-checked.
+- Native items: every `native-*` item installed from the registry into a copy of the `sandbox/native` Expo app and type-checked (`verify:native`); each twin has a sandbox demo at `/c/<name>`, checked on web, the iOS 26 simulator and Android.
 - Site checked in a browser, light/dark, phone and desktop.

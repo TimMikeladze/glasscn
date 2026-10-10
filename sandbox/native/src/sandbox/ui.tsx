@@ -53,7 +53,7 @@ export function ThemePicker() {
 export function Chip({ label, active, onPress }: { label: string; active?: boolean; onPress: () => void }) {
   const t = useGlassTheme()
   return (
-    <Press haptic onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: active }} style={[styles.chip, { backgroundColor: active ? t.primary : t.fill }]}>
+    <Press haptic onPress={onPress} accessibilityRole="button" aria-selected={active} style={[styles.chip, { backgroundColor: active ? t.primary : t.fill }]}>
       <Text style={{ color: active ? t.primaryForeground : t.foreground, fontWeight: "600", fontSize: 13 }}>{label}</Text>
     </Press>
   )

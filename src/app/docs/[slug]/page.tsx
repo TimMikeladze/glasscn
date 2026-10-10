@@ -10,7 +10,7 @@ import { ComponentPreview } from "@/components/site/component-preview"
 import { InstallCommand } from "@/components/site/install-command"
 import { PropsTable } from "@/components/site/props-table"
 import { H2, P } from "@/components/site/prose"
-import { docBySlug, docs } from "@/lib/docs"
+import { docBySlug, docs, nativeItems } from "@/lib/docs"
 import { demoSources, sources } from "@/lib/sources.generated"
 import { itemUrl } from "@/lib/site"
 import { pageMetadata } from "@/lib/metadata"
@@ -73,6 +73,14 @@ async function Doc({ params }: { params: PageProps<"/docs/[slug]">["params"] }) 
 
       <H2>Installation</H2>
       <InstallCommand args={`add ${itemUrl(slug)}`} />
+      {nativeItems.some((i) => i.name === `native-${slug}`) ? (
+        <>
+          <P className="mt-4">
+            React Native (iOS, Android and web through react-native-web) — same parts and props:
+          </P>
+          <InstallCommand args={`add ${itemUrl(`native-${slug}`)}`} />
+        </>
+      ) : null}
       <P className="mt-3 text-sm text-muted-foreground">
         Or with the namespace set up: <code className="rounded-md bg-fill px-1.5 py-0.5 font-mono text-xs">shadcn add @glasscn/{slug}</code>
       </P>

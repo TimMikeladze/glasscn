@@ -53,7 +53,7 @@ export const PAGES = {
   },
   native: {
     title: "React Native",
-    description: "The glass started life in an Expo app. The native items bring it back there — Liquid Glass on iOS 26 included.",
+    description: "Every glasscn component for Expo — one React Native file for iOS, Android and the web, Liquid Glass on iOS 26 included.",
     path: "/docs/native",
     eyebrow: "Guides",
     palette: "midnight",

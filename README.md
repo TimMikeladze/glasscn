@@ -26,7 +26,7 @@ Or set the namespace once in `components.json` — `"registries": { "@glasscn": 
 | Tables | `table` `data-table` (TanStack Table v9) |
 | Chat | `chat` |
 | Blocks | `dashboard-01` `analytics-01` `settings-01` `auth-01` `chat-01` |
-| React Native | `native-tokens` `native-glass` `native-aurora` `native-press` |
+| React Native | `native-tokens` `native-glass` `native-aurora` `native-press` `native-ui`, plus a `native-<name>` twin of every component and block (iOS, Android and web through react-native-web) |
 
 - **shadcn's APIs, in glass.** Button, Card, Dialog, Tabs… keep their props and parts — swapping is `@/components/ui/x` → `@/components/glass/x`. Files land in `components/glass/`, beside shadcn's, never over them.
 - **68 primitives in eleven groups** — colour, material (frost, blur, saturation, brightness, sheen, grain), rim, depth (shadow, inner glow), shape, density, motion, aurora, fonts, type. Presets compose; any primitive can be overridden on any element (`[--glass-blur:8px]`); `ThemeScope` re-themes a subtree at runtime.

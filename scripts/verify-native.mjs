@@ -97,12 +97,9 @@ try {
       2,
     ),
   );
-  const items = [
-    "native-tokens",
-    "native-glass",
-    "native-aurora",
-    "native-press",
-  ];
+  // every native item, standalone: each must install and type-check through the CLI
+  const { nativeItems } = await import("../registry/items.mjs");
+  const items = nativeItems.map((i) => i.name);
   // the CLI sees Expo and installs dependencies with `npx expo install` — into the copy
   run(
     "pnpm",
@@ -119,11 +116,16 @@ try {
   writeFileSync(
     join(app, "src", "glass-native-check.tsx"),
     `import { Text, View } from "react-native"
+import { ActivityRings } from "@/components/glass/native/activity-rings"
 import { Aurora } from "@/components/glass/native/aurora"
+import { Button } from "@/components/glass/native/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/glass/native/card"
 import { Glass, canFade } from "@/components/glass/native/glass"
 import { Press } from "@/components/glass/native/press"
+import { Toaster, toast } from "@/components/glass/native/toaster"
 import { GlassThemeProvider, useGlassTheme } from "@/components/glass/native/tokens"
 
+// the foundation, as before
 function Inner() {
   const t = useGlassTheme()
   return (
@@ -135,12 +137,26 @@ function Inner() {
   )
 }
 
+// the /docs/native usage example — keep in step with src/app/docs/native/page.tsx
 export default function Check() {
   return (
     <GlassThemeProvider palette="ocean" scheme="dark">
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, padding: 20, justifyContent: "center" }}>
         <Aurora />
         <Inner />
+        <Card>
+          <CardHeader>
+            <CardTitle>Tonight’s reflection</CardTitle>
+            <CardDescription>Three rings, closing as the day goes.</CardDescription>
+          </CardHeader>
+          <CardContent style={{ alignItems: "center" }}>
+            <ActivityRings rings={[{ value: 0.8 }, { value: 0.55 }, { value: 1.2 }]} size={140} />
+          </CardContent>
+          <CardFooter>
+            <Button onPress={() => toast.success("Sealed")}>Seal tonight</Button>
+          </CardFooter>
+        </Card>
+        <Toaster />
       </View>
     </GlassThemeProvider>
   )

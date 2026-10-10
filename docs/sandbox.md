@@ -19,6 +19,7 @@ An Expo app in `sandbox/native/` that renders every `native-*` item, so the nati
 | `/glass` | `Glass` default, tinted, `raised` off, `interactive`, `bar`; which surface the platform picked (`hasLiquidGlass()`, `canFade()`) |
 | `/aurora` | Full-screen aurora per palette; reduced motion note |
 | `/press` | `Press` with haptic, custom squash, hover, disabled |
+| `/c/<name>` | Every ported component and block (`native-<name>`), every prop and variant: demos in `src/sandbox/demos/<group>.tsx` (basics, controls, overlays, data, composite), keyed by registry name |
 
 ## Commands
 
@@ -34,4 +35,5 @@ Don't start Metro with `CI=1` — it turns off the file watcher and serves stale
 
 ## Adding a native item
 
-Add a screen under `sandbox/native/src/app/<name>.tsx`, link it from `ITEMS` in `src/app/index.tsx`, title it in `src/app/_layout.tsx`, and add the item to `items` + the check file in `scripts/verify-native.mjs`.
+- **Component twin** (`registry/native/<web-name>.tsx`): add the name to `NATIVE_NAMES` in `registry/items.mjs` (deps and registry deps are read from its imports) and a demo under its name in the right `src/sandbox/demos/<group>.tsx`. The index and `/c/<name>` pick it up. `verify:native` installs every native item.
+- **Foundation item:** add a screen under `sandbox/native/src/app/<name>.tsx`, link it from `ITEMS` in `src/app/index.tsx` and title it in `src/app/_layout.tsx`.

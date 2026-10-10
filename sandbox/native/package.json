@@ -3,6 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "dependencies": {
+    "@tanstack/react-table": "^9.2.4",
     "expo": "~57.0.26",
     "expo-blur": "~57.0.3",
     "expo-constants": "~57.0.20",
@@ -14,6 +15,7 @@
     "expo-splash-screen": "~57.0.9",
     "expo-status-bar": "~57.0.1",
     "expo-system-ui": "~57.0.4",
+    "lucide-react-native": "^1.48.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.86.3",

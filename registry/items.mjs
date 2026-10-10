@@ -4,6 +4,8 @@
  * writes registry.json — never edit registry.json directly.
  */
 
+import { existsSync, readFileSync } from "node:fs"
+
 const R = "{REGISTRY_URL}/r"
 const foundation = `${R}/glass-style.json`
 
@@ -139,7 +141,7 @@ export const blocks = [
   block("chat-01", "Chat", "A conversation on glass: grouped turns with avatars, a read receipt, typing that resolves into a reply, quick replies and a floating composer.", ["avatar", "button", "card", "chat"]),
 ]
 
-const native = (name, title, description, deps, reg = []) => ({
+const native = (name, title, description, deps, reg = [], ext = "tsx") => ({
   name: `native-${name}`,
   type: "registry:ui",
   title,
@@ -147,12 +149,36 @@ const native = (name, title, description, deps, reg = []) => ({
   categories: ["glass", "native"],
   dependencies: deps,
   registryDependencies: reg.map((n) => `${R}/native-${n}.json`),
-  files: [{ path: `registry/native/${name}.tsx`, type: "registry:ui", target: `@components/glass/native/${name}.tsx` }],
+  files: [{ path: `registry/native/${name}.${ext}`, type: ext === "ts" ? "registry:lib" : "registry:ui", target: `@components/glass/native/${name}.${ext}` }],
 })
+
+const NATIVE_NAMES = ["typography", "prose", "card", "theme-scope", "button", "badge", "input", "textarea", "label", "kbd", "separator", "avatar", "switch", "checkbox", "segmented-control", "tabs", "slider", "progress", "dock", "grouped-list", "dialog", "sheet", "popover", "tooltip", "dropdown-menu", "toaster", "activity-rings", "progress-ring", "sparkline", "stat", "bar-list", "gauge", "tracker", "category-bar", "heatmap", "chart", "area-chart", "bar-chart", "line-chart", "donut-chart", "table", "data-table", "chat", "dashboard-01", "analytics-01", "settings-01", "auth-01", "chat-01"]
+
+/**
+ * The native port of every web component and block: one React Native file per
+ * item, the same name and API, rendered on the web by react-native-web.
+ * Each file's imports are checked against these deps by registry.test.mjs.
+ */
+const NATIVE_COMPONENTS = nativeComponents()
+
+function nativeComponents() {
+  const meta = Object.fromEntries([...components, ...blocks].map((i) => [i.name, i]))
+  return NATIVE_NAMES.map((name) => {
+    const web = meta[name]
+    const file = `registry/native/${name}.tsx`
+    const source = existsSync(file) ? readFileSync(file, "utf8") : ""
+    const pkgs = [...new Set([...source.matchAll(/from "([^@.][^"/]*|@[^"/]+\/[^"/]+)"/g)].map((m) => m[1]))].filter((p) => !["react", "react-native"].includes(p))
+    const reg = [...new Set([...source.matchAll(/from "@\/components\/glass\/native\/([^"]+)"/g)].map((m) => m[1]))]
+    return native(name, `${web?.title ?? name} (native)`, `${web?.description ?? ""} React Native: iOS, Android and web.`.trim(), pkgs, reg)
+  })
+}
 
 export const nativeItems = [
   native("tokens", "Native tokens", "The glasscn palettes and tokens for React Native, a GlassThemeProvider and useGlassTheme().", []),
   native("glass", "Native glass", "Frosted glass for Expo: Liquid Glass on iOS 26, blur on older iOS, backdrop-filter on web, a fill on Android.", ["expo-blur", "expo-glass-effect"], ["tokens"]),
   native("aurora", "Native aurora", "The drifting aurora for React Native, drawn with react-native-svg on the native driver.", ["react-native-svg"], ["tokens"]),
   native("press", "Native press", "The pressable everything is built on: spring squash, dim, haptic, hover lift.", ["expo-haptics"]),
+  native("ui", "Native UI tokens", "The web theme's radii, control heights, type scale, chart colours and motion as plain values (useUI()), and GText, the text every native component sets type with.", [], ["tokens"]),
+  native("chart-math", "Native chart maths", "The pure maths behind the native data components: ring arcs, smooth paths, heatmap grids, gauge arcs, segments, stacks.", [], [], "ts"),
+  ...NATIVE_COMPONENTS,
 ]

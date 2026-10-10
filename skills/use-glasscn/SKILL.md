@@ -18,6 +18,16 @@ Or add `"registries": { "@glasscn": "https://glasscn.app/r/{name}.json" }` to `c
 
 Put `<Aurora />` once in the root layout — glass needs something to frost.
 
+### React Native (Expo) — iOS, Android and web in one
+
+Every component and block has a `native-<name>` twin: same parts and props, one React Native file that renders natively and on the web through react-native-web. Each installs on its own and brings what it needs:
+
+```bash
+npx shadcn@latest add https://glasscn.app/r/native-button.json https://glasscn.app/r/native-dialog.json
+```
+
+Files land in `components/glass/native/`. Wrap the app in `GlassThemeProvider` (palette, scheme) from `native-tokens`, put `<Aurora />` behind screens, mount `<Toaster />` once at the root if you use toasts. `className` becomes `style`; there's no `asChild` (triggers wrap their children). Never fade an ancestor of glass on iOS 26 — check `canFade()`.
+
 ## Compose
 
 - Swap shadcn imports: `@/components/ui/card` → `@/components/glass/card`. Same parts and props.

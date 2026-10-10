@@ -37,7 +37,7 @@ That is why `<Card className="[--glass-blur:6px]">`, `ThemeScope`, the studio's 
 | Fonts | `registry:font` | `font-*`, `font-heading-*`, `font-mono-*` — generated from `FONTS`, installed by the CLI via next/font or fontsource |
 | Components | `registry:ui` | `components/glass/*` |
 | Blocks | `registry:block` | `components/glass-blocks/*` |
-| Native | `registry:ui` | `components/glass/native/*` (Expo) |
+| Native | `registry:ui` | `components/glass/native/*` (Expo): the foundation (`native-tokens/glass/aurora/press/ui/chart-math`) and a `native-<name>` twin of every component and block. One React Native file per item renders on iOS, Android and, through react-native-web, the web |
 
 Each preset carries its **whole** group, so adding one replaces the previous choice in that group and never leaves stale values.
 

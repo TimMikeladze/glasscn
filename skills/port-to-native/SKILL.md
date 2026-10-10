@@ -12,9 +12,10 @@ The native track lives in `registry/native/*.tsx`, ships as `native-*` items int
 1. **Tokens first.** `native-tokens` holds the palettes as hex and the theme as plain values (`useGlassTheme()`). If a web palette changed, change it here too.
 2. **Build on `Glass` and `Press`.** Surfaces are `<Glass>` (it picks Liquid Glass / blur / backdrop-filter / fill); tappables are `<Press>`. Don't reach for `BlurView` or `GlassView` directly.
 3. **Motion without fades on iOS 26.** Liquid Glass doesn't render under an ancestor whose opacity starts below 1. Entrances translate/scale; check `canFade()` before any opacity animation, tab transition or screen fade.
-4. **Register** with `native(name, title, description, deps, reg)` in `registry/items.mjs`; deps are Expo packages (`expo-blur`, `expo-glass-effect`, `expo-haptics`, `react-native-svg`).
-5. **Add a sandbox screen.** `sandbox/native/src/app/<name>.tsx` exercising every prop, linked from `ITEMS` in `src/app/index.tsx` and named in `src/app/_layout.tsx`; add the item to `items` in `scripts/verify-native.mjs`. The sandbox imports `registry/native` live — see `docs/sandbox.md`.
-6. **Verify:** `pnpm verify:native` (installs from the registry into a copy of the sandbox and type-checks). Then `cd sandbox/native && npm run ios` on the iOS 26 simulator, and `npm run web` — type-checking can't see a vanished pane.
+4. **One file, every platform.** A component twin is `registry/native/<web-name>.tsx`: the web file's exports, parts and variant props, built on `Glass`/`Press`, with tokens from `useUI()` and type from `GText` (`native-ui`). It's plain React Native, so react-native-web renders it on the web. No Tailwind, Radix or DOM. Overlays use `Modal`, sliding thumbs use `onLayout`, and charts use `react-native-svg` on `chart-math`.
+5. **Register** a twin by adding its name to `NATIVE_NAMES` in `registry/items.mjs`. Its npm deps and `native-*` registry deps are read from its imports, so it installs standalone. Foundation items use `native(name, title, description, deps, reg)` directly.
+6. **Add a sandbox demo.** Add an entry under the item's name in `sandbox/native/src/sandbox/demos/<group>.tsx` exercising every prop. The index and `/c/<name>` list it. The sandbox imports `registry/native` live — see `docs/sandbox.md`.
+7. **Verify:** `pnpm verify:native` (installs from the registry into a copy of the sandbox and type-checks). Then `cd sandbox/native && npm run ios` on the iOS 26 simulator, and `npm run web` — type-checking can't see a vanished pane.
 
 ## Debugging "the glass is invisible on iOS"
 

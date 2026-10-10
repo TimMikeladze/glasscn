@@ -4400,6 +4400,1198 @@
           "target": "@components/glass/native/press.tsx"
         }
       ]
+    },
+    {
+      "name": "native-ui",
+      "type": "registry:ui",
+      "title": "Native UI tokens",
+      "description": "The web theme's radii, control heights, type scale, chart colours and motion as plain values (useUI()), and GText, the text every native component sets type with.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-tokens.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/ui.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/ui.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-chart-math",
+      "type": "registry:ui",
+      "title": "Native chart maths",
+      "description": "The pure maths behind the native data components: ring arcs, smooth paths, heatmap grids, gauge arcs, segments, stacks.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/native/chart-math.ts",
+          "type": "registry:lib",
+          "target": "@components/glass/native/chart-math.ts"
+        }
+      ]
+    },
+    {
+      "name": "native-typography",
+      "type": "registry:ui",
+      "title": "Typography (native)",
+      "description": "Heading, Text, Display, Blockquote, InlineCode, List and TextLink on the theme's modular scale — fonts, weights, case and numerals from the type tokens. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/typography.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/typography.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-prose",
+      "type": "registry:ui",
+      "title": "Prose (native)",
+      "description": "Rich text (Markdown, MDX, CMS) set in the theme's type: headings, links, lists, quotes, code, tables. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-typography.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/prose.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/prose.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-card",
+      "type": "registry:ui",
+      "title": "Card (native)",
+      "description": "shadcn's Card API on glass: header, title, description, action, content, footer. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/card.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-theme-scope",
+      "type": "registry:ui",
+      "title": "Theme scope (native)",
+      "description": "Re-theme a subtree at runtime: a different palette, material, shape or scheme for one card, section or preview. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-tokens.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/theme-scope.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/theme-scope.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-button",
+      "type": "registry:ui",
+      "title": "Button (native)",
+      "description": "shadcn's Button with glass, tinted and secondary variants, capsule or rounded, squash on press. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/button.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/button.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-badge",
+      "type": "registry:ui",
+      "title": "Badge (native)",
+      "description": "Small capsule labels: solid, tinted, glass, secondary, outline, destructive. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-button.json",
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/badge.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/badge.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-input",
+      "type": "registry:ui",
+      "title": "Input (native)",
+      "description": "A filled field for glass: soft fill, accent caret and focus ring. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/input.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/input.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-textarea",
+      "type": "registry:ui",
+      "title": "Textarea (native)",
+      "description": "A filled, auto-growing text area for glass. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-input.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/textarea.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/textarea.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-label",
+      "type": "registry:ui",
+      "title": "Label (native)",
+      "description": "An accessible label. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/label.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/label.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-kbd",
+      "type": "registry:ui",
+      "title": "Kbd (native)",
+      "description": "Keycaps on glass, singly or grouped. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/kbd.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/kbd.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-separator",
+      "type": "registry:ui",
+      "title": "Separator (native)",
+      "description": "A hairline that reads on glass. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/separator.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/separator.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-avatar",
+      "type": "registry:ui",
+      "title": "Avatar (native)",
+      "description": "shadcn's Avatar on glass: a round photo with a hairline rim, initials on a soft fill, and overlapping groups. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/avatar.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/avatar.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-switch",
+      "type": "registry:ui",
+      "title": "Switch (native)",
+      "description": "The iOS switch: capsule track fills with the accent, white knob springs across. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "expo-haptics"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-segmented-control.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/switch.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/switch.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-checkbox",
+      "type": "registry:ui",
+      "title": "Checkbox (native)",
+      "description": "shadcn's Checkbox on glass: a soft box that fills with the accent, with an indeterminate dash. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/checkbox.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/checkbox.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-segmented-control",
+      "type": "registry:ui",
+      "title": "Segmented control (native)",
+      "description": "The iOS segmented control: one raised thumb slides to the chosen segment; always has a selection. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/segmented-control.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/segmented-control.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-tabs",
+      "type": "registry:ui",
+      "title": "Tabs (native)",
+      "description": "Tabs with a sliding pill (glass capsule, plain) or a sliding underline. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-segmented-control.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/tabs.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/tabs.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-slider",
+      "type": "registry:ui",
+      "title": "Slider (native)",
+      "description": "A soft track, accent range and white glass knobs. Ranges supported. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/slider.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/slider.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-progress",
+      "type": "registry:ui",
+      "title": "Progress (native)",
+      "description": "A capsule bar filling from the second chart colour into the accent. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "react-native-svg"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-segmented-control.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/progress.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/progress.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-dock",
+      "type": "registry:ui",
+      "title": "Dock (native)",
+      "description": "The floating tab bar: a glass capsule of destinations with a sliding pill, plus a round action button. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "react-native-safe-area-context"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-segmented-control.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/dock.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/dock.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-grouped-list",
+      "type": "registry:ui",
+      "title": "Grouped list (native)",
+      "description": "iOS Settings-style inset grouped rows on glass: headers, footers, icon tiles, values, chevrons. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-segmented-control.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/grouped-list.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/grouped-list.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-dialog",
+      "type": "registry:ui",
+      "title": "Dialog (native)",
+      "description": "A strong-glass modal over a dimmed, softened page. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/dialog.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/dialog.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-sheet",
+      "type": "registry:ui",
+      "title": "Sheet (native)",
+      "description": "A floating glass panel that slides in from any edge, inset like an iPad sheet. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "react-native-safe-area-context"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-dialog.json",
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/sheet.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/sheet.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-popover",
+      "type": "registry:ui",
+      "title": "Popover (native)",
+      "description": "Floating glass content anchored to a trigger. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-dialog.json",
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/popover.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/popover.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-tooltip",
+      "type": "registry:ui",
+      "title": "Tooltip (native)",
+      "description": "A small glass capsule on hover and focus. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-dialog.json",
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-popover.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/tooltip.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/tooltip.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-dropdown-menu",
+      "type": "registry:ui",
+      "title": "Dropdown menu (native)",
+      "description": "A glass menu: items, checkbox and radio items, labels, shortcuts, submenus. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-dialog.json",
+        "{REGISTRY_URL}/r/native-popover.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/dropdown-menu.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/dropdown-menu.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-toaster",
+      "type": "registry:ui",
+      "title": "Toaster (native)",
+      "description": "Sonner toasts dressed in glass. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "react-native-safe-area-context",
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-dialog.json",
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/toaster.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/toaster.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-activity-rings",
+      "type": "registry:ui",
+      "title": "Activity rings (native)",
+      "description": "Concentric Activity-style rings that sweep in and lap past 100%. Server-component safe. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "react-native-svg"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-chart-math.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/activity-rings.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/activity-rings.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-progress-ring",
+      "type": "registry:ui",
+      "title": "Progress ring (native)",
+      "description": "One ring that closes around its content — a goal, a countdown, a seal. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "react-native-svg"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-chart-math.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/progress-ring.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/progress-ring.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-sparkline",
+      "type": "registry:ui",
+      "title": "Sparkline (native)",
+      "description": "A smooth measure over time that draws itself, with a soft area and the latest point lit. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "react-native-svg"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-chart-math.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/sparkline.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/sparkline.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-stat",
+      "type": "registry:ui",
+      "title": "Stat (native)",
+      "description": "A figure on a glass tile: icon, value, label, trend. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/stat.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/stat.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-bar-list",
+      "type": "registry:ui",
+      "title": "Bar list (native)",
+      "description": "Ranked horizontal bars with the label inside and the value at the end — top habits, sources, pages. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-chart-math.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/bar-list.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/bar-list.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-gauge",
+      "type": "registry:ui",
+      "title": "Gauge (native)",
+      "description": "A three-quarter meter with an optional target tick and the figure in its bowl. Server-component safe. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "react-native-svg"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-chart-math.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/gauge.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/gauge.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-tracker",
+      "type": "registry:ui",
+      "title": "Tracker (native)",
+      "description": "A row of status blocks — uptime, or a habit's last 30 days. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/tracker.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/tracker.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-category-bar",
+      "type": "registry:ui",
+      "title": "Category bar (native)",
+      "description": "A range split into coloured bands with a marker — a readiness score, a budget. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-chart-math.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/category-bar.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/category-bar.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-heatmap",
+      "type": "registry:ui",
+      "title": "Heatmap (native)",
+      "description": "Days in week columns coloured by intensity — a contribution graph with month and weekday labels and a legend. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-chart-math.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/heatmap.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/heatmap.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-chart",
+      "type": "registry:ui",
+      "title": "Chart (native)",
+      "description": "The chart host: TanStack Charts in a container that maps glass tokens — series colours from --chart-*, a glass-strong tooltip, inherited type — plus an HTML legend and chartColor(). React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "react-native-svg"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-chart-math.json",
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/chart.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-area-chart",
+      "type": "registry:ui",
+      "title": "Area chart (native)",
+      "description": "Volume over time: gradient areas under a line per series, optionally stacked, with a grouped glass tooltip. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "react-native-svg"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-chart.json",
+        "{REGISTRY_URL}/r/native-chart-math.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/area-chart.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/area-chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-bar-chart",
+      "type": "registry:ui",
+      "title": "Bar chart (native)",
+      "description": "Amounts per category, grouped or stacked, vertical or horizontal, with theme-rounded bar ends. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "react-native-svg"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-chart.json",
+        "{REGISTRY_URL}/r/native-chart-math.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/bar-chart.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/bar-chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-line-chart",
+      "type": "registry:ui",
+      "title": "Line chart (native)",
+      "description": "Measures over time, one smooth line per series, with a grouped glass tooltip and a crosshair. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "react-native-svg"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-chart.json",
+        "{REGISTRY_URL}/r/native-chart-math.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/line-chart.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/line-chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-donut-chart",
+      "type": "registry:ui",
+      "title": "Donut chart (native)",
+      "description": "Parts of a whole as a ring of rounded slices, with content in the hole and a legend. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "react-native-svg"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-chart.json",
+        "{REGISTRY_URL}/r/native-chart-math.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/donut-chart.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/donut-chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-table",
+      "type": "registry:ui",
+      "title": "Table (native)",
+      "description": "shadcn's Table for glass: hairline rows, fill on hover and selection, muted headers, density-aware cells. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/table.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/table.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-data-table",
+      "type": "registry:ui",
+      "title": "Data table (native)",
+      "description": "A sortable, searchable, paginated table with row selection — TanStack Table v9 on the glass table. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "@tanstack/react-table",
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-button.json",
+        "{REGISTRY_URL}/r/native-checkbox.json",
+        "{REGISTRY_URL}/r/native-input.json",
+        "{REGISTRY_URL}/r/native-table.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/data-table.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/data-table.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-chat",
+      "type": "registry:ui",
+      "title": "Chat (native)",
+      "description": "A conversation in parts: a thread that sticks to the latest message, user and assistant bubbles that group into runs, receipts, day dividers, typing dots, quick replies and a composer where Enter sends. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-button.json",
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-segmented-control.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/chat.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/chat.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-dashboard-01",
+      "type": "registry:ui",
+      "title": "Dashboard (native)",
+      "description": "Activity rings, stat tiles, a ranged sparkline and a 39-week heatmap. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-activity-rings.json",
+        "{REGISTRY_URL}/r/native-button.json",
+        "{REGISTRY_URL}/r/native-card.json",
+        "{REGISTRY_URL}/r/native-dropdown-menu.json",
+        "{REGISTRY_URL}/r/native-heatmap.json",
+        "{REGISTRY_URL}/r/native-segmented-control.json",
+        "{REGISTRY_URL}/r/native-sparkline.json",
+        "{REGISTRY_URL}/r/native-stat.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/dashboard-01.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/dashboard-01.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-analytics-01",
+      "type": "registry:ui",
+      "title": "Analytics (native)",
+      "description": "Stacked active minutes over a range, the training mix as a donut, a recovery gauge, top habits and a sortable table of recent sessions. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-area-chart.json",
+        "{REGISTRY_URL}/r/native-bar-list.json",
+        "{REGISTRY_URL}/r/native-card.json",
+        "{REGISTRY_URL}/r/native-data-table.json",
+        "{REGISTRY_URL}/r/native-donut-chart.json",
+        "{REGISTRY_URL}/r/native-gauge.json",
+        "{REGISTRY_URL}/r/native-segmented-control.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/analytics-01.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/analytics-01.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-settings-01",
+      "type": "registry:ui",
+      "title": "Settings (native)",
+      "description": "iOS Settings in glass: grouped rows, icon tiles, a switch, a segmented control and a slider. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-grouped-list.json",
+        "{REGISTRY_URL}/r/native-segmented-control.json",
+        "{REGISTRY_URL}/r/native-slider.json",
+        "{REGISTRY_URL}/r/native-switch.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/settings-01.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/settings-01.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-auth-01",
+      "type": "registry:ui",
+      "title": "Sign in (native)",
+      "description": "A strong-glass sign-in card with email, password and a passkey option. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-button.json",
+        "{REGISTRY_URL}/r/native-card.json",
+        "{REGISTRY_URL}/r/native-input.json",
+        "{REGISTRY_URL}/r/native-label.json",
+        "{REGISTRY_URL}/r/native-separator.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/auth-01.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/auth-01.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-chat-01",
+      "type": "registry:ui",
+      "title": "Chat (native)",
+      "description": "A conversation on glass: grouped turns with avatars, a read receipt, typing that resolves into a reply, quick replies and a floating composer. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-avatar.json",
+        "{REGISTRY_URL}/r/native-button.json",
+        "{REGISTRY_URL}/r/native-card.json",
+        "{REGISTRY_URL}/r/native-chat.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/chat-01.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/chat-01.tsx"
+        }
+      ]
     }
   ]
 }

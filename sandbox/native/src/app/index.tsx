@@ -4,6 +4,7 @@ import { Platform, Text, View } from "react-native"
 import { canFade, Glass } from "@/components/glass/native/glass"
 import { Press } from "@/components/glass/native/press"
 import { useGlassTheme } from "@/components/glass/native/tokens"
+import { DEMOS } from "@/sandbox/demos"
 import { Body, Screen, Section, surfaceName } from "@/sandbox/ui"
 
 const ITEMS: { href: Href; name: string; item: string; description: string }[] = [
@@ -27,7 +28,20 @@ export default function Index() {
           </Body>
         </Glass>
       </Section>
-      <Section title="Items">
+      <Section title="Components" note="Every web component and block, ported — one file for iOS, Android and web.">
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+          {Object.entries(DEMOS).map(([name, demo]) => (
+            <Link key={name} href={{ pathname: "/c/[name]", params: { name } }} asChild>
+              <Press haptic accessibilityRole="link" testID={`item-${name}`}>
+                <Glass interactive radius={14} style={{ paddingVertical: 10, paddingHorizontal: 14 }}>
+                  <Text style={{ color: t.foreground, fontSize: 14, fontWeight: "600" }}>{demo.title}</Text>
+                </Glass>
+              </Press>
+            </Link>
+          ))}
+        </View>
+      </Section>
+      <Section title="Foundation">
         <View style={{ gap: 10 }}>
           {ITEMS.map((i) => (
             <Link key={i.item} href={i.href} asChild>

@@ -56,7 +56,7 @@ export default function Home() {
         {[
           { icon: CodeIcon, title: "shadcn's APIs, in glass", body: "Button, Card, Dialog, Tabs… keep their props and parts. Swapping is an import path: @/components/ui → @/components/glass." },
           { icon: LayersIcon, title: "Tokens all the way down", body: "Frost, rim, blur, saturation, aurora — every one a CSS variable. Two hooks (--glass-bg, --glass-elevation) restyle any surface from a class." },
-          { icon: SmartphoneIcon, title: "Web and React Native", body: "The same palettes ship for Expo: Liquid Glass on iOS 26, blur on older iOS, a fill on Android, backdrop-filter on the web." },
+          { icon: SmartphoneIcon, title: "Web and React Native", body: "Every component has a native-* twin for Expo: one React Native file for iOS, Android and the web. Liquid Glass on iOS 26, blur on older iOS, a fill on Android." },
         ].map((f) => (
           <Card key={f.title}>
             <CardHeader>

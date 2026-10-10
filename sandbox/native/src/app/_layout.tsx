@@ -2,6 +2,7 @@ import { Stack } from "expo-router"
 import { Platform } from "react-native"
 import { StatusBar } from "expo-status-bar"
 
+import { Toaster } from "@/components/glass/native/toaster"
 import { useGlassTheme } from "@/components/glass/native/tokens"
 import { SandboxThemeProvider } from "@/sandbox/theme"
 
@@ -28,7 +29,10 @@ function Nav() {
         <Stack.Screen name="glass" options={{ title: "Glass" }} />
         <Stack.Screen name="aurora" options={{ title: "Aurora" }} />
         <Stack.Screen name="press" options={{ title: "Press" }} />
+        <Stack.Screen name="c/[name]" options={{ title: "Component" }} />
       </Stack>
+      {/* toasts are an overlay at the root, above every screen */}
+      <Toaster />
     </>
   )
 }
