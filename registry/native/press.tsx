@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Platform, Pressable, StyleSheet, type GestureResponderEvent, type PressableProps, type PressableStateCallbackType, type StyleProp, type ViewStyle } from "react-native"
+import { Platform, Pressable, StyleSheet, type GestureResponderEvent, type PressableProps, type StyleProp, type ViewStyle } from "react-native"
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated"
 import * as Haptics from "expo-haptics"
 
@@ -27,6 +27,9 @@ export const haptics = {
 }
 export const useHaptics = () => haptics
 
+/** Pressable's style-callback state, with hover (RN's own type lacks it in some versions). */
+export type PressState = { pressed: boolean; hovered?: boolean }
+
 export type PressProps = Omit<PressableProps, "style"> & {
   /** A selection haptic when the press lands (not on press-in, so scrolls never buzz). */
   haptic?: boolean
@@ -41,7 +44,7 @@ export type PressProps = Omit<PressableProps, "style"> & {
    * wrap Liquid Glass — glass stops rendering under a fading ancestor on iOS 26.
    */
   dim?: boolean
-  style?: StyleProp<ViewStyle> | ((state: PressableStateCallbackType) => StyleProp<ViewStyle>)
+  style?: StyleProp<ViewStyle> | ((state: PressState) => StyleProp<ViewStyle>)
   /**
    * Radix's `asChild`: render the single child (a Button, a custom pressable) instead of a
    * Press of its own, merging onPress / onLongPress and accessibility props into it — so a
