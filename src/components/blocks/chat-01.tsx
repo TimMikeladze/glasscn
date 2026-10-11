@@ -43,11 +43,8 @@ const REPLIES = [
   "Noted. Small steps, every evening — that's the whole method.",
 ]
 
-const at = (h: number, m: number) => {
-  const d = new Date()
-  d.setHours(h, m, 0, 0)
-  return d
-}
+// seed times on a fixed evening: a `new Date()` at render can't prerender (and would differ server → client)
+const at = (h: number, m: number) => new Date(2026, 9, 8, h, m)
 const clock = (d: Date) => d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
 
 const coach = (
