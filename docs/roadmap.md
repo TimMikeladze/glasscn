@@ -69,7 +69,7 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 - [x] **LG-08** P1 gap — **Concentric radii**: containers set `--glass-container-radius`/`--glass-container-pad`; `rounded-concentric` = `max(min, radius − pad)`; used by segmented/tab thumbs, menu items, sheet inner cards, grouped rows, stat tiles, widget tiles; native `concentric(outer, pad, min)` helper replaces `radius − 6`.
 - [x] **LG-09** P1 gap — **Glass knobs**: switch/slider/segmented thumbs become liquid lenses while `:active`/dragging, scaled ~1.15× and stretched toward travel; solid at rest.
 - [x] **LG-10** P1 gap — **Materialise**: registered `@property --glass-materialize` (0→1) drives blur + frost + small scale for overlay entrances/exits instead of opacity fades; reduced motion → plain fade (Apple: don't animate into/out of blur).
-- [x] **LG-11** P1 gap — **Morph from source**: menus/popovers/select grow from the trigger's size and radius (`--radix-*-trigger-width/height`, transform origin, `@starting-style` clip-path); sheets/dialogs from their button via View Transitions (re-enable blur after).
+- [x] **LG-11** P1 gap — **Morph from source**: menus/popovers/select grow from the trigger's size and radius (`--radix-*-trigger-width/height`, transform origin, `@starting-style` clip-path); sheets/dialogs from their button via View Transitions (re-enable blur after). *(M2: panel starts as a trigger-sized capsule centred on itself, not exactly over the trigger)*
 - [x] **LG-12** P1 gap — **Real springs**: `spring({ stiffness, damping, mass }) → linear()` in the engine (tested); motion presets emit `linear()` `--glass-ease` with cubic-bezier fallback; overshoot only on transforms (CMP-X07d).
 - [x] **LG-13** P1 gap — **Elastic press**: `--glass-press-stretch` asymmetric scale on press, spring back; liquid grows (`--glass-press-grow`), solid squashes; disabled under reduced motion.
 - [x] **LG-14** P1 gap — **`GlassGroup`** (GlassEffectContainer analogue) phase 1: children share one liquid backdrop; generalised sliding/morphing selection (size + radius). Used by toolbar groups, button groups, steppers, segmented. P2 phase 2: SVG goo split/merge (Chromium-first). *(M2: phase 1; phase 2 goo open)*
@@ -249,7 +249,7 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 ### Slider
 - [x] **SLD-01** P0 token — `bg-white`, `rgb()` shadows, `size-6`, `focus-visible:ring-4` (not `--glass-ring-width`) (`:33`).
 - [ ] **SLD-02** P1 a11y — No per-thumb names ("Minimum"/"Maximum") or `aria-valuetext` formatter (range demo labels both "Range"). → `thumbLabels`, `getAriaValueText`.
-- [x] **SLD-03** P1 rebuild (LG) — iOS 26 thumb = horizontal capsule that becomes a stretching glass lens while dragged; plus leading/trailing min-max icons, value bubble while dragging, `ticks` (label min/max only), `neutralValue`, `variant="progress"`, circular slider for wrapping values (P2).
+- [x] **SLD-03** P1 rebuild (LG) — iOS 26 thumb = horizontal capsule that becomes a stretching glass lens while dragged; plus leading/trailing min-max icons, value bubble while dragging, `ticks` (label min/max only), `neutralValue`, `variant="progress"`, circular slider for wrapping values (P2). *(M2: value bubble is solid accent, not glass; circular slider open)*
 - [ ] **SLD-04** P1 a11y — `hover:scale-105`/`active:scale-110` not stilled; 24px thumb no hit area.
 - [ ] **SLD-05** P2 bug — `disabled:pointer-events-none` on a `<span>` never matches → `data-disabled:`; renders `[min,max]` thumbs when no value (Radix defaults `[min]`).
 
