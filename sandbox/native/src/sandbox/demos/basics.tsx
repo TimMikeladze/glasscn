@@ -262,6 +262,9 @@ export const demos: Record<string, Demo> = {
             <Button disabled variant="outline">
               Disabled
             </Button>
+            <Button disabled variant="glass">
+              Disabled glass
+            </Button>
           </View>
         </Section>
       </>

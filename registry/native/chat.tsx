@@ -1,5 +1,6 @@
 import * as React from "react"
 import {
+  AccessibilityInfo,
   Animated,
   Easing,
   Platform,
@@ -68,6 +69,8 @@ function ChatThread({ style, children, inset = 0, ...props }: ViewProps & { inse
   const messages = kids.filter((c): c is React.ReactElement<ChatMessageProps> => React.isValidElement(c) && c.type === ChatMessage)
   const last = messages[messages.length - 1]
   const lastInfo = last ? { key: last.key, from: last.props.from ?? "assistant" } : null
+  // a reply still streaming would be re-read on every token: hold the live region until it's done
+  const streaming = messages.some((m) => m.props.streaming)
 
   const show = (visible: boolean) => {
     setAtBottom(!visible)
@@ -99,7 +102,7 @@ function ChatThread({ style, children, inset = 0, ...props }: ViewProps & { inse
       <ScrollView
         ref={scrollRef}
         role="log"
-        accessibilityLiveRegion="polite"
+        accessibilityLiveRegion={streaming ? "none" : "polite"}
         onScroll={onScroll}
         scrollEventThrottle={32}
         onContentSizeChange={follow}
@@ -142,16 +145,34 @@ function ChatThread({ style, children, inset = 0, ...props }: ViewProps & { inse
   )
 }
 
-type ChatMessageProps = ViewProps & { from?: ChatFrom; grouped?: boolean; avatar?: React.ReactNode }
+type ChatMessageProps = ViewProps & { from?: ChatFrom; grouped?: boolean; streaming?: boolean; avatar?: React.ReactNode }
+
+/** The plain text inside a tree of elements — what a finished message announces. */
+function textOf(node: React.ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") return String(node)
+  if (Array.isArray(node)) return node.map(textOf).join(" ")
+  if (React.isValidElement<{ children?: React.ReactNode }>(node)) return textOf(node.props.children)
+  return ""
+}
 
 /**
  * One turn. User turns sit on the right, the rest on the left. `grouped` marks a
  * follow-up from the same sender: the gap tightens, the avatar hides and the
  * bubble corners facing the sender square off so the run reads as one.
+ * `streaming` marks a reply still arriving: it's busy (and the thread's live region
+ * quiet) until it turns false, then its full text is announced once.
  */
-function ChatMessage({ style, from = "assistant", grouped = false, avatar, children, ...props }: ChatMessageProps) {
+function ChatMessage({ style, from = "assistant", grouped = false, streaming = false, avatar, children, ...props }: ChatMessageProps) {
   const first = React.useContext(FirstContext)
   const nextGrouped = React.useContext(NextGroupedContext)
+  const wasStreaming = React.useRef(streaming)
+  React.useEffect(() => {
+    if (wasStreaming.current && !streaming) {
+      const text = textOf(children).replace(/\s+/g, " ").trim()
+      if (text) AccessibilityInfo.announceForAccessibility(text)
+    }
+    wasStreaming.current = streaming
+  }, [streaming, children])
   return (
     <ChatMessageContext.Provider value={{ from, grouped, nextGrouped }}>
       <View
@@ -166,6 +187,7 @@ function ChatMessage({ style, from = "assistant", grouped = false, avatar, child
           },
           style,
         ]}
+        accessibilityState={streaming ? { busy: true } : undefined}
         {...props}
       >
         {avatar && from !== "system" ? (
@@ -203,14 +225,15 @@ function chatBubbleVariants(ui: UI, { variant = "assistant" }: { variant?: Bubbl
   return { container: { maxWidth: "100%", borderRadius: bubbleRadius(ui), borderCurve: "continuous", ...container } as ViewStyle, text, size: variant === "system" ? ("xs" as const) : ("sm" as const) }
 }
 
-/** Fades and rises a bubble in once, as the web `glass-fade` does. */
+/** Fades (where glass can fade) and rises a bubble in once, as the web `glass-fade` does. */
 function useEntrance() {
   const reduce = useReduceMotion()
   const [v] = React.useState(() => new Animated.Value(0))
   React.useEffect(() => {
     Animated.timing(v, { toValue: 1, duration: reduce.current ? 0 : 200, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start()
   }, [v, reduce])
-  return { opacity: v, transform: [{ translateY: v.interpolate({ inputRange: [0, 1], outputRange: [4, 0] }) }] }
+  // a bubble can hold glass (a glass Badge or Button): on iOS 26 it rises without the fade
+  return { opacity: canFade() ? v : 1, transform: [{ translateY: v.interpolate({ inputRange: [0, 1], outputRange: [4, 0] }) }] }
 }
 
 /** The message body. Its look follows the enclosing `ChatMessage` unless `variant` says otherwise. */

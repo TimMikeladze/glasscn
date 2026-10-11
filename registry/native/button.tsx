@@ -1,7 +1,7 @@
 import * as React from "react"
 import { View, type PressableProps, type StyleProp, type TextStyle, type ViewStyle } from "react-native"
 
-import { Glass } from "@/components/glass/native/glass"
+import { Glass, canFade } from "@/components/glass/native/glass"
 import { Press } from "@/components/glass/native/press"
 import { GText, alpha, useUI, web, type UI } from "@/components/glass/native/ui"
 
@@ -99,20 +99,25 @@ function Button({
   const v = buttonVariants(ui, { variant, size, shape })
   const content = decorate(children, v.text, v.color, v.iconSize)
   const radius = v.container.borderRadius as number
+  const glass = variant === "glass"
+  // Liquid Glass vanishes under a fading ancestor (native rule 3): a glass button
+  // never dims its container — not on press, not when disabled; its label dims instead.
+  const fades = !glass || canFade()
   return (
     <Press
       accessibilityRole="button"
       aria-disabled={!!disabled}
       disabled={disabled}
       haptic
+      dim={fades}
       hover={variant === "link" ? 1 : 1.02}
       squash={variant === "link" ? 1 : ui.motion.pressScale}
-      style={[v.container, variant === "glass" ? { backgroundColor: "transparent", padding: 0, paddingHorizontal: 0 } : null, disabled ? { opacity: 0.45 } : null, web({ cursor: disabled ? "default" : "pointer" }), style]}
+      style={[v.container, glass ? { backgroundColor: "transparent", padding: 0, paddingHorizontal: 0 } : null, disabled && fades ? { opacity: 0.45 } : null, web({ cursor: disabled ? "default" : "pointer" }), style]}
       {...props}
     >
-      {variant === "glass" ? (
-        <Glass interactive raised={false} radius={radius} style={{ flex: 1, alignSelf: "stretch", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: v.container.gap, paddingHorizontal: v.container.paddingHorizontal }}>
-          {content}
+      {glass ? (
+        <Glass interactive={!disabled} raised={false} radius={radius} style={{ flexGrow: 1, alignSelf: "stretch", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: v.container.gap, paddingHorizontal: v.container.paddingHorizontal }}>
+          {disabled && !fades ? <View style={{ flexDirection: "row", alignItems: "center", gap: v.container.gap, opacity: 0.45 }}>{content}</View> : content}
         </Glass>
       ) : (
         <View style={{ flexDirection: "row", alignItems: "center", gap: v.container.gap }}>{content}</View>

@@ -64,7 +64,7 @@ function BarList({
             </span>
           </>
         )
-        const row = "flex w-full items-center gap-3 rounded-control-sm text-left outline-none focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/50"
+        const row = "flex w-full items-center gap-3 rounded-control-sm text-left focus-visible:outline-hidden focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/50"
         const key = item.key ?? (typeof item.name === "string" ? item.name : i)
         return (
           <li key={key} data-slot="bar-list-item">

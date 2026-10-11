@@ -15,8 +15,9 @@ import { site } from "@/lib/site"
 import { formatStars } from "@/lib/format-stars"
 import { GitHubIcon, LinkedInIcon, XIcon } from "./brand-icons"
 import { Logo } from "./logo"
-import { PALETTES, usePalette, type Palette } from "./providers"
+import { usePalette, type Palette } from "./providers"
 import { DocsNav } from "./docs-nav"
+import type { NavSection } from "./docs-nav-data"
 
 const NAV = [
   { href: "/docs", label: "Docs" },
@@ -39,10 +40,10 @@ export function PaletteSwatch({ palette, className }: { palette: Palette; classN
   )
 }
 
-export function SiteHeader({ stars }: { stars: number | null }) {
+export function SiteHeader({ stars, nav }: { stars: number | null; nav: NavSection[] }) {
   const pathname = usePathname()
   const { resolvedTheme, setTheme } = useTheme()
-  const { palette, setPalette } = usePalette()
+  const { palette, setPalette, palettes } = usePalette()
   const [menu, setMenu] = React.useState(false)
   return (
     <header className="sticky top-0 z-40 px-3 pt-3">
@@ -58,7 +59,7 @@ export function SiteHeader({ stars }: { stars: number | null }) {
               <SheetTitle>glasscn</SheetTitle>
             </SheetHeader>
             <div className="px-3 pb-6">
-              <DocsNav onNavigate={() => setMenu(false)} />
+              <DocsNav sections={nav} onNavigate={() => setMenu(false)} />
             </div>
           </SheetContent>
         </Sheet>
@@ -95,7 +96,7 @@ export function SiteHeader({ stars }: { stars: number | null }) {
             <DropdownMenuContent align="end" className="max-h-96 w-44">
               <DropdownMenuLabel>Palette</DropdownMenuLabel>
               <DropdownMenuRadioGroup value={palette} onValueChange={(v) => setPalette(v as Palette)}>
-                {PALETTES.map((p) => (
+                {palettes.map((p) => (
                   <DropdownMenuRadioItem key={p} value={p} className="capitalize">
                     <PaletteSwatch palette={p} />
                     {p}

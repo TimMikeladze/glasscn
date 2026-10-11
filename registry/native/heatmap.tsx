@@ -1,7 +1,7 @@
 import * as React from "react"
 import { View, type LayoutChangeEvent, type StyleProp, type ViewProps, type ViewStyle } from "react-native"
 
-import { heatmapWeeks, isoDate, monthLabels, parseDate, type HeatCell } from "@/components/glass/native/chart-math"
+import { heatCellTitle, heatmapWeeks, isoDate, monthLabels, weekdayLabels, type HeatCell } from "@/components/glass/native/chart-math"
 import { Press } from "@/components/glass/native/press"
 import { alpha, GText, useUI, type UI } from "@/components/glass/native/ui"
 
@@ -20,8 +20,9 @@ export function Heatmap({
   today = isoDate(new Date()),
   max,
   cellSize = 16,
+  locale = "en-US",
   onSelect,
-  formatTitle = (c) => `${parseDate(c.date).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}${c.value ? ` · ${c.value}` : ""}`,
+  formatTitle = (c) => heatCellTitle(c, locale),
   style,
   ...props
 }: Omit<ViewProps, "style"> & {
@@ -32,6 +33,8 @@ export function Heatmap({
   max?: number
   /** Largest a cell grows, in px — cells shrink below it to fit narrow containers. */
   cellSize?: number
+  /** BCP 47 locale for weekday, month and title text — the same as the web Heatmap's. */
+  locale?: string
   onSelect?: (date: string) => void
   formatTitle?: (cell: HeatCell) => string
   style?: StyleProp<ViewStyle>
@@ -40,8 +43,8 @@ export function Heatmap({
   const fills = levels(ui)
   const [width, setWidth] = React.useState(0)
   const cols = heatmapWeeks(values, { today, weeks, weekStart, max })
-  const months = monthLabels(cols)
-  const days = Array.from({ length: 7 }, (_, r) => parseDate(cols[0][r].date).toLocaleDateString(undefined, { weekday: "short" }))
+  const months = monthLabels(cols, locale)
+  const days = weekdayLabels(weekStart, locale)
   const cell = width ? Math.max(4, Math.min(cellSize, (width - GAP * (weeks - 1)) / weeks)) : cellSize
   const label = (text: React.ReactNode) => (
     <GText style={{ fontSize: 10, lineHeight: 12 }} tone="muted" numberOfLines={1}>

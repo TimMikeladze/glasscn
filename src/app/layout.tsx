@@ -4,9 +4,11 @@ import { Geist, Geist_Mono } from "next/font/google"
 import { Aurora } from "@/components/glass/aurora"
 import { Providers, paletteScript } from "@/components/site/providers"
 import { SiteHeader } from "@/components/site/site-header"
+import { docsNav } from "@/components/site/docs-nav-data"
 import { SiteFooter } from "@/components/site/site-footer"
 import { repoStars } from "@/lib/github"
 import { rootMetadata } from "@/lib/metadata"
+import { PALETTES } from "@/lib/glass-theme"
 import "./globals.css"
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
@@ -22,9 +24,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: paletteScript }} />
       </head>
       <body className="type-glass min-h-dvh">
-        <Providers>
+        <Providers palettes={Object.keys(PALETTES)}>
           <Aurora />
-          <SiteHeader stars={stars} />
+          <SiteHeader stars={stars} nav={docsNav} />
           {children}
           <SiteFooter />
         </Providers>

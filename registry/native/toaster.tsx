@@ -185,18 +185,23 @@ function ToastItem({ toast: t, index, top, offset, expanded, duration, onPress, 
     return () => clearTimeout(timer)
   }, [closing, expanded, duration])
 
+  // `drag` shares a transform with `enter`/`place`, which run on the native driver —
+  // so it must too: once a node has moved to native, a JS-driven animation on it throws.
+  // The finger writes with setValue (fine on a native node); Animated.event can't
+  // drive a PanResponder natively.
   const [pan] = React.useState(() =>
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 8 && Math.abs(g.dx) > Math.abs(g.dy),
-      onPanResponderMove: Animated.event([null, { dx: drag }], { useNativeDriver: false }),
+      onPanResponderGrant: () => drag.stopAnimation(),
+      onPanResponderMove: (_, g) => drag.setValue(g.dx),
       onPanResponderRelease: (_, g) => {
         if (Math.abs(g.dx) > 80 || Math.abs(g.vx) > 0.8) {
-          Animated.timing(drag, { toValue: Math.sign(g.dx) * 480, duration: 180, useNativeDriver: false }).start(() => setLeaving(true))
+          Animated.timing(drag, { toValue: Math.sign(g.dx || g.vx) * 480, duration: 180, useNativeDriver: true }).start(() => setLeaving(true))
         } else {
-          Animated.spring(drag, { toValue: 0, friction: 7, useNativeDriver: false }).start()
+          Animated.spring(drag, { toValue: 0, friction: 7, useNativeDriver: true }).start()
         }
       },
-      onPanResponderTerminate: () => Animated.spring(drag, { toValue: 0, useNativeDriver: false }).start(),
+      onPanResponderTerminate: () => Animated.spring(drag, { toValue: 0, friction: 7, useNativeDriver: true }).start(),
     })
   )
 
@@ -220,7 +225,8 @@ function ToastItem({ toast: t, index, top, offset, expanded, duration, onPress, 
         ],
       }}
     >
-      <Press onPress={onPress} squash={0.99} accessibilityRole="alert" accessibilityLiveRegion="polite">
+      {/* the pane is glass: squash, never dim, on iOS 26 (native rule 3) */}
+      <Press onPress={onPress} squash={0.99} dim={fade} accessibilityRole="alert" accessibilityLiveRegion="polite">
         <Glass radius={ui.radius.surface} tint={ui.glassStrong} style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 16, paddingVertical: 14 }}>
           <ToastIcon type={t.type} />
           <View style={{ flex: 1, gap: 2 }}>

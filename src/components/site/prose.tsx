@@ -4,7 +4,7 @@ import { cn } from "cn"
 export function PageHeader({ eyebrow, title, description }: { eyebrow?: string; title: string; description?: string }) {
   return (
     <div className="flex flex-col gap-2 pb-6">
-      {eyebrow ? <div className="text-xs font-semibold tracking-wide text-primary uppercase">{eyebrow}</div> : null}
+      {eyebrow ? <div className="text-xs font-semibold tracking-wide text-primary-ink uppercase">{eyebrow}</div> : null}
       <h1 className="type-glass-heading text-4xl">{title}</h1>
       {description ? <p className="max-w-2xl text-lg text-muted-foreground">{description}</p> : null}
     </div>

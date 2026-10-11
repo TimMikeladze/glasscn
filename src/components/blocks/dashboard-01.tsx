@@ -19,10 +19,11 @@ function series(n: number, seed: number, base: number, swing: number) {
 
 function demoDays(today: string) {
   const values: Record<string, number> = {}
-  const d = new Date(`${today}T12:00:00`)
+  // all in UTC, so every time zone (and the server) gets the same dates
+  const d = new Date(`${today}T00:00:00Z`)
   for (let i = 0; i < 39 * 7; i++) {
     const x = new Date(d)
-    x.setDate(d.getDate() - i)
+    x.setUTCDate(d.getUTCDate() - i)
     const v = (Math.sin(i * 1.3) + Math.cos(i * 0.37) + 1.2) * 1.6
     if (v > 0.9) values[x.toISOString().slice(0, 10)] = Math.round(v)
   }

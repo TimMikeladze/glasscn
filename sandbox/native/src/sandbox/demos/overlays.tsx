@@ -2,6 +2,18 @@ import * as React from "react"
 import { TextInput, View } from "react-native"
 import { CopyIcon, PenIcon, SettingsIcon, ShareIcon, Trash2Icon } from "lucide-react-native"
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/glass/native/alert-dialog"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/glass/native/dialog"
 import {
   DropdownMenu,
@@ -25,7 +37,7 @@ import { Press } from "@/components/glass/native/press"
 import { Button } from "@/components/glass/native/button"
 import { toast } from "@/components/glass/native/toaster"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/glass/native/tooltip"
-import { GText, useUI } from "@/components/glass/native/ui"
+import { GText, alpha, useUI } from "@/components/glass/native/ui"
 import type { Demo } from "@/sandbox/demos/types"
 import { Body, Section } from "@/sandbox/ui"
 
@@ -282,6 +294,79 @@ function ControlledTip() {
   )
 }
 
+function DeleteNotesAlert() {
+  const ui = useUI()
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger>
+        <Face>Delete notes</Face>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogMedia style={{ backgroundColor: alpha(ui.destructive, 0.14) }}>
+            <Trash2Icon size={24} color={ui.destructive} />
+          </AlertDialogMedia>
+          <AlertDialogTitle>Delete 3 notes?</AlertDialogTitle>
+          <AlertDialogDescription>These notes will be removed from all your devices. This can’t be undone.</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction variant="destructive" onPress={() => toast.error("3 notes deleted")}>
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
+
+function SmallAlert() {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger>
+        <Face>Sign out (sm)</Face>
+      </AlertDialogTrigger>
+      <AlertDialogContent size="sm">
+        <AlertDialogHeader>
+          <AlertDialogTitle>Sign out?</AlertDialogTitle>
+          <AlertDialogDescription>Your journal stays synced.</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onPress={() => toast("Signed out")}>Sign out</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
+
+function ControlledAlert() {
+  const [open, setOpen] = React.useState(false)
+  return (
+    <>
+      <Row>
+        <Press onPress={() => setOpen(true)} accessibilityRole="button">
+          <Face>Unsaved entry (controlled)</Face>
+        </Press>
+        <Body>open: {String(open)}</Body>
+      </Row>
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Save today’s entry?</AlertDialogTitle>
+            <AlertDialogDescription>You have unsaved changes. Three buttons at most: the default on top, Cancel at the bottom.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction variant="destructive">Discard</AlertDialogAction>
+            <AlertDialogAction onPress={() => toast.success("Entry saved")}>Save</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  )
+}
+
 export const demos: Record<string, Demo> = {
   dialog: {
     title: "Dialog",
@@ -292,6 +377,22 @@ export const demos: Record<string, Demo> = {
         </Section>
         <Section title="Controlled · footer close">
           <ControlledDialog />
+        </Section>
+      </>
+    ),
+  },
+  "alert-dialog": {
+    title: "Alert dialog",
+    render: () => (
+      <>
+        <Section title="Destructive confirm" note="Only the buttons close it — no backdrop tap; Escape (web) and back (Android) cancel. Never fades on Liquid Glass.">
+          <DeleteNotesAlert />
+        </Section>
+        <Section title="size sm" note="Two buttons side by side at equal width.">
+          <SmallAlert />
+        </Section>
+        <Section title="Controlled · three buttons">
+          <ControlledAlert />
         </Section>
       </>
     ),

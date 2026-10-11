@@ -199,6 +199,9 @@ export const TOKENS: TokenDef[] = [
   { name: "glass-fill-opacity", group: "Material", label: "Fill", description: "How strong control fills are.", light: "12%", dark: "24%", control: range(0, 60, 1, "%") },
   { name: "glass-fill-opacity-strong", group: "Material", label: "Fill (strong)", description: "Hovered and pressed fills, tracks.", light: "20%", dark: "36%", control: range(0, 80, 1, "%") },
   { name: "glass-thumb", group: "Material", label: "Thumb", description: "The raised thumb of segmented controls.", light: "oklch(1 0 0)", dark: "oklch(1 0 0 / 20%)", control: colour },
+  { name: "glass-label", group: "Material", label: "Text on glass", description: "Text inside panes (remaps --foreground there).", light: "oklch(0.145 0 0)", dark: "oklch(0.985 0 0)", control: colour },
+  { name: "glass-label-secondary", group: "Material", label: "Secondary text", description: "Muted text inside panes (remaps --muted-foreground there).", light: "oklch(0.44 0.01 285)", dark: "oklch(0.84 0.01 285)", control: colour },
+  { name: "glass-knob", group: "Material", label: "Knob", description: "Switch and slider knobs.", light: "oklch(1 0 0)", dark: "oklch(1 0 0)", control: colour },
 
   // Rim
   { name: "glass-border-color", group: "Rim", label: "Rim colour", description: "The edge around every pane.", light: "oklch(1 0 0)", dark: "oklch(1 0 0)", control: colour },
@@ -211,6 +214,7 @@ export const TOKENS: TokenDef[] = [
   { name: "glass-shadow-opacity", group: "Depth", label: "Shadow", description: "Drop shadow strength.", light: "12%", dark: "45%", control: range(0, 80, 1, "%") },
   { name: "glass-shadow-y", group: "Depth", label: "Shadow offset", description: "How far below the pane the shadow falls.", light: "10px", dark: "10px", control: range(0, 60, 1, "px") },
   { name: "glass-shadow-blur", group: "Depth", label: "Shadow blur", description: "How soft the shadow is.", light: "30px", dark: "30px", control: range(0, 120, 1, "px") },
+  { name: "glass-dim", group: "Depth", label: "Dim", description: "The scrim behind dialogs and sheets.", light: "15%", dark: "45%", control: range(0, 80, 1, "%") },
   { name: "glass-glow", group: "Depth", label: "Inner glow", description: "An accent glow inside every pane.", light: "0%", dark: "0%", control: range(0, 80, 1, "%") },
 
   // Shape
@@ -261,6 +265,7 @@ export const TOKENS: TokenDef[] = [
 ]
 
 export const TOKEN_NAMES = TOKENS.map((t) => t.name)
+const TOKEN_BY_NAME: Record<string, TokenDef> = Object.fromEntries(TOKENS.map((t) => [t.name, t]))
 export const GROUPS: TokenGroup[] = ["Colour", "Material", "Rim", "Depth", "Shape", "Density", "Motion", "Aurora", "Fonts", "Type"]
 
 export const defaultTheme = (): GlassTheme => ({
@@ -295,15 +300,31 @@ const HARMONY: Record<Harmony, number[]> = {
   monochrome: [0, 8, -8],
 }
 
+/**
+ * Move an accent's lightness until its label reads at `min`:1 (WCAG AA) — darker under a
+ * light label, lighter under a dark one. Hue and chroma stay; only L moves.
+ */
+export function accentFor(primary: string, label: string, min = 5): string {
+  const p = parseOklch(primary)
+  const lab = parseOklch(label)
+  if (!p || !lab) return primary
+  const labelLum = relativeLuminance(lab)
+  const darken = labelLum > 0.5
+  let [l] = p
+  for (let i = 0; i < 100 && contrastRatio(labelLum, relativeLuminance([l, p[1], p[2], 1])) < min; i++) l += darken ? -0.005 : 0.005
+  return l === p[0] ? primary : oklch(Math.max(0, Math.min(1, l)), p[1], p[2])
+}
+
 /** A whole palette — accent, ring, five chart colours, three aurora blobs and a ground — from one hue. */
 export function paletteFromHue({ hue, harmony = "analogous", chroma = 0.17, tintedGround = true }: HueSpec): GlassTheme {
   const [a, b, c] = HARMONY[harmony].map((d) => hue + d)
   const mono = harmony === "monochrome"
   const scheme = (dark: boolean): Tokens => {
-    const primary = dark ? oklch(0.74, chroma * 0.92, hue) : oklch(0.6, chroma, hue)
+    const label = dark ? oklch(0.18, 0.03, hue) : oklch(0.99, 0, 0)
+    const primary = accentFor(dark ? oklch(0.74, chroma * 0.92, hue) : oklch(0.6, chroma, hue), label)
     return {
       primary,
-      "primary-foreground": dark ? oklch(0.18, 0.03, hue) : oklch(0.99, 0, 0),
+      "primary-foreground": label,
       ring: primary,
       "chart-1": primary,
       "chart-2": oklch(dark ? 0.72 : 0.66, chroma, b + (mono ? 0 : 0)),
@@ -328,12 +349,17 @@ export interface PaletteDef {
 /** Hand-tuned palettes keep their exact colours; the charts they don't set come from their hue. */
 function tuned(hue: number, light: { primary: string; aurora: string[]; rings: string[] }, dark: { primary: string; aurora: string[]; rings: string[] }, mono = false): GlassTheme {
   const gen = paletteFromHue({ hue, chroma: mono ? 0.02 : 0.16, tintedGround: false })
-  const scheme = (s: typeof light, isDark: boolean, base: Tokens): Tokens => ({
+  const scheme = (s: typeof light, isDark: boolean, base: Tokens): Tokens => {
+    const label = isDark ? (mono ? "oklch(0.15 0 0)" : oklch(0.18, 0.02, hue)) : "oklch(0.99 0 0)"
+    const primary = accentFor(s.primary, label)
+    return schemeTokens(s, isDark, base, primary, label)
+  }
+  const schemeTokens = (s: typeof light, isDark: boolean, base: Tokens, primary: string, label: string): Tokens => ({
     ...base,
-    primary: s.primary,
-    ring: s.primary,
-    "primary-foreground": isDark ? (mono ? "oklch(0.15 0 0)" : "oklch(0.18 0.02 30)") : "oklch(0.99 0 0)",
-    "chart-1": s.primary,
+    primary,
+    ring: primary,
+    "primary-foreground": label,
+    "chart-1": primary,
     "chart-2": s.rings[0],
     "chart-3": s.rings[1],
     "aurora-1": s.aurora[0],
@@ -441,7 +467,12 @@ export const MATERIALS: Record<string, PresetDef> = {
     title: "Smoked",
     description: "Dark tinted glass in both schemes.",
     tokens: { "glass-tint": "oklch(0.2 0.01 270)", "glass-blur": "30px", "glass-saturate": "140%", "glass-brightness": "85%", "glass-border-color": "oklch(1 0 0)", "glass-sheen": "6%" },
-    light: { "glass-opacity": "58%", "glass-opacity-strong": "82%", "glass-opacity-subtle": "40%", "glass-border-opacity": "16%", "glass-highlight-opacity": "18%", "glass-shadow-opacity": "30%" },
+    // dark panes in the light scheme too: text, fills and thumbs inside them follow the dark scheme
+    light: {
+      "glass-opacity": "72%", "glass-opacity-strong": "86%", "glass-opacity-subtle": "62%", "glass-border-opacity": "16%", "glass-highlight-opacity": "18%", "glass-shadow-opacity": "30%",
+      "glass-label": "oklch(0.985 0 0)", "glass-label-secondary": "oklch(0.88 0.01 270)",
+      "glass-fill-tint": "oklch(0.6 0.01 285)", "glass-fill-opacity": "24%", "glass-fill-opacity-strong": "36%", "glass-thumb": "oklch(1 0 0 / 20%)",
+    },
     dark: { "glass-opacity": "60%", "glass-opacity-strong": "84%" },
   },
   matte: {
@@ -613,7 +644,29 @@ export function sanitizeValue(value: unknown): string | null {
   // no fetching functions except the inert base64 SVG above
   if (/\b(url|src|image|image-set|cross-fade|element)\s*\(/i.test(v)) return null
   if ((v.match(/"/g)?.length ?? 0) % 2) return null
+  // a comment opener would swallow every declaration after it (and the closing braces)
+  if (v.includes("/*") || v.includes("*/")) return null
+  // primitives are plain values: a var() could reference page variables or form a cycle
+  if (/\bvar\s*\(/i.test(v)) return null
   return SAFE.test(v) ? v : null
+}
+
+const NUMBER = /^-?(?:\d+\.?\d*|\.\d+)/
+const COLOUR = /^(?:oklch|oklab|lch|lab|rgba?|hsla?|hwb|color)\(|^#[0-9a-f]{3,8}$|^(?:transparent|white|black|currentcolor)$/i
+
+/** Does a (sanitised) value fit its token's control — a number in the right unit, a colour, a select value? */
+export function fitsToken(def: TokenDef, value: string): boolean {
+  const { control } = def
+  if (control.type === "colour") return COLOUR.test(value)
+  if (control.type === "range") {
+    const m = value.match(NUMBER)
+    if (!m || value.slice(m[0].length) !== control.unit) return false
+    const n = Number(m[0])
+    // presets may sit outside the slider (still's 0.0001 aurora speed), but never below zero
+    // where the slider starts at zero or above, and never zero where it can't be (density)
+    return Number.isFinite(n) && (control.min < 0 || n >= 0) && (control.min <= 0 || n > 0)
+  }
+  return true
 }
 
 /** Keep only known tokens with safe values. */
@@ -624,7 +677,8 @@ export function sanitizeTokens(tokens: Record<string, unknown>): Tokens {
   for (const name of [...TOKEN_NAMES, ...EXTRA_NAMES]) {
     if (!(name in tokens)) continue
     const v = sanitizeValue(tokens[name])
-    if (v !== null) out[name] = v
+    const def = TOKEN_BY_NAME[name]
+    if (v !== null && (!def || fitsToken(def, v))) out[name] = v
   }
   return out
 }
@@ -784,34 +838,94 @@ export function oklchToLinearRgb([l, c, h]: [number, number, number, number]): [
   ]
 }
 
-const luminance = ([r, g, b]: [number, number, number]) => 0.2126 * r + 0.7152 * g + 0.0722 * b
-const contrast = (a: number, b: number) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)
-const mix = (top: [number, number, number], bottom: [number, number, number], alpha: number): [number, number, number] =>
-  [0, 1, 2].map((i) => top[i] * alpha + bottom[i] * (1 - alpha)) as [number, number, number]
+// Browsers composite and filter in gamma-encoded sRGB, so mixing happens there; luminance
+// is then measured in linear light. (Function declarations: the palettes use them at load.)
+function toGamma(x: number): number {
+  return x <= 0.0031308 ? 12.92 * x : 1.055 * x ** (1 / 2.4) - 0.055
+}
+function toLinear(x: number): number {
+  return x <= 0.04045 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4
+}
+type RGB = [number, number, number]
+function gammaRgb(c: [number, number, number, number]): RGB {
+  return oklchToLinearRgb(c).map(toGamma) as RGB
+}
+function luminanceOfGamma(rgb: RGB): number {
+  const [r, g, b] = rgb.map(toLinear)
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+/** WCAG relative luminance of an OKLCH colour. */
+export function relativeLuminance(c: [number, number, number, number]): number {
+  return luminanceOfGamma(gammaRgb(c))
+}
+/** WCAG contrast ratio of two relative luminances. */
+export function contrastRatio(a: number, b: number): number {
+  return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)
+}
+const over = (top: RGB, bottom: RGB, alpha: number): RGB => [0, 1, 2].map((i) => top[i] * alpha + bottom[i] * (1 - alpha)) as RGB
 
-/** shadcn's default foregrounds — what text on glass actually uses. */
+/** shadcn's default foregrounds — text outside panes. */
 const FOREGROUND: Record<Scheme, string> = { light: "oklch(0.145 0 0)", dark: "oklch(0.985 0 0)" }
 
+export type Tier = "subtle" | "default" | "strong"
+const TIER_OPACITY: Record<Tier, string> = { subtle: "glass-opacity-subtle", default: "glass-opacity", strong: "glass-opacity-strong" }
+
+export interface LegibilityReport {
+  /** Worst text contrast inside panes of each tier, over the ground and every aurora blob. */
+  text: Record<Tier, number>
+  /** Worst secondary (muted) text contrast inside panes of each tier. */
+  secondary: Record<Tier, number>
+  /** The accent button's label on the accent. */
+  accentLabel: number
+  /** The accent against the ground — switch tracks, rings, slider ranges (WCAG 1.4.11 wants 3). */
+  accentOnGround: number
+}
+
 /**
- * The worst-case text contrast on a default pane: the frost composited over the
- * ground and each aurora blob. A rough guide (blur averages the backdrop), not WCAG proof.
+ * Estimated contrast for a theme: the frost (tint at each tier's opacity, plus the
+ * brightness filter on what shows through) composited over the ground and each aurora
+ * blob, with the theme's own text-on-glass colours. A guide, not WCAG proof — blur
+ * averages the backdrop, and sheen/grain are ignored.
  */
-export function legibility(theme: GlassTheme, scheme: Scheme): { ratio: number; level: "AAA" | "AA" | "low" } {
+export function legibilityReport(theme: GlassTheme, scheme: Scheme): LegibilityReport {
   const t = theme[scheme]
-  const rgb = (v: string | undefined) => {
-    const p = v ? parseOklch(v) : null
-    return p ? { rgb: oklchToLinearRgb(p), a: p[3] } : null
+  const d = defaultTheme()[scheme]
+  const get = (k: string) => t[k] || d[k]
+  const col = (v: string | undefined) => (v ? parseOklch(v) : null)
+  const tint = col(get("glass-tint")) ?? [1, 0, 0, 1]
+  const tintRgb = gammaRgb(tint)
+  const brightness = parseFloat(get("glass-brightness") ?? "100") / 100
+  const grounds = ["aurora-base", "aurora-1", "aurora-2", "aurora-3"].map((k) => col(get(k))).filter(Boolean) as [number, number, number, number][]
+  const panes = (tier: Tier) => {
+    const alpha = (parseFloat(get(TIER_OPACITY[tier]) ?? "50") / 100) * tint[3]
+    return grounds.map((g) => luminanceOfGamma(over(tintRgb, gammaRgb(g).map((x) => Math.min(1, x * brightness)) as RGB, alpha)))
   }
-  const tint = rgb(t["glass-tint"]) ?? { rgb: [1, 1, 1] as [number, number, number], a: 1 }
-  const opacity = (parseFloat(t["glass-opacity"] ?? "50") / 100) * tint.a
-  const text = rgb(FOREGROUND[scheme])!.rgb
-  const behind = ["aurora-base", "aurora-1", "aurora-2", "aurora-3"].map((k) => rgb(t[k])).filter(Boolean) as { rgb: [number, number, number]; a: number }[]
-  const ratios = behind.map((b) => contrast(luminance(text), luminance(mix(tint.rgb, b.rgb, opacity))))
-  const ratio = round(Math.min(...ratios, 21), 2)
+  const worst = (fg: string | undefined, tier: Tier) => {
+    const c = col(fg)
+    if (!c) return 21
+    const l = relativeLuminance(c)
+    return round(Math.min(...panes(tier).map((p) => contrastRatio(l, p))), 2)
+  }
+  const tiers: Tier[] = ["subtle", "default", "strong"]
+  const label = get("glass-label") ?? FOREGROUND[scheme]
+  const secondary = get("glass-label-secondary")
+  const primary = col(get("primary"))
+  const primaryFg = col(get("primary-foreground"))
+  const ground = col(get("aurora-base"))
+  return {
+    text: Object.fromEntries(tiers.map((k) => [k, worst(label, k)])) as Record<Tier, number>,
+    secondary: Object.fromEntries(tiers.map((k) => [k, worst(secondary, k)])) as Record<Tier, number>,
+    accentLabel: primary && primaryFg ? round(contrastRatio(relativeLuminance(primary), relativeLuminance(primaryFg)), 2) : 21,
+    accentOnGround: primary && ground ? round(contrastRatio(relativeLuminance(primary), relativeLuminance(ground)), 2) : 21,
+  }
+}
+
+/** The worst-case contrast of text on a default pane — the studio's badge. See legibilityReport. */
+export function legibility(theme: GlassTheme, scheme: Scheme): { ratio: number; level: "AAA" | "AA" | "low" } {
+  const ratio = legibilityReport(theme, scheme).text.default
   return { ratio, level: ratio >= 7 ? "AAA" : ratio >= 4.5 ? "AA" : "low" }
 }
 
-/** A random but tasteful theme: any hue, any harmony, any material and shape. */
 export function randomTheme(seed = Math.random()): GlassTheme {
   let s = Math.floor(seed * 2 ** 31) || 1
   const next = () => ((s = (s * 48271) % 2147483647) / 2147483647)

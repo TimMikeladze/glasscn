@@ -15,11 +15,11 @@ shadcn's standard is Tailwind v4 + CSS variables + Radix + `cn`, copied into the
 - `registry.json` with `$schema`, `{REGISTRY_URL}` placeholders stamped at build (robocn pattern); output in `public/r`.
 - Components: `data-slot` on every part, `cva` variants, `cn` from `cn`, unified `radix-ui` package, `asChild` via `Slot`, `React.ComponentProps<…>` typing, `className` merges last, no hardcoded colours — tokens only.
 - Files install to `@components/glass/<name>.tsx` (import from `@/components/glass/button`) so they live beside, not over, shadcn's `components/ui`.
-- Namespace-ready: `npx shadcn add @glasscn/button` once `registries.@glasscn` is set.
+- Namespace-ready: `npx shadcn add @glasscn-app/button` once `registries["@glasscn-app"]` is set (`registryNamespace` in `src/lib/site.ts`; the directory's `@glasscn` belongs to another project).
 
 ## Theming
 
-See [`theming.md`](theming.md): 68 primitives in eleven groups, composable presets (12 palettes, 7 materials, 4 shapes, 4 motions, 3 densities, 8 type presets), 45 `registry:font` items ([`typography.md`](typography.md)), the theme engine (`glass-theme`), `ThemeScope`, and the Theme Studio at `/themes`. Agents: [`architecture.md`](architecture.md), [`rules/`](rules/README.md), `skills/`.
+See [`theming.md`](theming.md): 72 primitives in ten groups, composable presets (12 palettes, 7 materials, 4 shapes, 4 motions, 3 densities, 8 type presets), 45 `registry:font` items ([`typography.md`](typography.md)), the theme engine (`glass-theme`), `ThemeScope`, and the Theme Studio at `/themes`. Agents: [`architecture.md`](architecture.md), [`rules/`](rules/README.md), `skills/`.
 
 ## Foundations (v1 notes)
 
@@ -44,9 +44,16 @@ See [`theming.md`](theming.md): 68 primitives in eleven groups, composable prese
 
 Pure maths (`ring` arcs, smooth paths, heatmap grid, bar shares, gauge arcs, category segments) lives in `lib/glass-charts.ts` (tested). Charts and tables: [`data-and-chat.md`](data-and-chat.md).
 
+## Alignment with Apple Liquid Glass
+
+Where glasscn matches Apple's Liquid Glass and what it's missing — the material/liquid layer split, accessibility adaptivity, specular light, concentric shapes, the navigation layer — with a prioritised plan: [`liquid-glass.md`](liquid-glass.md). Full backlog: [`roadmap.md`](roadmap.md); Apple component spec: [`apple-hig-reference.md`](apple-hig-reference.md).
+
 ## Site
 
 Next 16 docs site in the same repo: landing (aurora hero, live dashboard, palette switcher, install), `/docs` index, `/docs/[slug]` (live demo, install command, usage, props, source), `/docs/theming` (token model, presets, ThemeScope, every primitive), `/docs/fonts` (font catalogue, type presets, scale), `/themes` (Theme Studio), `/docs/installation`, `/docs/native`.
+- Machine-readable: `/sitemap.xml` and `/robots.txt` (walk `docsNav`, the same list the sidebar renders), `/llms.txt` (summary, namespace install, every page with its description) and `/llms-full.txt` (plus every item's props, notes, usage and the design rules) — all built from source data in `src/lib/llms.ts` and prerendered.
+- Docs pages ship only their own demo: `DemoPreview` loads `components/demos/<slug>` as its own chunk (a server component can't code-split the client components it imports). `/docs/kbd` ≈ 215 KB gzip of JS.
+- Install commands use `NEXT_PUBLIC_REGISTRY_URL`, else glasscn.app on Vercel, else localhost — on the dev server's actual port in `next dev`.
 
 ## Verification
 

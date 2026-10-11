@@ -28,6 +28,9 @@ type ChatFrom = "user" | "assistant" | "system"
 
 const ChatMessageContext = React.createContext<ChatFrom>("assistant")
 
+/** Hands a finished message's text to the thread's announcer. */
+const ChatAnnounceContext = React.createContext<((text: string) => void) | null>(null)
+
 /** Pixels from the bottom that still count as "at the bottom". */
 const STICK_THRESHOLD = 32
 
@@ -35,6 +38,11 @@ const STICK_THRESHOLD = 32
  * The scrolling log. Sticks to the newest message while you're at the bottom (and
  * whenever you send one); scroll up to read back and a "jump to latest" button appears.
  * Set `--chat-thread-inset` to leave room for a composer floating over its bottom edge.
+ *
+ * Screen readers hear new messages through the log's implicit polite live region.
+ * A `ChatMessage` marked `streaming` is `aria-busy` (and only additions are relevant),
+ * so partial text isn't read token by token; when it finishes, the whole message is
+ * announced once through a visually hidden status region.
  */
 function ChatThread({ className, children, ...props }: React.ComponentProps<"div">) {
   const viewportRef = React.useRef<HTMLDivElement>(null)
@@ -42,6 +50,12 @@ function ChatThread({ className, children, ...props }: React.ComponentProps<"div
   const stick = React.useRef(true)
   const lastMessage = React.useRef<Element | null>(null)
   const [atBottom, setAtBottom] = React.useState(true)
+  const [announcement, setAnnouncement] = React.useState("")
+  const announce = React.useCallback((text: string) => {
+    // clear first so the same text twice is still a change
+    setAnnouncement("")
+    requestAnimationFrame(() => setAnnouncement(text))
+  }, [])
 
   const scrollToBottom = React.useCallback((behavior: ScrollBehavior = "instant") => {
     const el = viewportRef.current
@@ -83,18 +97,21 @@ function ChatThread({ className, children, ...props }: React.ComponentProps<"div
         ref={viewportRef}
         data-slot="chat-thread-viewport"
         role="log"
-        aria-live="polite"
+        aria-relevant="additions"
         tabIndex={0}
         onScroll={onScroll}
-        className="min-h-0 flex-1 overflow-y-auto overscroll-contain outline-none [scrollbar-width:thin] focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/40 focus-visible:ring-inset"
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain focus-visible:outline-hidden [scrollbar-width:thin] focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/40 focus-visible:ring-inset"
       >
         <div
           ref={contentRef}
           data-slot="chat-thread-content"
           className="flex min-h-full flex-col justify-end px-pad-sm pt-4 pb-[calc(var(--chat-thread-inset,0px)+1rem)]"
         >
-          {children}
+          <ChatAnnounceContext.Provider value={announce}>{children}</ChatAnnounceContext.Provider>
         </div>
+      </div>
+      <div data-slot="chat-thread-announcer" role="status" className="sr-only">
+        {announcement}
       </div>
       <Button
         type="button"
@@ -119,21 +136,36 @@ function ChatThread({ className, children, ...props }: React.ComponentProps<"div
  * One turn. User turns sit on the right, the rest on the left. `grouped` marks a
  * follow-up from the same sender: the gap tightens, the avatar hides and the
  * bubble corners facing the sender square off so the run reads as one.
+ * `streaming` marks a reply still arriving: it's `aria-busy` until it turns false,
+ * then its full text is announced once.
  */
 function ChatMessage({
   className,
   from = "assistant",
   grouped = false,
+  streaming = false,
   avatar,
   children,
   ...props
-}: React.ComponentProps<"div"> & { from?: ChatFrom; grouped?: boolean; avatar?: React.ReactNode }) {
+}: React.ComponentProps<"div"> & { from?: ChatFrom; grouped?: boolean; streaming?: boolean; avatar?: React.ReactNode }) {
+  const announce = React.useContext(ChatAnnounceContext)
+  const contentRef = React.useRef<HTMLDivElement>(null)
+  const wasStreaming = React.useRef(streaming)
+  React.useEffect(() => {
+    if (wasStreaming.current && !streaming) {
+      const text = contentRef.current?.textContent?.trim()
+      if (text) announce?.(text)
+    }
+    wasStreaming.current = streaming
+  }, [streaming, announce])
   return (
     <ChatMessageContext.Provider value={from}>
       <div
         data-slot="chat-message"
         data-from={from}
         data-grouped={grouped || undefined}
+        data-streaming={streaming || undefined}
+        aria-busy={streaming || undefined}
         className={cn(
           "group/chat-message flex w-full items-end gap-2 not-first:mt-3 data-grouped:mt-1 data-[from=system]:justify-center data-[from=user]:flex-row-reverse",
           // Runs: square the sender-side corners between bubbles of the same sender.
@@ -149,6 +181,7 @@ function ChatMessage({
           </div>
         ) : null}
         <div
+          ref={contentRef}
           data-slot="chat-message-content"
           className="flex max-w-[min(80%,36rem)] min-w-0 flex-col items-start gap-1 group-data-[from=system]/chat-message:max-w-full group-data-[from=system]/chat-message:items-center group-data-[from=user]/chat-message:items-end"
         >
@@ -368,7 +401,7 @@ function ChatComposer({
           }
         }}
         className={cn(
-          "max-h-40 min-h-control-sm flex-1 resize-none bg-transparent px-2 py-[calc((2rem*var(--glass-density)-1.25rem)/2)] text-base leading-5 text-foreground caret-primary outline-none placeholder:text-muted-foreground/80 selection:bg-primary/25 disabled:cursor-not-allowed md:text-sm md:leading-5",
+          "max-h-40 min-h-control-sm flex-1 resize-none bg-transparent px-2 py-[calc((2rem*var(--glass-density)-1.25rem)/2)] text-base leading-5 text-foreground caret-primary placeholder:text-muted-foreground/80 selection:bg-primary/25 focus-visible:outline-hidden disabled:cursor-not-allowed md:text-sm md:leading-5",
           textareaProps?.className
         )}
       />

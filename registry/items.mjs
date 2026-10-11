@@ -36,7 +36,9 @@ export const foundations = [
     description:
       "The design tokens (frost, rim, highlight, shadow, blur, saturation, fill, aurora), the glass / glass-strong / glass-subtle utilities, aurora and draw keyframes, a no-backdrop-filter fallback, and glassVariants — the cva every surface shares.",
     categories: ["glass", "foundations"],
-    dependencies: ["cn", "class-variance-authority"],
+    // tw-animate-css: overlay enter/exit classes (animate-in, zoom-in-95…). `shadcn init` already imports it.
+    dependencies: ["cn", "class-variance-authority", "tw-animate-css"],
+    docs: 'glasscn is installed. Put <Aurora /> (shadcn add @glasscn-app/aurora) behind your app, and make sure your global CSS has @import "tw-animate-css"; (shadcn init adds it) so overlays animate.',
     files: [{ path: "src/lib/glass-variants.ts", type: "registry:lib", target: "@lib/glass-variants.ts" }],
     // cssVars + css are filled in by scripts/generate.mjs from src/lib/glass-theme.ts and registry/stylesheet.mjs
   },
@@ -93,6 +95,7 @@ export const components = [
   ui("avatar", "Avatar", "shadcn's Avatar on glass: a round photo with a hairline rim, initials on a soft fill, and overlapping groups.", { deps: ["radix-ui", "class-variance-authority"], categories: ["controls"] }),
   // overlays
   ui("dialog", "Dialog", "A strong-glass modal over a dimmed, softened page.", { deps: ["radix-ui", "lucide-react"], reg: [at("button")], categories: ["overlays"] }),
+  ui("alert-dialog", "Alert dialog", "An Apple-style alert on strong glass: a bold title, a short message and capsule actions — for confirming destructive or irreversible choices. Only its buttons close it.", { deps: ["radix-ui"], reg: [at("button")], categories: ["overlays"] }),
   ui("sheet", "Sheet", "A floating glass panel that slides in from any edge, inset like an iPad sheet.", { deps: ["radix-ui", "lucide-react"], reg: [at("button")], categories: ["overlays"] }),
   ui("popover", "Popover", "Floating glass content anchored to a trigger.", { deps: ["radix-ui"], categories: ["overlays"] }),
   ui("tooltip", "Tooltip", "A small glass capsule on hover and focus.", { deps: ["radix-ui"], categories: ["overlays"] }),
@@ -152,7 +155,7 @@ const native = (name, title, description, deps, reg = [], ext = "tsx") => ({
   files: [{ path: `registry/native/${name}.${ext}`, type: ext === "ts" ? "registry:lib" : "registry:ui", target: `@components/glass/native/${name}.${ext}` }],
 })
 
-const NATIVE_NAMES = ["typography", "prose", "card", "theme-scope", "button", "badge", "input", "textarea", "label", "kbd", "separator", "avatar", "switch", "checkbox", "segmented-control", "tabs", "slider", "progress", "dock", "grouped-list", "dialog", "sheet", "popover", "tooltip", "dropdown-menu", "toaster", "activity-rings", "progress-ring", "sparkline", "stat", "bar-list", "gauge", "tracker", "category-bar", "heatmap", "chart", "area-chart", "bar-chart", "line-chart", "donut-chart", "table", "data-table", "chat", "dashboard-01", "analytics-01", "settings-01", "auth-01", "chat-01"]
+const NATIVE_NAMES = ["typography", "prose", "card", "theme-scope", "button", "badge", "input", "textarea", "label", "kbd", "separator", "avatar", "switch", "checkbox", "segmented-control", "tabs", "slider", "progress", "dock", "grouped-list", "dialog", "alert-dialog", "sheet", "popover", "tooltip", "dropdown-menu", "toaster", "activity-rings", "progress-ring", "sparkline", "stat", "bar-list", "gauge", "tracker", "category-bar", "heatmap", "chart", "area-chart", "bar-chart", "line-chart", "donut-chart", "table", "data-table", "chat", "dashboard-01", "analytics-01", "settings-01", "auth-01", "chat-01"]
 
 /**
  * The native port of every web component and block: one React Native file per

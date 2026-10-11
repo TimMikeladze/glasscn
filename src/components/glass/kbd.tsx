@@ -15,8 +15,9 @@ function Kbd({ className, ...props }: React.ComponentProps<"kbd">) {
   )
 }
 
-function KbdGroup({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="kbd-group" className={cn("inline-flex items-center gap-1", className)} {...props} />
+/** Keys pressed together. A `<kbd>` (not a `<div>`), so it's valid inside a paragraph. */
+function KbdGroup({ className, ...props }: React.ComponentProps<"kbd">) {
+  return <kbd data-slot="kbd-group" className={cn("inline-flex items-center gap-1", className)} {...props} />
 }
 
 export { Kbd, KbdGroup }

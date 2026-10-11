@@ -13,11 +13,13 @@ import * as React from "react"
  * `data-indicator-ready` is set after the first measurement so the indicator
  * doesn't animate in from the corner on mount.
  */
-export function useSlidingIndicator<T extends HTMLElement>(selector: string) {
-  const ref = React.useRef<T>(null)
+export function useSlidingIndicator<T extends HTMLElement>(selector: string, forwardedRef?: React.Ref<T>) {
+  // our node lives in state and is handed to the caller's ref, so a user `ref` can't replace ours
+  const [node, setNode] = React.useState<T | null>(null)
+  React.useImperativeHandle(forwardedRef, () => node as T, [node])
 
   React.useLayoutEffect(() => {
-    const root = ref.current
+    const root = node
     if (!root) return
     const update = () => {
       const active = root.querySelector<HTMLElement>(selector)
@@ -45,9 +47,9 @@ export function useSlidingIndicator<T extends HTMLElement>(selector: string) {
       mutations.disconnect()
       resizes.disconnect()
     }
-  }, [selector])
+  }, [selector, node])
 
-  return ref
+  return setNode
 }
 
 /** Classes for the sliding element itself. */

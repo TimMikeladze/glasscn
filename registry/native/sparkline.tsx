@@ -2,7 +2,7 @@ import * as React from "react"
 import { AccessibilityInfo, Animated, Easing, Platform, View, type LayoutChangeEvent, type StyleProp, type ViewProps, type ViewStyle } from "react-native"
 import Svg, { Circle, Defs, Line, LinearGradient, Path, Stop } from "react-native-svg"
 
-import { areaPath, scaleSeries, smoothPath } from "@/components/glass/native/chart-math"
+import { areaPath, scaleSeries, smoothPath, sanitizeId } from "@/components/glass/native/chart-math"
 import { useUI } from "@/components/glass/native/ui"
 
 // Animated sets collapsable={false}, which react-native-svg would pass to the DOM on web — strip it.
@@ -36,7 +36,7 @@ export function Sparkline({
 }) {
   const ui = useUI()
   const tone = color ?? ui.primary
-  const id = React.useId().replace(/[^a-zA-Z0-9]/g, "")
+  const id = sanitizeId(React.useId())
   const [width, setWidth] = React.useState(0)
   const [draw] = React.useState(() => new Animated.Value(0))
   const [fade] = React.useState(() => new Animated.Value(0))

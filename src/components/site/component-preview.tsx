@@ -4,12 +4,14 @@ import * as React from "react"
 import { cn } from "cn"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/glass/tabs"
-import { demos } from "@/components/demos"
 import { CopyButton } from "./copy-button"
 
-/** Preview | Code for one item: the live demo on its own patch of aurora, or the demo's highlighted source. */
-export function ComponentPreview({ name, html, code, wide = false }: { name: string; html?: string; code?: string; wide?: boolean }) {
-  const Demo = demos[name]
+/**
+ * Preview | Code for one item: the live demo on its own patch of aurora, or the demo's highlighted source.
+ * The demo arrives as `children`, rendered by the server page — so a docs page ships only its own demo's
+ * client code, never the whole `demos` map.
+ */
+export function ComponentPreview({ children, html, code, wide = false }: { children?: React.ReactNode; html?: string; code?: string; wide?: boolean }) {
   return (
     <Tabs defaultValue="preview" className="gap-3">
       <TabsList>
@@ -23,7 +25,7 @@ export function ComponentPreview({ name, html, code, wide = false }: { name: str
             wide ? "p-4 sm:p-8" : "p-6 sm:p-12"
           )}
         >
-          {Demo ? <Demo /> : <p className="text-muted-foreground">No preview.</p>}
+          {children ?? <p className="text-muted-foreground">No preview.</p>}
         </div>
       </TabsContent>
       {html && code ? (

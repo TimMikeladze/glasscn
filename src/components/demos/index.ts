@@ -13,6 +13,7 @@ import Card from "./card"
 import Checkbox from "./checkbox"
 import DataTable from "./data-table"
 import Dashboard01 from "./dashboard-01"
+import AlertDialog from "./alert-dialog"
 import Dialog from "./dialog"
 import Dock from "./dock"
 import DropdownMenu from "./dropdown-menu"
@@ -74,6 +75,7 @@ export const demos: Record<string, ComponentType> = {
   separator: Separator,
   avatar: Avatar,
   dialog: Dialog,
+  "alert-dialog": AlertDialog,
   sheet: Sheet,
   popover: Popover,
   tooltip: Tooltip,

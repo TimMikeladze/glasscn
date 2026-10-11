@@ -1,17 +1,21 @@
 import { Platform, Text, View } from "react-native"
 
-import { canFade, Glass } from "@/components/glass/native/glass"
+import { canFade, Glass, useReduceTransparency } from "@/components/glass/native/glass"
 import { useGlassTheme } from "@/components/glass/native/tokens"
 import { Body, Screen, Section, surfaceName } from "@/sandbox/ui"
 
 export default function GlassScreen() {
   const t = useGlassTheme()
+  const solid = useReduceTransparency()
   return (
     <Screen>
       <Section title="Surface picked" note="iOS 26+: Liquid Glass · older iOS: blur · web: backdrop-filter · Android: fill">
         <Glass style={{ padding: 16 }}>
           <Body testID="surface">
             {Platform.OS}: {surfaceName()} · canFade() = {String(canFade())}
+          </Body>
+          <Body testID="reduce-transparency" style={{ color: t.mutedForeground }}>
+            Reduce Transparency: {solid ? "on — solid fill (Liquid Glass adapts itself)" : "off"}
           </Body>
         </Glass>
       </Section>

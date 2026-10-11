@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { addDays, arcPath, areaPath, barShares, fraction, heatmapWeeks, levelOf, monthLabels, polarPoint, ringArc, ringRadii, scaleSeries, segmentAt, segments, smoothPath } from "../glass-charts"
+import { addDays, arcPath, areaPath, barShares, fraction, heatCellTitle, heatmapWeeks, levelOf, monthLabels, polarPoint, polylineLength, ringArc, ringRadii, sanitizeId, scaleSeries, segmentAt, segments, smoothPath, weekdayLabels } from "../glass-charts"
 
 describe("rings", () => {
   it("fits concentric radii inside the size and drops rings that would collapse", () => {
@@ -60,6 +60,45 @@ describe("heatmap", () => {
   it("labels a column only when its month changes", () => {
     const cols = heatmapWeeks({}, { today: "2026-10-08", weeks: 3, weekStart: 1 })
     expect(monthLabels(cols)).toEqual(["Sep", null, "Oct"])
+    // ICU spellings vary by runtime, so compare with Intl rather than a literal
+    const de = (m: number) => new Date(2026, m, 1).toLocaleString("de-DE", { month: "short" })
+    expect(monthLabels(cols, "de-DE")).toEqual([de(8), null, de(9)])
+  })
+  it("names weekday rows from the week start, independent of today", () => {
+    expect(weekdayLabels(1)).toEqual(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"])
+    expect(weekdayLabels(0)[0]).toBe("Sun")
+    expect(weekdayLabels(1, "de-DE")[0]).toBe(new Date(2026, 9, 5).toLocaleDateString("de-DE", { weekday: "short" })) // a Monday
+    // the rows line up with the grid's dates
+    const cols = heatmapWeeks({}, { today: "2026-10-08", weeks: 1, weekStart: 0 })
+    expect(cols[0].map((c) => heatCellTitle(c).slice(0, 3))).toEqual(weekdayLabels(0))
+  })
+  it("titles a cell in the given locale, with its value when there is one", () => {
+    expect(heatCellTitle({ date: "2026-10-08", value: 3, level: 3, future: false, today: true })).toBe("Thu, Oct 8 · 3")
+    expect(heatCellTitle({ date: "2026-10-08", value: 0, level: 0, future: false, today: true })).toBe("Thu, Oct 8")
+    expect(heatCellTitle({ date: "2026-10-08", value: 0, level: 0, future: false, today: true }, "de-DE")).toBe(
+      new Date(2026, 9, 8).toLocaleDateString("de-DE", { weekday: "short", month: "short", day: "numeric" })
+    )
+  })
+})
+
+describe("polyline length", () => {
+  it("measures the stretched path, so a dash can cover it at any width", () => {
+    const pts = [
+      { x: 0, y: 0 },
+      { x: 3, y: 4 },
+    ]
+    expect(polylineLength(pts)).toBe(5)
+    expect(polylineLength(pts, 2)).toBeCloseTo(Math.hypot(6, 4))
+    expect(polylineLength([{ x: 1, y: 1 }])).toBe(0)
+  })
+})
+
+describe("ids", () => {
+  it("keeps only id-safe characters from React 18 and 19 useId values", () => {
+    expect(sanitizeId(":r1:")).toBe("r1")
+    expect(sanitizeId("«r1»")).toBe("r1")
+    expect(sanitizeId("_r_1_")).toBe("_r_1_")
+    expect(sanitizeId("a b#c(d)")).toBe("abcd")
   })
 })
 

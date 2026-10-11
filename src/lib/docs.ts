@@ -101,7 +101,9 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
   dock: {
     props: [
       { name: "position (Dock)", type: `"fixed" | "static"`, default: `"fixed"`, description: "Float at the bottom of the viewport (safe-area aware) or sit in flow." },
-      { name: "value / onValueChange (DockBar)", type: "string", description: "The current destination; route on change." },
+      { name: "active (DockLink)", type: "boolean", default: "false", description: "The current page: sets aria-current=\"page\" and moves the pill to it. DockNav + DockLink are links in a nav landmark — use them for routes." },
+      { name: "asChild (DockLink)", type: "boolean", default: "false", description: "Render your router's Link (next/link…) as the item." },
+      { name: "value / onValueChange (DockBar)", type: "string", description: "DockBar + DockItem: views inside one page (single-choice group). For routes use DockNav." },
       { name: "asChild (DockAction)", type: "boolean", default: "false", description: "Render a link as the action button." },
     ],
   },
@@ -125,7 +127,8 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
       "DataTablePagination is exported for custom layouts: selected count, page x of y, previous/next.",
     ],
   },
-  "grouped-list": { notes: ["Parts: GroupedList, GroupedListHeader, GroupedListContent, GroupedListItem (asChild for button/link rows), GroupedListIcon, GroupedListTitle, GroupedListDescription, GroupedListValue, GroupedListChevron, GroupedListFooter."] },
+  tooltip: { notes: ["Parts: Tooltip, TooltipTrigger, TooltipContent, TooltipProvider. Each Tooltip brings its own provider (as shadcn's does); wrap an area in TooltipProvider to share delays.", "Tooltips don't open on touch — give icon-only buttons an aria-label too."] },
+  "grouped-list": { notes: ["Parts: GroupedList, GroupedListHeader, GroupedListContent, GroupedListItem (asChild for button/link rows), GroupedListIcon, GroupedListTitle, GroupedListDescription, GroupedListValue, GroupedListChevron, GroupedListFooter.", "With asChild the list-item role sits on a wrapper, so a <button> or <a> row keeps its own role."] },
   avatar: {
     props: [{ name: "size (Avatar, AvatarGroupCount)", type: `"sm" | "default" | "lg"`, default: `"default"`, description: "24, 32 or 40px, scaled by density." }],
     notes: ["Parts: Avatar, AvatarImage, AvatarFallback (shown until the image loads, or if it fails), AvatarGroup (overlapping stack with a glass rim), AvatarGroupCount (the \"+3\")."],
@@ -134,6 +137,7 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
     props: [
       { name: "from (ChatMessage)", type: `"user" | "assistant" | "system"`, default: `"assistant"`, description: "User turns sit on the right in the accent; assistant turns on the left on a fill; system lines are centred and muted." },
       { name: "grouped (ChatMessage)", type: "boolean", default: "false", description: "A follow-up from the same sender: tighter gap, avatar hidden, the sender-side corners squared." },
+      { name: "streaming (ChatMessage)", type: "boolean", default: "false", description: "A reply still arriving: aria-busy, so screen readers don't read it token by token. When it turns false the whole message is announced once." },
       { name: "avatar (ChatMessage)", type: "ReactNode", description: "Beside the bubble — usually an Avatar." },
       { name: "variant (ChatBubble)", type: `"user" | "assistant" | "system"`, default: "the message's from", description: "Override the bubble's look." },
       { name: "name (ChatTyping)", type: "string", default: `"Assistant"`, description: "Announced as \"<name> is typing\"." },
@@ -175,7 +179,8 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
       { name: "values", type: "Record<string, number>", description: "Numbers by ISO date (YYYY-MM-DD)." },
       { name: "weeks", type: "number", default: "26", description: "Columns, ending with the week holding today." },
       { name: "weekStart", type: "0 | 1", default: "1", description: "Sunday or Monday." },
-      { name: "today", type: "string", default: "the current date", description: "Pass it when rendering on the server to avoid a timezone mismatch." },
+      { name: "today", type: "string", default: "the viewer's local date", description: "The last day shown (YYYY-MM-DD). Without it the server renders empty cells and the client fills them in after hydration; pass it to render dates on the server." },
+      { name: "locale", type: "string", default: `"en-US"`, description: "BCP 47 locale for weekday, month and cell-title text. Fixed rather than the browser's, so server and client agree." },
       { name: "cellSize", type: "number", default: "16", description: "Largest a cell grows (px); cells shrink to fit narrow containers." },
       { name: "onSelect", type: "(date: string) => void", description: "Makes past cells buttons." },
     ],
@@ -272,6 +277,22 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
     ],
   },
   stat: { props: glassProps, notes: ["Parts: Stat, StatIcon, StatValue, StatLabel, StatTrend (direction up | down)."] },
+  "alert-dialog": {
+    props: [
+      { name: "size (AlertDialogContent)", type: `"default" | "sm"`, default: `"default"`, description: "Default: up to 28rem, buttons stacked on phones and in a trailing row from sm. sm: 20rem, two buttons side by side at equal width." },
+      { name: "variant (AlertDialogAction)", type: `"default" | "destructive" | …Button variants`, default: `"default"`, description: "The default action: solid accent, or the tinted destructive button for an action the user didn't deliberately choose." },
+      { name: "variant (AlertDialogCancel)", type: "Button variant", default: `"secondary"`, description: "A soft fill — never glass on the glass panel." },
+      { name: "open / defaultOpen / onOpenChange", type: "Radix AlertDialog", description: "Controlled or not, as Radix." },
+    ],
+    notes: [
+      "Use AlertDialog for destructive or irreversible confirmations; Dialog for everything else (forms, details, anything the user may dismiss by clicking away).",
+      "role=\"alertdialog\": an outside click doesn't close it, only its buttons and Escape (which cancels). Cancel is focused on open.",
+      "Parts (shadcn's API): AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction, plus AlertDialogPortal and AlertDialogOverlay.",
+      "Write Cancel first, then the action: on phones the action stacks on top and Cancel at the bottom; from sm they sit in a trailing row with Cancel leading.",
+      "Apple's rules: a title of two lines at most, a short message, at most three buttons labelled with one- or two-word verbs, and always a Cancel. Don't use an alert for undoable deletes or plain information.",
+      "The page behind dims by --glass-dim with no blur; enter and exit run on --glass-duration and still under reduced motion.",
+    ],
+  },
   sheet: { props: [{ name: "side (SheetContent)", type: `"top" | "right" | "bottom" | "left"`, default: `"right"`, description: "Floats inset from that edge." }] },
 }
 

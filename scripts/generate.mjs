@@ -97,6 +97,8 @@ writeFileSync("registry.json", JSON.stringify(registry, null, 2) + "\n")
 // ---- the docs site's CSS: what ships, the full default theme, and palette presets keyed by data-palette ----
 const block = (selector, body, depth = 0) => {
   const pad = "  ".repeat(depth)
+  // an empty body is a statement (`@custom-variant x (…);`), as the shadcn CLI writes it
+  if (Object.keys(body).length === 0) return `${pad}${selector};`
   const inner = Object.entries(body)
     .map(([k, v]) => (typeof v === "object" ? block(k, v, depth + 1) : `${pad}  ${k}: ${v};`))
     .join("\n")

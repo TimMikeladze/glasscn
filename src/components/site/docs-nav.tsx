@@ -4,18 +4,10 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "cn"
 
-import { GROUPS, docs } from "@/lib/docs"
+import type { NavSection } from "./docs-nav-data"
 
-const GUIDES = [
-  { href: "/docs", label: "Introduction" },
-  { href: "/docs/installation", label: "Installation" },
-  { href: "/docs/theming", label: "Theming" },
-  { href: "/docs/fonts", label: "Fonts & type" },
-  { href: "/themes", label: "Studio" },
-  { href: "/docs/native", label: "React Native" },
-]
-
-export function DocsNav({ className, onNavigate }: { className?: string; onNavigate?: () => void }) {
+/** The docs sidebar. `sections` comes from `docsNav`, built on the server. */
+export function DocsNav({ sections, className, onNavigate }: { sections: NavSection[]; className?: string; onNavigate?: () => void }) {
   const pathname = usePathname()
   const link = (href: string, label: string) => (
     <Link
@@ -32,14 +24,10 @@ export function DocsNav({ className, onNavigate }: { className?: string; onNavig
   )
   return (
     <nav className={cn("flex flex-col gap-5", className)} aria-label="Docs">
-      <div className="flex flex-col gap-0.5">
-        <div className="px-3 pb-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">Guides</div>
-        {GUIDES.map((g) => link(g.href, g.label))}
-      </div>
-      {GROUPS.map((group) => (
-        <div key={group} className="flex flex-col gap-0.5">
-          <div className="px-3 pb-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">{group}</div>
-          {docs.filter((d) => d.group === group).map((d) => link(`/docs/${d.slug}`, d.title))}
+      {sections.map((section) => (
+        <div key={section.label} className="flex flex-col gap-0.5">
+          <div className="px-3 pb-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">{section.label}</div>
+          {section.links.map((l) => link(l.href, l.label))}
         </div>
       ))}
     </nav>

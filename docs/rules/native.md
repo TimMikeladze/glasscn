@@ -2,7 +2,7 @@
 
 1. **Same names, same palettes.** `native-tokens` mirrors the web palettes and token names as plain values; keep them in step when a palette changes.
 2. **Best surface available:** Liquid Glass (`expo-glass-effect`) on iOS 26 → `expo-blur` on older iOS → `backdrop-filter` under react-native-web → a translucent fill on Android.
-3. **Never fade Liquid Glass.** It won't render under an ancestor whose opacity starts below 1. Entrances, tab transitions and screen animations on iOS 26 translate or scale instead — check `canFade()`.
+3. **Never fade Liquid Glass.** Expo documents that opacity 0 on a `GlassView` or any of its parents stops the glass rendering at all ([expo-glass-effect, known issues](https://docs.expo.dev/versions/latest/sdk/glass-effect/)), so a fade-in from 0 starts invisible. To bring glass in, translate or scale it, or materialise it with `glassEffectStyle={{ style, animate: true, animationDuration }}` (swap `"none"` ↔ `"regular"` — Expo's recommended fade); never animate opacity on it or above it. Entrances, tab transitions and screen animations on iOS 26 check `canFade()`. `Press` dims on press, so a `Press` around `<Glass>` passes `dim={canFade()}`, and disabled glass dims its label, not its container.
 4. **Tint Liquid Glass.** Untinted it nearly vanishes on a pale aurora; `Glass` lays in `glassTint` by default.
 5. **Bars never use Liquid Glass.** Chrome that fades with scroll uses `bar` (UIVisualEffect blur).
 6. **`Press` takes a plain style.** Animated drops Pressable's function-style form.

@@ -1,42 +1,63 @@
+"use client"
+
 import * as React from "react"
 import { cn } from "cn"
 
-import { heatmapWeeks, isoDate, monthLabels, parseDate, type HeatCell } from "@/lib/glass-charts"
+import { heatCellTitle, heatmapWeeks, isoDate, monthLabels, weekdayLabels, type HeatCell } from "@/lib/glass-charts"
 
 const LEVEL = ["bg-fill", "bg-primary/25", "bg-primary/50", "bg-primary/75", "bg-primary"]
+
+const noop = () => () => {}
+
+/**
+ * The viewer's local date — but only once hydrated. The server can't know the
+ * viewer's time zone, so it (and the hydration pass) gets `null`, then the client
+ * re-renders with its own date: no hydration mismatch.
+ */
+function useLocalToday(): string | null {
+  return React.useSyncExternalStore(noop, () => isoDate(new Date()), () => null)
+}
 
 /**
  * Days as rounded cells in week columns, coloured by intensity — a contribution
  * graph. Values are numbers by ISO date; levels are quantised against the max.
- * Pass `onSelect` to make cells buttons.
+ * Pass `onSelect` to make cells buttons. Without `today` the grid fills in on
+ * the client (the server renders empty cells); pass it to render dates on the server.
  */
 function Heatmap({
   values,
   weeks = 26,
   weekStart = 1,
-  today = isoDate(new Date()),
+  today: todayProp,
   max,
   cellSize = 16,
+  locale = "en-US",
   onSelect,
-  formatTitle = (c) => `${parseDate(c.date).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}${c.value ? ` · ${c.value}` : ""}`,
+  formatTitle,
   className,
   ...props
 }: Omit<React.ComponentProps<"div">, "onSelect"> & {
   values: Record<string, number>
   weeks?: number
   weekStart?: 0 | 1
+  /** ISO date (YYYY-MM-DD) of the last day shown. Defaults to the viewer's local date, resolved after hydration. */
   today?: string
   max?: number
   /** Largest a cell grows, in px — cells shrink below it to fit narrow containers. */
   cellSize?: number
+  /** BCP 47 locale for weekday, month and title text. Fixed (not the browser's) so server and client agree. */
+  locale?: string
   onSelect?: (date: string) => void
   formatTitle?: (cell: HeatCell) => string
 }) {
-  const cols = heatmapWeeks(values, { today, weeks, weekStart, max })
-  const months = monthLabels(cols)
-  const days = Array.from({ length: 7 }, (_, r) => parseDate(cols[0][r].date).toLocaleDateString(undefined, { weekday: "short" }))
+  const localToday = useLocalToday()
+  const today = todayProp ?? localToday
+  const title = formatTitle ?? ((c: HeatCell) => heatCellTitle(c, locale))
+  const cols = today ? heatmapWeeks(values, { today, weeks, weekStart, max }) : null
+  const months = cols ? monthLabels(cols, locale) : []
+  const days = weekdayLabels(weekStart, locale)
   return (
-    <div data-slot="heatmap" className={cn("flex gap-1.5 text-[0.625rem] text-muted-foreground", className)} {...props}>
+    <div data-slot="heatmap" data-pending={cols ? undefined : ""} className={cn("flex gap-1.5 text-[0.625rem] text-muted-foreground", className)} {...props}>
       <div className="flex shrink-0 flex-col gap-[3px] pt-4">
         {days.map((d, r) => (
           <div key={r} className="flex flex-1 items-center leading-none">
@@ -45,24 +66,34 @@ function Heatmap({
         ))}
       </div>
       <div className="grid min-w-0 flex-1 justify-start gap-[3px]" style={{ gridTemplateColumns: `repeat(${weeks}, minmax(0, ${cellSize}px))` }}>
-        {cols.map((col, w) => (
-          <div key={col[0].date} className="flex min-w-0 flex-col gap-[3px]">
-            <div className="relative h-3.5">{months[w] ? <span className="absolute left-0 whitespace-nowrap">{months[w]}</span> : null}</div>
-            {col.map((cell) => {
-              const cls = cn(
-                "relative aspect-square w-full rounded-[3px] outline-none",
-                cell.future ? "bg-transparent" : LEVEL[cell.level],
-                cell.today && "ring-2 ring-primary ring-inset",
-                onSelect && !cell.future && "cursor-pointer transition-transform hover:scale-125 focus-visible:ring-2 focus-visible:ring-ring"
-              )
-              return onSelect && !cell.future ? (
-                <button key={cell.date} type="button" data-slot="heatmap-cell" data-level={cell.level} title={formatTitle(cell)} aria-label={formatTitle(cell)} onClick={() => onSelect(cell.date)} className={cls} />
-              ) : (
-                <div key={cell.date} data-slot="heatmap-cell" data-level={cell.level} title={cell.future ? undefined : formatTitle(cell)} className={cls} />
-              )
-            })}
-          </div>
-        ))}
+        {cols
+          ? cols.map((col, w) => (
+              <div key={col[0].date} className="flex min-w-0 flex-col gap-[3px]">
+                <div className="relative h-3.5">{months[w] ? <span className="absolute left-0 whitespace-nowrap">{months[w]}</span> : null}</div>
+                {col.map((cell) => {
+                  const cls = cn(
+                    "relative aspect-square w-full rounded-[3px] focus-visible:outline-hidden",
+                    cell.future ? "bg-transparent" : LEVEL[cell.level],
+                    cell.today && "ring-2 ring-primary ring-inset",
+                    onSelect && !cell.future && "cursor-pointer transition-transform hover:scale-125 focus-visible:ring-2 focus-visible:ring-ring"
+                  )
+                  return onSelect && !cell.future ? (
+                    <button key={cell.date} type="button" data-slot="heatmap-cell" data-level={cell.level} title={title(cell)} aria-label={title(cell)} onClick={() => onSelect(cell.date)} className={cls} />
+                  ) : (
+                    <div key={cell.date} data-slot="heatmap-cell" data-level={cell.level} title={cell.future ? undefined : title(cell)} className={cls} />
+                  )
+                })}
+              </div>
+            ))
+          : // no `today` until hydrated: the same grid, empty, so nothing shifts when it fills in
+            Array.from({ length: weeks }, (_, w) => (
+              <div key={w} aria-hidden className="flex min-w-0 flex-col gap-[3px]">
+                <div className="h-3.5" />
+                {Array.from({ length: 7 }, (_, r) => (
+                  <div key={r} data-slot="heatmap-cell" data-level={0} className={cn("aspect-square w-full rounded-[3px]", LEVEL[0])} />
+                ))}
+              </div>
+            ))}
       </div>
     </div>
   )

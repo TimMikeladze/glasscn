@@ -9,11 +9,11 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground",
-        tinted: "bg-primary/16 text-primary dark:bg-primary/22",
+        tinted: "bg-primary/16 text-primary-ink dark:bg-primary/22",
         glass: "glass [--glass-elevation:0_0_#0000] text-foreground",
         secondary: "bg-fill text-foreground",
         outline: "border border-glass-border text-foreground",
-        destructive: "bg-destructive/14 text-destructive",
+        destructive: "bg-destructive/14 text-destructive-ink",
       },
     },
     defaultVariants: { variant: "default" },

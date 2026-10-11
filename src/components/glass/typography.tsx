@@ -107,7 +107,7 @@ function TextLink({ asChild = false, className, ...props }: React.ComponentProps
     <Comp
       data-slot="text-link"
       className={cn(
-        "text-primary underline decoration-primary/40 underline-offset-(--glass-underline-offset) transition-colors duration-(--glass-duration) outline-none hover:decoration-primary focus-visible:rounded-sm focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/50",
+        "text-primary-ink underline decoration-primary/40 underline-offset-(--glass-underline-offset) transition-colors duration-(--glass-duration) focus-visible:outline-hidden hover:decoration-primary focus-visible:rounded-sm focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/50",
         className
       )}
       {...props}

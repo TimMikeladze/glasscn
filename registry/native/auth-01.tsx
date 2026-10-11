@@ -89,7 +89,7 @@ export function Auth01({
           </GText>
           <Separator style={{ flex: 1, width: undefined }} />
         </View>
-        <Button variant="glass" style={{ width: "100%" }} onPress={onPasskey}>
+        <Button variant="secondary" style={{ width: "100%" }} onPress={onPasskey}>
           Continue with a passkey
         </Button>
       </CardContent>

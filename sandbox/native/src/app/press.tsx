@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Text, View } from "react-native"
 
-import { Glass } from "@/components/glass/native/glass"
+import { Glass, canFade } from "@/components/glass/native/glass"
 import { Press } from "@/components/glass/native/press"
 import { useGlassTheme } from "@/components/glass/native/tokens"
 import { Body, Screen, Section } from "@/sandbox/ui"
@@ -39,10 +39,10 @@ export default function PressScreen() {
       <Section title="Disabled">
         <Button label="Unavailable" disabled onPress={() => setCount((c) => c + 1)} />
       </Section>
-      <Section title="Press around glass">
+      <Section title="Press around glass" note="dim={canFade()}: squash only on iOS 26, where dimming would make the Liquid Glass vanish.">
         <View style={{ flexDirection: "row", gap: 10 }}>
           {["Mon", "Tue", "Wed"].map((d) => (
-            <Press key={d} haptic style={{ flex: 1 }} onPress={() => setCount((c) => c + 1)}>
+            <Press key={d} haptic dim={canFade()} style={{ flex: 1 }} onPress={() => setCount((c) => c + 1)}>
               <Glass interactive style={{ padding: 18, alignItems: "center" }}>
                 <Body style={{ fontWeight: "600" }}>{d}</Body>
               </Glass>

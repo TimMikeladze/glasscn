@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs"
+import { existsSync, readdirSync, readFileSync } from "node:fs"
 import { describe, expect, it } from "vitest"
 import { blocks, components, foundations, nativeItems } from "./items.mjs"
 import { DENSITIES, FONTS, MATERIALS, MOTIONS, PALETTES, SHAPES, TOKENS, TYPE_PRESETS } from "../src/lib/glass-theme.ts"
@@ -90,10 +90,48 @@ describe("registry.json", () => {
       for (const dep of item.registryDependencies ?? []) expect(names.has(dep.match(/\/r\/(.+)\.json$/)[1]), dep).toBe(true)
     expect(Object.values(FONTS).length).toBeGreaterThan(20)
   })
+  it("never lets a custom property reference itself in a component class (it would be invalid)", () => {
+    const files = readdirSync("src/components/glass").map((f) => `src/components/glass/${f}`).concat("src/lib/glass-variants.ts")
+    for (const f of files) {
+      const src = readFileSync(f, "utf8")
+      for (const [, name, value] of src.matchAll(/\[--([\w-]+):([^\]\s"]*)\]/g)) expect(value.includes(`var(--${name})`), `${f}: --${name}`).toBe(false)
+    }
+  })
+  it("ships the data-* variants its components use", () => {
+    const style = registry.items.find((i) => i.name === "glass-style")
+    for (const v of ["open", "closed", "checked", "unchecked", "disabled", "horizontal", "vertical"])
+      expect(Object.keys(style.css).some((k) => k.startsWith(`@custom-variant data-${v} `)), v).toBe(true)
+  })
+  it("states the real primitive count in the docs", () => {
+    for (const f of ["README.md", "docs/theming.md", "docs/spec.md"]) expect(readFileSync(f, "utf8"), f).toContain(`${TOKENS.length} primitives`)
+  })
   it("references only primitives that exist", () => {
     // primitives, the two layer hooks, and shadcn's own colour tokens
-    const known = new Set([...TOKENS.map((t) => t.name), "glass-bg", "glass-elevation", "glass-draw-from", "primary", "foreground", "muted-foreground"])
+    const known = new Set([...TOKENS.map((t) => t.name), "glass-bg", "glass-elevation", "glass-tinted", "glass-draw-from", "primary", "destructive", "foreground", "muted-foreground"])
     const css = JSON.stringify([themeTokens, ...registry.items.filter((i) => i.css).map((i) => i.css)])
     for (const [, name] of css.matchAll(/var\(--([\w-]+)/g)) expect(known.has(name), name).toBe(true)
+  })
+})
+
+describe("component rules (docs/rules/components.md, tokens.md, accessibility.md)", () => {
+  const dirs = ["src/components/glass", "src/components/blocks"]
+  const files = dirs.flatMap((d) => readdirSync(d).filter((f) => f.endsWith(".tsx")).map((f) => `${d}/${f}`))
+  const code = (f) => readFileSync(f, "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "")
+  const banned = [
+    [/(?<![\w:-])outline-none(?![\w-])/, "outline-none hides focus in forced colours — use focus-visible:outline-hidden"],
+    [/(?<![\w-])(?:bg|text|border|fill|stroke)-(?:white|black)(?![\w-])/, "literal white/black — use a token (glass-knob, primary-foreground, glass-dim…)"],
+    [/(?<![\w-])[\w-]+-\[[^\]]*(?:#[0-9a-f]{3,8}\b|rgba?\(|hsla?\()/i, "literal colour in an arbitrary class — use a token"],
+    [/(?<![\w:-])backdrop-blur(?:-|\b)/, "raw backdrop-blur — glass comes from the glass utilities"],
+  ]
+  it("components use tokens and keep focus visible", () => {
+    const failures = []
+    for (const f of files) {
+      const src = code(f)
+      for (const [re, why] of banned) {
+        const m = src.match(re)
+        if (m) failures.push(`${f}: "${m[0]}" — ${why}`)
+      }
+    }
+    expect(failures).toEqual([])
   })
 })

@@ -7,7 +7,9 @@
  */
 
 const mixed = (colour, amount) => `color-mix(in oklch, ${colour} ${amount}, transparent)`
-const frost = (opacity) => mixed("var(--glass-tint)", `var(${opacity})`)
+// --glass-tinted is the tint variant's hook (a colour mixed into the frost); it must not be
+// --glass-tint itself — a custom property that references itself is invalid and turns the pane clear.
+const frost = (opacity) => mixed("var(--glass-tinted, var(--glass-tint))", `var(${opacity})`)
 const rim = mixed("var(--glass-border-color)", "var(--glass-border-opacity)")
 const highlight = mixed("oklch(1 0 0)", "var(--glass-highlight-opacity)")
 const shadow = mixed("var(--glass-shadow-color)", "var(--glass-shadow-opacity)")
@@ -41,6 +43,14 @@ export const themeTokens = {
   "color-fill": mixed("var(--glass-fill-tint)", "var(--glass-fill-opacity)"),
   "color-fill-strong": mixed("var(--glass-fill-tint)", "var(--glass-fill-opacity-strong)"),
   "color-glass-thumb": "var(--glass-thumb)",
+  "color-glass-knob": "var(--glass-knob)",
+  // accent-coloured text on a tint of itself (tinted badges and buttons, links): the accent pulled
+  // toward the label colour, so it stays readable on its own 16–22% fill in both schemes
+  "color-primary-ink": "color-mix(in oklch, var(--primary) 68%, var(--glass-label))",
+  "color-destructive-ink": "color-mix(in oklch, var(--destructive) 68%, var(--glass-label))",
+  "color-glass-dim": mixed("oklch(0 0 0)", "var(--glass-dim)"),
+  "shadow-glass-knob": `0 3px 8px ${mixed("var(--glass-shadow-color)", "calc(var(--glass-shadow-opacity) + 8%)")}, 0 1px 2px ${mixed("var(--glass-shadow-color)", "calc(var(--glass-shadow-opacity) + 4%)")}`,
+  "shadow-glass-accent": `0 8px 22px ${mixed("var(--primary)", "32%")}, inset 0 1px 0 ${mixed("oklch(1 0 0)", "30%")}`,
   "color-aurora-base": "var(--aurora-base)",
   "color-aurora-1": "var(--aurora-1)",
   "color-aurora-2": "var(--aurora-2)",
@@ -67,6 +77,13 @@ export const themeTokens = {
 }
 
 const surface = (opacity) => ({
+  // text inside a pane uses the material's own label colours (a smoked pane in a light theme
+  // needs light text), remapping shadcn's foreground tokens for everything inside it
+  color: "var(--glass-label)",
+  "--foreground": "var(--glass-label)",
+  "--card-foreground": "var(--glass-label)",
+  "--popover-foreground": "var(--glass-label)",
+  "--muted-foreground": "var(--glass-label-secondary)",
   "background-color": `var(--glass-bg, ${frost(opacity)})`,
   "background-image": `linear-gradient(var(--glass-sheen-angle), ${mixed("oklch(1 0 0)", "var(--glass-sheen)")}, transparent 55%), var(--glass-texture)`,
   "border-width": "var(--glass-border-width)",
@@ -77,8 +94,30 @@ const surface = (opacity) => ({
   "box-shadow": `var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) ${shadow}), inset 0 1px 0 ${highlight}, inset 0 0 calc(var(--glass-shadow-blur) * 0.8) ${glow}`,
 })
 
+/**
+ * The data-* variants components use (data-open:, data-checked:…). shadcn's own
+ * `shadcn/tailwind.css` defines the same ones; repeating a @custom-variant is harmless,
+ * and shipping them here means components work in apps that never imported it.
+ */
+const dataVariant = (name, state) => [
+  `@custom-variant data-${name} (&:where([data-state="${state}"]), &:where([data-${name}]:not([data-${name}="false"])))`,
+  {},
+]
+export const customVariants = Object.fromEntries([
+  dataVariant("open", "open"),
+  dataVariant("closed", "closed"),
+  dataVariant("checked", "checked"),
+  dataVariant("unchecked", "unchecked"),
+  dataVariant("selected", "selected"),
+  dataVariant("active", "active"),
+  [`@custom-variant data-disabled (&:where([data-disabled]:not([data-disabled="false"])))`, {}],
+  [`@custom-variant data-horizontal (&:where([data-orientation="horizontal"]))`, {}],
+  [`@custom-variant data-vertical (&:where([data-orientation="vertical"]))`, {}],
+])
+
 /** Utilities, keyframes and fallbacks. */
 export const stylesheet = {
+  ...customVariants,
   "@utility glass": surface("--glass-opacity"),
   "@utility glass-strong": surface("--glass-opacity-strong"),
   "@utility glass-subtle": surface("--glass-opacity-subtle"),

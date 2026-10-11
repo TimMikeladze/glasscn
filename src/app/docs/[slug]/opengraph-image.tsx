@@ -1,6 +1,7 @@
 import { docBySlug, docs } from "@/lib/docs"
 import { GROUP_PALETTE } from "@/lib/og/colors"
 import { ogContentType, ogSize, renderOg } from "@/lib/og/render"
+import { registryNamespace } from "@/lib/site"
 
 export function generateStaticParams() {
   return docs.map((d) => ({ slug: d.slug }))
@@ -19,7 +20,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
     title: doc.title,
     description: doc.description,
     eyebrow: doc.group,
-    command: `npx shadcn add @glasscn/${slug}`,
+    command: `npx shadcn add ${registryNamespace}/${slug}`,
     path: `/docs/${slug}`,
     palette: GROUP_PALETTE[doc.group],
   })

@@ -36,8 +36,8 @@ const tabsListVariants = cva(
   }
 )
 
-function TabsList({ className, variant = "default", children, ...props }: React.ComponentProps<typeof TabsPrimitive.List> & VariantProps<typeof tabsListVariants>) {
-  const ref = useSlidingIndicator<HTMLDivElement>('[data-slot="tabs-trigger"][data-state="active"]')
+function TabsList({ className, variant = "default", children, ref: forwardedRef, ...props }: React.ComponentProps<typeof TabsPrimitive.List> & VariantProps<typeof tabsListVariants>) {
+  const ref = useSlidingIndicator<HTMLDivElement>('[data-slot="tabs-trigger"][data-state="active"]', forwardedRef)
   return (
     <TabsPrimitive.List ref={ref} data-slot="tabs-list" data-variant={variant} className={cn(tabsListVariants({ variant }), className)} {...props}>
       <span
@@ -60,7 +60,7 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "relative z-10 inline-flex h-[calc(2rem*var(--glass-density))] flex-1 items-center justify-center gap-1.5 rounded-button px-3.5 text-sm font-medium whitespace-nowrap text-foreground/65 transition-colors outline-none group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start hover:text-foreground focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-foreground group-data-[variant=line]/tabs-list:h-9 group-data-[variant=line]/tabs-list:rounded-none group-data-[variant=line]/tabs-list:px-2 group-data-[variant=line]/tabs-list:data-[state=active]:text-primary [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "relative z-10 inline-flex h-[calc(2rem*var(--glass-density))] flex-1 items-center justify-center gap-1.5 rounded-button px-3.5 text-sm font-medium whitespace-nowrap text-muted-foreground transition-colors focus-visible:outline-hidden group-data-vertical/tabs:w-full group-data-vertical/tabs:justify-start hover:text-foreground focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-foreground group-data-[variant=line]/tabs-list:h-9 group-data-[variant=line]/tabs-list:rounded-none group-data-[variant=line]/tabs-list:px-2 group-data-[variant=line]/tabs-list:data-[state=active]:text-primary [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}
@@ -72,7 +72,7 @@ function TabsContent({ className, ...props }: React.ComponentProps<typeof TabsPr
   return (
     <TabsPrimitive.Content
       data-slot="tabs-content"
-      className={cn("flex-1 text-sm outline-none data-[state=active]:animate-in data-[state=active]:fade-in-0 data-[state=active]:duration-(--glass-duration) data-[state=active]:slide-in-from-bottom-1 motion-reduce:animate-none", className)}
+      className={cn("flex-1 text-sm focus-visible:outline-hidden data-[state=active]:animate-in data-[state=active]:fade-in-0 data-[state=active]:duration-(--glass-duration) data-[state=active]:slide-in-from-bottom-1 motion-reduce:animate-none", className)}
       {...props}
     />
   )

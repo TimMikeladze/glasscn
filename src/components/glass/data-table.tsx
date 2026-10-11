@@ -257,7 +257,7 @@ function DataTable<TData extends RowData>({
                       }
                     : undefined
                 }
-                className={cn(onRowClick && "cursor-pointer outline-none focus-visible:bg-fill-strong focus-visible:outline-(length:--glass-ring-width) focus-visible:-outline-offset-2 focus-visible:outline-ring/50")}
+                className={cn(onRowClick && "cursor-pointer focus-visible:outline-hidden focus-visible:bg-fill-strong focus-visible:outline-(length:--glass-ring-width) focus-visible:-outline-offset-2 focus-visible:outline-ring/50")}
               >
                 {row.getAllCells().map((cell) => (
                   <TableCell key={cell.id}>

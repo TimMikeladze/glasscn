@@ -14,7 +14,7 @@ npx shadcn@latest add https://glasscn.app/r/glass-style.json https://glasscn.app
 npx shadcn@latest add https://glasscn.app/r/aurora.json https://glasscn.app/r/card.json https://glasscn.app/r/button.json
 ```
 
-Or add `"registries": { "@glasscn": "https://glasscn.app/r/{name}.json" }` to `components.json` and `npx shadcn add @glasscn/dock`. Components land in `components/glass/`, blocks in `components/glass-blocks/`.
+Or add `"registries": { "@glasscn-app": "https://glasscn.app/r/{name}.json" }` to `components.json` and `npx shadcn add @glasscn-app/dock`. Components land in `components/glass/`, blocks in `components/glass-blocks/`.
 
 Put `<Aurora />` once in the root layout — glass needs something to frost.
 
@@ -33,7 +33,8 @@ Files land in `components/glass/native/`. Wrap the app in `GlassThemeProvider` (
 - Swap shadcn imports: `@/components/ui/card` → `@/components/glass/card`. Same parts and props.
 - Floating layers (dialogs, menus, popovers, toasts) are already `glass-strong`. In-flow cards are `glass`. Quiet panes: `<Glass intensity="subtle">`.
 - Inside a pane, use fills (`bg-fill`), not another pane. Two levels of glass at most.
-- iOS-style pieces with no shadcn equivalent: `SegmentedControl`, `Dock` (floating tab bar + action), `GroupedList` (Settings rows), `ActivityRings`, `ProgressRing`, `Sparkline`, `Stat`, `Heatmap`, `BarList`, `Gauge`, `Tracker`, `CategoryBar`.
+- Destructive or irreversible confirmations: `AlertDialog` (never a plain `Dialog`). Never put a `variant="glass"` button inside a glass panel — use `secondary` there.
+- iOS-style pieces with no shadcn equivalent: `SegmentedControl`, `Dock` (floating tab bar + action — `DockNav` + `DockLink active` for routes, `DockBar` + `DockItem` for in-page views), `GroupedList` (Settings rows), `ActivityRings`, `ProgressRing`, `Sparkline`, `Stat`, `Heatmap`, `BarList`, `Gauge`, `Tracker`, `CategoryBar`.
 - Charts: `AreaChart`, `BarChart`, `LineChart`, `DonutChart` (TanStack Charts) take your rows unmodified plus typed accessors — `x={(d) => d.day}`, `series={[{ id, label, value: (d) => d.minutes }]}` — and a required `ariaLabel`. For anything else, build a TanStack `defineChart` and render it in `ChartContainer` from `chart`: series colours come from `--chart-1..5`, the tooltip is glass.
 - Tables: `Table` is shadcn's markup; `DataTable` (TanStack Table v9) adds sort, search, pagination, selection — build columns with `createDataTableColumnHelper<Row>()`.
 - Chat: `ChatThread` › `ChatMessage from="user|assistant"` › `ChatBubble`, plus `ChatTyping`, `ChatSuggestions`, `ChatComposer onSubmit`. It renders state; wire it to AI SDK `useChat` (`status === "submitted"` → `ChatTyping`).

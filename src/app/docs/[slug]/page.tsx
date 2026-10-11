@@ -7,12 +7,13 @@ import { Badge } from "@/components/glass/badge"
 import { Button } from "@/components/glass/button"
 import { CodeBlock } from "@/components/site/code-block"
 import { ComponentPreview } from "@/components/site/component-preview"
+import { DemoPreview } from "@/components/site/demo-preview"
 import { InstallCommand } from "@/components/site/install-command"
 import { PropsTable } from "@/components/site/props-table"
 import { H2, P } from "@/components/site/prose"
 import { docBySlug, docs, nativeItems } from "@/lib/docs"
 import { demoSources, sources } from "@/lib/sources.generated"
-import { itemUrl } from "@/lib/site"
+import { itemUrl, registryNamespace } from "@/lib/site"
 import { pageMetadata } from "@/lib/metadata"
 
 export function generateStaticParams() {
@@ -69,7 +70,9 @@ async function Doc({ params }: { params: PageProps<"/docs/[slug]">["params"] }) 
         <p className="max-w-2xl text-lg text-muted-foreground">{doc.description}</p>
       </div>
 
-      <ComponentPreview name={slug} html={demo?.html} code={demo?.code} wide={doc.group === "Blocks"} />
+      <ComponentPreview html={demo?.html} code={demo?.code} wide={doc.group === "Blocks"}>
+        {demo ? <DemoPreview name={slug} /> : null}
+      </ComponentPreview>
 
       <H2>Installation</H2>
       <InstallCommand args={`add ${itemUrl(slug)}`} />
@@ -82,7 +85,7 @@ async function Doc({ params }: { params: PageProps<"/docs/[slug]">["params"] }) 
         </>
       ) : null}
       <P className="mt-3 text-sm text-muted-foreground">
-        Or with the namespace set up: <code className="rounded-md bg-fill px-1.5 py-0.5 font-mono text-xs">shadcn add @glasscn/{slug}</code>
+        Or with the namespace set up: <code className="rounded-md bg-fill px-1.5 py-0.5 font-mono text-xs">shadcn add {registryNamespace}/{slug}</code>
       </P>
 
       {doc.props?.length ? (

@@ -30,7 +30,7 @@ function Slider({ className, defaultValue, value, min = 0, max = 100, ...props }
         <SliderPrimitive.Thumb
           data-slot="slider-thumb"
           key={i}
-          className="block size-6 shrink-0 rounded-full border border-glass-border bg-white shadow-[0_3px_10px_rgb(0_0_0/0.18),0_1px_2px_rgb(0_0_0/0.12)] transition-transform outline-none hover:scale-105 focus-visible:ring-4 focus-visible:ring-ring/40 active:scale-110 disabled:pointer-events-none"
+          className="block size-[calc(1.5rem*var(--glass-density))] shrink-0 rounded-button border border-glass-border bg-glass-knob shadow-glass-knob transition-transform duration-(--glass-duration) ease-glass focus-visible:outline-hidden hover:scale-105 focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/50 active:scale-110 data-disabled:pointer-events-none motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100"
         />
       ))}
     </SliderPrimitive.Root>

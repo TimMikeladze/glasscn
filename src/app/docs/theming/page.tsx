@@ -128,7 +128,7 @@ export default function Theming() {
           <div className="glass overflow-hidden rounded-surface-sm [--glass-elevation:0_0_#0000]">
             {TOKENS.filter((t) => t.group === g).map((t) => (
               <div key={t.name} className="grid gap-1 border-b border-foreground/5 px-4 py-2.5 last:border-0 sm:grid-cols-[14rem_1fr_auto] sm:gap-4">
-                <code className="font-mono text-[0.78rem] text-primary">--{t.name}</code>
+                <code className="font-mono text-[0.78rem] text-primary-ink">--{t.name}</code>
                 <span className="text-sm text-muted-foreground">{t.description}</span>
                 <code className="truncate font-mono text-[0.72rem] text-muted-foreground sm:max-w-56" title={t.light}>
                   {t.control.type === "select" ? (t.control.options.find((o) => o.value === t.light)?.label ?? t.light) : t.light}

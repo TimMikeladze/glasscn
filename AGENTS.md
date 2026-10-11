@@ -2,7 +2,7 @@
 
 A shadcn registry of glass components, the theme engine behind it, and its docs site (Next 16, Tailwind v4, `radix-ui`, pnpm).
 
-**Start here:** [`docs/architecture.md`](docs/architecture.md) (how it works) · [`docs/rules/`](docs/rules/README.md) (what you must follow) · [`docs/theming.md`](docs/theming.md) (the token model) · [`docs/spec.md`](docs/spec.md) (what's in it).
+**Start here:** [`docs/architecture.md`](docs/architecture.md) (how it works) · [`docs/rules/`](docs/rules/README.md) (what you must follow) · [`docs/theming.md`](docs/theming.md) (the token model) · [`docs/spec.md`](docs/spec.md) (what's in it) · [`docs/liquid-glass.md`](docs/liquid-glass.md) (Apple alignment study) · [`docs/roadmap.md`](docs/roadmap.md) (ID'd backlog — cite IDs in commits) · [`docs/apple-hig-reference.md`](docs/apple-hig-reference.md) (per-component Apple spec).
 
 ## Skills (in `skills/`, mirrored to `.claude/skills` and `.agents/skills` on install)
 

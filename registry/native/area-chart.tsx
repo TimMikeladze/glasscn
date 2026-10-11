@@ -3,7 +3,7 @@ import { View, type StyleProp, type ViewProps, type ViewStyle } from "react-nati
 import { Defs, Line, LinearGradient, Path, Stop } from "react-native-svg"
 
 import { ChartContainer, ChartLegend, chartColor, nearest, seriesTooltip, xScaleFor, type AxisSpec, type ChartFrame, type ChartSeries } from "@/components/glass/native/chart"
-import { monotoneCurve, runningTotals } from "@/components/glass/native/chart-math"
+import { monotoneCurve, runningTotals, sanitizeId } from "@/components/glass/native/chart-math"
 import { useUI } from "@/components/glass/native/ui"
 
 type XValue = string | number | Date
@@ -52,7 +52,7 @@ export function AreaChart<Row>({
   style?: StyleProp<ViewStyle>
 }) {
   const ui = useUI()
-  const id = React.useId().replace(/[^a-zA-Z0-9]/g, "")
+  const id = sanitizeId(React.useId())
   const colors = series.map((s, i) => s.color ?? chartColor(i, ui))
   const path = curve === "smooth" ? monotoneCurve : linear
   // the bottom and top of layer i at row d: 0 → value, or the running totals when stacked

@@ -7,13 +7,13 @@ pnpm dlx shadcn@latest add https://glasscn.app/r/glass-style.json https://glassc
 pnpm dlx shadcn@latest add https://glasscn.app/r/card.json https://glasscn.app/r/button.json
 ```
 
-Or set the namespace once in `components.json` — `"registries": { "@glasscn": "https://glasscn.app/r/{name}.json" }` — and `shadcn add @glasscn/dock`.
+Or set the namespace once in `components.json` — `"registries": { "@glasscn-app": "https://glasscn.app/r/{name}.json" }` — and `shadcn add @glasscn-app/dock`.
 
 ## What's in it
 
 | | Items |
 |---|---|
-| Foundation | `glass-style` — 50 primitives, `glass` / `glass-strong` / `glass-subtle` utilities, theme tokens, keyframes, fallbacks, `glassVariants`; `glass-theme` (the theme engine); `glass-charts`; `use-sliding-indicator` |
+| Foundation | `glass-style` — 60 primitives, `glass` / `glass-strong` / `glass-subtle` utilities, theme tokens, keyframes, fallbacks, `glassVariants`; `glass-theme` (the theme engine); `glass-charts`; `use-sliding-indicator` |
 | Palettes (12) | `theme-dusk` `-ocean` `-rose` `-sage` `-amber` `-graphite` `-lavender` `-mint` `-cherry` `-lagoon` `-sand` `-midnight` |
 | Materials (7) | `material-frosted` `-liquid` `-crystal` `-smoked` `-matte` `-vapor` `-neon` |
 | Shape · Motion · Density | `shape-round` `-soft` `-sharp` `-square` · `motion-spring` `-smooth` `-snappy` `-still` · `density-compact` `-default` `-comfortable` |
@@ -29,7 +29,7 @@ Or set the namespace once in `components.json` — `"registries": { "@glasscn": 
 | React Native | `native-tokens` `native-glass` `native-aurora` `native-press` `native-ui`, plus a `native-<name>` twin of every component and block (iOS, Android and web through react-native-web) |
 
 - **shadcn's APIs, in glass.** Button, Card, Dialog, Tabs… keep their props and parts — swapping is `@/components/ui/x` → `@/components/glass/x`. Files land in `components/glass/`, beside shadcn's, never over them.
-- **68 primitives in eleven groups** — colour, material (frost, blur, saturation, brightness, sheen, grain), rim, depth (shadow, inner glow), shape, density, motion, aurora, fonts, type. Presets compose; any primitive can be overridden on any element (`[--glass-blur:8px]`); `ThemeScope` re-themes a subtree at runtime.
+- **72 primitives in ten groups** — colour, material (frost, blur, saturation, brightness, sheen, grain), rim, depth (shadow, inner glow), shape, density, motion, aurora, fonts, type. Presets compose; any primitive can be overridden on any element (`[--glass-blur:8px]`); `ThemeScope` re-themes a subtree at runtime.
 - **Theme Studio** at `/themes` — every primitive as a control, a hue-harmony palette generator, randomise, a scoped live preview with its own scheme, a legibility estimate, export as a one-line `npx shadcn add` command / CSS / a shadcn theme item / TypeScript / a share link, and "apply to the whole site".
 - **Standards.** `data-slot` on every part, `cva` variants, `cn`, unified `radix-ui`, `asChild`, Tailwind v4, `prefers-reduced-motion`, a no-`backdrop-filter` fallback.
 
@@ -43,7 +43,7 @@ Or set the namespace once in `components.json` — `"registries": { "@glasscn": 
 
 ```bash
 pnpm install
-pnpm dev                 # generate + docs site on :3000 (registry served from /r)
+pnpm dev                 # generate + docs site (registry served from /r; install commands follow the dev port)
 ```
 
 - `registry/items.mjs` — every item (edit this, not registry.json)

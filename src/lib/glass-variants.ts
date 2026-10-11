@@ -9,6 +9,7 @@ import { cva, type VariantProps } from "class-variance-authority"
  * whole layers:
  *   --glass-bg         the fill            e.g. `[--glass-bg:var(--primary)]`
  *   --glass-elevation  the outer shadow    e.g. `[--glass-elevation:0_0_#0000]`
+ *   --glass-tinted     the frost colour    (set by `tint`; overrides --glass-tint)
  */
 export const glassVariants = cva("relative", {
   variants: {
@@ -19,9 +20,10 @@ export const glassVariants = cva("relative", {
     },
     tint: {
       none: "",
-      // a tint replaces the frost's colour, keeping its opacity
-      primary: "[--glass-tint:color-mix(in_oklch,var(--primary)_30%,var(--glass-tint))]",
-      destructive: "[--glass-tint:color-mix(in_oklch,var(--destructive)_30%,var(--glass-tint))]",
+      // a tint mixes a colour into the frost, keeping its opacity. It writes --glass-tinted, never
+      // --glass-tint: a property that references itself is invalid and would make the pane clear.
+      primary: "[--glass-tinted:color-mix(in_oklch,var(--primary)_30%,var(--glass-tint))]",
+      destructive: "[--glass-tinted:color-mix(in_oklch,var(--destructive)_30%,var(--glass-tint))]",
     },
     elevation: {
       raised: "",

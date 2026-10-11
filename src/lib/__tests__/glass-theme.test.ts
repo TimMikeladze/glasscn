@@ -14,11 +14,16 @@ import {
   decodeTheme,
   defaultTheme,
   encodeTheme,
+  accentFor,
+  contrastRatio,
   legibility,
+  legibilityReport,
+  relativeLuminance,
   oklchToLinearRgb,
   paletteFromHue,
   parseOklch,
   randomTheme,
+  fitsToken,
   sanitizeTokens,
   sanitizeValue,
   themeToCss,
@@ -91,6 +96,13 @@ describe("safety", () => {
   it("drops unknown tokens and unsafe values", () => {
     expect(sanitizeTokens({ "glass-blur": "4px", evil: "1px", primary: "red;}" })).toEqual({ "glass-blur": "4px" })
   })
+  it("rejects comment openers and var() — one '/*' would swallow the rest of a stylesheet", () => {
+    for (const bad of ["10px /*", "*/ red", "var(--x)", "calc(var(--glass-blur) * 2)"]) expect(sanitizeValue(bad), bad).toBeNull()
+  })
+  it("rejects values that don't fit their token: wrong unit, not a colour, impossible numbers", () => {
+    expect(sanitizeTokens({ "glass-blur": "red", "glass-density": "0", "glass-opacity": "-5%", primary: "12px", "glass-radius-surface": "1.5px" })).toEqual({})
+    expect(sanitizeTokens({ "glass-blur": "8px", "glass-density": "0.9", primary: "#ff8800", "aurora-speed": "0.0001" })).toEqual({ "glass-blur": "8px", "glass-density": "0.9", primary: "#ff8800", "aurora-speed": "0.0001" })
+  })
 })
 
 describe("outputs", () => {
@@ -135,6 +147,47 @@ describe("colour maths", () => {
     expect(legibility(createGlassTheme(), "dark").level).not.toBe("low")
     const bad = createGlassTheme({ tokens: { "glass-opacity": "0%", "aurora-base": "oklch(0.55 0 0)", "aurora-1": "oklch(0.55 0 0)", "aurora-2": "oklch(0.55 0 0)", "aurora-3": "oklch(0.55 0 0)" } })
     expect(legibility(bad, "light").level).toBe("low")
+  })
+  it("every shipped palette × material, in both schemes, meets WCAG AA (accessibility rule 1)", () => {
+    const failures: string[] = []
+    for (const palette of Object.keys(PALETTES))
+      for (const material of Object.keys(MATERIALS))
+        for (const scheme of ["light", "dark"] as const) {
+          const r = legibilityReport(createGlassTheme({ palette, material }), scheme)
+          const id = `${palette}/${material}/${scheme}`
+          for (const tier of ["subtle", "default", "strong"] as const) {
+            if (r.text[tier] < 4.5) failures.push(`${id} text on ${tier} ${r.text[tier]}`)
+            if (r.secondary[tier] < 4.5) failures.push(`${id} secondary text on ${tier} ${r.secondary[tier]}`)
+          }
+          if (r.accentLabel < 4.5) failures.push(`${id} accent label ${r.accentLabel}`)
+          if (r.accentOnGround < 3) failures.push(`${id} accent on ground ${r.accentOnGround}`)
+        }
+    expect(failures).toEqual([])
+  })
+  it("generated palettes keep a legible accent label at any hue", () => {
+    for (let hue = 0; hue < 360; hue += 15)
+      for (const harmony of ["analogous", "monochrome"] as const) {
+        const p = paletteFromHue({ hue, harmony, chroma: 0.26 })
+        for (const scheme of ["light", "dark"] as const) {
+          const ratio = contrastRatio(relativeLuminance(parseOklch(p[scheme].primary)!), relativeLuminance(parseOklch(p[scheme]["primary-foreground"])!))
+          expect(ratio, `${hue} ${harmony} ${scheme}`).toBeGreaterThanOrEqual(4.5)
+        }
+      }
+  })
+  it("accentFor only moves lightness, and leaves an already legible accent alone", () => {
+    const dark = "oklch(0.4 0.1 250)"
+    expect(accentFor(dark, "oklch(0.99 0 0)")).toBe(dark)
+    const fixed = parseOklch(accentFor("oklch(0.7 0.15 60)", "oklch(0.99 0 0)"))!
+    expect(fixed[0]).toBeLessThan(0.7)
+    expect(fixed[1]).toBe(0.15)
+    expect(fixed[2]).toBe(60)
+  })
+  it("every preset value fits its token (so share links round-trip)", () => {
+    for (const t of TOKENS) for (const v of [t.light, t.dark]) if (v) expect(fitsToken(t, v), `${t.name}: ${v}`).toBe(true)
+    for (const [k, m] of Object.entries(MATERIALS)) for (const [name, v] of Object.entries({ ...m.tokens, ...m.light, ...m.dark })) {
+      const def = TOKENS.find((t) => t.name === name)
+      if (def) expect(fitsToken(def, v), `${k} ${name}: ${v}`).toBe(true)
+    }
   })
   it("random themes are deterministic per seed and always sanitary", () => {
     expect(randomTheme(0.42)).toEqual(randomTheme(0.42))

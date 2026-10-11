@@ -28,11 +28,12 @@ function SegmentedControl({
   onValueChange,
   size = "default",
   children,
+  ref: forwardedRef,
   ...props
 }: SegmentedControlProps) {
   const [inner, setInner] = React.useState(defaultValue ?? "")
   const current = value ?? inner
-  const ref = useSlidingIndicator<HTMLDivElement>('[data-slot="segmented-control-item"][data-state="on"]')
+  const ref = useSlidingIndicator<HTMLDivElement>('[data-slot="segmented-control-item"][data-state="on"]', forwardedRef)
   return (
     <ToggleGroupPrimitive.Root
       ref={ref}
@@ -56,7 +57,7 @@ function SegmentedControl({
         aria-hidden
         className={cn(
           slidingIndicatorClass,
-          "rounded-control-sm bg-glass-thumb shadow-[0_3px_8px_rgb(0_0_0/0.12),0_0_1px_rgb(0_0_0/0.1)] dark:shadow-none"
+          "rounded-control-sm bg-glass-thumb shadow-glass-knob"
         )}
       />
       {children}
@@ -69,7 +70,7 @@ function SegmentedControlItem({ className, ...props }: React.ComponentProps<type
     <ToggleGroupPrimitive.Item
       data-slot="segmented-control-item"
       className={cn(
-        "relative z-10 inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-control-sm px-3 text-sm font-medium whitespace-nowrap text-foreground/70 transition-colors outline-none hover:text-foreground focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-40 data-[state=on]:font-semibold data-[state=on]:text-foreground group-data-[size=lg]/segmented:text-base group-data-[size=sm]/segmented:px-2 group-data-[size=sm]/segmented:text-xs [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
+        "relative z-10 inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-control-sm px-3 text-sm font-medium whitespace-nowrap text-muted-foreground transition-colors focus-visible:outline-hidden hover:text-foreground focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-40 data-[state=on]:font-semibold data-[state=on]:text-foreground group-data-[size=lg]/segmented:text-base group-data-[size=sm]/segmented:px-2 group-data-[size=sm]/segmented:text-xs [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}

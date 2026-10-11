@@ -53,6 +53,13 @@ export function scaleSeries(values: (number | null | undefined)[], width: number
   }))
 }
 
+/** Length of the polyline through `points` after scaling x by `sx` and y by `sy` — a stretched path's on-screen length. */
+export function polylineLength(points: Point[], sx = 1, sy = 1): number {
+  let length = 0
+  for (let i = 1; i < points.length; i++) length += Math.hypot((points[i].x - points[i - 1].x) * sx, (points[i].y - points[i - 1].y) * sy)
+  return length
+}
+
 /** A smooth path through points: Catmull-Rom converted to cubic Béziers (tension ½). */
 export function smoothPath(points: Point[]): string {
   if (!points.length) return ""
@@ -73,6 +80,17 @@ export function areaPath(points: Point[], floor: number): string {
   if (!points.length) return ""
   const last = points[points.length - 1]
   return `${smoothPath(points)} L${last.x},${floor} L${points[0].x},${floor} Z`
+}
+
+// ---- ids ----
+
+/**
+ * A React `useId()` (or any string) made safe for an SVG/HTML id and `url(#…)`
+ * reference: React 18 ids carry `:`, React 19's carry `«»` or `_r_`; keep only
+ * `[a-zA-Z0-9_-]`.
+ */
+export function sanitizeId(id: string): string {
+  return id.replace(/[^a-zA-Z0-9_-]/g, "")
 }
 
 // ---- heatmap ----
@@ -125,6 +143,17 @@ export function heatmapWeeks(values: Record<string, number>, opts: { today: stri
     cols.push(col)
   }
   return cols
+}
+
+/** Short weekday names for the seven rows, starting at `weekStart` — the same on server and client for a given `locale`. */
+export function weekdayLabels(weekStart: 0 | 1 = 1, locale = "en-US"): string[] {
+  // 2024-01-07 is a Sunday; walk forward from it so the result never depends on today
+  return Array.from({ length: 7 }, (_, r) => new Date(2024, 0, 7 + weekStart + r).toLocaleDateString(locale, { weekday: "short" }))
+}
+
+/** "Wed, Oct 8 · 3" — a heatmap cell's title, in `locale`. */
+export function heatCellTitle(cell: HeatCell, locale = "en-US"): string {
+  return `${parseDate(cell.date).toLocaleDateString(locale, { weekday: "short", month: "short", day: "numeric" })}${cell.value ? ` · ${cell.value}` : ""}`
 }
 
 /** Month label for each column — the short month name when it changes from the column before. */

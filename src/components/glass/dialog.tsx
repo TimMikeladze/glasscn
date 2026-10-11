@@ -23,13 +23,13 @@ function DialogClose({ ...props }: React.ComponentProps<typeof DialogPrimitive.C
   return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
 }
 
-/** The page dims and softens behind the glass. */
+/** The page dims behind the glass (no blur: a blurred scrim under a frosted pane is blur on blur). */
 function DialogOverlay({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
   return (
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        "fixed inset-0 isolate z-50 bg-black/15 backdrop-blur-[3px] duration-200 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 dark:bg-black/45",
+        "fixed inset-0 isolate z-50 bg-glass-dim duration-(--glass-duration) data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
         className
       )}
       {...props}
@@ -49,7 +49,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "glass-strong fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-surface p-6 text-sm text-popover-foreground duration-200 outline-none sm:max-w-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "glass-strong fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-surface p-6 text-sm text-popover-foreground duration-200 focus-visible:outline-hidden sm:max-w-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className
         )}
         {...props}
@@ -78,7 +78,7 @@ function DialogFooter({ className, showCloseButton = false, children, ...props }
       {children}
       {showCloseButton && (
         <DialogPrimitive.Close asChild>
-          <Button variant="glass">Close</Button>
+          <Button variant="secondary">Close</Button>
         </DialogPrimitive.Close>
       )}
     </div>

@@ -19,7 +19,8 @@ export function Progress({ value, max = 100, accessibilityLabel, testID, style }
   const pct = Math.min(100, Math.max(0, ((value ?? 0) / (max || 100)) * 100))
   const [fill] = React.useState(() => new Animated.Value(pct))
   const reduce = useReduceMotion()
-  const id = React.useId().replace(/:/g, "")
+  // React 19 ids carry «» / _r_ — keep only id-safe characters
+  const id = React.useId().replace(/[^a-zA-Z0-9_-]/g, "")
 
   React.useEffect(() => {
     if (reduce.current) fill.setValue(pct)

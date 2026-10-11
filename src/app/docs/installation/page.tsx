@@ -1,7 +1,7 @@
 import { CodeBlock } from "@/components/site/code-block"
 import { InstallCommand } from "@/components/site/install-command"
 import { C, H2, P, PageHeader, Step } from "@/components/site/prose"
-import { itemUrl, registryUrl } from "@/lib/site"
+import { itemUrl, registryNamespace, registryUrl } from "@/lib/site"
 import { pageMetadata } from "@/lib/metadata"
 import { PAGES } from "@/lib/og/pages"
 
@@ -9,7 +9,7 @@ export const metadata = pageMetadata(PAGES.installation)
 
 const componentsJson = `{
   "registries": {
-    "@glasscn": "${registryUrl}/r/{name}.json"
+    "${registryNamespace}": "${registryUrl}/r/{name}.json"
   }
 }`
 
@@ -48,13 +48,13 @@ export default function Installation() {
         <P className="mb-0">Glass needs something to frost. The aurora is fixed behind the page by default.</P>
         <CodeBlock code={layout} html={`<pre><code>${layout.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</code></pre>`} title="app/layout.tsx" />
       </Step>
-      <H2>Use the @glasscn namespace</H2>
+      <H2>Use the {registryNamespace} namespace</H2>
       <P>
         Add the registry to <C>components.json</C> once and install by name:
       </P>
       <CodeBlock code={componentsJson} html={`<pre><code>${componentsJson}</code></pre>`} title="components.json" />
       <div className="mt-4">
-        <InstallCommand args="add @glasscn/button @glasscn/dock @glasscn/activity-rings" />
+        <InstallCommand args={`add ${["button", "dock", "activity-rings"].map((n) => `${registryNamespace}/${n}`).join(" ")}`} />
       </div>
       <H2>Where files go</H2>
       <P>

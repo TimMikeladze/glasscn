@@ -14,8 +14,10 @@
       ],
       "dependencies": [
         "cn",
-        "class-variance-authority"
+        "class-variance-authority",
+        "tw-animate-css"
       ],
+      "docs": "glasscn is installed. Put <Aurora /> (shadcn add @glasscn-app/aurora) behind your app, and make sure your global CSS has @import \"tw-animate-css\"; (shadcn init adds it) so overlays animate.",
       "files": [
         {
           "path": "src/lib/glass-variants.ts",
@@ -25,15 +27,21 @@
       ],
       "cssVars": {
         "theme": {
-          "color-glass": "color-mix(in oklch, var(--glass-tint) var(--glass-opacity), transparent)",
-          "color-glass-strong": "color-mix(in oklch, var(--glass-tint) var(--glass-opacity-strong), transparent)",
-          "color-glass-subtle": "color-mix(in oklch, var(--glass-tint) var(--glass-opacity-subtle), transparent)",
+          "color-glass": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) var(--glass-opacity), transparent)",
+          "color-glass-strong": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) var(--glass-opacity-strong), transparent)",
+          "color-glass-subtle": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) var(--glass-opacity-subtle), transparent)",
           "color-glass-border": "color-mix(in oklch, var(--glass-border-color) var(--glass-border-opacity), transparent)",
           "color-glass-highlight": "color-mix(in oklch, oklch(1 0 0) var(--glass-highlight-opacity), transparent)",
           "color-glass-shadow": "color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)",
           "color-fill": "color-mix(in oklch, var(--glass-fill-tint) var(--glass-fill-opacity), transparent)",
           "color-fill-strong": "color-mix(in oklch, var(--glass-fill-tint) var(--glass-fill-opacity-strong), transparent)",
           "color-glass-thumb": "var(--glass-thumb)",
+          "color-glass-knob": "var(--glass-knob)",
+          "color-primary-ink": "color-mix(in oklch, var(--primary) 68%, var(--glass-label))",
+          "color-destructive-ink": "color-mix(in oklch, var(--destructive) 68%, var(--glass-label))",
+          "color-glass-dim": "color-mix(in oklch, oklch(0 0 0) var(--glass-dim), transparent)",
+          "shadow-glass-knob": "0 3px 8px color-mix(in oklch, var(--glass-shadow-color) calc(var(--glass-shadow-opacity) + 8%), transparent), 0 1px 2px color-mix(in oklch, var(--glass-shadow-color) calc(var(--glass-shadow-opacity) + 4%), transparent)",
+          "shadow-glass-accent": "0 8px 22px color-mix(in oklch, var(--primary) 32%, transparent), inset 0 1px 0 color-mix(in oklch, oklch(1 0 0) 30%, transparent)",
           "color-aurora-base": "var(--aurora-base)",
           "color-aurora-1": "var(--aurora-1)",
           "color-aurora-2": "var(--aurora-2)",
@@ -77,6 +85,9 @@
           "glass-fill-opacity": "12%",
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
+          "glass-label": "oklch(0.145 0 0)",
+          "glass-label-secondary": "oklch(0.44 0.01 285)",
+          "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "85%",
           "glass-border-width": "1px",
@@ -85,6 +96,7 @@
           "glass-shadow-opacity": "12%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
+          "glass-dim": "15%",
           "glass-glow": "0%",
           "glass-radius-surface": "1.5rem",
           "glass-radius-control": "0.75rem",
@@ -135,6 +147,9 @@
           "glass-fill-opacity": "24%",
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
+          "glass-label": "oklch(0.985 0 0)",
+          "glass-label-secondary": "oklch(0.84 0.01 285)",
+          "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "12%",
           "glass-border-width": "1px",
@@ -143,6 +158,7 @@
           "glass-shadow-opacity": "45%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
+          "glass-dim": "45%",
           "glass-glow": "0%",
           "glass-radius-surface": "1.5rem",
           "glass-radius-control": "0.75rem",
@@ -176,8 +192,22 @@
         }
       },
       "css": {
+        "@custom-variant data-open (&:where([data-state=\"open\"]), &:where([data-open]:not([data-open=\"false\"])))": {},
+        "@custom-variant data-closed (&:where([data-state=\"closed\"]), &:where([data-closed]:not([data-closed=\"false\"])))": {},
+        "@custom-variant data-checked (&:where([data-state=\"checked\"]), &:where([data-checked]:not([data-checked=\"false\"])))": {},
+        "@custom-variant data-unchecked (&:where([data-state=\"unchecked\"]), &:where([data-unchecked]:not([data-unchecked=\"false\"])))": {},
+        "@custom-variant data-selected (&:where([data-state=\"selected\"]), &:where([data-selected]:not([data-selected=\"false\"])))": {},
+        "@custom-variant data-active (&:where([data-state=\"active\"]), &:where([data-active]:not([data-active=\"false\"])))": {},
+        "@custom-variant data-disabled (&:where([data-disabled]:not([data-disabled=\"false\"])))": {},
+        "@custom-variant data-horizontal (&:where([data-orientation=\"horizontal\"]))": {},
+        "@custom-variant data-vertical (&:where([data-orientation=\"vertical\"]))": {},
         "@utility glass": {
-          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tint) var(--glass-opacity), transparent))",
+          "color": "var(--glass-label)",
+          "--foreground": "var(--glass-label)",
+          "--card-foreground": "var(--glass-label)",
+          "--popover-foreground": "var(--glass-label)",
+          "--muted-foreground": "var(--glass-label-secondary)",
+          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) var(--glass-opacity), transparent))",
           "background-image": "linear-gradient(var(--glass-sheen-angle), color-mix(in oklch, oklch(1 0 0) var(--glass-sheen), transparent), transparent 55%), var(--glass-texture)",
           "border-width": "var(--glass-border-width)",
           "border-style": "solid",
@@ -187,7 +217,12 @@
           "box-shadow": "var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)), inset 0 1px 0 color-mix(in oklch, oklch(1 0 0) var(--glass-highlight-opacity), transparent), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) color-mix(in oklch, var(--primary) var(--glass-glow), transparent)"
         },
         "@utility glass-strong": {
-          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tint) var(--glass-opacity-strong), transparent))",
+          "color": "var(--glass-label)",
+          "--foreground": "var(--glass-label)",
+          "--card-foreground": "var(--glass-label)",
+          "--popover-foreground": "var(--glass-label)",
+          "--muted-foreground": "var(--glass-label-secondary)",
+          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) var(--glass-opacity-strong), transparent))",
           "background-image": "linear-gradient(var(--glass-sheen-angle), color-mix(in oklch, oklch(1 0 0) var(--glass-sheen), transparent), transparent 55%), var(--glass-texture)",
           "border-width": "var(--glass-border-width)",
           "border-style": "solid",
@@ -197,7 +232,12 @@
           "box-shadow": "var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)), inset 0 1px 0 color-mix(in oklch, oklch(1 0 0) var(--glass-highlight-opacity), transparent), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) color-mix(in oklch, var(--primary) var(--glass-glow), transparent)"
         },
         "@utility glass-subtle": {
-          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tint) var(--glass-opacity-subtle), transparent))",
+          "color": "var(--glass-label)",
+          "--foreground": "var(--glass-label)",
+          "--card-foreground": "var(--glass-label)",
+          "--popover-foreground": "var(--glass-label)",
+          "--muted-foreground": "var(--glass-label-secondary)",
+          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) var(--glass-opacity-subtle), transparent))",
           "background-image": "linear-gradient(var(--glass-sheen-angle), color-mix(in oklch, oklch(1 0 0) var(--glass-sheen), transparent), transparent 55%), var(--glass-texture)",
           "border-width": "var(--glass-border-width)",
           "border-style": "solid",
@@ -405,10 +445,10 @@
       ],
       "cssVars": {
         "light": {
-          "primary": "oklch(0.657 0.19 34.8)",
+          "primary": "oklch(0.557 0.19 34.8)",
           "primary-foreground": "oklch(0.99 0 0)",
-          "ring": "oklch(0.657 0.19 34.8)",
-          "chart-1": "oklch(0.657 0.19 34.8)",
+          "ring": "oklch(0.557 0.19 34.8)",
+          "chart-1": "oklch(0.557 0.19 34.8)",
           "chart-2": "oklch(0.685 0.189 296.4)",
           "chart-3": "oklch(0.803 0.159 69.8)",
           "chart-4": "oklch(0.55 0.128 95)",
@@ -420,7 +460,7 @@
         },
         "dark": {
           "primary": "oklch(0.728 0.171 36.5)",
-          "primary-foreground": "oklch(0.18 0.02 30)",
+          "primary-foreground": "oklch(0.18 0.02 35)",
           "ring": "oklch(0.728 0.171 36.5)",
           "chart-1": "oklch(0.728 0.171 36.5)",
           "chart-2": "oklch(0.685 0.189 296.4)",
@@ -445,10 +485,10 @@
       ],
       "cssVars": {
         "light": {
-          "primary": "oklch(0.583 0.203 259)",
+          "primary": "oklch(0.543 0.203 259)",
           "primary-foreground": "oklch(0.99 0 0)",
-          "ring": "oklch(0.583 0.203 259)",
-          "chart-1": "oklch(0.583 0.203 259)",
+          "ring": "oklch(0.543 0.203 259)",
+          "chart-1": "oklch(0.543 0.203 259)",
           "chart-2": "oklch(0.773 0.127 186.5)",
           "chart-3": "oklch(0.665 0.187 286.4)",
           "chart-4": "oklch(0.55 0.128 319)",
@@ -460,7 +500,7 @@
         },
         "dark": {
           "primary": "oklch(0.705 0.159 252.4)",
-          "primary-foreground": "oklch(0.18 0.02 30)",
+          "primary-foreground": "oklch(0.18 0.02 259)",
           "ring": "oklch(0.705 0.159 252.4)",
           "chart-1": "oklch(0.705 0.159 252.4)",
           "chart-2": "oklch(0.773 0.127 186.5)",
@@ -485,10 +525,10 @@
       ],
       "cssVars": {
         "light": {
-          "primary": "oklch(0.618 0.194 9.9)",
+          "primary": "oklch(0.558 0.194 9.9)",
           "primary-foreground": "oklch(0.99 0 0)",
-          "ring": "oklch(0.618 0.194 9.9)",
-          "chart-1": "oklch(0.618 0.194 9.9)",
+          "ring": "oklch(0.558 0.194 9.9)",
+          "chart-1": "oklch(0.558 0.194 9.9)",
           "chart-2": "oklch(0.698 0.191 302)",
           "chart-3": "oklch(0.771 0.143 43.5)",
           "chart-4": "oklch(0.55 0.128 70)",
@@ -500,7 +540,7 @@
         },
         "dark": {
           "primary": "oklch(0.719 0.182 8.2)",
-          "primary-foreground": "oklch(0.18 0.02 30)",
+          "primary-foreground": "oklch(0.18 0.02 10)",
           "ring": "oklch(0.719 0.182 8.2)",
           "chart-1": "oklch(0.719 0.182 8.2)",
           "chart-2": "oklch(0.698 0.191 302)",
@@ -525,10 +565,10 @@
       ],
       "cssVars": {
         "light": {
-          "primary": "oklch(0.589 0.126 157.8)",
+          "primary": "oklch(0.519 0.126 157.8)",
           "primary-foreground": "oklch(0.99 0 0)",
-          "ring": "oklch(0.589 0.126 157.8)",
-          "chart-1": "oklch(0.589 0.126 157.8)",
+          "ring": "oklch(0.519 0.126 157.8)",
+          "chart-1": "oklch(0.519 0.126 157.8)",
           "chart-2": "oklch(0.779 0.178 129)",
           "chart-3": "oklch(0.711 0.118 221.5)",
           "chart-4": "oklch(0.55 0.128 218)",
@@ -540,7 +580,7 @@
         },
         "dark": {
           "primary": "oklch(0.769 0.149 158.2)",
-          "primary-foreground": "oklch(0.18 0.02 30)",
+          "primary-foreground": "oklch(0.18 0.02 158)",
           "ring": "oklch(0.769 0.149 158.2)",
           "chart-1": "oklch(0.769 0.149 158.2)",
           "chart-2": "oklch(0.779 0.178 129)",
@@ -565,10 +605,10 @@
       ],
       "cssVars": {
         "light": {
-          "primary": "oklch(0.65 0.144 65.8)",
+          "primary": "oklch(0.54 0.144 65.8)",
           "primary-foreground": "oklch(0.99 0 0)",
-          "ring": "oklch(0.65 0.144 65.8)",
-          "chart-1": "oklch(0.65 0.144 65.8)",
+          "ring": "oklch(0.54 0.144 65.8)",
+          "chart-1": "oklch(0.54 0.144 65.8)",
           "chart-2": "oklch(0.712 0.183 34)",
           "chart-3": "oklch(0.823 0.164 94.1)",
           "chart-4": "oklch(0.55 0.128 126)",
@@ -580,7 +620,7 @@
         },
         "dark": {
           "primary": "oklch(0.82 0.152 73.2)",
-          "primary-foreground": "oklch(0.18 0.02 30)",
+          "primary-foreground": "oklch(0.18 0.02 66)",
           "ring": "oklch(0.82 0.152 73.2)",
           "chart-1": "oklch(0.82 0.152 73.2)",
           "chart-2": "oklch(0.712 0.183 34)",
@@ -645,10 +685,10 @@
       ],
       "cssVars": {
         "light": {
-          "primary": "oklch(0.6 0.15 300)",
+          "primary": "oklch(0.55 0.15 300)",
           "primary-foreground": "oklch(0.99 0 0)",
-          "ring": "oklch(0.6 0.15 300)",
-          "chart-1": "oklch(0.6 0.15 300)",
+          "ring": "oklch(0.55 0.15 300)",
+          "chart-1": "oklch(0.55 0.15 300)",
           "chart-2": "oklch(0.66 0.15 338)",
           "chart-3": "oklch(0.78 0.128 266)",
           "chart-4": "oklch(0.55 0.12 0)",
@@ -685,10 +725,10 @@
       ],
       "cssVars": {
         "light": {
-          "primary": "oklch(0.6 0.13 165)",
+          "primary": "oklch(0.51 0.13 165)",
           "primary-foreground": "oklch(0.99 0 0)",
-          "ring": "oklch(0.6 0.13 165)",
-          "chart-1": "oklch(0.6 0.13 165)",
+          "ring": "oklch(0.51 0.13 165)",
+          "chart-1": "oklch(0.51 0.13 165)",
           "chart-2": "oklch(0.66 0.13 315)",
           "chart-3": "oklch(0.78 0.111 15)",
           "chart-4": "oklch(0.55 0.104 225)",
@@ -725,10 +765,10 @@
       ],
       "cssVars": {
         "light": {
-          "primary": "oklch(0.6 0.2 22)",
+          "primary": "oklch(0.56 0.2 22)",
           "primary-foreground": "oklch(0.99 0 0)",
-          "ring": "oklch(0.6 0.2 22)",
-          "chart-1": "oklch(0.6 0.2 22)",
+          "ring": "oklch(0.56 0.2 22)",
+          "chart-1": "oklch(0.56 0.2 22)",
           "chart-2": "oklch(0.66 0.2 202)",
           "chart-3": "oklch(0.78 0.17 46)",
           "chart-4": "oklch(0.55 0.16 82)",
@@ -765,10 +805,10 @@
       ],
       "cssVars": {
         "light": {
-          "primary": "oklch(0.6 0.14 200)",
+          "primary": "oklch(0.5 0.14 200)",
           "primary-foreground": "oklch(0.99 0 0)",
-          "ring": "oklch(0.6 0.14 200)",
-          "chart-1": "oklch(0.6 0.14 200)",
+          "ring": "oklch(0.5 0.14 200)",
+          "chart-1": "oklch(0.5 0.14 200)",
           "chart-2": "oklch(0.66 0.14 238)",
           "chart-3": "oklch(0.78 0.119 166)",
           "chart-4": "oklch(0.55 0.112 260)",
@@ -805,10 +845,10 @@
       ],
       "cssVars": {
         "light": {
-          "primary": "oklch(0.6 0.07 70)",
+          "primary": "oklch(0.535 0.07 70)",
           "primary-foreground": "oklch(0.99 0 0)",
-          "ring": "oklch(0.6 0.07 70)",
-          "chart-1": "oklch(0.6 0.07 70)",
+          "ring": "oklch(0.535 0.07 70)",
+          "chart-1": "oklch(0.535 0.07 70)",
           "chart-2": "oklch(0.66 0.07 78)",
           "chart-3": "oklch(0.78 0.06 62)",
           "chart-4": "oklch(0.55 0.056 130)",
@@ -845,10 +885,10 @@
       ],
       "cssVars": {
         "light": {
-          "primary": "oklch(0.6 0.19 275)",
+          "primary": "oklch(0.545 0.19 275)",
           "primary-foreground": "oklch(0.99 0 0)",
-          "ring": "oklch(0.6 0.19 275)",
-          "chart-1": "oklch(0.6 0.19 275)",
+          "ring": "oklch(0.545 0.19 275)",
+          "chart-1": "oklch(0.545 0.19 275)",
           "chart-2": "oklch(0.66 0.19 35)",
           "chart-3": "oklch(0.78 0.162 155)",
           "chart-4": "oklch(0.55 0.152 335)",
@@ -899,6 +939,9 @@
           "glass-fill-opacity": "12%",
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
+          "glass-label": "oklch(0.145 0 0)",
+          "glass-label-secondary": "oklch(0.44 0.01 285)",
+          "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "85%",
           "glass-border-width": "1px",
@@ -907,6 +950,7 @@
           "glass-shadow-opacity": "12%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
+          "glass-dim": "15%",
           "glass-glow": "0%"
         },
         "dark": {
@@ -924,6 +968,9 @@
           "glass-fill-opacity": "24%",
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
+          "glass-label": "oklch(0.985 0 0)",
+          "glass-label-secondary": "oklch(0.84 0.01 285)",
+          "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "12%",
           "glass-border-width": "1px",
@@ -932,6 +979,7 @@
           "glass-shadow-opacity": "45%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
+          "glass-dim": "45%",
           "glass-glow": "0%"
         }
       }
@@ -961,6 +1009,9 @@
           "glass-fill-opacity": "12%",
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
+          "glass-label": "oklch(0.145 0 0)",
+          "glass-label-secondary": "oklch(0.44 0.01 285)",
+          "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "85%",
           "glass-border-width": "1px",
@@ -969,6 +1020,7 @@
           "glass-shadow-opacity": "12%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
+          "glass-dim": "15%",
           "glass-glow": "0%"
         },
         "dark": {
@@ -986,6 +1038,9 @@
           "glass-fill-opacity": "24%",
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
+          "glass-label": "oklch(0.985 0 0)",
+          "glass-label-secondary": "oklch(0.84 0.01 285)",
+          "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "12%",
           "glass-border-width": "1px",
@@ -994,6 +1049,7 @@
           "glass-shadow-opacity": "45%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
+          "glass-dim": "45%",
           "glass-glow": "0%"
         }
       }
@@ -1023,6 +1079,9 @@
           "glass-fill-opacity": "12%",
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
+          "glass-label": "oklch(0.145 0 0)",
+          "glass-label-secondary": "oklch(0.44 0.01 285)",
+          "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "100%",
           "glass-border-width": "1.5px",
@@ -1031,6 +1090,7 @@
           "glass-shadow-opacity": "12%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
+          "glass-dim": "15%",
           "glass-glow": "0%"
         },
         "dark": {
@@ -1048,6 +1108,9 @@
           "glass-fill-opacity": "24%",
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
+          "glass-label": "oklch(0.985 0 0)",
+          "glass-label-secondary": "oklch(0.84 0.01 285)",
+          "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "28%",
           "glass-border-width": "1.5px",
@@ -1056,6 +1119,7 @@
           "glass-shadow-opacity": "45%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
+          "glass-dim": "45%",
           "glass-glow": "0%"
         }
       }
@@ -1072,19 +1136,22 @@
       "cssVars": {
         "light": {
           "glass-tint": "oklch(0.2 0.01 270)",
-          "glass-opacity": "58%",
-          "glass-opacity-strong": "82%",
-          "glass-opacity-subtle": "40%",
+          "glass-opacity": "72%",
+          "glass-opacity-strong": "86%",
+          "glass-opacity-subtle": "62%",
           "glass-blur": "30px",
           "glass-saturate": "140%",
           "glass-brightness": "85%",
           "glass-sheen": "6%",
           "glass-sheen-angle": "160deg",
           "glass-texture": "none",
-          "glass-fill-tint": "oklch(0.55 0.01 285)",
-          "glass-fill-opacity": "12%",
-          "glass-fill-opacity-strong": "20%",
-          "glass-thumb": "oklch(1 0 0)",
+          "glass-fill-tint": "oklch(0.6 0.01 285)",
+          "glass-fill-opacity": "24%",
+          "glass-fill-opacity-strong": "36%",
+          "glass-thumb": "oklch(1 0 0 / 20%)",
+          "glass-label": "oklch(0.985 0 0)",
+          "glass-label-secondary": "oklch(0.88 0.01 270)",
+          "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "16%",
           "glass-border-width": "1px",
@@ -1093,6 +1160,7 @@
           "glass-shadow-opacity": "30%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
+          "glass-dim": "15%",
           "glass-glow": "0%"
         },
         "dark": {
@@ -1110,6 +1178,9 @@
           "glass-fill-opacity": "24%",
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
+          "glass-label": "oklch(0.985 0 0)",
+          "glass-label-secondary": "oklch(0.84 0.01 285)",
+          "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "12%",
           "glass-border-width": "1px",
@@ -1118,6 +1189,7 @@
           "glass-shadow-opacity": "45%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
+          "glass-dim": "45%",
           "glass-glow": "0%"
         }
       }
@@ -1147,6 +1219,9 @@
           "glass-fill-opacity": "12%",
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
+          "glass-label": "oklch(0.145 0 0)",
+          "glass-label-secondary": "oklch(0.44 0.01 285)",
+          "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "85%",
           "glass-border-width": "1px",
@@ -1155,6 +1230,7 @@
           "glass-shadow-opacity": "12%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
+          "glass-dim": "15%",
           "glass-glow": "0%"
         },
         "dark": {
@@ -1172,6 +1248,9 @@
           "glass-fill-opacity": "24%",
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
+          "glass-label": "oklch(0.985 0 0)",
+          "glass-label-secondary": "oklch(0.84 0.01 285)",
+          "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "12%",
           "glass-border-width": "1px",
@@ -1180,6 +1259,7 @@
           "glass-shadow-opacity": "45%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
+          "glass-dim": "45%",
           "glass-glow": "0%"
         }
       }
@@ -1209,6 +1289,9 @@
           "glass-fill-opacity": "12%",
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
+          "glass-label": "oklch(0.145 0 0)",
+          "glass-label-secondary": "oklch(0.44 0.01 285)",
+          "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "35%",
           "glass-border-width": "1px",
@@ -1217,6 +1300,7 @@
           "glass-shadow-opacity": "12%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "60px",
+          "glass-dim": "15%",
           "glass-glow": "0%"
         },
         "dark": {
@@ -1234,6 +1318,9 @@
           "glass-fill-opacity": "24%",
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
+          "glass-label": "oklch(0.985 0 0)",
+          "glass-label-secondary": "oklch(0.84 0.01 285)",
+          "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "6%",
           "glass-border-width": "1px",
@@ -1242,6 +1329,7 @@
           "glass-shadow-opacity": "45%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "60px",
+          "glass-dim": "45%",
           "glass-glow": "0%"
         }
       }
@@ -1271,6 +1359,9 @@
           "glass-fill-opacity": "12%",
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
+          "glass-label": "oklch(0.145 0 0)",
+          "glass-label-secondary": "oklch(0.44 0.01 285)",
+          "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "70%",
           "glass-border-width": "1px",
@@ -1279,6 +1370,7 @@
           "glass-shadow-opacity": "12%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
+          "glass-dim": "15%",
           "glass-glow": "38%"
         },
         "dark": {
@@ -1296,6 +1388,9 @@
           "glass-fill-opacity": "24%",
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
+          "glass-label": "oklch(0.985 0 0)",
+          "glass-label-secondary": "oklch(0.84 0.01 285)",
+          "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "22%",
           "glass-border-width": "1px",
@@ -1304,6 +1399,7 @@
           "glass-shadow-opacity": "45%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
+          "glass-dim": "45%",
           "glass-glow": "38%"
         }
       }
@@ -3168,7 +3264,7 @@
             "font-family": "var(--glass-font-mono, --theme(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace))",
             "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), -1))",
             "line-height": "1.6",
-            "background-color": "color-mix(in oklch, var(--glass-tint) var(--glass-opacity-subtle), transparent)",
+            "background-color": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) var(--glass-opacity-subtle), transparent)",
             "border": "var(--glass-border-width) solid color-mix(in oklch, var(--glass-border-color) var(--glass-border-opacity), transparent)",
             "border-radius": "var(--glass-radius-control)",
             "padding": "1em 1.2em",
@@ -3578,6 +3674,31 @@
           "path": "src/components/glass/dialog.tsx",
           "type": "registry:ui",
           "target": "@components/glass/dialog.tsx"
+        }
+      ]
+    },
+    {
+      "name": "alert-dialog",
+      "type": "registry:ui",
+      "title": "Alert dialog",
+      "description": "An Apple-style alert on strong glass: a bold title, a short message and capsule actions — for confirming destructive or irreversible choices. Only its buttons close it.",
+      "categories": [
+        "glass",
+        "overlays"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/button.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/alert-dialog.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/alert-dialog.tsx"
         }
       ]
     },
@@ -4912,6 +5033,31 @@
           "path": "registry/native/dialog.tsx",
           "type": "registry:ui",
           "target": "@components/glass/native/dialog.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-alert-dialog",
+      "type": "registry:ui",
+      "title": "Alert dialog (native)",
+      "description": "An Apple-style alert on strong glass: a bold title, a short message and capsule actions — for confirming destructive or irreversible choices. Only its buttons close it. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-button.json",
+        "{REGISTRY_URL}/r/native-dialog.json",
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/alert-dialog.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/alert-dialog.tsx"
         }
       ]
     },

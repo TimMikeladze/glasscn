@@ -24,7 +24,7 @@ export interface OgCard {
   description?: string
   /** Small pill above the title — a section or group. */
   eyebrow?: string
-  /** Footer left: a command shown in mono, e.g. `npx shadcn add @glasscn/button`. */
+  /** Footer left: a command shown in mono, e.g. `npx shadcn add @glasscn-app/button`. */
   command?: string
   /** The page this card is for, e.g. `/docs/button` (used by page metadata). */
   path?: string

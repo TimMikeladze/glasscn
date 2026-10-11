@@ -9,7 +9,7 @@ import { scaleLinear } from "@tanstack/charts/scales/linear"
 import { tooltip } from "@tanstack/charts/tooltip"
 
 import { ChartContainer, ChartLegend, chartColor, seriesTooltip, xScaleFor, type ChartSeries } from "@/components/glass/chart"
-import { monotoneCurve, runningTotals } from "@/lib/glass-charts"
+import { monotoneCurve, runningTotals, sanitizeId } from "@/lib/glass-charts"
 
 type XValue = string | number | Date
 
@@ -45,6 +45,8 @@ function AreaChart<Row>({
   grid?: boolean
   curve?: "smooth" | "linear"
 }) {
+  // unique per chart, so two area charts on a page never share gradients
+  const uid = sanitizeId(React.useId())
   const definition = React.useMemo(() => {
     const colors = series.map((s, i) => s.color ?? chartColor(i))
     const path = curve === "smooth" ? monotoneCurve : undefined
@@ -64,7 +66,7 @@ function AreaChart<Row>({
             y2: top(i),
             z: () => s.id,
             color: () => s.id,
-            fill: `url(#area-${i})`,
+            fill: `url(#area-${uid}-${i})`,
             fillOpacity: 1,
             curve: path,
           })
@@ -79,7 +81,7 @@ function AreaChart<Row>({
       },
       color: { domain: series.map((s) => s.id), range: colors },
       gradients: colors.map((color, i) => ({
-        id: `area-${i}`,
+        id: `area-${uid}-${i}`,
         x1: 0,
         y1: 0,
         x2: 0,
@@ -99,11 +101,11 @@ function AreaChart<Row>({
         content: seriesTooltip(series, x, { xFormat, valueFormat }),
       },
     })
-  }, [data, x, series, stacked, valueFormat, xFormat, grid, curve])
+  }, [uid, data, x, series, stacked, valueFormat, xFormat, grid, curve])
 
   return (
     <div data-slot="area-chart" className={cn("grid w-full gap-3", className)} {...props}>
-      <ChartContainer definition={definition} ariaLabel={ariaLabel} height={height} />
+      <ChartContainer definition={definition} ariaLabel={ariaLabel} height={height} idPrefix={`area-chart-${uid}`} />
       {legend ? <ChartLegend items={series.map((s, i) => ({ label: s.label, color: s.color ?? chartColor(i) }))} /> : null}
     </div>
   )

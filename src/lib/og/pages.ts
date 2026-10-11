@@ -1,5 +1,6 @@
 /** Copy for the hand-written pages — shared by each page's metadata and its share card. */
 import type { OgCard } from "@/lib/og/render"
+import { registryNamespace } from "@/lib/site"
 
 export interface PageCopy extends OgCard {
   title: string
@@ -12,7 +13,7 @@ export const PAGES = {
     title: "Glass components for shadcn",
     description: "Frosted surfaces, a living aurora and iOS-grade controls — installed as source.",
     path: "/",
-    command: "npx shadcn add @glasscn/button",
+    command: `npx shadcn add ${registryNamespace}/button`,
     palette: "dusk",
   },
   themes: {
@@ -34,7 +35,7 @@ export const PAGES = {
     description: "Three commands in any project that uses shadcn — Next.js, Vite, React Router, Astro, TanStack Start.",
     path: "/docs/installation",
     eyebrow: "Guides",
-    command: "npx shadcn add @glasscn/glass-style",
+    command: `npx shadcn add ${registryNamespace}/glass-style`,
     palette: "lagoon",
   },
   theming: {
@@ -61,3 +62,13 @@ export const PAGES = {
 } satisfies Record<string, PageCopy>
 
 export type PageKey = keyof typeof PAGES
+
+/** The guide pages, in docs-nav order — shared by the nav, the sitemap and llms.txt. */
+export const GUIDES: (PageCopy & { label: string })[] = [
+  { ...PAGES.docs, label: "Introduction" },
+  { ...PAGES.installation, label: "Installation" },
+  { ...PAGES.theming, label: "Theming" },
+  { ...PAGES.fonts, label: "Fonts & type" },
+  { ...PAGES.themes, label: "Studio" },
+  { ...PAGES.native, label: "React Native" },
+]

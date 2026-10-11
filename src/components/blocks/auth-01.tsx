@@ -46,7 +46,7 @@ export function Auth01({ onSubmit }: { onSubmit?: (data: { email: string; passwo
             or
             <Separator className="flex-1" />
           </div>
-          <Button type="button" variant="glass" className="w-full">
+          <Button type="button" variant="secondary" className="w-full">
             Continue with a passkey
           </Button>
         </form>

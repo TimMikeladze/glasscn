@@ -5,18 +5,15 @@ import { ThemeProvider } from "next-themes"
 
 import { TooltipProvider } from "@/components/glass/tooltip"
 import { Toaster } from "@/components/glass/toaster"
-import { PALETTES as PALETTE_DEFS } from "@/lib/glass-theme"
-
-export const PALETTES = Object.keys(PALETTE_DEFS)
 export type Palette = string
 const KEY = "glasscn-palette"
 
-const PaletteContext = React.createContext<{ palette: Palette; setPalette: (p: Palette) => void }>({ palette: "dusk", setPalette: () => {} })
+const PaletteContext = React.createContext<{ palette: Palette; setPalette: (p: Palette) => void; palettes: Palette[] }>({ palette: "dusk", setPalette: () => {}, palettes: ["dusk"] })
 
-function readPalette(): Palette {
+function readPalette(palettes: Palette[]): Palette {
   try {
     const v = localStorage.getItem(KEY)
-    return v && PALETTES.includes(v) ? v : "dusk"
+    return v && palettes.includes(v) ? v : "dusk"
   } catch {
     return "dusk"
   }
@@ -31,13 +28,17 @@ const subscribe = (cb: () => void) => {
   }
 }
 
-/** The palette lives on <html data-palette> (set before paint by paletteScript) and in localStorage. */
+/** The palette lives on <html data-palette> (set before paint by paletteScript) and in localStorage. `palettes` lists the choices. */
 export function usePalette() {
   return React.useContext(PaletteContext)
 }
 
-export function Providers({ children }: { children: React.ReactNode }) {
-  const palette = React.useSyncExternalStore(subscribe, readPalette, () => "dusk")
+/**
+ * `palettes` (the palette names) comes from the server layout, so the palette definitions in
+ * glass-theme never ship to the browser just to list their keys.
+ */
+export function Providers({ palettes, children }: { palettes: Palette[]; children: React.ReactNode }) {
+  const palette = React.useSyncExternalStore(subscribe, () => readPalette(palettes), () => "dusk")
   const setPalette = React.useCallback((p: Palette) => {
     try {
       localStorage.setItem(KEY, p)
@@ -45,7 +46,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     document.documentElement.dataset.palette = p
     window.dispatchEvent(new Event("glasscn-palette"))
   }, [])
-  const value = React.useMemo(() => ({ palette, setPalette }), [palette, setPalette])
+  const value = React.useMemo(() => ({ palette, setPalette, palettes }), [palette, setPalette, palettes])
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <PaletteContext.Provider value={value}>
