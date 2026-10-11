@@ -1,5 +1,6 @@
 import * as React from "react"
 import { Platform, ScrollView, StyleSheet, Text, View, type TextProps } from "react-native"
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import { Aurora } from "@/components/glass/native/aurora"
@@ -14,16 +15,19 @@ export function surfaceName() {
   return Platform.select({ ios: "UIVisualEffect blur", web: "backdrop-filter", default: "translucent fill" })
 }
 
+// native: focused inputs scroll above the keyboard (keyboard-controller); the web has no on-screen keyboard to dodge
+const Scroller = Platform.OS === "web" ? ScrollView : KeyboardAwareScrollView
+
 /** A screen: the aurora ground, the theme picker, then scrolling content. */
 export function Screen({ children, picker = true }: { children: React.ReactNode; picker?: boolean }) {
   const insets = useSafeAreaInsets()
   return (
     <View style={{ flex: 1 }}>
       <Aurora />
-      <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 32, gap: 16 }}>
+      <Scroller contentInsetAdjustmentBehavior="automatic" bottomOffset={16} keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 32, gap: 16 }}>
         {picker ? <ThemePicker /> : null}
         {children}
-      </ScrollView>
+      </Scroller>
     </View>
   )
 }

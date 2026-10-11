@@ -3,6 +3,8 @@ appId: host.exp.Exponent
 tags:
   - util
 ---
+# cold start: every flow begins from fresh state, not the last flow's screen
+- stopApp
 - openLink: ${APP_URL}/--/${ROUTE}?${QUERY || ""}
 - extendedWaitUntil:
     visible:

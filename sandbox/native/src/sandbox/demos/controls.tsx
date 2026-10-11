@@ -222,7 +222,7 @@ function SliderDemo() {
         <Slider value={one} onValueChange={setOne} accessibilityLabel="Volume" />
       </Section>
       <Section title="Glass (native={false}) · icons · bubble" note="Vertical drags still scroll the page.">
-        <Slider native={false} value={one} onValueChange={setOne} valueBubble formatValue={(n) => `${n}%`} minIcon={<SunIcon size={16} />} maxIcon={<SunIcon size={22} />} accessibilityLabel="Brightness" />
+        <Slider native={false} value={one} onValueChange={setOne} valueBubble formatValue={(n) => `${n}%`} minIcon={<SunIcon size={16} />} maxIcon={<SunIcon size={22} />} accessibilityLabel="Brightness" testID="brightness" />
       </Section>
       <Section title="Range · step 5" note={`${range[0]} – ${range[1]} · committed ${committed.join(" – ") || "—"}`}>
         <Slider value={range} onValueChange={setRange} onValueCommit={setCommitted} step={5} accessibilityLabel="Hours" />

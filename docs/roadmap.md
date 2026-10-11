@@ -534,8 +534,8 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 
 - [x] **NAT-50** P0 test — Unit (root vitest): chart-math, `placeFloating`, slider snapping, toaster store, **token parity** (generated native tokens vs `createGlassTheme` within ΔE threshold).
 - [x] **NAT-51** P1 test — Component (jest-expo + RNTL): controlled/uncontrolled state, a11y role/state/value, text-in-`Text` safety, and a structural test failing if `Press` or any opacity-animated node wraps `Glass`.
-- [ ] **NAT-52** P1 test — E2E (Maestro on iOS 26/27 sim + Android emulator in CI): a flow per `/c/<name>` (swipe toast, slider in ScrollView, menu, composer + keyboard) with screenshots; runs with `forceRTL`, largest Dynamic Type, Reduce Transparency, Increase Contrast. *(M4: Maestro flows written; toast-swipe passes on the iOS 26.5 sim; slider/composer/menu not yet green, no CI job)*
-- [ ] **NAT-53** P1 test — Visual diffs of Maestro screenshots per palette × scheme. *(M4: no visual baselines recorded yet)*
+- [ ] **NAT-52** P1 test — E2E (Maestro on iOS 26/27 sim + Android emulator in CI): a flow per `/c/<name>` (swipe toast, slider in ScrollView, menu, composer + keyboard) with screenshots; runs with `forceRTL`, largest Dynamic Type, Reduce Transparency, Increase Contrast. *(M4: 6 flows green on the iOS 26.5 sim incl. Reduce Transparency + Increase Contrast; left: CI job, Android emulator, RTL / largest Dynamic Type runs)*
+- [x] **NAT-53** P1 test — Visual diffs of Maestro screenshots per palette × scheme. *(M4: 28 baselines in `sandbox/native/.maestro/baselines/`, `npm run visual`)*
 - [x] **NAT-54** P1 test — `verify:native` also runs component tests against the shadcn-installed copy.
 - [x] **NAT-76** P1 infra — Reanimated 4.5, worklets, gesture-handler installed in sandbox but unused by the registry; `@expo/ui` only transitive. → Declare as item deps when adopted.
 - [x] **NAT-77** P1 platform — iOS 27 SDK requires scene-based lifecycle: SDK 57 needs `ios.enableSceneSupport` (expo ≥ 57.0.23) via `expo-build-properties`; default in SDK 58. Set in sandbox; document.

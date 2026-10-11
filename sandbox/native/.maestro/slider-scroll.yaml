@@ -8,15 +8,15 @@ name: Slider inside a ScrollView — horizontal drag moves it, vertical drag scr
 - assertVisible: "value = 40 — iOS/Android render the system slider"
 - swipe:
     from:
-      label: "Brightness"
+      id: "brightness"
     direction: RIGHT
-    duration: 600
+    duration: 800
 - assertNotVisible: "value = 40 — iOS/Android render the system slider"
 - takeScreenshot: screenshots/slider-dragged
 # a vertical swipe on the slider scrolls the page instead of moving it
 - swipe:
     from:
-      label: "Brightness"
+      id: "brightness"
     direction: UP
 - assertVisible:
     text: "Ticks · neutral value"

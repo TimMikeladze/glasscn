@@ -38,6 +38,8 @@
     "@types/react": "~19.2.2",
     "jest": "~29.7.0",
     "jest-expo": "~57.0.5",
+    "pixelmatch": "^7.2.0",
+    "pngjs": "^7.0.0",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -48,7 +50,10 @@
     "typecheck": "tsc --noEmit",
     "export:web": "expo export --platform web",
     "lint": "expo lint",
-    "test": "jest"
+    "test": "jest",
+    "visual": "node scripts/visual.mjs",
+    "visual:update": "node scripts/visual.mjs --update",
+    "e2e": "maestro test --exclude-tags util .maestro/"
   },
   "private": true
 }

@@ -1,0 +1,27 @@
+appId: host.exp.Exponent
+name: Visual baselines — Reduce Transparency and Increase Contrast, light and dark (NAT-52/53)
+---
+- runFlow:
+    file: _open.yaml
+    env:
+      ROUTE: c/card
+      QUERY: palette=dusk&scheme=light&still=1&force=reduceTransparency
+- takeScreenshot: screenshots/a11y-solid-light
+- runFlow:
+    file: _open.yaml
+    env:
+      ROUTE: c/card
+      QUERY: palette=dusk&scheme=dark&still=1&force=reduceTransparency
+- takeScreenshot: screenshots/a11y-solid-dark
+- runFlow:
+    file: _open.yaml
+    env:
+      ROUTE: c/card
+      QUERY: palette=dusk&scheme=light&still=1&force=highContrast
+- takeScreenshot: screenshots/a11y-contrast-light
+- runFlow:
+    file: _open.yaml
+    env:
+      ROUTE: c/card
+      QUERY: palette=dusk&scheme=dark&still=1&force=highContrast
+- takeScreenshot: screenshots/a11y-contrast-dark

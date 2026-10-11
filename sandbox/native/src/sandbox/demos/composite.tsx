@@ -425,7 +425,7 @@ function ChatDemo() {
               <ChatSuggestion>Try mornings</ChatSuggestion>
               <ChatSuggestion value="skip">Skip tomorrow</ChatSuggestion>
             </ChatSuggestions>
-            <ChatComposer style={{ marginHorizontal: 12, width: "auto" }} placeholder="Reply to Kai" onSubmit={reply} />
+            <ChatComposer style={{ marginHorizontal: 12, width: "auto" }} placeholder="Reply to Kai" onSubmit={reply} textInputProps={{ testID: "composer" }} />
           </View>
         </Glass>
       </Section>

@@ -42,14 +42,51 @@ export type PressProps = Omit<PressableProps, "style"> & {
    */
   dim?: boolean
   style?: StyleProp<ViewStyle> | ((state: PressableStateCallbackType) => StyleProp<ViewStyle>)
+  /**
+   * Radix's `asChild`: render the single child (a Button, a custom pressable) instead of a
+   * Press of its own, merging onPress / onLongPress and accessibility props into it — so a
+   * trigger wrapping a Button doesn't nest two pressables (the inner one would swallow the tap).
+   */
+  asChild?: boolean
 }
+
+type Pressish = { onPress?: (e: GestureResponderEvent) => void; onLongPress?: (e: GestureResponderEvent) => void; style?: unknown }
+const chain =
+  <E,>(a?: (e: E) => void, b?: (e: E) => void) =>
+  (e: E) => {
+    a?.(e)
+    b?.(e)
+  }
 
 /**
  * Every tappable thing: an elastic spring press (solid squashes wider-and-shorter,
  * liquid grows), an optional dim, a selection haptic when asked, and a hover lift.
  * Reanimated on the UI thread; none of it under Reduce Motion.
  */
-export function Press({ haptic = false, squash, hover = 1, liquid = false, dim = false, style, onPress, onPressIn, onPressOut, onHoverIn, onHoverOut, disabled, accessibilityRole = "button", ...props }: PressProps) {
+export function Press(props: PressProps) {
+  // triggers map string children into text first, so the single child may arrive in an array
+  const only = props.asChild && typeof props.children !== "function" ? React.Children.toArray(props.children) : []
+  if (only.length === 1 && React.isValidElement<Pressish>(only[0])) return <PressSlot {...props}>{only[0]}</PressSlot>
+  return <PressView {...props} />
+}
+
+function PressSlot({ children, onPress, onLongPress, haptic, style, asChild: _a, squash: _s, hover: _h, liquid: _l, dim: _d, ...rest }: PressProps) {
+  const child = children as React.ReactElement<Pressish>
+  const own = typeof style === "function" ? style({ pressed: false, hovered: false }) : style
+  return React.cloneElement(child, {
+    // accessibility and state props from the trigger (aria-expanded, aria-haspopup…), the child's own win
+    ...(rest as object),
+    ...child.props,
+    onPress: chain<GestureResponderEvent>(child.props.onPress, (e) => {
+      if (haptic) haptics.selection()
+      onPress?.(e)
+    }),
+    onLongPress: onLongPress || child.props.onLongPress ? chain(child.props.onLongPress, onLongPress ?? undefined) : undefined,
+    style: own ? [own, child.props.style as StyleProp<ViewStyle>] : child.props.style,
+  })
+}
+
+function PressView({ haptic = false, squash, hover = 1, liquid = false, dim = false, style, onPress, onPressIn, onPressOut, onHoverIn, onHoverOut, disabled, accessibilityRole = "button", asChild: _asChild, ...props }: PressProps) {
   const ui = useUI()
   const still = useReducedMotion() || ui.motion.duration === 0
   const sx = useSharedValue(1)

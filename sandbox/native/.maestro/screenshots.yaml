@@ -13,6 +13,6 @@ name: Visual baselines — one screen per palette × scheme (NAT-53)
           file: _open.yaml
           env:
             ROUTE: c/card
-            QUERY: palette=${output.shots[output.i].palette}&scheme=${output.shots[output.i].scheme}
+            QUERY: palette=${output.shots[output.i].palette}&scheme=${output.shots[output.i].scheme}&still=1
       - takeScreenshot: screenshots/card-${output.shots[output.i].palette}-${output.shots[output.i].scheme}
       - evalScript: ${output.i = output.i + 1}

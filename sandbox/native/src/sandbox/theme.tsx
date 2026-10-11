@@ -38,7 +38,7 @@ const Ctx = React.createContext<SandboxTheme | null>(null)
 
 /**
  * The palette, scheme, presets and forced a11y settings every screen renders in;
- * starts on the system scheme. A deep link's `?palette=…&scheme=…` query (Maestro's
+ * starts on the system scheme. A deep link's `?palette=…&scheme=…&still=1` query (Maestro's
  * screenshot flows use it) picks them on launch.
  */
 export function SandboxThemeProvider({ children }: { children: React.ReactNode }) {
@@ -54,6 +54,13 @@ export function SandboxThemeProvider({ children }: { children: React.ReactNode }
     const q = Linking.parse(url).queryParams ?? {}
     if (typeof q.palette === "string" && PALETTES.includes(q.palette as PaletteName)) setPalette(q.palette as PaletteName)
     if (q.scheme === "light" || q.scheme === "dark") setScheme(q.scheme)
+    // ?still=1 forces Reduce Motion: the aurora freezes, so screenshots are stable baselines
+    // ?force=reduceTransparency,highContrast forces settings on, like the /tokens chips
+    const forced = [...(q.still === "1" ? ["reduceMotion"] : []), ...(typeof q.force === "string" ? q.force.split(",") : [])].filter((k): k is A11ySetting =>
+      ["reduceMotion", "reduceTransparency", "highContrast", "boldText"].includes(k)
+    )
+    for (const k of forced) forceA11y(k, true)
+    if (forced.length) setA11yState((s) => ({ ...s, ...Object.fromEntries(forced.map((k) => [k, true])) }))
   }, [url])
 
   const value = React.useMemo<SandboxTheme>(

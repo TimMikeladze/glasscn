@@ -17,14 +17,19 @@ Three layers (NAT-50..54), cheapest first.
 
 `pnpm verify:native` (NAT-54) copies the tests into the shadcn-installed app and runs them with `GLASS_NATIVE_DIR` pointing at the installed `src/components/glass/native`.
 
-**E2E — Maestro (`sandbox/native/.maestro/`).** Flows: `toast-swipe`, `slider-scroll` (slider inside the ScrollView), `menu`, `composer-keyboard`, and `screenshots` (the card demo per palette × scheme, via the sandbox's `?palette=&scheme=` deep-link query — NAT-53 baselines land in `.maestro/screenshots/`). Needs Java 17 and Maestro (`curl -fsSL https://get.maestro.mobile.dev | bash`):
+**E2E — Maestro (`sandbox/native/.maestro/`).** Flows: `toast-swipe`, `slider-scroll` (horizontal drag moves the slider, vertical drag scrolls), `menu` (the system menu: open, pick, toast), `composer-keyboard` (input scrolls above the keyboard, one tap sends), and two visual flows — `screenshots` (the card demo per palette × scheme) and `screenshots-a11y` (Reduce Transparency and Increase Contrast, light and dark). `_open.yaml` cold-starts Expo Go and deep-links `?palette=&scheme=&still=1&force=…` (`still` forces Reduce Motion so the aurora is frozen; `force` turns a11y settings on). Needs Java 17 (`brew install openjdk@17`) and Maestro (`curl -fsSL https://get.maestro.mobile.dev | bash`):
 
 ```bash
 cd sandbox/native && npx expo start --port 8091   # not CI=1 (stale bundles)
-JAVA_HOME=$(brew --prefix openjdk@17) maestro --device <sim-udid> test -e APP_URL=exp://127.0.0.1:8091 .maestro
+export JAVA_HOME=$(brew --prefix openjdk@17)
+maestro --device <sim-udid> test -e APP_URL=exp://127.0.0.1:8091 --exclude-tags util .maestro/   # npm run e2e
+npm run visual           # NAT-53: diff the latest visual runs against .maestro/baselines/ (status bar cropped; 0.5% budget; diffs in .maestro/diffs/)
+npm run visual:update    # accept them as the new baselines
 ```
 
-CI: a macOS job boots an iOS 26 simulator, installs Expo Go (or a dev build), starts Metro and runs the same command; Android runs on an emulator with `appId` switched. Not wired yet — flows run locally. The forceRTL / largest Dynamic Type / Reduce Transparency / Increase Contrast variants (NAT-52) use the sandbox's force-a11y chips on `/tokens` (or simulator settings).
+Maestro screenshots land in `~/.maestro/tests/<run>/`; `scripts/visual.mjs` picks the newest run of every "Visual baselines …" flow. Match text carefully: a section heading with the same text as a button is matched first (use `index:` or a `testID` → `id:`). The first Maestro run on a fresh simulator can crash Expo Go inside Apple's XCTest automation thread; re-run.
+
+CI: not wired (CI only runs on `main` and PRs, and needs a macOS runner with a booted iOS 26 simulator, Expo Go, Metro, then the commands above; Android on an emulator with `appId` switched). forceRTL and the largest Dynamic Type need a native restart — set them in the simulator's settings and re-run the flows.
 
 ## End-to-end (`e2e/`)
 

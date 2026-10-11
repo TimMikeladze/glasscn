@@ -5,12 +5,14 @@ name: Chat composer — sticks above the keyboard, Return is a newline, send pos
     file: _open.yaml
     env:
       ROUTE: c/chat
-- tapOn: "Reply to Kai"
+- tapOn:
+    id: "composer"
 - inputText: "Two nights in a row"
 - takeScreenshot: screenshots/composer-keyboard
 # the composer stays visible above the keyboard (KeyboardStickyView)
 - assertVisible: "Two nights in a row"
+# one tap sends, even with the keyboard up (keyboardShouldPersistTaps="handled")
 - tapOn:
-    label: "Send"
-- assertVisible: "Two nights in a row"
+    text: "Send"
+- assertVisible: "Noted: “Two nights in a row”."
 - hideKeyboard

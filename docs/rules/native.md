@@ -24,3 +24,4 @@
     - **Keyboard.** Dialogs and sheets avoid it with `KeyboardAvoid`; the bottom search field rides it in a `KeyboardStickyView`.
     - **Safe area.** Read insets with `useInsets()`, which returns zero instead of throwing when there's no `SafeAreaProvider`.
     - **Scroll.** Bars that react to scroll read `ScrollEdgeProvider` / `useScrollEdge()`, not their own listener.
+18. **Triggers take `asChild`.** `<DialogTrigger asChild><Button/></DialogTrigger>` merges the trigger into the child (Press `asChild`); without it a trigger around a Button nests two pressables and the inner one swallows the tap.
