@@ -2,6 +2,7 @@ import * as React from "react"
 import { View, type StyleProp, type ViewStyle } from "react-native"
 import { MinusIcon, PlusIcon } from "lucide-react-native"
 
+import { hitSlop } from "@/components/glass/native/a11y"
 import { Press } from "@/components/glass/native/press"
 import { useUI } from "@/components/glass/native/ui"
 
@@ -66,6 +67,7 @@ function Stepper({
       disabled={disabled || (dir < 0 ? value <= min : value >= max)}
       onPressIn={() => start(dir)}
       onPressOut={stop}
+      hitSlop={hitSlop(h, 44)}
       importantForAccessibility="no"
       accessibilityElementsHidden
       style={{ flex: 1, alignItems: "center", justifyContent: "center", opacity: disabled || (dir < 0 ? value <= min : value >= max) ? 0.35 : 1 }}
@@ -78,11 +80,11 @@ function Stepper({
       accessible
       accessibilityRole="adjustable"
       accessibilityLabel={accessibilityLabel}
-      accessibilityValue={{ min, max, now: value, text: formatValue?.(value) }}
+      accessibilityValue={{ min, max, now: value, text: formatValue?.(value) ?? String(value) }}
       accessibilityActions={[{ name: "increment" }, { name: "decrement" }]}
       onAccessibilityAction={(e) => set(latest.current + (e.nativeEvent.actionName === "increment" ? step : -step))}
       aria-disabled={disabled}
-      style={[{ flexDirection: "row", height: h, width: size === "sm" ? 76 : 92, borderRadius: ui.radius.button, backgroundColor: ui.fill, overflow: "hidden", opacity: disabled ? 0.5 : 1 }, style]}
+      style={[{ flexDirection: "row", minHeight: h, width: size === "sm" ? 76 : 92, borderRadius: ui.radius.button, backgroundColor: ui.fill, overflow: "hidden", opacity: disabled ? 0.5 : 1 }, style]}
     >
       {half(-1)}
       <View style={{ width: 1, marginVertical: h / 4, backgroundColor: ui.separator }} />

@@ -4,7 +4,7 @@ import { CheckIcon, ChevronsUpDownIcon, XIcon } from "lucide-react-native"
 
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/glass/native/command"
 import { Floating, useAnchorRect } from "@/components/glass/native/popover"
-import { Press } from "@/components/glass/native/press"
+import { Press, haptics } from "@/components/glass/native/press"
 import { GText, alpha, useUI, web } from "@/components/glass/native/ui"
 
 /**
@@ -43,6 +43,7 @@ function Combobox(props: ComboboxProps) {
     ;(props.onValueChange as ((v: string | string[]) => void) | undefined)?.(next)
   }
   const choose = (v: string) => {
+    haptics.selection()
     if (props.multiple) commit(selected.includes(v) ? selected.filter((s) => s !== v) : [...selected, v])
     else {
       commit(v === value ? "" : v)

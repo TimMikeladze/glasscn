@@ -24,6 +24,8 @@ type Shared = ViewProps & {
   weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6
   showOutsideDays?: boolean
   locale?: string
+  /** The month arrows' button variant (the web's `buttonVariant`). */
+  buttonVariant?: "ghost" | "secondary" | "outline"
 }
 
 type CalendarProps =
@@ -42,7 +44,7 @@ export function monthGrid(month: Date, weekStartsOn = 0): Date[] {
 }
 
 function Calendar(props: CalendarProps) {
-  const { month: monthProp, defaultMonth, onMonthChange, disabled, weekStartsOn = 0, showOutsideDays = true, locale, style, ...rest } = props
+  const { month: monthProp, defaultMonth, onMonthChange, disabled, weekStartsOn = 0, showOutsideDays = true, locale, buttonVariant = "ghost", style, ...rest } = props
   const ui = useUI()
   const initial = defaultMonth ?? (props.mode === "range" ? props.selected?.from : props.mode === "multiple" ? props.selected?.[0] : props.selected) ?? new Date()
   const [innerMonth, setInnerMonth] = React.useState(() => new Date(initial.getFullYear(), initial.getMonth(), 1))
@@ -57,6 +59,7 @@ function Calendar(props: CalendarProps) {
   const isDisabled = (d: Date) => (typeof disabled === "function" ? disabled(d) : (disabled ?? []).some((x) => sameDay(x, d)))
   const caption = new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(month)
   const weekday = new Intl.DateTimeFormat(locale, { weekday: "narrow" })
+  const dayName = new Intl.DateTimeFormat(locale, { weekday: "long", month: "long", day: "numeric", year: "numeric" })
   const cell = Math.round(ui.control.default * 0.9)
 
   const state = (d: Date) => {
@@ -87,13 +90,13 @@ function Calendar(props: CalendarProps) {
   return (
     <View style={[{ padding: 8, gap: 8, alignSelf: "flex-start" }, style]} {...rest}>
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-        <Button variant="ghost" size="icon-sm" accessibilityLabel="Previous month" onPress={() => go(-1)}>
+        <Button variant={buttonVariant} size="icon-sm" accessibilityLabel="Previous month" onPress={() => go(-1)}>
           {rtl ? <ChevronRightIcon /> : <ChevronLeftIcon />}
         </Button>
         <GText size="sm" weight="600" role="heading" aria-live="polite">
           {caption}
         </GText>
-        <Button variant="ghost" size="icon-sm" accessibilityLabel="Next month" onPress={() => go(1)}>
+        <Button variant={buttonVariant} size="icon-sm" accessibilityLabel="Next month" onPress={() => go(1)}>
           {rtl ? <ChevronLeftIcon /> : <ChevronRightIcon />}
         </Button>
       </View>
@@ -122,17 +125,20 @@ function Calendar(props: CalendarProps) {
                     width: cell,
                     height: cell,
                     backgroundColor: band ? alpha(ui.primary, 0.12) : "transparent",
-                    borderTopLeftRadius: s.start ? cell / 2 : 0,
-                    borderBottomLeftRadius: s.start ? cell / 2 : 0,
-                    borderTopRightRadius: s.end ? cell / 2 : 0,
-                    borderBottomRightRadius: s.end ? cell / 2 : 0,
+                    // start/end, so the band's rounded ends follow RTL (NAT-25)
+                    borderTopStartRadius: s.start ? cell / 2 : 0,
+                    borderBottomStartRadius: s.start ? cell / 2 : 0,
+                    borderTopEndRadius: s.end ? cell / 2 : 0,
+                    borderBottomEndRadius: s.end ? cell / 2 : 0,
                   }}
                 >
                   <Press
+                    haptic
                     role="button"
                     aria-pressed={s.selected || s.middle}
                     aria-disabled={off}
-                    aria-label={d.toDateString()}
+                    aria-label={`${dayName.format(d)}${isToday ? ", today" : ""}`}
+                    accessibilityState={{ selected: s.selected || s.middle, disabled: off }}
                     disabled={off}
                     onPress={() => pick(d)}
                     style={[

@@ -34,7 +34,7 @@ function ChatCodeBlock({ code, language, onCopy, style, ...props }: ViewProps & 
   const [copied, setCopied] = React.useState(false)
   return (
     <View style={[{ borderRadius: ui.radius.control, borderWidth: 1, borderColor: ui.glassBorder, backgroundColor: ui.fill, overflow: "hidden", marginVertical: 6 }, style]} {...props}>
-      <View style={{ flexDirection: "row", alignItems: "center", borderBottomWidth: 1, borderBottomColor: ui.separator, paddingLeft: 12, paddingRight: 4, paddingVertical: 2 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", borderBottomWidth: 1, borderBottomColor: ui.separator, paddingStart: 12, paddingEnd: 4, paddingVertical: 2 }}>
         <GText size="xs" tone="muted" style={{ flex: 1, fontFamily: mono }}>
           {language || "text"}
         </GText>
@@ -125,7 +125,7 @@ function ChatMarkdown({ children, repair = true, onCopy, style, ...props }: View
       flush()
       const k = `l${blocks.length}`
       blocks.push(
-        <View key={k} style={{ flexDirection: "row", gap: 6, paddingLeft: 4 }}>
+        <View key={k} style={{ flexDirection: "row", gap: 6, paddingStart: 4 }}>
           <GText size="sm" tone="muted" style={{ minWidth: 14 }}>
             {/^\d/.test(item[1]) ? item[1] : "•"}
           </GText>
@@ -138,7 +138,7 @@ function ChatMarkdown({ children, repair = true, onCopy, style, ...props }: View
       flush()
       const k = `q${blocks.length}`
       blocks.push(
-        <View key={k} style={{ borderLeftWidth: 2, borderLeftColor: ui.separator, paddingLeft: 10 }}>
+        <View key={k} style={{ borderStartWidth: 2, borderStartColor: ui.separator, paddingStart: 10 }}>
           <GText size="sm" tone="muted">
             {inline(quote[1], k, ui.primary)}
           </GText>

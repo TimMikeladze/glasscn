@@ -1,8 +1,9 @@
 import * as React from "react"
-import { LayoutAnimation, View, type ViewProps } from "react-native"
+import { View, type ViewProps } from "react-native"
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated"
 
 import { Press } from "@/components/glass/native/press"
-import { reduceMotion } from "@/components/glass/native/dialog"
+import { useUI } from "@/components/glass/native/ui"
 
 type Ctx = { open: boolean; toggle: () => void; disabled?: boolean }
 const CollapsibleContext = React.createContext<Ctx | null>(null)
@@ -12,12 +13,11 @@ function useCollapsible() {
   return ctx
 }
 
-/** Show and hide a region from a trigger; the height animates (snaps under reduce motion). */
+/** Show and hide a region from a trigger; the region eases in and out (Reanimated; still under Reduce Motion). */
 function Collapsible({ open, defaultOpen = false, onOpenChange, disabled, ...props }: ViewProps & { open?: boolean; defaultOpen?: boolean; onOpenChange?: (open: boolean) => void; disabled?: boolean }) {
   const [inner, setInner] = React.useState(defaultOpen)
   const value = open ?? inner
   const toggle = () => {
-    if (!reduceMotion()) LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
     setInner(!value)
     onOpenChange?.(!value)
   }
@@ -45,9 +45,10 @@ function CollapsibleTrigger({ onPress, ...props }: React.ComponentProps<typeof P
 }
 
 function CollapsibleContent({ style, ...props }: ViewProps) {
+  const ui = useUI()
   const c = useCollapsible()
   if (!c.open) return null
-  return <View style={[{ overflow: "hidden" }, style]} {...props} />
+  return <Animated.View entering={FadeIn.duration(ui.motion.duration)} exiting={FadeOut.duration(ui.motion.duration / 2)} style={[{ overflow: "hidden" }, style]} {...props} />
 }
 
 export { Collapsible, CollapsibleTrigger, CollapsibleContent, useCollapsible }

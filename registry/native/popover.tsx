@@ -1,7 +1,8 @@
 import * as React from "react"
-import { Animated, StyleSheet, View, useWindowDimensions, type LayoutChangeEvent, type StyleProp, type ViewProps, type ViewStyle } from "react-native"
+import { Platform, StyleSheet, View, useWindowDimensions, type LayoutChangeEvent, type StyleProp, type ViewProps, type ViewStyle } from "react-native"
+import Animated from "react-native-reanimated"
 
-import { Backdrop, DialogPortal, glassOpacity, textChildren, useControllableOpen, usePresence } from "@/components/glass/native/dialog"
+import { Backdrop, DialogPortal, textChildren, useControllableOpen, useEntrance, usePresence } from "@/components/glass/native/dialog"
 import { Glass } from "@/components/glass/native/glass"
 import { Press } from "@/components/glass/native/press"
 import { useUI } from "@/components/glass/native/ui"
@@ -35,13 +36,20 @@ export function placeFloating(anchor: Rect, size: { width: number; height: numbe
   return { side: placed, left: clamp(left, win.width - size.width), top: clamp(along(anchor.y, anchor.height, size.height), win.height - size.height) }
 }
 
-/** Measures `target()` in window coordinates (measureInWindow) each time `open` turns on or the window resizes. */
+/**
+ * Measures `target()` in window coordinates each time `open` turns on or the window
+ * resizes. Android (edge-to-edge, NAT-56): `measure`'s page coordinates, which match the
+ * translucent Modal the panel draws in; `measureInWindow` elsewhere.
+ */
 export function useAnchorRect(open: boolean, target: () => View | null) {
   const [rect, setRect] = React.useState<Rect | null>(null)
   const { width, height } = useWindowDimensions()
   React.useEffect(() => {
     if (!open) return
-    target()?.measureInWindow((x, y, w, h) => setRect({ x, y, width: w, height: h }))
+    const node = target()
+    if (!node) return
+    if (Platform.OS === "android") node.measure((_x, _y, w, h, pageX, pageY) => setRect({ x: pageX, y: pageY, width: w, height: h }))
+    else node.measureInWindow((x, y, w, h) => setRect({ x, y, width: w, height: h }))
   }, [open, target, width, height])
   return rect
 }
@@ -60,7 +68,7 @@ export type FloatingProps = ViewProps & {
 }
 
 /**
- * A glass panel anchored to a measured rect in its own transparent Modal: lands on
+ * A liquid-glass panel (the control layer) anchored to a measured rect in its own transparent Modal: lands on
  * `side`, flips when off-screen, slides 8pt from the anchor and scales from 95%.
  * Tapping outside, Escape (web) and hardware back (Android) close it.
  */
@@ -76,24 +84,17 @@ export function Floating({ open, anchor, onClose, side = "bottom", align = "cent
   // off-screen until measured — never an opacity-0 start (Liquid Glass wouldn't render)
   const spot = anchor && size ? placeFloating(anchor, size, win, side, align, sideOffset) : null
   const dir = spot?.side ?? side
-  const slide = progress.interpolate({ inputRange: [0, 1], outputRange: [dir === "top" || dir === "left" ? 8 : -8, 0] })
+  const slide = dir === "top" || dir === "left" ? 8 : -8
+  const entrance = useEntrance(progress, dir === "top" || dir === "bottom" ? { y: slide, scale: 0.95 } : { x: slide, scale: 0.95 })
   return (
     <DialogPortal visible={mounted} onRequestClose={onClose}>
       <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
         <Backdrop progress={progress} onPress={onClose} dim={dim} />
         <Animated.View
           onLayout={onLayout}
-          style={{
-            position: "absolute",
-            left: spot ? spot.left : -10000,
-            top: spot ? spot.top : 0,
-            maxWidth: win.width - 16,
-            maxHeight: win.height - 16,
-            opacity: glassOpacity(progress),
-            transform: [dir === "top" || dir === "bottom" ? { translateY: slide } : { translateX: slide }, { scale: progress.interpolate({ inputRange: [0, 1], outputRange: [0.95, 1] }) }],
-          }}
+          style={[{ position: "absolute", left: spot ? spot.left : -10000, top: spot ? spot.top : 0, maxWidth: win.width - 16, maxHeight: win.height - 16 }, entrance]}
         >
-          <Glass radius={radius ?? ui.radius.surface - 6} tint={ui.glassStrong} style={style} {...props}>
+          <Glass variant="liquid" visible={open} radius={radius ?? ui.radius.surface - 6} style={style} {...props}>
             {children}
           </Glass>
         </Animated.View>

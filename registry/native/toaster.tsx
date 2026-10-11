@@ -1,69 +1,36 @@
 import * as React from "react"
-import { Animated, Easing, PanResponder, StyleSheet, View, useWindowDimensions, type ViewStyle } from "react-native"
-import { SafeAreaInsetsContext } from "react-native-safe-area-context"
+import { AccessibilityInfo, Platform, StyleSheet, View, useWindowDimensions, type ViewStyle } from "react-native"
+import { Gesture, GestureDetector } from "react-native-gesture-handler"
+import Animated, { Easing, cancelAnimation, runOnJS, useAnimatedStyle, useSharedValue, withRepeat, withSpring, withTiming } from "react-native-reanimated"
+import { FullWindowOverlay } from "react-native-screens"
 import { CircleCheckIcon, InfoIcon, Loader2Icon, OctagonXIcon, TriangleAlertIcon } from "lucide-react-native"
 
-import { reduceMotion } from "@/components/glass/native/dialog"
+import { announce, useReducedMotion } from "@/components/glass/native/a11y"
+import { useInsets } from "@/components/glass/native/dialog"
 import { Glass, canFade } from "@/components/glass/native/glass"
-import { Press } from "@/components/glass/native/press"
+import { Press, haptics } from "@/components/glass/native/press"
+import { toastDuration, toastStore, type Toast, type ToastOptions, type ToastType } from "@/components/glass/native/toast-store"
 import { GText, useUI, web } from "@/components/glass/native/ui"
 
-export type ToastType = "default" | "success" | "info" | "warning" | "error" | "loading"
-export type ToastOptions = {
-  id?: string | number
-  description?: React.ReactNode
-  /** One button on the toast; pressing it dismisses the toast. */
-  action?: { label: string; onClick: () => void }
-  /** ms before it leaves on its own; Infinity keeps it. Loading toasts stay until updated. */
-  duration?: number
-  onDismiss?: () => void
-}
-type Toast = ToastOptions & { id: string | number; title: React.ReactNode; type: ToastType; closing: boolean }
-
-let toasts: Toast[] = []
-let seq = 0
-const listeners = new Set<() => void>()
-const emit = () => listeners.forEach((l) => l())
-const subscribe = (l: () => void) => {
-  listeners.add(l)
-  return () => listeners.delete(l)
-}
-const snapshot = () => toasts
-
-function show(type: ToastType, title: React.ReactNode, options: ToastOptions = {}) {
-  const id = options.id ?? ++seq
-  const next: Toast = { ...options, id, title, type, closing: false }
-  // same id → update in place (e.g. a loading toast turning into success)
-  toasts = toasts.some((t) => t.id === id) ? toasts.map((t) => (t.id === id ? next : t)) : [next, ...toasts]
-  emit()
-  return id
-}
-
-function remove(id: string | number) {
-  toasts = toasts.filter((t) => t.id !== id)
-  emit()
-}
+export type { Toast, ToastOptions, ToastType }
 
 /**
  * Show a toast (sonner's API, no sonner): `toast("Copied")`,
  * `toast.success("Saved", { description, action })`, `toast.dismiss(id)`.
  */
-export const toast = Object.assign((title: React.ReactNode, options?: ToastOptions) => show("default", title, options), {
-  success: (title: React.ReactNode, options?: ToastOptions) => show("success", title, options),
-  info: (title: React.ReactNode, options?: ToastOptions) => show("info", title, options),
-  warning: (title: React.ReactNode, options?: ToastOptions) => show("warning", title, options),
-  error: (title: React.ReactNode, options?: ToastOptions) => show("error", title, options),
-  loading: (title: React.ReactNode, options?: ToastOptions) => show("loading", title, options),
+export const toast = Object.assign((title: React.ReactNode, options?: ToastOptions) => toastStore.show("default", title, options), {
+  success: (title: React.ReactNode, options?: ToastOptions) => toastStore.show("success", title, options),
+  info: (title: React.ReactNode, options?: ToastOptions) => toastStore.show("info", title, options),
+  warning: (title: React.ReactNode, options?: ToastOptions) => toastStore.show("warning", title, options),
+  error: (title: React.ReactNode, options?: ToastOptions) => toastStore.show("error", title, options),
+  loading: (title: React.ReactNode, options?: ToastOptions) => toastStore.show("loading", title, options),
   /** Dismiss one toast, or all of them. */
-  dismiss: (id?: string | number) => {
-    toasts = toasts.map((t) => (id === undefined || t.id === id ? { ...t, closing: true } : t))
-    emit()
-  },
+  dismiss: (id?: string | number) => toastStore.dismiss(id),
 })
 
 export type ToasterProps = {
   position?: "top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right"
-  /** Default ms before a toast leaves. */
+  /** Default ms before a toast leaves (Android stretches it to the user's accessibility timeout). */
   duration?: number
   /** How many show in the stack. */
   visibleToasts?: number
@@ -73,16 +40,36 @@ export type ToasterProps = {
   style?: ViewStyle
 }
 
+/** iOS: a window above every Modal and formSheet (NAT-58); a plain layer elsewhere. */
+function Overlay({ children }: { children: React.ReactNode }) {
+  if (Platform.OS === "ios") return <FullWindowOverlay>{children}</FullWindowOverlay>
+  return <>{children}</>
+}
+
 /**
- * The host for toast(): frosted glass capsules with accent icons, stacked like
+ * The host for toast(): liquid-glass capsules with accent icons, stacked like
  * sonner (tap the stack to fan it out), swipe or wait to dismiss, clear of the
- * safe area. Mount once, last, at your app root so it overlays every screen.
+ * safe area. Spoken by the screen reader; success/warning/error buzz. Mount once,
+ * last, at your app root — on iOS it floats above modals and sheets too.
  */
 function Toaster({ position: positionProp, duration = 4000, visibleToasts = 3, expand = false, offset = 16, style }: ToasterProps) {
-  const list = React.useSyncExternalStore(subscribe, snapshot, snapshot)
-  const insets = React.useContext(SafeAreaInsetsContext) ?? { top: 0, right: 0, bottom: 0, left: 0 }
+  const list = React.useSyncExternalStore(toastStore.subscribe, toastStore.get, toastStore.get)
+  const insets = useInsets()
   const [expanded, setExpanded] = React.useState(expand)
   const [heights, setHeights] = React.useState<Record<string, number>>({})
+  // Android: honour "Time to take action" (accessibility timeout)
+  const [recommended, setStay] = React.useState<number | null>(null)
+  const stay = Platform.OS === "android" ? (recommended ?? duration) : duration
+  React.useEffect(() => {
+    if (Platform.OS !== "android") return
+    let live = true
+    AccessibilityInfo.getRecommendedTimeoutMillis(duration)
+      .then((ms) => live && setStay(ms))
+      .catch(() => {})
+    return () => {
+      live = false
+    }
+  }, [duration])
   // phones: from the top centre, clear of the thumb and the Dock
   const { width } = useWindowDimensions()
   const position = positionProp ?? (width <= 600 ? "top-center" : "bottom-center")
@@ -91,95 +78,116 @@ function Toaster({ position: positionProp, duration = 4000, visibleToasts = 3, e
   const shown = list.slice(0, visibleToasts)
   const open = expanded || expand
   if (!list.length && open && !expand) setExpanded(false)
+  if (!list.length) return null
   const lifts = shown.map((_, i) => shown.slice(0, i).reduce((sum, t) => sum + (heights[String(t.id)] ?? 64) + 8, 0))
   return (
-    <View
-      pointerEvents="box-none"
-      style={[
-        StyleSheet.absoluteFill,
-        { zIndex: 9999, alignItems: horizontal, justifyContent: top ? "flex-start" : "flex-end", paddingTop: insets.top + offset, paddingBottom: insets.bottom + offset, paddingLeft: insets.left + offset, paddingRight: insets.right + offset },
-        web({ position: "fixed" }),
-        style,
-      ]}
-    >
-      <View pointerEvents="box-none" style={{ width: "100%", maxWidth: 356 }}>
-        {shown.map((t, i) => {
-          const key = String(t.id)
-          return (
-            <ToastItem
-              key={key}
-              toast={t}
-              index={i}
-              top={top}
-              offset={open ? lifts[i] : i * 10}
-              expanded={open}
-              duration={t.duration ?? (t.type === "loading" ? Infinity : duration)}
-              onPress={() => setExpanded(!open)}
-              onHeight={(h) => {
-                if (heights[key] !== h) setHeights((prev) => ({ ...prev, [key]: h }))
-              }}
-            />
-          )
-        })}
+    <Overlay>
+      <View
+        pointerEvents="box-none"
+        style={[
+          StyleSheet.absoluteFill,
+          { zIndex: 9999, alignItems: horizontal, justifyContent: top ? "flex-start" : "flex-end", paddingTop: insets.top + offset, paddingBottom: insets.bottom + offset, paddingLeft: insets.left + offset, paddingRight: insets.right + offset },
+          web({ position: "fixed" }),
+          style,
+        ]}
+      >
+        <View pointerEvents="box-none" style={{ width: "100%", maxWidth: 356 }}>
+          {shown.map((t, i) => {
+            const key = String(t.id)
+            return (
+              <ToastItem
+                key={key}
+                toast={t}
+                index={i}
+                top={top}
+                offset={open ? lifts[i] : i * 10}
+                expanded={open}
+                duration={toastDuration(t, stay)}
+                onPress={() => setExpanded(!open)}
+                onHeight={(h) => {
+                  if (heights[key] !== h) setHeights((prev) => ({ ...prev, [key]: h }))
+                }}
+              />
+            )
+          })}
+        </View>
       </View>
-    </View>
+    </Overlay>
+  )
+}
+
+function Spinner() {
+  const ui = useUI()
+  const reduced = useReducedMotion()
+  const turn = useSharedValue(0)
+  React.useEffect(() => {
+    if (reduced) return
+    turn.set(withRepeat(withTiming(1, { duration: 900, easing: Easing.linear }), -1))
+    return () => cancelAnimation(turn)
+  }, [reduced, turn])
+  const spin = useAnimatedStyle(() => ({ transform: [{ rotate: `${turn.value * 360}deg` }] }))
+  return (
+    <Animated.View style={spin}>
+      <Loader2Icon size={16} color={ui.mutedForeground} />
+    </Animated.View>
   )
 }
 
 function ToastIcon({ type }: { type: ToastType }) {
   const ui = useUI()
-  const [spin] = React.useState(() => new Animated.Value(0))
-  React.useEffect(() => {
-    if (type !== "loading") return
-    const loop = Animated.loop(Animated.timing(spin, { toValue: 1, duration: 900, easing: Easing.linear, useNativeDriver: true }))
-    loop.start()
-    return () => loop.stop()
-  }, [type, spin])
   switch (type) {
     case "success":
-      return <CircleCheckIcon size={16} color={ui.primary} />
+      return <CircleCheckIcon size={16} color={ui.success} />
     case "info":
       return <InfoIcon size={16} color={ui.primary} />
     case "warning":
-      return <TriangleAlertIcon size={16} color={ui.foreground} />
+      return <TriangleAlertIcon size={16} color={ui.warning} />
     case "error":
       return <OctagonXIcon size={16} color={ui.destructive} />
     case "loading":
-      return (
-        <Animated.View style={{ transform: [{ rotate: spin.interpolate({ inputRange: [0, 1], outputRange: ["0deg", "360deg"] }) }] }}>
-          <Loader2Icon size={16} color={ui.mutedForeground} />
-        </Animated.View>
-      )
+      return <Spinner />
     default:
       return null
   }
 }
 
+const plain = (node: React.ReactNode) => (typeof node === "string" || typeof node === "number" ? String(node) : "")
+
 function ToastItem({ toast: t, index, top, offset, expanded, duration, onPress, onHeight }: { toast: Toast; index: number; top: boolean; offset: number; expanded: boolean; duration: number; onPress: () => void; onHeight: (h: number) => void }) {
   const ui = useUI()
-  const [enter] = React.useState(() => new Animated.Value(0))
-  const [drag] = React.useState(() => new Animated.Value(0))
-  const [place] = React.useState(() => new Animated.Value(offset))
+  const reduced = useReducedMotion()
+  const enter = useSharedValue(0)
+  const drag = useSharedValue(0)
+  const place = useSharedValue(offset)
   const [leaving, setLeaving] = React.useState(false)
   const closing = t.closing || leaving
+  const spring = ui.motion.springConfig
+
+  // speak it, and buzz the typed ones — once per type (loading → success speaks again)
+  React.useEffect(() => {
+    announce([plain(t.title), plain(t.description)].filter(Boolean).join(". "))
+    if (t.type === "success" || t.type === "warning" || t.type === "error") haptics.notify(t.type)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [t.type, t.title])
 
   // enter, or leave (dismiss / timer / swipe), then drop from the store
   React.useEffect(() => {
-    const anim = closing
-      ? Animated.timing(enter, { toValue: 0, duration: reduceMotion() ? 0 : 200, easing: Easing.in(Easing.quad), useNativeDriver: true })
-      : Animated.spring(enter, { toValue: 1, friction: 9, tension: 110, useNativeDriver: true })
-    anim.start(({ finished }) => {
-      if (finished && closing) {
-        t.onDismiss?.()
-        remove(t.id)
-      }
-    })
-    return () => anim.stop()
-  }, [closing, enter, t])
+    const done = () => {
+      t.onDismiss?.()
+      toastStore.remove(t.id)
+    }
+    if (closing)
+      enter.set(
+        withTiming(0, { duration: reduced ? 0 : 200, easing: Easing.in(Easing.quad) }, (finished) => {
+          if (finished) runOnJS(done)()
+        })
+      )
+    else enter.set(reduced ? 1 : withSpring(1, spring))
+  }, [closing, enter, t, reduced, spring])
 
   React.useEffect(() => {
-    Animated.spring(place, { toValue: offset, friction: 10, tension: 140, useNativeDriver: true }).start()
-  }, [offset, place])
+    place.set(reduced ? offset : withSpring(offset, spring))
+  }, [offset, place, reduced, spring])
 
   // auto-dismiss, paused while the stack is fanned out
   React.useEffect(() => {
@@ -188,85 +196,79 @@ function ToastItem({ toast: t, index, top, offset, expanded, duration, onPress, 
     return () => clearTimeout(timer)
   }, [closing, expanded, duration])
 
-  // `drag` shares a transform with `enter`/`place`, which run on the native driver —
-  // so it must too: once a node has moved to native, a JS-driven animation on it throws.
-  // The finger writes with setValue (fine on a native node); Animated.event can't
-  // drive a PanResponder natively.
-  const [pan] = React.useState(() =>
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 8 && Math.abs(g.dx) > Math.abs(g.dy),
-      onPanResponderGrant: () => drag.stopAnimation(),
-      onPanResponderMove: (_, g) => drag.setValue(g.dx),
-      onPanResponderRelease: (_, g) => {
-        if (Math.abs(g.dx) > 80 || Math.abs(g.vx) > 0.8) {
-          Animated.timing(drag, { toValue: Math.sign(g.dx || g.vx) * 480, duration: 180, useNativeDriver: true }).start(() => setLeaving(true))
-        } else {
-          Animated.spring(drag, { toValue: 0, friction: 7, useNativeDriver: true }).start()
-        }
-      },
-      onPanResponderTerminate: () => Animated.spring(drag, { toValue: 0, friction: 7, useNativeDriver: true }).start(),
+  // a horizontal swipe dismisses; vertical drags fall through to whatever scrolls behind
+  const leave = () => setLeaving(true)
+  const swipe = Gesture.Pan()
+    .activeOffsetX([-10, 10])
+    .failOffsetY([-12, 12])
+    .onUpdate((e) => {
+      drag.set(e.translationX)
     })
-  )
+    .onEnd((e) => {
+      if (Math.abs(e.translationX) > 80 || Math.abs(e.velocityX) > 800) {
+        drag.set(
+          withTiming(Math.sign(e.translationX || e.velocityX) * 480, { duration: 180 }, (finished) => {
+            if (finished) runOnJS(leave)()
+          })
+        )
+      } else drag.set(withSpring(0, spring))
+    })
 
   const dir = top ? -1 : 1
   const fade = canFade()
+  const scale = expanded ? 1 : 1 - index * 0.05
+  const motion = useAnimatedStyle(() => ({
+    // never fade Liquid Glass (iOS 26): it slides in and out instead
+    opacity: fade ? Math.min(1, Math.max(0, enter.value)) : 1,
+    transform: [{ translateX: drag.value }, { translateY: -place.value * dir + dir * 80 * (1 - enter.value) }, { scale }],
+  }))
   return (
-    <Animated.View
-      {...pan.panHandlers}
-      onLayout={(e) => onHeight(Math.round(e.nativeEvent.layout.height))}
-      style={{
-        position: index === 0 ? "relative" : "absolute",
-        left: 0,
-        right: 0,
-        [top ? "top" : "bottom"]: 0,
-        zIndex: 100 - index,
-        opacity: fade ? enter : 1,
-        transform: [
-          { translateX: drag },
-          { translateY: Animated.add(Animated.multiply(place, -dir), enter.interpolate({ inputRange: [0, 1], outputRange: [dir * 80, 0] })) },
-          { scale: expanded ? 1 : 1 - index * 0.05 },
-        ],
-      }}
-    >
-      {/* the pane is glass: squash, never dim, on iOS 26 (native rule 3) */}
-      <Press onPress={onPress} squash={0.99} dim={fade} accessibilityRole="alert" accessibilityLiveRegion="polite">
-        <Glass radius={ui.radius.surface} tint={ui.glassStrong} style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 16, paddingVertical: 14 }}>
-          <ToastIcon type={t.type} />
-          <View style={{ flex: 1, gap: 2 }}>
-            {typeof t.title === "string" ? (
-              <GText size="sm" weight="600">
-                {t.title}
-              </GText>
-            ) : (
-              t.title
-            )}
-            {t.description ? (
-              typeof t.description === "string" ? (
-                <GText size="xs" tone="muted">
-                  {t.description}
+    <GestureDetector gesture={swipe}>
+      <Animated.View
+        onLayout={(e) => onHeight(Math.round(e.nativeEvent.layout.height))}
+        style={[{ position: index === 0 ? "relative" : "absolute", left: 0, right: 0, [top ? "top" : "bottom"]: 0, zIndex: 100 - index }, motion]}
+      >
+        {/* the pane is liquid glass: it grows on press, never dims (native rule 3) */}
+        <Press onPress={onPress} liquid accessibilityRole="alert" accessibilityLiveRegion="polite" accessibilityHint={expanded ? "Collapses the notifications" : "Shows all notifications"}>
+          <Glass variant="liquid" visible={!closing || fade} radius={ui.radius.surface} style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 16, paddingVertical: 14 }}>
+            <ToastIcon type={t.type} />
+            <View style={{ flex: 1, gap: 2 }}>
+              {typeof t.title === "string" || typeof t.title === "number" ? (
+                <GText size="sm" weight="600">
+                  {t.title}
                 </GText>
               ) : (
-                t.description
-              )
+                t.title
+              )}
+              {t.description ? (
+                typeof t.description === "string" || typeof t.description === "number" ? (
+                  <GText size="xs" tone="muted">
+                    {t.description}
+                  </GText>
+                ) : (
+                  t.description
+                )
+              ) : null}
+            </View>
+            {t.action ? (
+              <Press
+                accessibilityRole="button"
+                hitSlop={8}
+                onPress={() => {
+                  t.action?.onClick()
+                  setLeaving(true)
+                }}
+                style={[{ height: ui.control.xs, paddingHorizontal: 10, borderRadius: ui.radius.button, backgroundColor: ui.primary, alignItems: "center", justifyContent: "center" }, web({ cursor: "pointer" })]}
+              >
+                <GText size="xs" weight="600" tone="onPrimary">
+                  {t.action.label}
+                </GText>
+              </Press>
             ) : null}
-          </View>
-          {t.action ? (
-            <Press
-              accessibilityRole="button"
-              onPress={() => {
-                t.action?.onClick()
-                setLeaving(true)
-              }}
-              style={[{ height: ui.control.xs, paddingHorizontal: 10, borderRadius: ui.radius.button, backgroundColor: ui.primary, alignItems: "center", justifyContent: "center" }, web({ cursor: "pointer" })]}
-            >
-              <GText size="xs" weight="600" tone="onPrimary">
-                {t.action.label}
-              </GText>
-            </Press>
-          ) : null}
-        </Glass>
-      </Press>
-    </Animated.View>
+          </Glass>
+        </Press>
+      </Animated.View>
+    </GestureDetector>
   )
 }
 

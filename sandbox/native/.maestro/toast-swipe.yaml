@@ -1,0 +1,17 @@
+appId: host.exp.Exponent
+name: Toast — show, then swipe sideways to dismiss
+---
+- runFlow:
+    file: _open.yaml
+    env:
+      ROUTE: c/toaster
+- tapOn: "Copy"
+- assertVisible: "Copied as text"
+- takeScreenshot: screenshots/toast-shown
+- swipe:
+    from: "Copied as text"
+    direction: RIGHT
+    duration: 300
+- extendedWaitUntil:
+    notVisible: "Copied as text"
+    timeout: 3000

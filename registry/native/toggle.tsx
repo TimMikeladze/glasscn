@@ -2,6 +2,7 @@ import * as React from "react"
 import { type PressableProps, type StyleProp, type ViewStyle } from "react-native"
 
 import { decorate } from "@/components/glass/native/button"
+import { hitSlop } from "@/components/glass/native/a11y"
 import { Press } from "@/components/glass/native/press"
 import { alpha, useUI, web, type UI } from "@/components/glass/native/ui"
 
@@ -13,7 +14,7 @@ function toggleVariants(ui: UI, { variant = "default", size = "default", on = fa
   const h = ui.control[size]
   return {
     container: {
-      height: h,
+      minHeight: h,
       minWidth: h,
       paddingHorizontal: size === "lg" ? ui.pad.sm : ui.pad.xs,
       flexDirection: "row" as const,
@@ -52,6 +53,8 @@ function Toggle({ pressed, defaultPressed = false, onPressedChange, variant, siz
       disabled={disabled}
       accessibilityRole="button"
       aria-pressed={on}
+      accessibilityState={{ selected: on, disabled: !!disabled }}
+      hitSlop={hitSlop(ui.control[size ?? "default"])}
       aria-disabled={!!disabled}
       onPress={() => {
         setInner(!on)

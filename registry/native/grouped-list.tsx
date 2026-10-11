@@ -1,7 +1,8 @@
 import * as React from "react"
-import { View, type PressableProps, type StyleProp, type TextProps, type ViewProps, type ViewStyle } from "react-native"
+import { I18nManager, StyleSheet, View, type PressableProps, type StyleProp, type TextProps, type ViewProps, type ViewStyle } from "react-native"
 import { ChevronRightIcon } from "lucide-react-native"
 
+import { MAX_FONT_SCALE } from "@/components/glass/native/a11y"
 import { Glass } from "@/components/glass/native/glass"
 import { Press } from "@/components/glass/native/press"
 import { withGlyphs } from "@/components/glass/native/segmented-control"
@@ -27,23 +28,31 @@ export function GroupedList({ style, ...props }: ViewProps) {
   return <View style={[{ gap: 8 }, style]} {...props} />
 }
 
+/** iOS 26 section header: sentence case, not the old all-caps caption (NAT-73). */
 export function GroupedListHeader({ style, ...props }: TextProps) {
-  return <GText accessibilityRole="header" size="xs" weight="600" tone="muted" style={[{ paddingHorizontal: 16, letterSpacing: 0.6, textTransform: "uppercase" }, style]} {...props} />
+  return <GText accessibilityRole="header" size="sm" weight="600" tone="muted" style={[{ paddingHorizontal: 16, marginStart: 4 }, style]} {...props} />
 }
 
 export function GroupedListFooter({ style, ...props }: TextProps) {
-  return <GText size="xs" tone="muted" style={[{ paddingHorizontal: 16 }, style]} {...props} />
+  return <GText size="xs" tone="muted" style={[{ paddingHorizontal: 16, marginStart: 4 }, style]} {...props} />
 }
 
-/** The glass card; hairlines separate its rows. */
+const ICON = 30
+const GAP = 14
+const PAD = 16
+/** Whether a row leads with a GroupedListIcon — its separator then starts at the text. */
+const hasIcon = (row: React.ReactNode) =>
+  React.isValidElement<{ children?: React.ReactNode }>(row) && React.Children.toArray(row.props.children).some((c) => React.isValidElement(c) && c.type === GroupedListIcon)
+
+/** The glass card (the content layer: material, never liquid); hairlines separate its rows, inset to the text. */
 export function GroupedListContent({ style, children, ...props }: ViewProps) {
   const ui = useUI()
   const rows = React.Children.toArray(children)
   return (
-    <Glass radius={ui.radius.surface - 6} accessibilityRole="list" style={[{ overflow: "hidden" }, style]} {...props}>
+    <Glass variant="material" radius={ui.radius.surface - 6} accessibilityRole="list" style={[{ overflow: "hidden" }, style]} {...props}>
       {rows.map((row, i) => (
         <React.Fragment key={React.isValidElement(row) && row.key != null ? row.key : i}>
-          {i > 0 ? <View style={{ height: 1, marginLeft: 16, backgroundColor: alpha(ui.foreground, 0.09) }} /> : null}
+          {i > 0 ? <View style={{ height: StyleSheet.hairlineWidth, marginStart: PAD + (hasIcon(row) ? ICON + GAP : 0), backgroundColor: ui.separator }} /> : null}
           {row}
         </React.Fragment>
       ))}
@@ -67,14 +76,14 @@ export function GroupedListItem({ style, children, destructive = false, selected
   const ui = useUI()
   const ctx = React.useMemo(() => ({ destructive }), [destructive])
   const base: StyleProp<ViewStyle> = [
-    { flexDirection: "row", alignItems: "center", gap: 14, minHeight: 52, paddingHorizontal: 16, paddingVertical: 10, width: "100%" },
+    { flexDirection: "row", alignItems: "center", gap: GAP, minHeight: 52, paddingHorizontal: PAD, paddingVertical: 10, width: "100%" },
     selected && { backgroundColor: ui.fill },
     style,
   ]
   return (
     <ItemContext.Provider value={ctx}>
       {onPress ? (
-        <Press squash={1} onPress={onPress} accessibilityRole="button" aria-selected={selected} style={[base, web({ cursor: "pointer" })]} {...props}>
+        <Press squash={1} dim onPress={onPress} accessibilityRole="button" aria-selected={selected} accessibilityState={{ selected }} style={[base, web({ cursor: "pointer" })]} {...props}>
           {children}
         </Press>
       ) : (
@@ -91,7 +100,7 @@ export function GroupedListIcon({ color, style, children, ...props }: ViewProps 
   const ui = useUI()
   return (
     <View
-      style={[{ width: 30, height: 30, borderRadius: ui.radius.control * 0.75, borderCurve: "continuous", alignItems: "center", justifyContent: "center", backgroundColor: color ?? ui.primary }, style]}
+      style={[{ width: ICON, height: ICON, borderRadius: ui.radius.control * 0.75, borderCurve: "continuous", alignItems: "center", justifyContent: "center", backgroundColor: color ?? ui.primary }, style]}
       {...props}
     >
       {withGlyphs(children, { color: "#FFFFFF", size: 16 })}
@@ -106,7 +115,8 @@ export function GroupedListTitle({ style, children, ...props }: ViewProps) {
     <View style={[{ flex: 1, minWidth: 0, gap: 2 }, style]} {...props}>
       {React.Children.map(children, (c) =>
         typeof c === "string" || typeof c === "number" ? (
-          <GText style={{ fontSize: 15.2 }} color={destructive ? ui.destructive : ui.foreground} numberOfLines={1}>
+          // iOS body: 17pt
+          <GText style={{ fontSize: 17, lineHeight: 22 }} maxFontSizeMultiplier={MAX_FONT_SCALE.body} color={destructive ? ui.destructive : ui.foreground} numberOfLines={1}>
             {c}
           </GText>
         ) : (
@@ -127,5 +137,5 @@ export function GroupedListValue({ style, ...props }: TextProps) {
 
 export function GroupedListChevron({ size = 16, color }: { size?: number; color?: string }) {
   const ui = useUI()
-  return <ChevronRightIcon size={size} color={color ?? alpha(ui.mutedForeground, 0.7)} aria-hidden />
+  return <ChevronRightIcon size={size} color={color ?? alpha(ui.mutedForeground, 0.7)} style={I18nManager.isRTL ? { transform: [{ scaleX: -1 }] } : undefined} aria-hidden />
 }

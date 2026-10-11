@@ -1,8 +1,9 @@
 import * as React from "react"
-import { Image, Linking, View, type ViewProps } from "react-native"
+import { Image, Linking, View, type StyleProp, type ViewProps, type ViewStyle } from "react-native"
 import { AlertCircleIcon, BrainIcon, CheckIcon, ChevronDownIcon, FileIcon, GlobeIcon, LoaderIcon, RotateCwIcon, WrenchIcon, XIcon } from "lucide-react-native"
 
 import { Button } from "@/components/glass/native/button"
+import { Glass } from "@/components/glass/native/glass"
 import { ChatBubble } from "@/components/glass/native/chat"
 import { ChatMarkdown } from "@/components/glass/native/chat-markdown"
 import { Press } from "@/components/glass/native/press"
@@ -143,7 +144,7 @@ function ChatTool({ name, state, input, output, errorText, onApprove, onDeny, de
 
 type ChatSource = { url?: string; title?: string; id?: string }
 
-function ChatCitation({ index, href, children, style, ...props }: Omit<React.ComponentProps<typeof Press>, "children"> & { index?: number; href?: string; children?: React.ReactNode }) {
+function ChatCitation({ index, href, children, style, ...props }: Omit<React.ComponentProps<typeof Press>, "children" | "style"> & { index?: number; href?: string; children?: React.ReactNode; style?: StyleProp<ViewStyle> }) {
   const ui = useUI()
   return (
     <Press
@@ -258,7 +259,8 @@ function ChatReactions({ reactions, onToggle, style, ...props }: ViewProps & { r
   const ui = useUI()
   if (!reactions.length) return null
   return (
-    <View role="group" aria-label="Reactions" style={[{ flexDirection: "row", gap: 2, marginTop: -12, marginHorizontal: 8, borderRadius: ui.radius.badge, borderWidth: 1, borderColor: ui.glassBorder, backgroundColor: ui.glassSolid, padding: 2 }, style]} {...props}>
+    // a liquid capsule on the bubble's corner (the control layer); its taps never dim it
+    <Glass variant="liquid" radius={ui.radius.badge} role="group" aria-label="Reactions" style={[{ flexDirection: "row", gap: 2, marginTop: -12, marginHorizontal: 8, padding: 2, alignSelf: "flex-start" }, style]} {...props}>
       {reactions.map((r) => (
         <Press
           key={r.emoji}
@@ -276,7 +278,7 @@ function ChatReactions({ reactions, onToggle, style, ...props }: ViewProps & { r
           ) : null}
         </Press>
       ))}
-    </View>
+    </Glass>
   )
 }
 

@@ -1,0 +1,6 @@
+# Maestro E2E for the native sandbox (NAT-52/53). See docs/testing.md#native.
+# Run against Expo Go: APP_URL=exp://127.0.0.1:8081 maestro test .maestro
+flows:
+  - "*.yaml"
+excludeTags:
+  - util

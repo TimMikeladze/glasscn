@@ -1,0 +1,10 @@
+# Open a sandbox route in Expo Go: ROUTE (e.g. c/toaster) and an optional QUERY (palette=ocean&scheme=dark).
+appId: host.exp.Exponent
+tags:
+  - util
+---
+- openLink: ${APP_URL}/--/${ROUTE}?${QUERY || ""}
+- extendedWaitUntil:
+    visible:
+      id: theme-picker
+    timeout: 60000

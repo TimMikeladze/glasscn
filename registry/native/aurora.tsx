@@ -1,7 +1,9 @@
 import * as React from "react"
-import { AccessibilityInfo, Animated, Easing, StyleSheet, View, useWindowDimensions } from "react-native"
+import { StyleSheet, View, useWindowDimensions, type LayoutChangeEvent } from "react-native"
+import Animated, { cancelAnimation, Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated"
 import { Circle, Defs, RadialGradient, Stop, Svg } from "react-native-svg"
 
+import { useReducedMotion } from "@/components/glass/native/a11y"
 import { useGlassTheme } from "@/components/glass/native/tokens"
 
 const BLOBS = [
@@ -10,48 +12,26 @@ const BLOBS = [
   { x: -0.1, y: 0.62, size: 1.2, dx: 30, dy: -38, ms: 19000 },
 ]
 
-function useReducedMotion() {
-  const [reduced, setReduced] = React.useState(false)
-  React.useEffect(() => {
-    AccessibilityInfo.isReduceMotionEnabled().then(setReduced).catch(() => {})
-    const sub = AccessibilityInfo.addEventListener("reduceMotionChanged", setReduced)
-    return () => sub.remove()
-  }, [])
-  return reduced
-}
-
-function Blob({ color, i, w, h, dark, still }: { color: string; i: number; w: number; h: number; dark: boolean; still: boolean }) {
+function Blob({ color, i, w, h, dark, still, speed }: { color: string; i: number; w: number; h: number; dark: boolean; still: boolean; speed: number }) {
   const id = React.useId().replace(/:/g, "")
-  const [t] = React.useState(() => new Animated.Value(0))
+  const t = useSharedValue(0)
   const b = BLOBS[i]
   const size = Math.max(w, 380) * b.size
+  const ms = b.ms / Math.max(0.1, speed)
   React.useEffect(() => {
-    if (still) return
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(t, { toValue: 1, duration: b.ms, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-        Animated.timing(t, { toValue: 0, duration: b.ms, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-      ])
-    )
-    loop.start()
-    return () => loop.stop()
-  }, [t, still, b.ms])
+    if (still) {
+      // Reduce Motion or paused: hold where it is
+      cancelAnimation(t)
+      return
+    }
+    t.set(withRepeat(withTiming(1, { duration: ms, easing: Easing.inOut(Easing.sin) }), -1, true))
+    return () => cancelAnimation(t)
+  }, [t, still, ms])
+  const drift = useAnimatedStyle(() => ({
+    transform: [{ translateX: t.value * b.dx }, { translateY: t.value * b.dy }, { scale: 1 + t.value * 0.08 }],
+  }))
   return (
-    <Animated.View
-      style={{
-        pointerEvents: "none",
-        position: "absolute",
-        left: b.x * w,
-        top: b.y * h,
-        width: size,
-        height: size,
-        transform: [
-          { translateX: t.interpolate({ inputRange: [0, 1], outputRange: [0, b.dx] }) },
-          { translateY: t.interpolate({ inputRange: [0, 1], outputRange: [0, b.dy] }) },
-          { scale: t.interpolate({ inputRange: [0, 1], outputRange: [1, 1.08] }) },
-        ],
-      }}
-    >
+    <Animated.View style={[{ pointerEvents: "none", position: "absolute", left: b.x * w, top: b.y * h, width: size, height: size }, drift]}>
       <Svg width={size} height={size}>
         <Defs>
           <RadialGradient id={`a${id}`} cx="50%" cy="50%" r="50%">
@@ -67,17 +47,26 @@ function Blob({ color, i, w, h, dark, still }: { color: string; i: number; w: nu
 }
 
 /**
- * The living ground behind glass: three palette blobs drifting over the base. Fills its parent.
- * `animate={false}` holds it still — e.g. while a ScrollView over it is being dragged.
+ * The living ground behind glass: three palette blobs drifting over the base. Fills its parent and
+ * sizes the blobs to it (onLayout — NAT-26). Reanimated on the UI thread; still under Reduce Motion
+ * or a zero motion preset. `animate={false}` holds it still — e.g. while a ScrollView over it is dragged.
  */
 export function Aurora({ animate = true }: { animate?: boolean } = {}) {
   const t = useGlassTheme()
-  const still = useReducedMotion() || !animate
-  const { width, height } = useWindowDimensions()
+  const still = useReducedMotion() || !animate || t.motion.duration === 0 || t.motion.auroraSpeed === 0
+  const win = useWindowDimensions()
+  const [box, setBox] = React.useState<{ width: number; height: number } | null>(null)
+  const { width, height } = box ?? win
   return (
-    <View style={[StyleSheet.absoluteFill, { pointerEvents: "none", backgroundColor: t.auroraBase, overflow: "hidden" }]}>
+    <View
+      onLayout={(e: LayoutChangeEvent) => {
+        const { width: w, height: h } = e.nativeEvent.layout
+        if (w && h && (w !== box?.width || h !== box?.height)) setBox({ width: w, height: h })
+      }}
+      style={[StyleSheet.absoluteFill, { pointerEvents: "none", backgroundColor: t.auroraBase, overflow: "hidden" }]}
+    >
       {t.aurora.map((color, i) => (
-        <Blob key={i} i={i} color={color} w={width} h={height} dark={t.scheme === "dark"} still={still} />
+        <Blob key={i} i={i} color={color} w={width} h={height} dark={t.scheme === "dark"} still={still} speed={t.motion.auroraSpeed || 1} />
       ))}
     </View>
   )

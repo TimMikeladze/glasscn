@@ -1,10 +1,10 @@
 import * as React from "react"
 import { View } from "react-native"
-import { ArrowRight, MoreHorizontal, Pen, Plus, Sprout, Trash2 } from "lucide-react-native"
+import { ArrowRight, MoreHorizontal, Pen, Plus, Save, Sprout, Trash2 } from "lucide-react-native"
 
 import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount, AvatarImage } from "@/components/glass/native/avatar"
 import { Badge } from "@/components/glass/native/badge"
-import { Button } from "@/components/glass/native/button"
+import { Button, PullDownButton, SplitButton } from "@/components/glass/native/button"
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/glass/native/card"
 import { Input } from "@/components/glass/native/input"
 import { Kbd, KbdGroup } from "@/components/glass/native/kbd"
@@ -61,15 +61,22 @@ function Fields() {
   return (
     <>
       <Section title="Input">
-        <Label nativeID="name-label">Name</Label>
-        <Input aria-labelledby="name-label" placeholder="Your name" value={name} onChangeText={setName} />
-        <Input placeholder="Invalid" invalid defaultValue="not-an-email" />
+        <Label htmlFor="demo-name" required>
+          Name (press me to focus)
+        </Label>
+        <Input id="demo-name" placeholder="Your name" value={name} onChangeText={setName} />
+        <Input placeholder="Invalid" invalid defaultValue="not-an-email" accessibilityHint="Enter an email address" />
         <Input placeholder="Disabled" disabled />
         <Input placeholder="Password" secureTextEntry />
+        <View style={row}>
+          <Input size="sm" placeholder="sm" style={{ width: 100 }} />
+          <Input size="lg" placeholder="lg" style={{ width: 140 }} />
+        </View>
       </Section>
       <Section title="Textarea" note="Grows with its text">
         <Textarea placeholder="What mattered today?" value={note} onChangeText={setNote} />
         <Textarea placeholder="Capped at 160" maxHeight={160} />
+        <Textarea placeholder="Max 3 rows" maxRows={3} minHeight={60} />
         <Textarea placeholder="Invalid" invalid />
         <Textarea placeholder="Disabled" disabled />
       </Section>
@@ -252,6 +259,39 @@ export const demos: Record<string, Demo> = {
             </Button>
           </View>
         </Section>
+        <Section title="Prominent · loading">
+          <View style={row}>
+            <Button variant="prominent">Prominent</Button>
+            <Button loading>
+              <Save /> Save
+            </Button>
+            <Button loading variant="secondary">
+              Centered spinner
+            </Button>
+            <Button loading loadingText="Saving…" variant="tinted">
+              Save
+            </Button>
+            <Button loading size="icon" variant="glass" accessibilityLabel="Busy">
+              <Plus />
+            </Button>
+          </View>
+        </Section>
+        <Section title="Pull-down · split">
+          <View style={row}>
+            <PullDownButton variant="secondary">Sort</PullDownButton>
+            <PullDownButton variant="glass">More</PullDownButton>
+            <SplitButton>
+              <Button>Publish</Button>
+              <PullDownButton accessibilityLabel="More publish options" />
+            </SplitButton>
+            <SplitButton>
+              <Button variant="secondary">Export</Button>
+              <Button variant="secondary" size="icon" accessibilityLabel="More">
+                <MoreHorizontal />
+              </Button>
+            </SplitButton>
+          </View>
+        </Section>
         <Section title="Shape · disabled">
           <View style={row}>
             <Button shape="rounded" variant="glass">
@@ -298,6 +338,9 @@ export const demos: Record<string, Demo> = {
           <Sprout size={14} /> With icon
         </Label>
         <Label disabled>Disabled</Label>
+        <Label required>Required</Label>
+        <Label optional>Optional</Label>
+        <Label optional="(if any)">Custom optional</Label>
       </Section>
     ),
   },

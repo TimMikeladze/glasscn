@@ -40,7 +40,7 @@ function Avatar({ size = "default", style, children, ...props }: ViewProps & { s
   const box = { ...avatarVariants(ui, { size }), fontSize: undefined }
   return (
     <AvatarContext.Provider value={value}>
-      <View style={[box, grouped ? { backgroundColor: ui.glassTint, marginLeft: -8 } : null, style]} {...props}>
+      <View style={[box, grouped ? { backgroundColor: ui.glassTint, marginStart: -8 } : null, style]} {...props}>
         {children}
         <Rim grouped={grouped} />
       </View>
@@ -99,7 +99,7 @@ function AvatarFallback({ style, children, ...props }: ViewProps) {
 function AvatarGroup({ style, ...props }: ViewProps) {
   return (
     <GroupContext.Provider value>
-      <View style={[{ flexDirection: "row", alignItems: "center", paddingLeft: 8 }, style]} {...props} />
+      <View style={[{ flexDirection: "row", alignItems: "center", paddingStart: 8 }, style]} {...props} />
     </GroupContext.Provider>
   )
 }
@@ -110,7 +110,7 @@ function AvatarGroupCount({ size = "default", style, children, ...props }: ViewP
   const grouped = React.useContext(GroupContext)
   const { fontSize, ...box } = avatarVariants(ui, { size })
   return (
-    <View style={[box, { alignItems: "center", justifyContent: "center", backgroundColor: ui.glassTint }, grouped ? { marginLeft: -8 } : null, style]} {...props}>
+    <View style={[box, { alignItems: "center", justifyContent: "center", backgroundColor: ui.glassTint }, grouped ? { marginStart: -8 } : null, style]} {...props}>
       <View style={[StyleSheet.absoluteFill, { backgroundColor: ui.fill }]} />
       {typeof children === "string" || typeof children === "number" ? (
         <GText tone="muted" weight="500" style={{ fontSize, lineHeight: Math.round(fontSize * 1.2), fontVariant: ["tabular-nums"] }}>

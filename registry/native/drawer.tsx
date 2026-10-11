@@ -1,5 +1,5 @@
 import * as React from "react"
-import { View, type ViewProps } from "react-native"
+import { ScrollView, type ScrollViewProps } from "react-native"
 
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger, type SheetDetent } from "@/components/glass/native/sheet"
 
@@ -15,8 +15,8 @@ function DrawerContent({ detents = DEFAULT_DETENTS, ...props }: Omit<React.Compo
 }
 
 /** The scrolling middle (web's DrawerBody). */
-function DrawerBody({ style, ...props }: ViewProps) {
-  return <View style={[{ flex: 1, paddingHorizontal: 20 }, style]} {...props} />
+function DrawerBody({ style, contentContainerStyle, ...props }: ScrollViewProps) {
+  return <ScrollView style={[{ flex: 1 }, style]} contentContainerStyle={[{ paddingHorizontal: 20, gap: 12 }, contentContainerStyle]} keyboardShouldPersistTaps="handled" {...props} />
 }
 
 const DrawerHeader = SheetHeader

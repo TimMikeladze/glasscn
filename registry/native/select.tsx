@@ -69,7 +69,7 @@ function SelectTrigger({ size = "default", variant = "default", style, children,
       accessibilityRole="combobox"
       accessibilityLabel={accessibilityLabel}
       style={[
-        { height: ui.control[size], flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8, paddingHorizontal: pill ? 12 : ui.pad.sm, borderRadius: pill ? ui.radius.button : ui.radius.control, backgroundColor: ui.fill, opacity: disabled ? 0.5 : 1 },
+        { minHeight: ui.control[size], flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8, paddingHorizontal: pill ? 12 : ui.pad.sm, borderRadius: pill ? ui.radius.button : ui.radius.control, backgroundColor: ui.fill, opacity: disabled ? 0.5 : 1 },
         style,
       ]}
     >

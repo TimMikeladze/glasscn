@@ -1,8 +1,8 @@
 import * as React from "react"
-import { View, type StyleProp, type ViewProps, type ViewStyle } from "react-native"
-import { Path, Rect } from "react-native-svg"
+import { type StyleProp, type ViewProps, type ViewStyle } from "react-native"
+import { Path } from "react-native-svg"
 
-import { ChartContainer, ChartLegend, chartColor, nearest, seriesTooltip, useControlRadius, type AxisSpec, type ChartFrame, type ChartSeries } from "@/components/glass/native/chart"
+import { ChartContainer, ChartLegend, chartColor, presetContainerProps, seriesTooltip, useControlRadius, type AxisSpec, type ChartFrame, type ChartPresetProps, type ChartSeries } from "@/components/glass/native/chart"
 import { runningTotals } from "@/components/glass/native/chart-math"
 import { useUI } from "@/components/glass/native/ui"
 
@@ -48,9 +48,18 @@ export function BarChart<Row>({
   xFormat,
   legend = series.length > 1,
   grid = true,
+  selectedX,
+  onSelect,
+  onScrub,
+  state,
+  onRetry,
+  stateLabels,
+  accessibilityTable,
+  axis,
   style,
   ...props
-}: Omit<ViewProps, "children" | "style"> & {
+}: Omit<ViewProps, "children" | "style"> &
+  ChartPresetProps<Row> & {
   data: readonly Row[]
   x: (d: Row) => XValue
   series: readonly ChartSeries<Row>[]
@@ -92,13 +101,6 @@ export function BarChart<Row>({
     const zero = scale.map(0)
     return (
       <>
-        {f.focused !== null ? (
-          horizontal ? (
-            <Rect x={f.plot.left} y={band.map(category(data[f.focused]))} width={f.plot.width} height={band.bandwidth} fill={ui.fill} rx={radius} />
-          ) : (
-            <Rect x={band.map(category(data[f.focused]))} y={f.plot.top} width={band.bandwidth} height={f.plot.height} fill={ui.fill} rx={radius} />
-          )
-        ) : null}
         {data.map((d, j) => {
           const start = band.map(category(d))
           const bw = band.bandwidth
@@ -124,7 +126,6 @@ export function BarChart<Row>({
                 key={`${j}-${s.id}`}
                 d={barPath(horizontal, at, thick, lo === 0 ? zero : scale.map(lo), scale.map(hi), radius, !stacked || i === capIndex)}
                 fill={colors[i]}
-                opacity={f.focused === null || f.focused === j ? 1 : 0.55}
               />
             )
           })
@@ -133,31 +134,27 @@ export function BarChart<Row>({
     )
   }
 
+  const center = (f: ChartFrame) => data.map((d) => cat(f).map(category(d)) + cat(f).bandwidth / 2)
   return (
-    <View style={[{ width: "100%", gap: 12 }, style]} {...props}>
-      <ChartContainer
-        ariaLabel={ariaLabel}
-        height={height}
-        x={horizontal ? vals : cats}
-        y={horizontal ? cats : vals}
-        grow={horizontal ? "x" : "y"}
-        render={render}
-        hit={(p, f) => {
-          const band = cat(f)
-          return nearest(
-            data.map((d) => band.map(category(d)) + band.bandwidth / 2),
-            horizontal ? p.y : p.x
-          )
-        }}
-        tooltip={(i, f) => {
-          const row = data[i]
-          const band = cat(f)
-          const mid = band.map(category(row)) + band.bandwidth / 2
-          const peak = stacked ? (totals[i][totals[i].length - 1] ?? 0) : Math.max(0, ...series.map((s) => s.value(row) ?? 0))
-          return { content: content(row), anchor: horizontal ? { x: f.x.map(peak), y: mid } : { x: mid, y: f.y.map(peak) } }
-        }}
-      />
-      {legend ? <ChartLegend items={series.map((s, i) => ({ label: s.label, color: colors[i] }))} /> : null}
-    </View>
+    <ChartContainer
+      ariaLabel={ariaLabel}
+      height={height}
+      x={horizontal ? vals : cats}
+      y={horizontal ? cats : vals}
+      grow={horizontal ? "x" : "y"}
+      render={render}
+      highlight="band"
+      targets={(f) => ({ kind: horizontal ? "y" : "x", at: center(f) })}
+      tooltip={(i, f) => {
+        const row = data[i]
+        const mid = center(f)[i]
+        const peak = stacked ? (totals[i][totals[i].length - 1] ?? 0) : Math.max(0, ...series.map((s) => s.value(row) ?? 0))
+        return { content: content(row), anchor: horizontal ? { x: f.x.map(peak), y: mid } : { x: mid, y: f.y.map(peak) } }
+      }}
+      {...presetContainerProps(data, x, series, { selectedX, onSelect, onScrub, state, onRetry, stateLabels, accessibilityTable, axis: horizontal ? "leading" : axis, ariaLabel, valueFormat, xFormat })}
+      legend={legend ? <ChartLegend items={series.map((s, i) => ({ label: s.label, color: colors[i] }))} /> : null}
+      style={style}
+      {...props}
+    />
   )
 }

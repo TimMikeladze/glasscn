@@ -136,6 +136,112 @@ function SideSheet({ side }: { side: "top" | "right" | "bottom" | "left" }) {
   )
 }
 
+function DetentSheet({ native = true, guarded, controlled, inspector }: { native?: boolean; guarded?: boolean; controlled?: boolean; inspector?: boolean }) {
+  const [detent, setDetent] = React.useState(0)
+  const label = inspector ? "Inspector (modal false)" : guarded ? "Guarded dismiss" : controlled ? `Controlled detent: ${detent}` : native ? "Detents (system sheet)" : "Detents (native={false})"
+  return (
+    <Sheet>
+      <SheetTrigger>
+        <Face>{label}</Face>
+      </SheetTrigger>
+      <SheetContent
+        side="bottom"
+        native={native}
+        detents={["medium", "large", 0.3]}
+        detent={controlled ? detent : undefined}
+        onDetentChange={setDetent}
+        modal={!inspector}
+        onBeforeDismiss={guarded ? () => new Promise<boolean>((resolve) => resolve(confirmDismiss())) : undefined}
+      >
+        <SheetHeader>
+          <SheetTitle>Tonight’s entry</SheetTitle>
+          <SheetDescription>Drag the grabber between detents; tap it to cycle; drag down to dismiss.</SheetDescription>
+        </SheetHeader>
+        <View style={{ paddingHorizontal: 20 }}>
+          <Body>Detent index: {detent}</Body>
+        </View>
+      </SheetContent>
+    </Sheet>
+  )
+}
+
+let dismissals = 0
+/** Keeps the sheet on every other attempt, to show onBeforeDismiss. */
+function confirmDismiss() {
+  dismissals++
+  if (dismissals % 2) {
+    toast.warning("Kept — drag again to dismiss")
+    return false
+  }
+  return true
+}
+
+function LongDialog() {
+  const ui = useUI()
+  return (
+    <Dialog>
+      <DialogTrigger>
+        <Face>Long form + keyboard</Face>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Tonight’s reflection</DialogTitle>
+          <DialogDescription>Caps at the window height and scrolls; rides above the keyboard.</DialogDescription>
+        </DialogHeader>
+        {Array.from({ length: 8 }, (_, i) => (
+          <TextInput key={i} placeholder={`Line ${i + 1}`} placeholderTextColor={ui.mutedForeground} style={{ height: ui.control.default, borderRadius: ui.radius.control, paddingHorizontal: 12, backgroundColor: ui.fill, color: ui.foreground }} />
+        ))}
+        <DialogFooter>
+          <DialogClose>
+            <Face variant="primary">Save</Face>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function SymbolMenu({ native }: { native: boolean }) {
+  return (
+    <DropdownMenu native={native}>
+      <DropdownMenuTrigger>
+        <Face>{native ? "System menu" : "Glass menu (native={false})"}</Face>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem systemImage="square.and.arrow.up" onSelect={() => toast("Shared")}>
+          Share
+        </DropdownMenuItem>
+        <DropdownMenuItem systemImage="doc.on.doc" onSelect={() => toast("Copied")}>
+          Copy
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem variant="destructive" systemImage="trash" onSelect={() => toast.error("Deleted")}>
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+function CustomMenu() {
+  const ui = useUI()
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <Face>Custom content → glass</Face>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <View style={{ padding: 10, flexDirection: "row", gap: 6 }}>
+          {ui.charts.slice(0, 5).map((c) => (
+            <View key={c} style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: c }} />
+          ))}
+        </View>
+        <DropdownMenuItem onSelect={() => toast("Picked")}>Pick colour</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
 function WeekPopover({ align, side }: { align?: "start" | "center" | "end"; side?: "top" | "right" | "bottom" | "left" }) {
   return (
     <Popover>
@@ -269,6 +375,22 @@ function Toasts() {
   )
 }
 
+function ToastOverDialog() {
+  return (
+    <Dialog>
+      <DialogTrigger onPress={() => setTimeout(() => toast.info("Above the dialog"), 600)}>
+        <Face>Dialog + toast</Face>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Under the toast</DialogTitle>
+          <DialogDescription>The toast floats in its own window above this modal on iOS.</DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 function Pressish({ label, onPress, primary }: { label: string; onPress: () => void; primary?: boolean }) {
   return (
     <Press onPress={onPress} accessibilityRole="button">
@@ -378,6 +500,9 @@ export const demos: Record<string, Demo> = {
         <Section title="Controlled · footer close">
           <ControlledDialog />
         </Section>
+        <Section title="Long content · keyboard" note="maxHeight + a scrolling body; KeyboardAvoidingView (keyboard-controller). VoiceOver lands on the title.">
+          <LongDialog />
+        </Section>
       </>
     ),
   },
@@ -409,6 +534,15 @@ export const demos: Record<string, Demo> = {
             <SideSheet side="bottom" />
           </Row>
         </Section>
+        <Section title="Detents" note="iOS/Android: the system sheet (@expo/ui BottomSheet). native={false}, a controlled detent or onBeforeDismiss use the Reanimated sheet: drag, rubber-band, tap the grabber to cycle.">
+          <Row>
+            <DetentSheet />
+            <DetentSheet native={false} />
+            <DetentSheet controlled />
+            <DetentSheet guarded />
+            <DetentSheet inspector native={false} />
+          </Row>
+        </Section>
       </>
     ),
   },
@@ -435,7 +569,7 @@ export const demos: Record<string, Demo> = {
     title: "Tooltip",
     render: () => (
       <TooltipProvider>
-        <Section title="Settings" note="Hover on web (after delayDuration); long-press on touch.">
+        <Section title="Settings" note="Hover on web and iPad pointers (after delayDuration); long-press on Android only. Everywhere the tip is the trigger's accessibilityHint.">
           <Row>
             <SettingsTip />
             <Tooltip delayDuration={0}>
@@ -459,6 +593,13 @@ export const demos: Record<string, Demo> = {
         <Section title="This night" note="Items with icons and shortcuts, a sub-menu (expands in place), checkbox and radio items, destructive.">
           <NightMenu />
         </Section>
+        <Section title="System or glass" note="Plain items open the system menu on iOS/Android (SF Symbols via systemImage); custom content, a controlled open or native={false} the liquid-glass menu. Rows are 44pt, labels sentence case, a selection tick on choose.">
+          <Row>
+            <SymbolMenu native />
+            <SymbolMenu native={false} />
+            <CustomMenu />
+          </Row>
+        </Section>
       </>
     ),
   },
@@ -466,8 +607,11 @@ export const demos: Record<string, Demo> = {
     title: "Toaster",
     render: () => (
       <>
-        <Section title="toast()" note="Tap the stack to fan it out; swipe sideways to dismiss. Mount <Toaster /> once at the app root.">
+        <Section title="toast()" note="Tap the stack to fan it out; swipe sideways to dismiss. Spoken by the screen reader; success/warning/error buzz; above modals on iOS (FullWindowOverlay). Mount <Toaster /> once at the app root.">
           <Toasts />
+        </Section>
+        <Section title="Over a modal" note="Opens a dialog, then toasts — the toast sits above it.">
+          <ToastOverDialog />
         </Section>
       </>
     ),

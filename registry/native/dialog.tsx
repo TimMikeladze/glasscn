@@ -1,18 +1,14 @@
 import * as React from "react"
-import { AccessibilityInfo, Animated, Easing, Modal, Pressable, StyleSheet, View, useWindowDimensions, type StyleProp, type ViewProps, type ViewStyle } from "react-native"
+import { AccessibilityInfo, Modal, Platform, Pressable, ScrollView, StyleSheet, View, findNodeHandle, useWindowDimensions, type StyleProp, type Text, type ViewProps, type ViewStyle } from "react-native"
+import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withSpring, withTiming, type SharedValue } from "react-native-reanimated"
+import { KeyboardAvoidingView } from "react-native-keyboard-controller"
+import { SafeAreaInsetsContext } from "react-native-safe-area-context"
 import { XIcon } from "lucide-react-native"
 
+import { useReducedMotion } from "@/components/glass/native/a11y"
 import { Glass, canFade } from "@/components/glass/native/glass"
 import { Press } from "@/components/glass/native/press"
 import { GText, useUI, web, type GTextProps } from "@/components/glass/native/ui"
-
-let reduced = false
-AccessibilityInfo.isReduceMotionEnabled?.()
-  .then((v) => (reduced = v))
-  .catch(() => {})
-AccessibilityInfo.addEventListener?.("reduceMotionChanged", (v) => (reduced = v))
-/** The OS "reduce motion" setting, kept current. Overlays snap instead of animating when it's on. */
-export const reduceMotion = () => reduced
 
 /** Radix-style open state: controlled by `open`/`onOpenChange`, or uncontrolled from `defaultOpen`. */
 export function useControllableOpen(open: boolean | undefined, defaultOpen: boolean | undefined, onOpenChange?: (open: boolean) => void) {
@@ -29,51 +25,75 @@ export function useControllableOpen(open: boolean | undefined, defaultOpen: bool
 }
 
 /**
- * Keeps an overlay mounted through its exit animation. `progress` runs 0 → 1 on
- * open and back on close; `mounted` drops once the exit finishes.
+ * Keeps an overlay mounted through its exit. `progress` (a Reanimated shared value)
+ * springs 0 → 1 on open and eases back on close; `mounted` drops once the exit
+ * finishes. Snaps under Reduce Motion.
  */
 export function usePresence(open: boolean, duration = 220) {
+  const ui = useUI()
+  const reduced = useReducedMotion()
   const [mounted, setMounted] = React.useState(open)
   if (open && !mounted) setMounted(true)
-  const [progress] = React.useState(() => new Animated.Value(open ? 1 : 0))
+  const progress = useSharedValue(open ? 1 : 0)
   React.useEffect(() => {
-    const anim = reduceMotion()
-      ? Animated.timing(progress, { toValue: open ? 1 : 0, duration: 0, useNativeDriver: true })
-      : open
-        ? Animated.spring(progress, { toValue: 1, friction: 9, tension: 120, useNativeDriver: true })
-        : Animated.timing(progress, { toValue: 0, duration: Math.round(duration * 0.75), easing: Easing.in(Easing.quad), useNativeDriver: true })
-    anim.start(({ finished }) => {
-      if (finished && !open) setMounted(false)
-    })
-    return () => anim.stop()
-  }, [open, progress, duration])
+    const unmount = () => setMounted(false)
+    const done = (finished?: boolean) => {
+      "worklet"
+      if (finished && !open) runOnJS(unmount)()
+    }
+    if (reduced || ui.motion.duration === 0) progress.set(withTiming(open ? 1 : 0, { duration: 0 }, done))
+    else if (open) progress.set(withSpring(1, ui.motion.springConfig))
+    else progress.set(withTiming(0, { duration: Math.round(duration * 0.75), easing: Easing.in(Easing.quad) }, done))
+  }, [open, reduced, duration, progress, ui.motion.duration, ui.motion.springConfig])
   return { mounted: mounted || open, progress }
 }
 
-/** Opacity for a glass surface: only where fading glass is safe (never on iOS 26 Liquid Glass). */
-export const glassOpacity = (progress: Animated.Value) => (canFade() ? progress.interpolate({ inputRange: [0, 1], outputRange: [0, 1] }) : 1)
+/**
+ * The entrance every overlay shares: translate and scale in from `from`. Opacity
+ * only where glass may fade — never on or above Liquid Glass (iOS 26), which
+ * materialises through `Glass visible` instead.
+ */
+export function useEntrance(progress: SharedValue<number>, { x = 0, y = 0, scale = 1 }: { x?: number; y?: number; scale?: number } = {}) {
+  const fade = canFade()
+  return useAnimatedStyle(() => {
+    const p = progress.value
+    return {
+      opacity: fade ? Math.min(1, Math.max(0, p)) : 1,
+      transform: [{ translateX: x * (1 - p) }, { translateY: y * (1 - p) }, { scale: scale + (1 - scale) * p }],
+    }
+  })
+}
 
 /** Wraps bare strings/numbers in GText so they're legal React Native children. */
 export function textChildren(children: React.ReactNode, props?: GTextProps) {
   return React.Children.map(children, (c) => (typeof c === "string" || typeof c === "number" ? <GText {...props}>{c}</GText> : c))
 }
 
+/** Safe-area insets, zero without a SafeAreaProvider (never throws). */
+export function useInsets() {
+  return React.useContext(SafeAreaInsetsContext) ?? { top: 0, right: 0, bottom: 0, left: 0 }
+}
+
 /** The dimmed backdrop — a sibling of the glass, so fading it is safe everywhere. Tapping it dismisses. */
-export function Backdrop({ progress, onPress, dim = true }: { progress: Animated.Value; onPress?: () => void; dim?: boolean }) {
+export function Backdrop({ progress, onPress, dim = true }: { progress: SharedValue<number>; onPress?: () => void; dim?: boolean }) {
   const ui = useUI()
+  const fade = useAnimatedStyle(() => ({ opacity: Math.min(1, Math.max(0, progress.value)) }))
   return (
-    <Animated.View style={[StyleSheet.absoluteFill, { opacity: progress }]}>
+    <Animated.View style={[StyleSheet.absoluteFill, fade]}>
       <Pressable
         accessibilityRole="button"
         accessibilityLabel="Dismiss"
+        // screen readers dismiss through the escape gesture / close button, not this layer
+        importantForAccessibility="no"
+        accessibilityElementsHidden
         onPress={onPress}
-        style={[StyleSheet.absoluteFill, dim ? { backgroundColor: ui.scheme === "dark" ? "rgba(0,0,0,0.45)" : "rgba(0,0,0,0.15)" } : null, dim ? web({ backdropFilter: "blur(3px)", WebkitBackdropFilter: "blur(3px)", cursor: "default" }) : web({ cursor: "default" })]}
+        style={[StyleSheet.absoluteFill, dim ? { backgroundColor: ui.dim } : null, dim ? web({ backdropFilter: "blur(3px)", WebkitBackdropFilter: "blur(3px)", cursor: "default" }) : web({ cursor: "default" })]}
       />
     </Animated.View>
   )
 }
 
-/** The round "×" in a dialog or sheet corner (web: Button variant="secondary" size="icon-sm"). */
+/** The round "×" in a dialog or sheet corner (web: Button variant="secondary" size="icon-sm"). A fill, never glass on glass. */
 export function CloseButton({ onPress, style }: { onPress: () => void; style?: StyleProp<ViewStyle> }) {
   const ui = useUI()
   return (
@@ -82,7 +102,7 @@ export function CloseButton({ onPress, style }: { onPress: () => void; style?: S
       haptic
       accessibilityRole="button"
       accessibilityLabel="Close"
-      hitSlop={8}
+      hitSlop={Math.ceil((44 - ui.control.sm) / 2)}
       style={[{ position: "absolute", top: 14, right: 14, width: ui.control.sm, height: ui.control.sm, borderRadius: ui.radius.button, alignItems: "center", justifyContent: "center", backgroundColor: ui.fillStrong }, web({ cursor: "pointer" }), style]}
     >
       <XIcon size={16} color={ui.foreground} />
@@ -90,7 +110,19 @@ export function CloseButton({ onPress, style }: { onPress: () => void; style?: S
   )
 }
 
-type DialogCtx = { open: boolean; setOpen: (open: boolean) => void }
+/** Moves the screen reader to `ref` once an overlay has presented (NAT-47). */
+export function useInitialFocus(active: boolean, ref: React.RefObject<View | Text | null>) {
+  React.useEffect(() => {
+    if (!active || Platform.OS === "web") return
+    const timer = setTimeout(() => {
+      const node = ref.current ? findNodeHandle(ref.current) : null
+      if (node) AccessibilityInfo.setAccessibilityFocus(node)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [active, ref])
+}
+
+type DialogCtx = { open: boolean; setOpen: (open: boolean) => void; titleRef: React.RefObject<Text | null>; titleId: string; descriptionId: string }
 const DialogContext = React.createContext<DialogCtx | null>(null)
 /** The nearest Dialog/Sheet's open state (Sheet shares it). */
 export function useDialog() {
@@ -104,7 +136,9 @@ export type DialogProps = { open?: boolean; defaultOpen?: boolean; onOpenChange?
 /** Root: holds open state, controlled (`open`/`onOpenChange`) or not (`defaultOpen`). */
 function Dialog({ open, defaultOpen, onOpenChange, children }: DialogProps) {
   const [value, setOpen] = useControllableOpen(open, defaultOpen, onOpenChange)
-  const ctx = React.useMemo(() => ({ open: value, setOpen }), [value, setOpen])
+  const titleRef = React.useRef<Text>(null)
+  const id = React.useId().replace(/:/g, "")
+  const ctx = React.useMemo(() => ({ open: value, setOpen, titleRef, titleId: `dialog-title-${id}`, descriptionId: `dialog-description-${id}` }), [value, setOpen, id])
   return <DialogContext.Provider value={ctx}>{children}</DialogContext.Provider>
 }
 
@@ -117,6 +151,7 @@ function DialogTrigger({ children, onPress, ...props }: PressProps) {
     <Press
       accessibilityRole="button"
       aria-expanded={open}
+      aria-haspopup="dialog"
       {...props}
       onPress={(e) => {
         onPress?.(e)
@@ -148,41 +183,71 @@ function DialogClose({ children, onPress, ...props }: PressProps) {
 /** Renders children above everything (an RN Modal: transparent, own animation). Hardware back / Escape call `onRequestClose`. */
 function DialogPortal({ visible, onRequestClose, children }: { visible: boolean; onRequestClose?: () => void; children?: React.ReactNode }) {
   return (
-    <Modal transparent visible={visible} animationType="none" statusBarTranslucent navigationBarTranslucent supportedOrientations={["portrait", "landscape"]} onRequestClose={onRequestClose}>
+    <Modal transparent visible={visible} animationType="none" statusBarTranslucent navigationBarTranslucent supportedOrientations={["portrait", "portrait-upside-down", "landscape"]} onRequestClose={onRequestClose}>
       {children}
     </Modal>
   )
 }
 
-/** The page dims and softens behind the glass. */
-function DialogOverlay({ progress, onPress }: { progress: Animated.Value; onPress?: () => void }) {
+/** Lifts its content above the on-screen keyboard (react-native-keyboard-controller; a plain View on the web). */
+export function KeyboardAvoid({ style, children, ...props }: ViewProps) {
+  if (Platform.OS === "web")
+    return (
+      <View style={style} {...props}>
+        {children}
+      </View>
+    )
+  return (
+    <KeyboardAvoidingView behavior="padding" style={style} {...props}>
+      {children}
+    </KeyboardAvoidingView>
+  )
+}
+
+/** The page dims behind the glass (the web's --glass-dim). */
+function DialogOverlay({ progress, onPress }: { progress: SharedValue<number>; onPress?: () => void }) {
   return <Backdrop progress={progress} onPress={onPress} />
 }
 
-/** Centred strong-glass card: rises and scales in (fades only where glass may fade). */
+/**
+ * Centred liquid-glass panel (the control layer; what's inside is fills, never more glass).
+ * Rises and scales in, materialising on iOS 26; rides above the keyboard; caps at the
+ * window height and scrolls its body. The screen reader lands on the title.
+ */
 function DialogContent({ style, children, showCloseButton = true, ...props }: ViewProps & { showCloseButton?: boolean }) {
   const ui = useUI()
-  const { open, setOpen } = useDialog()
+  const { open, setOpen, titleRef, titleId, descriptionId } = useDialog()
   const { mounted, progress } = usePresence(open)
-  const { width } = useWindowDimensions()
+  const { width, height } = useWindowDimensions()
+  const insets = useInsets()
+  const entrance = useEntrance(progress, { y: 16, scale: 0.95 })
   const close = () => setOpen(false)
+  useInitialFocus(open && mounted, titleRef)
+  const maxHeight = height - insets.top - insets.bottom - 32
   return (
     <DialogPortal visible={mounted} onRequestClose={close}>
-      <View style={styles.center} pointerEvents="box-none">
+      <KeyboardAvoid style={styles.center} pointerEvents="box-none">
         <DialogOverlay progress={progress} onPress={close} />
-        <Animated.View
-          style={{
-            width: Math.min(width - 32, 448),
-            opacity: glassOpacity(progress),
-            transform: [{ translateY: progress.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }, { scale: progress.interpolate({ inputRange: [0, 1], outputRange: [0.95, 1] }) }],
-          }}
-        >
-          <Glass radius={ui.radius.surface} tint={ui.glassStrong} accessibilityViewIsModal role="dialog" aria-modal style={[{ padding: 24, gap: 16 }, style]} {...props}>
-            {textChildren(children)}
+        <Animated.View style={[{ width: Math.min(width - 32, 448), maxHeight }, entrance]}>
+          <Glass
+            variant="liquid"
+            visible={open}
+            radius={ui.radius.surface}
+            accessibilityViewIsModal
+            role="dialog"
+            aria-modal
+            aria-labelledby={titleId}
+            aria-describedby={descriptionId}
+            style={{ maxHeight, overflow: "hidden" }}
+            {...props}
+          >
+            <ScrollView bounces={false} keyboardShouldPersistTaps="handled" style={{ flexGrow: 0 }} contentContainerStyle={[{ padding: 24, gap: 16 }, style]}>
+              {textChildren(children)}
+            </ScrollView>
             {showCloseButton ? <CloseButton onPress={close} /> : null}
           </Glass>
         </Animated.View>
-      </View>
+      </KeyboardAvoid>
     </DialogPortal>
   )
 }
@@ -216,14 +281,16 @@ function DialogFooter({ style, showCloseButton = false, children, ...props }: Vi
   )
 }
 
-/** Heading type, text-lg. */
+/** Heading type, text-lg. Takes the screen reader's focus when the dialog opens. */
 function DialogTitle({ style, ...props }: GTextProps) {
-  return <GText font="heading" size="lg" accessibilityRole="header" style={style} {...props} />
+  const ctx = React.useContext(DialogContext)
+  return <GText {...({ ref: ctx?.titleRef } as object)} nativeID={ctx?.titleId} font="heading" size="lg" accessibilityRole="header" style={style} {...props} />
 }
 
 /** Muted supporting text, text-sm. */
 function DialogDescription(props: GTextProps) {
-  return <GText size="sm" tone="muted" {...props} />
+  const ctx = React.useContext(DialogContext)
+  return <GText nativeID={ctx?.descriptionId} size="sm" tone="muted" {...props} />
 }
 
 const styles = StyleSheet.create({

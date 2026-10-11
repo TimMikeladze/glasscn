@@ -206,19 +206,22 @@ const native = (name, title, description, deps, reg = [], ext = "tsx") => ({
   files: [{ path: `registry/native/${name}.${ext}`, type: ext === "ts" ? "registry:lib" : "registry:ui", target: `@components/glass/native/${name}.${ext}` }],
 })
 
-const NATIVE_NAMES = ["typography", "prose", "card", "theme-scope", "button", "badge", "input", "textarea", "label", "kbd", "separator", "avatar", "switch", "checkbox", "segmented-control", "glass-group", "tabs", "slider", "progress", "dock", "toolbar", "scroll-edge", "navigation-bar", "sidebar", "search-field", "grouped-list", "dialog", "alert-dialog", "sheet", "action-sheet", "popover", "tooltip", "dropdown-menu", "toaster", "activity-rings", "progress-ring", "sparkline", "stat", "bar-list", "gauge", "tracker", "category-bar", "heatmap", "chart", "area-chart", "bar-chart", "line-chart", "donut-chart", "table", "data-table", "chat", "dashboard-01", "analytics-01", "settings-01", "auth-01", "chat-01", "chat-markdown", "chat-parts", "command", "combobox", "calendar", "date-picker", "spinner", "skeleton", "select", "radio-group", "field", "input-group", "button-group", "toggle", "toggle-group", "stepper", "drawer", "context-menu", "confirmation-popover", "scroll-area", "accordion", "collapsible", "alert", "item", "empty", "backdrop", "kpi", "widget", "range-chart"]
+const NATIVE_NAMES = ["typography", "prose", "card", "theme-scope", "button", "badge", "input", "textarea", "label", "kbd", "separator", "avatar", "switch", "checkbox", "segmented-control", "glass-group", "tabs", "slider", "progress", "dock", "toolbar", "scroll-edge", "navigation-bar", "sidebar", "search-field", "grouped-list", "dialog", "alert-dialog", "sheet", "action-sheet", "popover", "tooltip", "dropdown-menu", "toaster", "activity-rings", "progress-ring", "sparkline", "stat", "bar-list", "gauge", "tracker", "category-bar", "heatmap", "chart", "area-chart", "bar-chart", "line-chart", "donut-chart", "table", "data-table", "chat", "dashboard-01", "analytics-01", "settings-01", "auth-01", "chat-01", "chat-markdown", "chat-parts", "command", "combobox", "calendar", "date-picker", "spinner", "skeleton", "select", "radio-group", "field", "input-group", "button-group", "toggle", "toggle-group", "stepper", "drawer", "context-menu", "confirmation-popover", "scroll-area", "accordion", "collapsible", "alert", "item", "empty", "backdrop", "kpi", "widget", "range-chart", "tabs-layout"]
 
 /**
  * The native port of every web component and block: one React Native file per
  * item, the same name and API, rendered on the web by react-native-web.
  * Each file's imports are checked against these deps by registry.test.mjs.
  */
+const NATIVE_ONLY = {
+  "tabs-layout": { title: "Tabs layout", description: "The app tab bar as a recipe: expo-router NativeTabs themed from glasscn tokens — minimize on scroll, a bottom accessory with placement, a search tab, a Material bar on Android." },
+}
 const NATIVE_COMPONENTS = nativeComponents()
 
 function nativeComponents() {
   const meta = Object.fromEntries([...components, ...blocks].map((i) => [i.name, i]))
   return NATIVE_NAMES.map((name) => {
-    const web = meta[name]
+    const web = meta[name] ?? NATIVE_ONLY[name]
     const file = `registry/native/${name}.tsx`
     const source = existsSync(file) ? readFileSync(file, "utf8") : ""
     const pkgs = [...new Set([...source.matchAll(/from "([^@.][^"/]*|@[^"/]+\/[^"/]+)"/g)].map((m) => m[1]))].filter((p) => !["react", "react-native"].includes(p))
@@ -228,11 +231,19 @@ function nativeComponents() {
 }
 
 export const nativeItems = [
-  native("tokens", "Native tokens", "The glasscn palettes and tokens for React Native, a GlassThemeProvider and useGlassTheme().", []),
-  native("glass", "Native glass", "Frosted glass for Expo: Liquid Glass on iOS 26, blur on older iOS, backdrop-filter on web, a fill on Android.", ["expo-blur", "expo-glass-effect"], ["tokens"]),
+  {
+    ...native("tokens", "Native tokens", "The glasscn palettes and presets for React Native, generated from the web theme engine: a GlassThemeProvider and useGlassTheme().", [], ["a11y"]),
+    files: [
+      { path: "registry/native/tokens.tsx", type: "registry:ui", target: "@components/glass/native/tokens.tsx" },
+      { path: "registry/native/tokens.generated.ts", type: "registry:lib", target: "@components/glass/native/tokens.generated.ts" },
+    ],
+  },
+  native("a11y", "Native accessibility", "Live Reduce Motion, Reduce Transparency, Increase Contrast and Bold Text; screen-reader announcements; the 44pt hit-slop policy.", []),
+  native("glass", "Native glass", "Two-layer glass for Expo: material (system blur, web backdrop-filter, Android blur tier) for content, liquid (Liquid Glass on iOS 26) for controls.", ["expo-blur", "expo-glass-effect"], ["tokens", "a11y"]),
   native("aurora", "Native aurora", "The drifting aurora for React Native, drawn with react-native-svg on the native driver.", ["react-native-svg"], ["tokens"]),
-  native("press", "Native press", "The pressable everything is built on: spring squash, dim, haptic, hover lift.", ["expo-haptics"]),
-  native("ui", "Native UI tokens", "The web theme's radii, control heights, type scale, chart colours and motion as plain values (useUI()), and GText, the text every native component sets type with.", [], ["tokens"]),
+  native("press", "Native press", "The pressable everything is built on: an elastic Reanimated spring press, optional dim, typed haptics, hover lift.", ["expo-haptics", "react-native-reanimated"], ["a11y", "ui"]),
+  native("ui", "Native UI tokens", "The web theme's radii, control heights, type scale, chart colours and motion as plain values (useUI()), and GText, the text every native component sets type with.", [], ["tokens", "a11y"]),
   native("chart-math", "Native chart maths", "The pure maths behind the native data components: ring arcs, smooth paths, heatmap grids, gauge arcs, segments, stacks.", [], [], "ts"),
+  native("toast-store", "Native toast store", "The toaster's pure state: queue, upsert, close, durations — no React Native, unit-tested.", [], [], "ts"),
   ...NATIVE_COMPONENTS,
 ]

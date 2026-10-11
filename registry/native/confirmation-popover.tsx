@@ -1,6 +1,7 @@
 import * as React from "react"
-import { View } from "react-native"
+import { View, useWindowDimensions } from "react-native"
 
+import { ActionSheet, ActionSheetAction, ActionSheetCancel, ActionSheetContent, ActionSheetDescription, ActionSheetHeader, ActionSheetTitle } from "@/components/glass/native/action-sheet"
 import { Button } from "@/components/glass/native/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/glass/native/popover"
 import { GText } from "@/components/glass/native/ui"
@@ -8,7 +9,10 @@ import { GText } from "@/components/glass/native/ui"
 type Ctx = { close: () => void }
 const ConfirmContext = React.createContext<Ctx>({ close: () => {} })
 
-/** A confirmation anchored to the button that asked for it — an alert popover with Cancel and a (destructive) confirm. */
+/**
+ * A confirmation anchored to the button that asked for it — an alert popover with Cancel
+ * and a (destructive) confirm. On phones (< 600pt wide) it's an action sheet instead, Apple's idiom.
+ */
 function ConfirmationPopover({ open, defaultOpen, onOpenChange, children }: { open?: boolean; defaultOpen?: boolean; onOpenChange?: (open: boolean) => void; children?: React.ReactNode }) {
   const [inner, setInner] = React.useState(defaultOpen ?? false)
   const value = open ?? inner
@@ -18,9 +22,11 @@ function ConfirmationPopover({ open, defaultOpen, onOpenChange, children }: { op
   }
   return (
     <ConfirmContext.Provider value={{ close: () => set(false) }}>
-      <Popover open={value} onOpenChange={set}>
-        {children}
-      </Popover>
+      <ActionSheet open={value} onOpenChange={set}>
+        <Popover open={value} onOpenChange={set}>
+          {children}
+        </Popover>
+      </ActionSheet>
     </ConfirmContext.Provider>
   )
 }
@@ -48,6 +54,22 @@ function ConfirmationPopoverContent({
   children?: React.ReactNode
 }) {
   const { close } = React.useContext(ConfirmContext)
+  const { width } = useWindowDimensions()
+  if (width < 600) {
+    return (
+      <ActionSheetContent>
+        <ActionSheetHeader>
+          <ActionSheetTitle>{title}</ActionSheetTitle>
+          {description ? <ActionSheetDescription>{description}</ActionSheetDescription> : null}
+        </ActionSheetHeader>
+        {children}
+        <ActionSheetAction variant={variant === "destructive" ? "destructive" : "preferred"} onPress={() => onConfirm?.()}>
+          {confirmLabel}
+        </ActionSheetAction>
+        <ActionSheetCancel onPress={() => onCancel?.()}>{cancelLabel}</ActionSheetCancel>
+      </ActionSheetContent>
+    )
+  }
   return (
     <PopoverContent role="alertdialog" style={{ width: 256 }} {...props}>
       <View style={{ gap: 4 }}>

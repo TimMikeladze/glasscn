@@ -2,6 +2,7 @@ import * as React from "react"
 import { type StyleProp, type ViewStyle } from "react-native"
 import { CheckIcon, MinusIcon } from "lucide-react-native"
 
+import { hitSlop } from "@/components/glass/native/a11y"
 import { Press } from "@/components/glass/native/press"
 import { useUI, web } from "@/components/glass/native/ui"
 
@@ -34,14 +35,18 @@ export function Checkbox({ checked, defaultChecked = false, onCheckedChange, dis
       haptic
       squash={ui.motion.pressScale}
       disabled={disabled}
-      hitSlop={10}
+      // a 44pt target around the small box (NAT-42)
+      hitSlop={hitSlop(size)}
       onPress={() => {
         const next = state === "indeterminate" ? true : !state
         setInner(next)
         onCheckedChange?.(next)
       }}
       accessibilityRole="checkbox"
-      aria-checked={state === "indeterminate" ? "mixed" : state} aria-disabled={disabled}
+      aria-checked={state === "indeterminate" ? "mixed" : state}
+      aria-disabled={disabled}
+      aria-invalid={invalid}
+      accessibilityState={{ checked: state === "indeterminate" ? "mixed" : state, disabled: !!disabled }}
       style={[
         {
           width: size,

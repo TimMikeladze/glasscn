@@ -1,6 +1,8 @@
 import { Stack } from "expo-router"
 import { Platform } from "react-native"
 import { StatusBar } from "expo-status-bar"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { KeyboardProvider } from "react-native-keyboard-controller"
 
 import { Toaster } from "@/components/glass/native/toaster"
 import { useGlassTheme } from "@/components/glass/native/tokens"
@@ -30,6 +32,7 @@ function Nav() {
         <Stack.Screen name="aurora" options={{ title: "Aurora" }} />
         <Stack.Screen name="press" options={{ title: "Press" }} />
         <Stack.Screen name="c/[name]" options={{ title: "Component" }} />
+        <Stack.Screen name="tabs-layout" options={{ title: "Tabs layout" }} />
       </Stack>
       {/* toasts are an overlay at the root, above every screen */}
       <Toaster />
@@ -39,8 +42,13 @@ function Nav() {
 
 export default function RootLayout() {
   return (
-    <SandboxThemeProvider>
-      <Nav />
-    </SandboxThemeProvider>
+    // gesture-handler and keyboard-controller roots: every glasscn native app needs both
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <KeyboardProvider>
+        <SandboxThemeProvider>
+          <Nav />
+        </SandboxThemeProvider>
+      </KeyboardProvider>
+    </GestureHandlerRootView>
   )
 }

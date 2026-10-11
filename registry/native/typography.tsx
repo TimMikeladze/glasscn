@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Linking, Text as RNText, View, type TextProps, type ViewProps } from "react-native"
 
+import { MAX_FONT_SCALE } from "@/components/glass/native/a11y"
 import { GText, alpha, useUI, type GTextProps, type TextSize } from "@/components/glass/native/ui"
 
 /**
@@ -87,14 +88,15 @@ function displayVariants({ size = "lg" }: { size?: DisplaySize } = {}) {
 /** A big figure — a count, a day number, a price. Display font, tight tracking, tabular numerals. */
 function Display({ size = "lg", style, ...props }: Omit<GTextProps, "size"> & { size?: DisplaySize }) {
   const d = displayVariants({ size })
-  return <GText font="display" style={[d, { letterSpacing: -0.03 * d.fontSize }, style]} {...props} />
+  // 95pt grows at most 1.2× under the largest Dynamic Type (NAT-74)
+  return <GText font="display" maxFontSizeMultiplier={MAX_FONT_SCALE.display} style={[d, { letterSpacing: -0.03 * d.fontSize }, style]} {...props} />
 }
 
 /** A pulled quote in the heading face, ruled with the accent. */
 function Blockquote({ style, children, ...props }: ViewProps) {
   const ui = useUI()
   return (
-    <View style={[{ borderLeftWidth: 3, borderLeftColor: ui.primary, paddingLeft: 16 }, style]} {...props}>
+    <View style={[{ borderStartWidth: 3, borderStartColor: ui.primary, paddingStart: 16 }, style]} {...props}>
       {typeof children === "string" || typeof children === "number" ? (
         <GText font="heading" size="lg" tone="muted" weight="400">
           {children}

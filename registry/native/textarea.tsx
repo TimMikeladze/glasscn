@@ -1,13 +1,18 @@
 import * as React from "react"
 import { TextInput } from "react-native"
 
-import { useField, type InputProps } from "@/components/glass/native/input"
+import { fieldProps, useField, type InputProps } from "@/components/glass/native/input"
 
-/** A multi-line filled field that grows with its text (from 96pt, up to `maxHeight`). */
-function Textarea({ invalid, disabled, style, onFocus, onBlur, editable, onContentSizeChange, minHeight = 96, maxHeight, ...props }: InputProps & { minHeight?: number; maxHeight?: number }) {
-  const f = useField({ invalid, disabled, onFocus, onBlur, editable })
+/**
+ * A multi-line filled field that grows with its text from `minHeight` (96pt) up to `maxRows`
+ * lines (10, like the web) or `maxHeight`, then scrolls.
+ */
+function Textarea({ style, onContentSizeChange, minHeight = 96, maxHeight, maxRows = 10, ...rest }: InputProps & { minHeight?: number; maxHeight?: number; maxRows?: number }) {
+  const [own, props] = fieldProps(rest)
+  const f = useField(own)
   const [content, setContent] = React.useState(0)
-  const height = Math.min(maxHeight ?? Infinity, Math.max(minHeight, content + 24 + 6))
+  const cap = Math.min(maxHeight ?? Infinity, maxRows * Math.round(f.ui.text.base * 1.4) + 30)
+  const height = Math.min(cap, Math.max(minHeight, content + 24 + 6))
   return (
     <TextInput
       multiline
@@ -17,7 +22,7 @@ function Textarea({ invalid, disabled, style, onFocus, onBlur, editable, onConte
         setContent(e.nativeEvent.contentSize.height)
         onContentSizeChange?.(e)
       }}
-      scrollEnabled={maxHeight != null && height >= maxHeight}
+      scrollEnabled={height >= cap}
       style={[f.style, { paddingTop: 12, paddingBottom: 12, height }, style]}
       {...props}
     />

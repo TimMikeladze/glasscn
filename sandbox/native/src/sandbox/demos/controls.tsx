@@ -31,10 +31,17 @@ function SwitchDemo() {
   const [on, setOn] = React.useState(true)
   return (
     <>
-      <Section title="Controlled" note={on ? "On" : "Off"}>
+      <Section title="Controlled · system" note={`${on ? "On" : "Off"} — iOS/Android render the system switch`}>
         <View style={row}>
           <Switch checked={on} onCheckedChange={setOn} accessibilityLabel="Reminders" />
           <Switch size="sm" checked={on} onCheckedChange={setOn} accessibilityLabel="Reminders small" />
+        </View>
+      </Section>
+      <Section title="Glass (native={false})" note="Drag the knob to either side; it swells into a lens while held.">
+        <View style={row}>
+          <Switch native={false} checked={on} onCheckedChange={setOn} accessibilityLabel="Reminders glass" />
+          <Switch native={false} defaultChecked />
+          <Switch native={false} />
         </View>
       </Section>
       <Section title="Uncontrolled">
@@ -47,6 +54,7 @@ function SwitchDemo() {
         <View style={row}>
           <Switch disabled defaultChecked />
           <Switch disabled size="sm" />
+          <Switch native={false} disabled defaultChecked />
         </View>
       </Section>
     </>
@@ -71,19 +79,46 @@ function CheckboxDemo() {
           <Checkbox disabled defaultChecked />
         </View>
       </Section>
+      <Section title="Shape · size" note="Every box has a 44pt touch target.">
+        <View style={row}>
+          <Checkbox shape="circle" defaultChecked />
+          <Checkbox shape="circle" />
+          <Checkbox size="sm" defaultChecked />
+          <Checkbox size="lg" defaultChecked />
+          <Checkbox size="lg" shape="circle" defaultChecked="indeterminate" />
+        </View>
+      </Section>
     </>
   )
 }
 
 function SegmentedDemo() {
   const [v, setV] = React.useState("week")
+  const [tapped, setTapped] = React.useState("—")
   return (
     <>
-      <Section title="Controlled" note={`value = ${v}`}>
+      <Section title="Controlled · system" note={`value = ${v} — text-only segments use the system control on iOS/Android`}>
         <SegmentedControl value={v} onValueChange={setV}>
           <SegmentedControlItem value="week">Week</SegmentedControlItem>
           <SegmentedControlItem value="month">Month</SegmentedControlItem>
           <SegmentedControlItem value="year">Year</SegmentedControlItem>
+        </SegmentedControl>
+      </Section>
+      <Section title="Glass (native={false})" note="Drag from the thumb to scrub.">
+        <SegmentedControl native={false} value={v} onValueChange={setV}>
+          <SegmentedControlItem value="week">Week</SegmentedControlItem>
+          <SegmentedControlItem value="month">Month</SegmentedControlItem>
+          <SegmentedControlItem value="year">Year</SegmentedControlItem>
+        </SegmentedControl>
+        <SegmentedControl native={false} shape="rounded" defaultValue="b">
+          <SegmentedControlItem value="a">Rounded</SegmentedControlItem>
+          <SegmentedControlItem value="b">Shape</SegmentedControlItem>
+        </SegmentedControl>
+      </Section>
+      <Section title="Momentary" note={`last tapped: ${tapped}`}>
+        <SegmentedControl momentary onValueChange={setTapped}>
+          <SegmentedControlItem value="undo">Undo</SegmentedControlItem>
+          <SegmentedControlItem value="redo">Redo</SegmentedControlItem>
         </SegmentedControl>
       </Section>
       <Section title="Sizes · icons">
@@ -180,13 +215,24 @@ function SliderDemo() {
   const [one, setOne] = React.useState([40])
   const [range, setRange] = React.useState([20, 80])
   const [committed, setCommitted] = React.useState<number[]>([])
+  const [scrub, setScrub] = React.useState([30])
   return (
     <>
-      <Section title="Single" note={`value = ${one[0]}`}>
+      <Section title="Single · system" note={`value = ${one[0]} — iOS/Android render the system slider`}>
         <Slider value={one} onValueChange={setOne} accessibilityLabel="Volume" />
+      </Section>
+      <Section title="Glass (native={false}) · icons · bubble" note="Vertical drags still scroll the page.">
+        <Slider native={false} value={one} onValueChange={setOne} valueBubble formatValue={(n) => `${n}%`} minIcon={<SunIcon size={16} />} maxIcon={<SunIcon size={22} />} accessibilityLabel="Brightness" />
       </Section>
       <Section title="Range · step 5" note={`${range[0]} – ${range[1]} · committed ${committed.join(" – ") || "—"}`}>
         <Slider value={range} onValueChange={setRange} onValueCommit={setCommitted} step={5} accessibilityLabel="Hours" />
+      </Section>
+      <Section title="Ticks · neutral value">
+        <Slider defaultValue={[2]} min={0} max={6} ticks accessibilityLabel="Nights" />
+        <Slider defaultValue={[-20]} min={-50} max={50} neutralValue={0} ticks={[-50, 0, 50]} accessibilityLabel="Balance" />
+      </Section>
+      <Section title="Progress (scrubber)" note={`${scrub[0]}s`}>
+        <Slider variant="progress" value={scrub} onValueChange={setScrub} valueBubble={(n) => `0:${String(n).padStart(2, "0")}`} max={59} accessibilityLabel="Position" />
       </Section>
       <Section title="Uncontrolled · 0–10">
         <Slider defaultValue={[3]} min={0} max={10} />

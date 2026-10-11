@@ -1,6 +1,9 @@
 import * as React from "react"
-import { ActivityIndicator, View, type PressableProps, type StyleProp, type TextStyle, type ViewStyle } from "react-native"
+import { ActivityIndicator, View, type PressableProps, type ViewProps, type StyleProp, type TextStyle, type ViewStyle } from "react-native"
 
+import { ChevronDownIcon } from "lucide-react-native"
+
+import { hitSlop } from "@/components/glass/native/a11y"
 import { Glass, canFade } from "@/components/glass/native/glass"
 import { Press } from "@/components/glass/native/press"
 import { GText, alpha, useUI, web, type UI } from "@/components/glass/native/ui"
@@ -51,8 +54,9 @@ function buttonVariants(ui: UI, { variant = "default", size = "default", shape =
     link: ui.primary,
   }
   const container: ViewStyle = {
-    height,
-    width: icon ? height : undefined,
+    // minHeight so Dynamic Type can grow the label (NAT-23)
+    minHeight: height,
+    minWidth: icon ? height : undefined,
     paddingHorizontal: icon ? 0 : ui.pad[s.pad as keyof UI["pad"]],
     gap: s.gap,
     flexDirection: "row",
@@ -96,11 +100,12 @@ function Button({
   shape = "pill",
   disabled,
   loading = false,
+  loadingText,
   style,
   children,
   onPress,
   ...props
-}: Omit<PressableProps, "style" | "children"> & { variant?: Variant; size?: Size; shape?: Shape; loading?: boolean; style?: StyleProp<ViewStyle>; children?: React.ReactNode }) {
+}: ButtonProps) {
   const ui = useUI()
   const v = buttonVariants(ui, { variant, size, shape })
   const items = React.Children.toArray(children)
@@ -108,6 +113,11 @@ function Button({
   const spinner = <ActivityIndicator size="small" color={v.color} />
   const content = !loading ? (
     decorate(children, v.text, v.color, v.iconSize)
+  ) : loadingText !== undefined ? (
+    <>
+      {spinner}
+      {decorate(loadingText, v.text, v.color, v.iconSize)}
+    </>
   ) : leadingIcon ? (
     <>
       {spinner}
@@ -121,6 +131,7 @@ function Button({
     </View>
   )
   const radius = v.container.borderRadius as number
+  const icon = size.startsWith("icon")
   const glass = variant === "glass" || variant === "prominent"
   // Liquid Glass vanishes under a fading ancestor (native rule 3): a glass button
   // never dims its container — not on press, not when disabled; its label dims instead.
@@ -133,14 +144,17 @@ function Button({
       onPress={loading ? undefined : onPress}
       disabled={disabled}
       haptic
+      liquid={glass}
       dim={fades}
+      hitSlop={hitSlop(v.container.minHeight as number, icon ? (v.container.minHeight as number) : 44)}
       hover={variant === "link" ? 1 : 1.02}
       squash={variant === "link" ? 1 : ui.motion.pressScale}
       style={[v.container, glass ? { backgroundColor: "transparent", padding: 0, paddingHorizontal: 0 } : null, disabled && fades ? { opacity: 0.45 } : null, web({ cursor: disabled ? "default" : "pointer" }), style]}
       {...props}
     >
       {glass ? (
-        <Glass interactive={!disabled} raised={false} radius={radius} tint={variant === "prominent" ? alpha(ui.primary, 0.94) : undefined} style={{ flexGrow: 1, alignSelf: "stretch", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: v.container.gap, paddingHorizontal: v.container.paddingHorizontal }}>
+        // floating control layer: liquid; one Liquid Glass per button, nothing liquid inside it
+        <Glass variant="liquid" interactive={!disabled} raised={false} radius={radius} tint={variant === "prominent" ? alpha(ui.primary, 0.94) : undefined} style={{ flexGrow: 1, alignSelf: "stretch", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: v.container.gap, paddingHorizontal: v.container.paddingHorizontal }}>
           {disabled && !fades ? <View style={{ flexDirection: "row", alignItems: "center", gap: v.container.gap, opacity: 0.45 }}>{content}</View> : content}
         </Glass>
       ) : (
@@ -150,4 +164,52 @@ function Button({
   )
 }
 
-export { Button, buttonVariants }
+type ButtonProps = Omit<PressableProps, "style" | "children"> & {
+  variant?: Variant
+  size?: Size
+  shape?: Shape
+  /** Shows a spinner and marks the button busy; presses are ignored. */
+  loading?: boolean
+  /** A label to show while loading (e.g. "Saving…"). */
+  loadingText?: React.ReactNode
+  style?: StyleProp<ViewStyle>
+  children?: React.ReactNode
+}
+
+/** A button that opens a menu: the label and a trailing chevron. Use it as a DropdownMenuTrigger's child. */
+function PullDownButton({ children, ...props }: ButtonProps) {
+  const ui = useUI()
+  const v = buttonVariants(ui, { variant: props.variant, size: props.size, shape: props.shape })
+  return (
+    <Button accessibilityState={{ expanded: false }} {...props}>
+      {children}
+      <ChevronDownIcon size={v.iconSize} strokeWidth={2.25} color={v.color} style={{ opacity: 0.7 }} aria-hidden />
+    </Button>
+  )
+}
+
+/**
+ * A primary action joined to a menu of alternatives: two buttons that read as one (shared outer
+ * corners, a hairline between). Children: the action Button, then a PullDownButton (or icon Button).
+ */
+function SplitButton({ style, children, ...props }: ViewProps) {
+  const ui = useUI()
+  const kids = React.Children.toArray(children).filter(React.isValidElement) as React.ReactElement<{ style?: StyleProp<ViewStyle> }>[]
+  return (
+    <View role="group" style={[{ flexDirection: "row", alignItems: "stretch", alignSelf: "flex-start" }, style]} {...props}>
+      {kids.map((c, i) =>
+        React.cloneElement(c, {
+          key: i,
+          style: [
+            c.props.style,
+            i > 0 ? { borderTopStartRadius: 0, borderBottomStartRadius: 0, borderStartWidth: 1, borderStartColor: ui.separator, paddingStart: 10 } : null,
+            i < kids.length - 1 ? { borderTopEndRadius: 0, borderBottomEndRadius: 0 } : null,
+          ],
+        })
+      )}
+    </View>
+  )
+}
+
+export { Button, buttonVariants, PullDownButton, SplitButton }
+export type { ButtonProps }

@@ -1140,3 +1140,222 @@ export function randomTheme(seed = Math.random()): GlassTheme {
     density: round(0.85 + next() * 0.3, 2),
   })
 }
+
+// ---------------------------------------------------------------------------
+// native: the same theme as plain values for React Native (NAT-60)
+// ---------------------------------------------------------------------------
+
+/** One scheme of the native theme: sRGB colours (`#rrggbb` / `rgba()`), points, ms, unitless numbers. */
+export interface NativeScheme {
+  primary: string
+  primaryForeground: string
+  ring: string
+  destructive: string
+  destructiveForeground: string
+  success: string
+  successForeground: string
+  warning: string
+  warningForeground: string
+  info: string
+  infoForeground: string
+  chart: [string, string, string, string, string, string, string, string]
+  aurora: [string, string, string]
+  auroraBase: string
+  /** Text outside panes, then the four label tiers inside them. */
+  foreground: string
+  label: string
+  labelSecondary: string
+  labelTertiary: string
+  labelQuaternary: string
+  /** Frost colour (opaque) and the material tiers as fills at clarity. */
+  frost: string
+  glassSubtle: string
+  glass: string
+  glassStrong: string
+  /** The control layer. */
+  glassLiquid: string
+  glassLiquidClear: string
+  glassClearDim: string
+  /** Reduce Transparency / no-blur fallback. */
+  glassSolid: string
+  glassBorder: string
+  glassHighlight: string
+  glassShadow: string
+  shadowY: number
+  shadowBlur: number
+  dim: string
+  fill: string
+  fillStrong: string
+  separator: string
+  thumb: string
+  knob: string
+  blur: number
+  liquidBlur: number
+  specular: number
+  edgeShade: number
+  illumination: number
+  clarity: number
+  radius: { surface: number; control: number; button: number; badge: number }
+  density: number
+  hitMin: number
+  ringWidth: number
+  motion: { duration: number; pressScale: number; pressStretch: number; pressGrow: number; knobLensScale: number; auroraSpeed: number }
+  type: { scale: number; ratio: number; leading: number; headingLeading: number; bodyWeight: number; headingWeight: number; displayWeight: number; tracking: number; headingTracking: number; displayTracking: number }
+  fonts: { sans?: string; heading?: string; display?: string; mono?: string }
+}
+
+/** Increased-contrast overrides (NAT-12): firmer rims and separators, stronger secondary text. */
+export type NativeHighContrast = Pick<NativeScheme, "glassBorder" | "separator" | "labelSecondary" | "labelTertiary" | "fill" | "fillStrong" | "primary" | "ring">
+
+export interface NativeTheme {
+  light: NativeScheme
+  dark: NativeScheme
+  highContrast: { light: NativeHighContrast; dark: NativeHighContrast }
+}
+
+const hex2 = (x: number) => Math.round(Math.min(1, Math.max(0, x)) * 255).toString(16).padStart(2, "0")
+
+/** An `oklch()` colour (gamut-mapped) → `#rrggbb`, or `rgba()` when it has alpha or one is given. */
+export function oklchToRgb(value: string, alphaOverride?: number): string {
+  const p = parseOklch(mapColour(value))
+  if (!p) return value
+  const [r, g, b] = gammaRgb(p)
+  const a = alphaOverride ?? p[3]
+  if (a >= 1) return `#${hex2(r)}${hex2(g)}${hex2(b)}`
+  return `rgba(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)},${round(a, 3)})`
+}
+
+const num = (v: string | undefined, fallback = 0) => {
+  const n = parseFloat(v ?? "")
+  return Number.isFinite(n) ? n : fallback
+}
+const pct = (v: string | undefined) => num(v) / 100
+/** rem / px → points (1rem = 16pt); 9999px capsules → 999. */
+const pt = (v: string | undefined) => {
+  const n = num(v)
+  const p = v?.trim().endsWith("rem") ? n * 16 : n
+  return p >= 999 ? 999 : round(p, 2)
+}
+const em = (v: string | undefined) => num(v)
+/** The first family of a CSS stack, unquoted — what React Native's fontFamily takes. System stacks → undefined. */
+const family = (stack: string | undefined) => {
+  if (!stack) return undefined
+  const first = stack.split(",")[0].trim().replace(/^["']|["']$/g, "")
+  return /^(system-ui|-apple-system|ui-sans-serif|sans-serif|serif|monospace|ui-monospace|ui-rounded|ui-serif)$/.test(first) ? undefined : first
+}
+/** `oklch(... / a)` with the alpha replaced: a token colour at a token opacity. */
+const at = (colour: string, alpha: number) => oklchToRgb(colour, Math.max(0, Math.min(1, alpha)))
+const lighten = (colour: string, dl: number) => {
+  const p = parseOklch(colour)
+  return p ? `oklch(${round(Math.min(1, Math.max(0, p[0] + dl)), 3)} ${p[1]} ${p[2]})` : colour
+}
+
+function nativeScheme(t: Tokens, scheme: Scheme): NativeScheme {
+  const dark = scheme === "dark"
+  const clarity = num(t["glass-clarity"], 0.5)
+  const frost = t["glass-tint"]
+  const tier = (key: string) => at(frost, clarityOpacity(pct(t[key]), clarity))
+  const label = t["glass-label"] || FOREGROUND[scheme]
+  const borderAlpha = pct(t["glass-border-opacity"])
+  return {
+    primary: oklchToRgb(t.primary),
+    primaryForeground: oklchToRgb(t["primary-foreground"]),
+    ring: oklchToRgb(t.ring || t.primary),
+    destructive: oklchToRgb(t.destructive || DESTRUCTIVE[scheme]),
+    destructiveForeground: "#ffffff",
+    success: oklchToRgb(t.success),
+    successForeground: oklchToRgb(t["success-foreground"]),
+    warning: oklchToRgb(t.warning),
+    warningForeground: oklchToRgb(t["warning-foreground"]),
+    info: oklchToRgb(t.info),
+    infoForeground: oklchToRgb(t["info-foreground"]),
+    chart: [1, 2, 3, 4, 5, 6, 7, 8].map((i) => oklchToRgb(t[`chart-${i}`])) as NativeScheme["chart"],
+    aurora: [1, 2, 3].map((i) => oklchToRgb(t[`aurora-${i}`])) as NativeScheme["aurora"],
+    auroraBase: oklchToRgb(t["aurora-base"]),
+    foreground: oklchToRgb(FOREGROUND[scheme]),
+    label: oklchToRgb(label),
+    labelSecondary: oklchToRgb(t["glass-label-secondary"]),
+    labelTertiary: oklchToRgb(t["glass-label-tertiary"]),
+    labelQuaternary: oklchToRgb(t["glass-label-quaternary"]),
+    frost: oklchToRgb(frost),
+    glassSubtle: tier("glass-opacity-subtle"),
+    glass: tier("glass-opacity"),
+    glassStrong: tier("glass-opacity-strong"),
+    glassLiquid: tier("glass-liquid-opacity"),
+    glassLiquidClear: tier("glass-liquid-clear-opacity"),
+    glassClearDim: at("oklch(0 0 0)", pct(t["glass-liquid-clear-dim"])),
+    glassSolid: at(frost, dark ? 0.94 : 0.92),
+    glassBorder: at(t["glass-border-color"], borderAlpha),
+    glassHighlight: at(t["glass-highlight-color"], pct(t["glass-highlight-opacity"])),
+    glassShadow: at(t["glass-shadow-color"], pct(t["glass-shadow-opacity"])),
+    shadowY: pt(t["glass-shadow-y"]),
+    shadowBlur: pt(t["glass-shadow-blur"]),
+    dim: at("oklch(0 0 0)", pct(t["glass-dim"])),
+    fill: at(t["glass-fill-tint"], pct(t["glass-fill-opacity"])),
+    fillStrong: at(t["glass-fill-tint"], pct(t["glass-fill-opacity-strong"])),
+    separator: at(label, pct(t["glass-separator-opacity"])),
+    thumb: oklchToRgb(t["glass-thumb"]),
+    knob: oklchToRgb(t["glass-knob"]),
+    blur: pt(t["glass-blur"]),
+    liquidBlur: pt(t["glass-liquid-blur"]),
+    specular: pct(t["glass-specular"]),
+    edgeShade: pct(t["glass-edge-shade"]),
+    illumination: pct(t["glass-illumination"]),
+    clarity,
+    radius: { surface: pt(t["glass-radius-surface"]), control: pt(t["glass-radius-control"]), button: pt(t["glass-radius-button"]), badge: pt(t["glass-radius-badge"]) },
+    density: num(t["glass-density"], 1),
+    hitMin: pt(t["glass-hit-min"]),
+    ringWidth: pt(t["glass-ring-width"]),
+    motion: {
+      duration: num(t["glass-duration"], 200),
+      pressScale: num(t["glass-press-scale"], 0.97),
+      pressStretch: num(t["glass-press-stretch"]),
+      pressGrow: num(t["glass-press-grow"], 1),
+      knobLensScale: num(t["glass-knob-lens-scale"], 1),
+      auroraSpeed: num(t["aurora-speed"], 1),
+    },
+    type: {
+      scale: num(t["glass-text-scale"], 1),
+      ratio: num(t["glass-type-ratio"], 1.25),
+      leading: num(t["glass-leading"], 1.6),
+      headingLeading: num(t["glass-heading-leading"], 1.15),
+      bodyWeight: num(t["glass-body-weight"], 400),
+      headingWeight: num(t["glass-heading-weight"], 650),
+      displayWeight: num(t["glass-display-weight"], 700),
+      tracking: em(t["glass-tracking"]),
+      headingTracking: em(t["glass-heading-tracking"]),
+      displayTracking: em(t["glass-display-tracking"]),
+    },
+    fonts: { sans: family(t["glass-font-sans"]), heading: family(t["glass-font-heading"]), display: family(t["glass-font-display"]), mono: family(t["glass-font-mono"]) },
+  }
+}
+
+function nativeHighContrast(t: Tokens, scheme: Scheme): NativeHighContrast {
+  const dark = scheme === "dark"
+  const label = t["glass-label"] || FOREGROUND[scheme]
+  // accent pushed away from the ground by 0.08 L
+  const primary = oklchToRgb(lighten(t.primary, dark ? 0.08 : -0.08))
+  return {
+    glassBorder: at(label, dark ? 0.5 : 0.4),
+    separator: at(label, dark ? 0.4 : 0.32),
+    labelSecondary: oklchToRgb(lighten(t["glass-label-secondary"], dark ? 0.08 : -0.12)),
+    labelTertiary: oklchToRgb(lighten(t["glass-label-tertiary"], dark ? 0.12 : -0.16)),
+    fill: at(t["glass-fill-tint"], Math.min(1, pct(t["glass-fill-opacity"]) * 1.8)),
+    fillStrong: at(t["glass-fill-tint"], Math.min(1, pct(t["glass-fill-opacity-strong"]) * 1.8)),
+    primary,
+    ring: primary,
+  }
+}
+
+/**
+ * The theme as plain values for React Native: OKLCH → sRGB (gamut-mapped), rem → pt,
+ * clarity applied to every frost, plus increased-contrast overrides. `pnpm generate`
+ * writes every palette and preset through this into `registry/native/tokens.generated.ts`.
+ */
+export function toNativeTheme(theme: GlassTheme): NativeTheme {
+  return {
+    light: nativeScheme(theme.light, "light"),
+    dark: nativeScheme(theme.dark, "dark"),
+    highContrast: { light: nativeHighContrast(theme.light, "light"), dark: nativeHighContrast(theme.dark, "dark") },
+  }
+}

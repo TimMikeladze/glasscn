@@ -14,10 +14,14 @@ const SIZES = {
   inline: { height: 24 },
 } as const
 
-type WidgetSize = keyof typeof SIZES
+export type WidgetSize = keyof typeof SIZES
 const WidgetContext = React.createContext<{ size: WidgetSize; accented: boolean }>({ size: "small", accented: false })
 
-/** A glanceable widget at Apple's sizes — the web's Widget. Home-screen sizes are glass; lock-screen accessories sit on the ground. */
+/**
+ * A glanceable widget at Apple's sizes — the web's Widget. Home-screen sizes are
+ * material glass panes; lock-screen accessories sit on the ground. `accented`
+ * renders it like iOS's tinted home screen: title and figure in the accent.
+ */
 export function Widget({ size = "small", accented = false, style, children, ...props }: Omit<ViewProps, "style"> & { size?: WidgetSize; accented?: boolean; style?: StyleProp<ViewStyle> }) {
   const ui = useUI()
   const value = React.useMemo(() => ({ size, accented }), [size, accented])
@@ -33,7 +37,7 @@ export function Widget({ size = "small", accented = false, style, children, ...p
           {children}
         </View>
       ) : (
-        <Glass radius={ui.radius.surface} style={[box, { padding: 16, gap: 8 }, style]} {...props}>
+        <Glass variant="material" radius={ui.radius.surface} style={[box, { padding: ui.pad.default, gap: 8 }, style]} {...props}>
           {children}
         </Glass>
       )}
@@ -52,7 +56,8 @@ export function WidgetTitle(props: GTextProps) {
 
 export function WidgetValue(props: GTextProps) {
   const { size, accented } = React.useContext(WidgetContext)
-  return <GText font="display" size={size === "circular" || size === "inline" ? "base" : size === "rectangular" ? "xl" : "3xl"} tone={accented ? "primary" : "default"} numberOfLines={1} {...props} />
+  const step = size === "inline" ? "sm" : size === "circular" ? "base" : size === "rectangular" ? "lg" : size === "large" || size === "extraLarge" ? "4xl" : "3xl"
+  return <GText font="display" size={step} tone={accented ? "primary" : "default"} numberOfLines={1} {...props} style={[{ fontVariant: ["tabular-nums"] }, props.style]} />
 }
 
 export function WidgetDescription(props: GTextProps) {

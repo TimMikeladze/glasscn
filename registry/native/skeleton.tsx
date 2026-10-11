@@ -1,24 +1,30 @@
 import * as React from "react"
-import { AccessibilityInfo, Animated, type ViewProps } from "react-native"
+import { type ViewProps } from "react-native"
+import Animated, { cancelAnimation, Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated"
 
+import { useReducedMotion } from "@/components/glass/native/a11y"
 import { useUI } from "@/components/glass/native/ui"
 
-/** A loading placeholder: a fill that breathes softly; still under reduce motion. Hidden from assistive tech. */
+/**
+ * A loading placeholder: a fill that breathes softly (Reanimated, on the UI
+ * thread); still under Reduce Motion. Hidden from assistive tech — announce the
+ * loading state on the container. Never wrap glass in one: it fades.
+ */
 function Skeleton({ style, ...props }: ViewProps) {
   const ui = useUI()
-  const [pulse] = React.useState(() => new Animated.Value(1))
+  const still = useReducedMotion() || ui.motion.duration === 0
+  const pulse = useSharedValue(1)
   React.useEffect(() => {
-    let loop: Animated.CompositeAnimation | null = null
-    AccessibilityInfo.isReduceMotionEnabled?.()
-      .then((reduced) => {
-        if (reduced) return
-        loop = Animated.loop(Animated.sequence([Animated.timing(pulse, { toValue: 0.55, duration: 800, useNativeDriver: true }), Animated.timing(pulse, { toValue: 1, duration: 800, useNativeDriver: true })]))
-        loop.start()
-      })
-      .catch(() => {})
-    return () => loop?.stop()
-  }, [pulse])
-  return <Animated.View aria-hidden importantForAccessibility="no-hide-descendants" style={[{ backgroundColor: ui.fill, borderRadius: ui.radius.control - 4, opacity: pulse }, style]} {...props} />
+    if (still) {
+      cancelAnimation(pulse)
+      pulse.set(1)
+      return
+    }
+    pulse.set(withRepeat(withTiming(0.55, { duration: 800, easing: Easing.inOut(Easing.quad) }), -1, true))
+    return () => cancelAnimation(pulse)
+  }, [pulse, still])
+  const breathe = useAnimatedStyle(() => ({ opacity: pulse.value }))
+  return <Animated.View aria-hidden importantForAccessibility="no-hide-descendants" style={[{ backgroundColor: ui.fill, borderRadius: ui.radius.control - 4 }, style, breathe]} {...props} />
 }
 
 export { Skeleton }

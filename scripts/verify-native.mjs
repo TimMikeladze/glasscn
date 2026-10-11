@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Install the native-* items into an Expo app and type-check it.
+ * Install the native-* items into an Expo app, type-check it and run its component tests (jest).
  *
  *   node scripts/verify-native.mjs [path-to-expo-app]   (default sandbox/native)
  *
@@ -54,6 +54,13 @@ try {
     "app.json",
     "expo-env.d.ts",
     "src",
+    // the component tests (NAT-54) run against the installed copy too
+    "babel.config.js",
+    "jest.config.js",
+    "jest.setup.js",
+    "jest.resolver.js",
+    "jest.expo-ui.js",
+    "__tests__",
   ])
     if (existsSync(join(source, f)))
       cpSync(join(source, f), join(app, f), { recursive: true });
@@ -164,8 +171,14 @@ export default function Check() {
 `,
   );
   run("npx", ["tsc", "--noEmit"], app);
+  // NAT-54: the sandbox's component tests (roles, text-in-Text, never-fade-liquid-glass) against
+  // the files shadcn installed, not registry/native
+  if (existsSync(join(app, "jest.config.js")))
+    run("npx", ["jest", "--ci"], app, {
+      GLASS_NATIVE_DIR: join(app, "src", "components", "glass", "native"),
+    });
   console.log(
-    `\n✔ ${items.length} native items installed into a copy of ${source} and type-checked`,
+    `\n✔ ${items.length} native items installed into a copy of ${source}, type-checked and component-tested`,
   );
   rmSync(app, { recursive: true, force: true });
 } finally {

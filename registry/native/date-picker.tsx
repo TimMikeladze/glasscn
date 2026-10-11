@@ -1,8 +1,9 @@
 import * as React from "react"
-import { ScrollView, View } from "react-native"
+import { Platform, ScrollView, View } from "react-native"
+import { DateTimePicker } from "@expo/ui/community/datetime-picker"
 import { CalendarIcon } from "lucide-react-native"
 
-import { Calendar, type DateRange } from "@/components/glass/native/calendar"
+import { Calendar, type CalendarProps, type DateRange } from "@/components/glass/native/calendar"
 import { Floating, useAnchorRect } from "@/components/glass/native/popover"
 import { Press } from "@/components/glass/native/press"
 import { GText, useUI, web } from "@/components/glass/native/ui"
@@ -18,12 +19,69 @@ export function minuteSlots(step = 1): number[] {
   return Array.from({ length: 60 / step }, (_, i) => i * step)
 }
 
-type Shared = { placeholder?: string; variant?: "compact" | "field"; disabled?: boolean; locale?: string; formatOptions?: Intl.DateTimeFormatOptions; "aria-label"?: string }
+type Shared = {
+  placeholder?: string
+  variant?: "compact" | "field"
+  disabled?: boolean
+  locale?: string
+  formatOptions?: Intl.DateTimeFormatOptions
+  "aria-label"?: string
+  /** Passed to the Calendar (e.g. `disabled`, `weekStartsOn`). */
+  calendarProps?: Omit<CalendarProps, "mode" | "selected" | "onSelect">
+  /**
+   * NAT-80: one date uses the system picker — iOS's compact capsule (`variant="compact"`, any
+   * `time`, `minuteStep` 1) and Android's date dialog (no `time`). `false` forces the glass calendar.
+   */
+  native?: boolean
+}
 type DatePickerProps =
   | (Shared & { mode?: "single"; value?: Date; defaultValue?: Date; onValueChange?: (value: Date | undefined) => void; time?: boolean; minuteStep?: number })
   | (Shared & { mode: "range"; value?: DateRange; defaultValue?: DateRange; onValueChange?: (value: DateRange | undefined) => void; time?: never; minuteStep?: never })
 
 function DatePicker(props: DatePickerProps) {
+  const ios = Platform.OS === "ios" && (props.variant ?? "compact") === "compact" && (props.minuteStep ?? 1) === 1
+  const android = Platform.OS === "android" && !props.time
+  if (props.native !== false && props.mode !== "range" && (ios || android)) return <SystemDatePicker {...props} dialog={android} />
+  return <GlassDatePicker {...props} />
+}
+
+function SystemDatePicker(props: Extract<DatePickerProps, { mode?: "single" }> & { dialog: boolean }) {
+  const ui = useUI()
+  const [inner, setInner] = React.useState<Date | undefined>(props.defaultValue)
+  const [open, setOpen] = React.useState(false)
+  const value = props.value ?? inner
+  const commit = (d: Date | undefined) => {
+    if (props.value === undefined) setInner(d)
+    props.onValueChange?.(d)
+  }
+  const picker = (
+    <DateTimePicker
+      value={value ?? new Date()}
+      mode={props.time ? "datetime" : "date"}
+      display={props.dialog ? "default" : "compact"}
+      presentation={props.dialog ? "dialog" : "inline"}
+      accentColor={ui.primary}
+      themeVariant={ui.scheme}
+      locale={props.locale}
+      disabled={props.disabled}
+      onChange={(e, d) => {
+        if (props.dialog) setOpen(false)
+        if (e.type === "set" && d) commit(d)
+      }}
+      onDismiss={() => setOpen(false)}
+    />
+  )
+  if (!props.dialog) return <View accessibilityLabel={props["aria-label"]} style={{ alignSelf: "flex-start" }}>{picker}</View>
+  // Android: our trigger, the system dialog
+  return (
+    <>
+      <GlassDatePicker {...props} onOpen={() => setOpen(true)} value={value} />
+      {open ? picker : null}
+    </>
+  )
+}
+
+function GlassDatePicker(props: DatePickerProps & { onOpen?: () => void }) {
   const { placeholder = props.mode === "range" ? "Pick dates" : "Pick a date", variant = "compact", disabled, locale } = props
   const ui = useUI()
   const [open, setOpen] = React.useState(false)
@@ -66,7 +124,7 @@ function DatePicker(props: DatePickerProps) {
           aria-label={props["aria-label"] ? `${props["aria-label"]}${label ? `, ${label}` : ""}` : undefined}
           aria-disabled={!!disabled}
           disabled={disabled}
-          onPress={() => setOpen(!open)}
+          onPress={() => (props.onOpen ? props.onOpen() : setOpen(!open))}
           style={[
             variant === "field"
               ? { flexDirection: "row", alignItems: "center", gap: 8, height: ui.control.default, borderRadius: ui.radius.control, paddingLeft: ui.pad.sm, paddingRight: 12 }
@@ -83,9 +141,10 @@ function DatePicker(props: DatePickerProps) {
       </View>
       <Floating open={open} anchor={rect} onClose={() => setOpen(false)} align="start" sideOffset={6} style={{ padding: 4 }}>
         {props.mode === "range" ? (
-          <Calendar mode="range" selected={range} onSelect={(r) => commit(r)} />
+          <Calendar {...props.calendarProps} mode="range" selected={range} onSelect={(r) => commit(r)} />
         ) : (
           <Calendar
+            {...props.calendarProps}
             mode="single"
             selected={single}
             onSelect={(d) => {

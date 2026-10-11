@@ -1,9 +1,10 @@
 import * as React from "react"
-import { Animated, ScrollView, StyleSheet, View, useWindowDimensions, type PressableProps, type StyleProp, type ViewProps, type ViewStyle } from "react-native"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { Pressable, ScrollView, StyleSheet, View, useWindowDimensions, type PressableProps, type StyleProp, type ViewProps, type ViewStyle } from "react-native"
+import Animated, { useAnimatedStyle, useDerivedValue, withSpring } from "react-native-reanimated"
 import { PanelLeftIcon } from "lucide-react-native"
 
-import { reduceMotion } from "@/components/glass/native/dialog"
+import { useReducedMotion } from "@/components/glass/native/a11y"
+import { useInsets } from "@/components/glass/native/dialog"
 import { Glass } from "@/components/glass/native/glass"
 import { Press } from "@/components/glass/native/press"
 import { withGlyphs } from "@/components/glass/native/segmented-control"
@@ -33,25 +34,32 @@ function SidebarProvider({ defaultOpen, width = 272, style, children, ...props }
   )
 }
 
-/** The floating, inset liquid panel. Slides off the leading edge when closed. */
+/** The floating, inset liquid panel. Slides off the leading edge when closed (moves, never fades — it's Liquid Glass). */
 function Sidebar({ style, children, ...props }: ViewProps) {
   const ui = useUI()
-  const insets = useSafeAreaInsets()
+  const insets = useInsets()
+  const reduced = useReducedMotion()
   const { open, setOpen, width, overlay } = useSidebar()
-  const [x] = React.useState(() => new Animated.Value(open ? 0 : -width - 16))
-  React.useEffect(() => {
-    const to = open ? 0 : -width - 16
-    if (reduceMotion()) x.setValue(to)
-    else Animated.spring(x, { toValue: to, ...ui.motion.spring, useNativeDriver: true }).start()
-  }, [open, width, x, ui.motion.spring])
+  const x = useDerivedValue(() => {
+    const to = open ? 0 : -width - 16 - insets.left
+    return reduced ? to : withSpring(to, ui.motion.springConfig)
+  }, [open, width, reduced, insets.left])
+  const slide = useAnimatedStyle(() => ({ transform: [{ translateX: x.value }] }))
+  const scrim = useAnimatedStyle(() => ({ opacity: 1 + x.value / (width + 16) }))
   return (
     <>
-      {overlay && open ? <Press accessibilityRole="button" accessibilityLabel="Close sidebar" onPress={() => setOpen(false)} style={[StyleSheet.absoluteFill, { zIndex: 40, backgroundColor: "rgba(0,0,0,0.2)" }]} /> : null}
+      {overlay && open ? (
+        <Animated.View style={[StyleSheet.absoluteFill, { zIndex: 40 }, scrim]}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Close sidebar" onPress={() => setOpen(false)} style={[StyleSheet.absoluteFill, { backgroundColor: ui.dim }]} />
+        </Animated.View>
+      ) : null}
       <Animated.View
         aria-hidden={!open}
-        style={{ position: "absolute", zIndex: 50, top: insets.top + 12, bottom: insets.bottom + 12, left: insets.left + 12, width, transform: [{ translateX: x }] }}
+        importantForAccessibility={open ? "auto" : "no-hide-descendants"}
+        accessibilityViewIsModal={overlay && open}
+        style={[{ position: "absolute", zIndex: 50, top: insets.top + 12, bottom: insets.bottom + 12, left: insets.left + 12, width }, slide]}
       >
-        <Glass interactive radius={ui.radius.surface} role="navigation" style={[{ flex: 1, overflow: "hidden" }, style]} {...props}>
+        <Glass variant="liquid" radius={ui.radius.surface} role="navigation" style={[{ flex: 1, overflow: "hidden" }, style]} {...props}>
           {children}
         </Glass>
       </Animated.View>
@@ -84,8 +92,8 @@ function SidebarTrigger({ style, ...props }: Omit<PressableProps, "style" | "chi
   const ui = useUI()
   const { open, toggle } = useSidebar()
   return (
-    <Press haptic accessibilityRole="button" accessibilityLabel="Toggle sidebar" aria-expanded={open} onPress={toggle} style={style} {...props}>
-      <Glass interactive radius={ui.radius.button} style={{ width: ui.control.default, height: ui.control.default, alignItems: "center", justifyContent: "center" }}>
+    <Press haptic liquid accessibilityRole="button" accessibilityLabel="Toggle sidebar" aria-expanded={open} onPress={toggle} style={style} {...props}>
+      <Glass variant="liquid" interactive radius={ui.radius.button} style={{ width: ui.control.default, height: ui.control.default, alignItems: "center", justifyContent: "center" }}>
         <PanelLeftIcon size={18} color={ui.foreground} />
       </Glass>
     </Press>
@@ -133,7 +141,8 @@ function SidebarMenuButton({ isActive = false, style, children, ...props }: Butt
     <Press
       accessibilityRole="button"
       aria-current={isActive ? "page" : undefined}
-      style={[{ height: ui.control.default, flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: ui.pad.sm, borderRadius: ui.radius.control, backgroundColor: isActive ? ui.fillStrong : "transparent" }, web({ cursor: "pointer" }), style]}
+      aria-selected={isActive}
+      style={[{ height: ui.control.default, minHeight: 44, flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: ui.pad.sm, borderRadius: ui.radius.control, backgroundColor: isActive ? ui.fillStrong : "transparent" }, web({ cursor: "pointer" }), style]}
       {...props}
     >
       {withGlyphs(children, { color: isActive ? ui.primary : ui.foreground, size: 18, weight: isActive ? "600" : "400" })}

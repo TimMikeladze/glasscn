@@ -128,7 +128,10 @@ function TableRow({ style, selected, onPress, ...props }: TableRowProps) {
 
 type CellProps = ViewProps & {
   colSpan?: number
-  align?: "left" | "center" | "right"
+  /** `start`/`end` follow the writing direction (the web's names); `left`/`right` are kept for older code. */
+  align?: "start" | "center" | "end" | "left" | "right"
+  /** Figures: end-aligned, tabular. */
+  numeric?: boolean
   minWidth?: number
   /** Overrides for the wrapped text of string children. */
   textStyle?: TextStyle
@@ -144,22 +147,28 @@ function cellText(children: React.ReactNode, el: (text: React.ReactNode) => Reac
 }
 
 function justify(align: CellProps["align"]) {
-  return align === "right" ? "flex-end" : align === "center" ? "center" : "flex-start"
+  return align === "right" || align === "end" ? "flex-end" : align === "center" ? "center" : "flex-start"
 }
 
-function TableHead({ style, colSpan = 1, align = "left", minWidth = MIN_CELL, textStyle, tone = "muted", weight = "500", children, ...props }: CellProps) {
+/** Text alignment for `align`; `start`/`end` resolve against the layout direction via flex, so text stays "auto". */
+function textAlign(align: CellProps["align"]) {
+  return align === "left" || align === "right" || align === "center" ? align : undefined
+}
+
+function TableHead({ style, colSpan = 1, align: alignProp, numeric, minWidth = MIN_CELL, textStyle, tone = "muted", weight = "500", children, ...props }: CellProps) {
   const ui = useUI()
+  const align = alignProp ?? (numeric ? "end" : "start")
   return (
     <View
       role="columnheader"
       style={[
-        { flex: colSpan, minWidth: minWidth * colSpan, height: ui.control.default, paddingHorizontal: 12, flexDirection: "row", alignItems: "center", justifyContent: justify(align) },
+        { flex: colSpan, minWidth: minWidth * colSpan, height: ui.control.default, paddingHorizontal: ui.pad.sm, flexDirection: "row", alignItems: "center", justifyContent: justify(align) },
         style,
       ]}
       {...props}
     >
       {cellText(children, (t) => (
-        <GText size="xs" tone={tone} weight={weight} numberOfLines={1} align={align} style={textStyle}>
+        <GText size="xs" tone={tone} weight={weight} numberOfLines={1} align={textAlign(align)} style={textStyle}>
           {t}
         </GText>
       ))}
@@ -167,13 +176,15 @@ function TableHead({ style, colSpan = 1, align = "left", minWidth = MIN_CELL, te
   )
 }
 
-function TableCell({ style, colSpan = 1, align = "left", minWidth = MIN_CELL, textStyle, tone, weight, children, ...props }: CellProps) {
+function TableCell({ style, colSpan = 1, align: alignProp, numeric, minWidth = MIN_CELL, textStyle, tone, weight, children, ...props }: CellProps) {
   const section = React.useContext(SectionContext)
+  const ui = useUI()
+  const align = alignProp ?? (numeric ? "end" : "start")
   return (
     <View
       role="cell"
       style={[
-        { flex: colSpan, minWidth: minWidth * colSpan, paddingHorizontal: 12, paddingVertical: 10, flexDirection: "row", alignItems: "center", justifyContent: justify(align) },
+        { flex: colSpan, minWidth: minWidth * colSpan, paddingHorizontal: ui.pad.sm, paddingVertical: Math.round(10 * ui.density), flexDirection: "row", alignItems: "center", justifyContent: justify(align) },
         style,
       ]}
       {...props}
@@ -184,7 +195,7 @@ function TableCell({ style, colSpan = 1, align = "left", minWidth = MIN_CELL, te
           tone={tone}
           weight={weight ?? (section === "footer" ? "500" : undefined)}
           numberOfLines={1}
-          align={align}
+          align={textAlign(align)}
           style={[{ fontVariant: ["tabular-nums"] }, textStyle]}
         >
           {t}

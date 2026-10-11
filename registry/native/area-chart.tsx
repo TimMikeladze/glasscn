@@ -1,9 +1,9 @@
 import * as React from "react"
-import { View, type StyleProp, type ViewProps, type ViewStyle } from "react-native"
-import { Defs, Line, LinearGradient, Path, Stop } from "react-native-svg"
+import { type StyleProp, type ViewProps, type ViewStyle } from "react-native"
+import { Defs, LinearGradient, Path, Stop } from "react-native-svg"
 
-import { ChartContainer, ChartLegend, chartColor, nearest, seriesTooltip, xScaleFor, type AxisSpec, type ChartFrame, type ChartSeries } from "@/components/glass/native/chart"
-import { monotoneCurve, runningTotals, sanitizeId } from "@/components/glass/native/chart-math"
+import { ChartContainer, ChartLegend, chartColor, presetContainerProps, seriesTooltip, xScaleFor, type AxisSpec, type ChartFrame, type ChartPresetProps, type ChartSeries } from "@/components/glass/native/chart"
+import { monotoneCurve, runningTotals, sanitizeId, stepCurve } from "@/components/glass/native/chart-math"
 import { useUI } from "@/components/glass/native/ui"
 
 type XValue = string | number | Date
@@ -35,9 +35,18 @@ export function AreaChart<Row>({
   legend = series.length > 1,
   grid = true,
   curve = "smooth",
+  selectedX,
+  onSelect,
+  onScrub,
+  state,
+  onRetry,
+  stateLabels,
+  accessibilityTable,
+  axis,
   style,
   ...props
-}: Omit<ViewProps, "children" | "style"> & {
+}: Omit<ViewProps, "children" | "style"> &
+  ChartPresetProps<Row> & {
   data: readonly Row[]
   x: (d: Row) => XValue
   series: readonly ChartSeries<Row>[]
@@ -48,13 +57,13 @@ export function AreaChart<Row>({
   xFormat?: (value: XValue) => string
   legend?: boolean
   grid?: boolean
-  curve?: "smooth" | "linear"
+  curve?: "smooth" | "linear" | "step"
   style?: StyleProp<ViewStyle>
 }) {
   const ui = useUI()
   const id = sanitizeId(React.useId())
   const colors = series.map((s, i) => s.color ?? chartColor(i, ui))
-  const path = curve === "smooth" ? monotoneCurve : linear
+  const path = curve === "smooth" ? monotoneCurve : curve === "step" ? stepCurve : linear
   // the bottom and top of layer i at row d: 0 → value, or the running totals when stacked
   const bottom = (i: number, d: Row) => (stacked && i > 0 ? runningTotals(series.slice(0, i).map((s) => s.value(d)))[i - 1] : 0)
   const top = (i: number, d: Row) => {
@@ -68,7 +77,6 @@ export function AreaChart<Row>({
 
   const render = (f: ChartFrame) => {
     const px = (d: Row) => f.x.map(x(d))
-    const at = f.focused === null ? null : data[f.focused]
     return (
       <>
         <Defs>
@@ -106,27 +114,28 @@ export function AreaChart<Row>({
             </React.Fragment>
           )
         })}
-        {at ? <Line x1={px(at)} x2={px(at)} y1={f.plot.top} y2={f.plot.bottom} stroke={ui.mutedForeground} strokeOpacity={0.5} strokeWidth={1} /> : null}
       </>
     )
   }
 
   return (
-    <View style={[{ width: "100%", gap: 12 }, style]} {...props}>
-      <ChartContainer
-        ariaLabel={ariaLabel}
-        height={height}
-        x={xSpec}
-        y={ySpec}
-        render={render}
-        hit={(p, f) => nearest(data.map((d) => f.x.map(x(d))), p.x)}
-        tooltip={(i, f) => {
-          const row = data[i]
-          const tops = series.map((_, s) => top(s, row)).filter((v): v is number => v != null)
-          return { content: content(row), anchor: { x: f.x.map(x(row)), y: tops.length ? Math.min(...tops.map((v) => f.y.map(v))) : f.plot.top } }
-        }}
-      />
-      {legend ? <ChartLegend items={series.map((s, i) => ({ label: s.label, color: colors[i] }))} /> : null}
-    </View>
+    <ChartContainer
+      ariaLabel={ariaLabel}
+      height={height}
+      x={xSpec}
+      y={ySpec}
+      render={render}
+      targets={(f) => ({ kind: "x", at: data.map((d) => f.x.map(x(d))) })}
+      dots={(f) => series.map((_, i) => ({ color: colors[i], y: data.map((d) => top(i, d)).map((t) => (t == null ? null : f.y.map(t))) }))}
+      tooltip={(i, f) => {
+        const row = data[i]
+        const tops = series.map((_, s) => top(s, row)).filter((v): v is number => v != null)
+        return { content: content(row), anchor: { x: f.x.map(x(row)), y: tops.length ? Math.min(...tops.map((v) => f.y.map(v))) : f.plot.top } }
+      }}
+      {...presetContainerProps(data, x, series, { selectedX, onSelect, onScrub, state, onRetry, stateLabels, accessibilityTable, axis, ariaLabel, valueFormat, xFormat })}
+      legend={legend ? <ChartLegend items={series.map((s, i) => ({ label: s.label, color: colors[i] }))} /> : null}
+      style={style}
+      {...props}
+    />
   )
 }

@@ -7011,7 +7011,33 @@
       "name": "native-tokens",
       "type": "registry:ui",
       "title": "Native tokens",
-      "description": "The glasscn palettes and tokens for React Native, a GlassThemeProvider and useGlassTheme().",
+      "description": "The glasscn palettes and presets for React Native, generated from the web theme engine: a GlassThemeProvider and useGlassTheme().",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/tokens.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/tokens.tsx"
+        },
+        {
+          "path": "registry/native/tokens.generated.ts",
+          "type": "registry:lib",
+          "target": "@components/glass/native/tokens.generated.ts"
+        }
+      ]
+    },
+    {
+      "name": "native-a11y",
+      "type": "registry:ui",
+      "title": "Native accessibility",
+      "description": "Live Reduce Motion, Reduce Transparency, Increase Contrast and Bold Text; screen-reader announcements; the 44pt hit-slop policy.",
       "categories": [
         "glass",
         "native"
@@ -7020,9 +7046,9 @@
       "registryDependencies": [],
       "files": [
         {
-          "path": "registry/native/tokens.tsx",
+          "path": "registry/native/a11y.tsx",
           "type": "registry:ui",
-          "target": "@components/glass/native/tokens.tsx"
+          "target": "@components/glass/native/a11y.tsx"
         }
       ]
     },
@@ -7030,7 +7056,7 @@
       "name": "native-glass",
       "type": "registry:ui",
       "title": "Native glass",
-      "description": "Frosted glass for Expo: Liquid Glass on iOS 26, blur on older iOS, backdrop-filter on web, a fill on Android.",
+      "description": "Two-layer glass for Expo: material (system blur, web backdrop-filter, Android blur tier) for content, liquid (Liquid Glass on iOS 26) for controls.",
       "categories": [
         "glass",
         "native"
@@ -7040,7 +7066,8 @@
         "expo-glass-effect"
       ],
       "registryDependencies": [
-        "{REGISTRY_URL}/r/native-tokens.json"
+        "{REGISTRY_URL}/r/native-tokens.json",
+        "{REGISTRY_URL}/r/native-a11y.json"
       ],
       "files": [
         {
@@ -7077,15 +7104,19 @@
       "name": "native-press",
       "type": "registry:ui",
       "title": "Native press",
-      "description": "The pressable everything is built on: spring squash, dim, haptic, hover lift.",
+      "description": "The pressable everything is built on: an elastic Reanimated spring press, optional dim, typed haptics, hover lift.",
       "categories": [
         "glass",
         "native"
       ],
       "dependencies": [
-        "expo-haptics"
+        "expo-haptics",
+        "react-native-reanimated"
       ],
-      "registryDependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
       "files": [
         {
           "path": "registry/native/press.tsx",
@@ -7105,7 +7136,8 @@
       ],
       "dependencies": [],
       "registryDependencies": [
-        "{REGISTRY_URL}/r/native-tokens.json"
+        "{REGISTRY_URL}/r/native-tokens.json",
+        "{REGISTRY_URL}/r/native-a11y.json"
       ],
       "files": [
         {
@@ -7135,6 +7167,25 @@
       ]
     },
     {
+      "name": "native-toast-store",
+      "type": "registry:ui",
+      "title": "Native toast store",
+      "description": "The toaster's pure state: queue, upsert, close, durations — no React Native, unit-tested.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/native/toast-store.ts",
+          "type": "registry:lib",
+          "target": "@components/glass/native/toast-store.ts"
+        }
+      ]
+    },
+    {
       "name": "native-typography",
       "type": "registry:ui",
       "title": "Typography (native)",
@@ -7145,6 +7196,7 @@
       ],
       "dependencies": [],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
@@ -7229,8 +7281,11 @@
         "glass",
         "native"
       ],
-      "dependencies": [],
+      "dependencies": [
+        "lucide-react-native"
+      ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-glass.json",
         "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-ui.json"
@@ -7277,6 +7332,8 @@
       ],
       "dependencies": [],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-field.json",
+        "{REGISTRY_URL}/r/native-label.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
@@ -7402,10 +7459,13 @@
         "native"
       ],
       "dependencies": [
-        "expo-haptics"
+        "react-native-gesture-handler",
+        "react-native-reanimated",
+        "@expo/ui"
       ],
       "registryDependencies": [
-        "{REGISTRY_URL}/r/native-segmented-control.json",
+        "{REGISTRY_URL}/r/native-a11y.json",
+        "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
@@ -7429,6 +7489,7 @@
         "lucide-react-native"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
@@ -7449,8 +7510,12 @@
         "glass",
         "native"
       ],
-      "dependencies": [],
+      "dependencies": [
+        "react-native-gesture-handler",
+        "react-native-reanimated"
+      ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
@@ -7471,8 +7536,11 @@
         "glass",
         "native"
       ],
-      "dependencies": [],
+      "dependencies": [
+        "react-native-reanimated"
+      ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-glass.json",
         "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-segmented-control.json",
@@ -7495,8 +7563,11 @@
         "glass",
         "native"
       ],
-      "dependencies": [],
+      "dependencies": [
+        "react-native-reanimated"
+      ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-glass.json",
         "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-segmented-control.json",
@@ -7519,8 +7590,15 @@
         "glass",
         "native"
       ],
-      "dependencies": [],
+      "dependencies": [
+        "react-native-gesture-handler",
+        "react-native-reanimated",
+        "@expo/ui"
+      ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
@@ -7541,10 +7619,11 @@
         "native"
       ],
       "dependencies": [
+        "react-native-reanimated",
         "react-native-svg"
       ],
       "registryDependencies": [
-        "{REGISTRY_URL}/r/native-segmented-control.json",
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
@@ -7565,11 +7644,14 @@
         "native"
       ],
       "dependencies": [
-        "react-native-safe-area-context"
+        "react-native-gesture-handler",
+        "react-native-reanimated"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-dialog.json",
         "{REGISTRY_URL}/r/native-glass.json",
         "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-scroll-edge.json",
         "{REGISTRY_URL}/r/native-search-field.json",
         "{REGISTRY_URL}/r/native-segmented-control.json",
         "{REGISTRY_URL}/r/native-ui.json"
@@ -7592,13 +7674,16 @@
         "native"
       ],
       "dependencies": [
-        "react-native-safe-area-context",
+        "react-native-reanimated",
         "lucide-react-native"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
+        "{REGISTRY_URL}/r/native-dialog.json",
         "{REGISTRY_URL}/r/native-dropdown-menu.json",
         "{REGISTRY_URL}/r/native-glass.json",
         "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-scroll-edge.json",
         "{REGISTRY_URL}/r/native-segmented-control.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
@@ -7619,7 +7704,9 @@
         "glass",
         "native"
       ],
-      "dependencies": [],
+      "dependencies": [
+        "react-native-reanimated"
+      ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/native-ui.json"
       ],
@@ -7641,9 +7728,10 @@
         "native"
       ],
       "dependencies": [
-        "react-native-safe-area-context"
+        "react-native-reanimated"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-dialog.json",
         "{REGISTRY_URL}/r/native-scroll-edge.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
@@ -7665,10 +7753,11 @@
         "native"
       ],
       "dependencies": [
-        "react-native-safe-area-context",
+        "react-native-reanimated",
         "lucide-react-native"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-dialog.json",
         "{REGISTRY_URL}/r/native-glass.json",
         "{REGISTRY_URL}/r/native-press.json",
@@ -7693,9 +7782,12 @@
         "native"
       ],
       "dependencies": [
+        "react-native-reanimated",
+        "react-native-keyboard-controller",
         "lucide-react-native"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-glass.json",
         "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-ui.json"
@@ -7721,6 +7813,7 @@
         "lucide-react-native"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-glass.json",
         "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-segmented-control.json",
@@ -7744,9 +7837,13 @@
         "native"
       ],
       "dependencies": [
+        "react-native-reanimated",
+        "react-native-keyboard-controller",
+        "react-native-safe-area-context",
         "lucide-react-native"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-glass.json",
         "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-ui.json"
@@ -7768,7 +7865,9 @@
         "glass",
         "native"
       ],
-      "dependencies": [],
+      "dependencies": [
+        "react-native-reanimated"
+      ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/native-button.json",
         "{REGISTRY_URL}/r/native-dialog.json",
@@ -7794,11 +7893,15 @@
         "native"
       ],
       "dependencies": [
-        "react-native-safe-area-context"
+        "react-native-gesture-handler",
+        "react-native-reanimated",
+        "@expo/ui"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-dialog.json",
         "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
@@ -7819,7 +7922,7 @@
         "native"
       ],
       "dependencies": [
-        "react-native-safe-area-context"
+        "react-native-reanimated"
       ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/native-dialog.json",
@@ -7845,7 +7948,9 @@
         "glass",
         "native"
       ],
-      "dependencies": [],
+      "dependencies": [
+        "react-native-reanimated"
+      ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/native-dialog.json",
         "{REGISTRY_URL}/r/native-glass.json",
@@ -7869,7 +7974,9 @@
         "glass",
         "native"
       ],
-      "dependencies": [],
+      "dependencies": [
+        "react-native-reanimated"
+      ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/native-dialog.json",
         "{REGISTRY_URL}/r/native-glass.json",
@@ -7921,13 +8028,17 @@
         "native"
       ],
       "dependencies": [
-        "react-native-safe-area-context",
+        "react-native-gesture-handler",
+        "react-native-reanimated",
+        "react-native-screens",
         "lucide-react-native"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-dialog.json",
         "{REGISTRY_URL}/r/native-glass.json",
         "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-toast-store.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
@@ -7948,9 +8059,11 @@
         "native"
       ],
       "dependencies": [
+        "react-native-reanimated",
         "react-native-svg"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-chart-math.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
@@ -7972,9 +8085,11 @@
         "native"
       ],
       "dependencies": [
+        "react-native-reanimated",
         "react-native-svg"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-chart-math.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
@@ -7996,9 +8111,12 @@
         "native"
       ],
       "dependencies": [
+        "react-native-gesture-handler",
+        "react-native-reanimated",
         "react-native-svg"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-chart-math.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
@@ -8043,8 +8161,11 @@
         "glass",
         "native"
       ],
-      "dependencies": [],
+      "dependencies": [
+        "react-native-reanimated"
+      ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-chart-math.json",
         "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-ui.json"
@@ -8067,9 +8188,11 @@
         "native"
       ],
       "dependencies": [
+        "react-native-reanimated",
         "react-native-svg"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-chart-math.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
@@ -8090,9 +8213,13 @@
         "glass",
         "native"
       ],
-      "dependencies": [],
+      "dependencies": [
+        "react-native-gesture-handler",
+        "react-native-reanimated"
+      ],
       "registryDependencies": [
-        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-chart.json",
+        "{REGISTRY_URL}/r/native-chart-math.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
@@ -8134,10 +8261,13 @@
         "glass",
         "native"
       ],
-      "dependencies": [],
+      "dependencies": [
+        "react-native-gesture-handler",
+        "react-native-reanimated"
+      ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-chart.json",
         "{REGISTRY_URL}/r/native-chart-math.json",
-        "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
@@ -8158,11 +8288,15 @@
         "native"
       ],
       "dependencies": [
+        "react-native-gesture-handler",
+        "react-native-reanimated",
         "react-native-svg"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-chart-math.json",
         "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
@@ -8304,12 +8438,14 @@
         "native"
       ],
       "dependencies": [
+        "@shopify/flash-list",
         "@tanstack/react-table",
         "lucide-react-native"
       ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/native-button.json",
         "{REGISTRY_URL}/r/native-checkbox.json",
+        "{REGISTRY_URL}/r/native-dropdown-menu.json",
         "{REGISTRY_URL}/r/native-input.json",
         "{REGISTRY_URL}/r/native-table.json",
         "{REGISTRY_URL}/r/native-ui.json"
@@ -8332,12 +8468,16 @@
         "native"
       ],
       "dependencies": [
+        "react-native-reanimated",
+        "@shopify/flash-list",
+        "react-native-keyboard-controller",
         "lucide-react-native"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-button.json",
         "{REGISTRY_URL}/r/native-glass.json",
-        "{REGISTRY_URL}/r/native-segmented-control.json",
+        "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
@@ -8527,6 +8667,7 @@
       ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/native-button.json",
+        "{REGISTRY_URL}/r/native-glass.json",
         "{REGISTRY_URL}/r/native-chat.json",
         "{REGISTRY_URL}/r/native-chat-markdown.json",
         "{REGISTRY_URL}/r/native-press.json",
@@ -8672,8 +8813,11 @@
         "glass",
         "native"
       ],
-      "dependencies": [],
+      "dependencies": [
+        "react-native-reanimated"
+      ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
@@ -8719,6 +8863,7 @@
       ],
       "dependencies": [],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
@@ -8741,6 +8886,7 @@
       ],
       "dependencies": [],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-label.json",
         "{REGISTRY_URL}/r/native-separator.json",
         "{REGISTRY_URL}/r/native-ui.json"
@@ -8811,6 +8957,7 @@
       "dependencies": [],
       "registryDependencies": [
         "{REGISTRY_URL}/r/native-button.json",
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
@@ -8856,6 +9003,7 @@
         "lucide-react-native"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
@@ -8920,6 +9068,7 @@
       ],
       "dependencies": [],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-action-sheet.json",
         "{REGISTRY_URL}/r/native-button.json",
         "{REGISTRY_URL}/r/native-popover.json",
         "{REGISTRY_URL}/r/native-ui.json"
@@ -8961,10 +9110,11 @@
         "native"
       ],
       "dependencies": [
+        "react-native-reanimated",
         "lucide-react-native"
       ],
       "registryDependencies": [
-        "{REGISTRY_URL}/r/native-dialog.json",
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
@@ -8985,10 +9135,12 @@
         "glass",
         "native"
       ],
-      "dependencies": [],
+      "dependencies": [
+        "react-native-reanimated"
+      ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/native-press.json",
-        "{REGISTRY_URL}/r/native-dialog.json"
+        "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
         {
@@ -9073,9 +9225,11 @@
         "native"
       ],
       "dependencies": [
-        "react-native-svg"
+        "react-native-svg",
+        "expo-video"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
@@ -9151,6 +9305,28 @@
           "path": "registry/native/range-chart.tsx",
           "type": "registry:ui",
           "target": "@components/glass/native/range-chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-tabs-layout",
+      "type": "registry:ui",
+      "title": "Tabs layout (native)",
+      "description": "The app tab bar as a recipe: expo-router NativeTabs themed from glasscn tokens — minimize on scroll, a bottom accessory with placement, a search tab, a Material bar on Android. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-tokens.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/tabs-layout.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/tabs-layout.tsx"
         }
       ]
     }

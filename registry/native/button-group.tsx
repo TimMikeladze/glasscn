@@ -5,7 +5,10 @@ import { Glass } from "@/components/glass/native/glass"
 import { Separator } from "@/components/glass/native/separator"
 import { GText, useUI, type GTextProps } from "@/components/glass/native/ui"
 
-/** Buttons joined into one control (inner corners squared); `variant="glass"` floats them on one liquid capsule. */
+/**
+ * Buttons joined into one control (inner corners squared); `variant="glass"` floats them on one
+ * liquid capsule — glass buttons inside render clear on it (never liquid in liquid).
+ */
 function ButtonGroup({ orientation = "horizontal", variant = "default", style, children, ...props }: ViewProps & { orientation?: "horizontal" | "vertical"; variant?: "default" | "glass" }) {
   const ui = useUI()
   const row = orientation === "horizontal"
@@ -22,12 +25,12 @@ function ButtonGroup({ orientation = "horizontal", variant = "default", style, c
   const layout: ViewStyle = { flexDirection: row ? "row" : "column", alignItems: "stretch", alignSelf: "flex-start" }
   if (variant === "glass")
     return (
-      <Glass role="group" radius={ui.radius.button} raised={false} style={[layout, { padding: 4 }, style]} {...props}>
+      <Glass variant="liquid" role="group" radius={ui.radius.button} raised={false} style={[layout, { padding: 4 }, style]} {...props}>
         {joined}
       </Glass>
     )
   return (
-    <View role="group" style={[layout, style]} {...props}>
+    <View role="group" aria-orientation={row ? undefined : "vertical"} style={[layout, style]} {...props}>
       {joined}
     </View>
   )

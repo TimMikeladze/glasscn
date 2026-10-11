@@ -1,8 +1,9 @@
 import * as React from "react"
-import { Animated, Easing, View, type StyleProp, type ViewStyle } from "react-native"
+import { View, type StyleProp, type ViewStyle } from "react-native"
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg"
 
-import { useReduceMotion } from "@/components/glass/native/segmented-control"
+import { useReducedMotion } from "@/components/glass/native/a11y"
 import { useUI } from "@/components/glass/native/ui"
 
 type ProgressProps = {
@@ -17,15 +18,15 @@ type ProgressProps = {
 export function Progress({ value, max = 100, accessibilityLabel, testID, style }: ProgressProps) {
   const ui = useUI()
   const pct = Math.min(100, Math.max(0, ((value ?? 0) / (max || 100)) * 100))
-  const [fill] = React.useState(() => new Animated.Value(pct))
-  const reduce = useReduceMotion()
+  const still = useReducedMotion() || ui.motion.duration === 0
+  const fill = useSharedValue(pct)
   // React 19 ids carry «» / _r_ — keep only id-safe characters
   const id = React.useId().replace(/[^a-zA-Z0-9_-]/g, "")
 
   React.useEffect(() => {
-    if (reduce.current) fill.setValue(pct)
-    else Animated.timing(fill, { toValue: pct, duration: 700, easing: Easing.out(Easing.cubic), useNativeDriver: false }).start()
-  }, [pct, fill, reduce])
+    fill.set(still ? pct : withTiming(pct, { duration: ui.motion.duration * 3.5, easing: Easing.out(Easing.cubic) }))
+  }, [pct, fill, still, ui.motion.duration])
+  const fillStyle = useAnimatedStyle(() => ({ width: `${fill.value}%` }))
 
   return (
     <View
@@ -35,7 +36,7 @@ export function Progress({ value, max = 100, accessibilityLabel, testID, style }
       accessibilityValue={value == null ? undefined : { min: 0, max, now: value }}
       style={[{ width: "100%", height: 10, borderRadius: 999, overflow: "hidden", backgroundColor: ui.fill }, style]}
     >
-      <Animated.View style={{ height: "100%", borderRadius: 999, overflow: "hidden", width: fill.interpolate({ inputRange: [0, 100], outputRange: ["0%", "100%"] }) }}>
+      <Animated.View style={[{ height: "100%", borderRadius: 999, overflow: "hidden" }, fillStyle]}>
         <Svg width="100%" height="100%" preserveAspectRatio="none">
           <Defs>
             <LinearGradient id={id} x1="0" y1="0" x2="1" y2="0">

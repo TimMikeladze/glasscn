@@ -1,5 +1,8 @@
 import * as React from "react"
-import { AccessibilityInfo, Animated, Easing, Linking, View, type StyleProp, type ViewProps, type ViewStyle } from "react-native"
+import { I18nManager, Linking, View, type StyleProp, type ViewProps, type ViewStyle } from "react-native"
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming } from "react-native-reanimated"
+
+import { useReducedMotion } from "@/components/glass/native/a11y"
 
 import { barShares } from "@/components/glass/native/chart-math"
 import { Press } from "@/components/glass/native/press"
@@ -15,35 +18,32 @@ export interface BarListItem {
   key?: string
 }
 
-/** One bar, growing from the left once. Scale on the native driver, anchored left. */
+/** One bar, growing from the leading edge once, on the UI thread. */
 function Bar({ share, color, index, radius }: { share: number; color: string; index: number; radius: number }) {
-  const [grow] = React.useState(() => new Animated.Value(0))
+  const ui = useUI()
+  const still = useReducedMotion() || ui.motion.duration === 0
+  const grow = useSharedValue(still ? 1 : 0)
   React.useEffect(() => {
-    let anim: Animated.CompositeAnimation | null = null
-    AccessibilityInfo.isReduceMotionEnabled()
-      .catch(() => false)
-      .then((reduce) => {
-        if (reduce) return grow.setValue(1)
-        anim = Animated.timing(grow, { toValue: 1, duration: 800, delay: index * 40, easing: Easing.bezier(0.16, 1, 0.3, 1), useNativeDriver: true })
-        anim.start()
-      })
-    return () => anim?.stop()
-  }, [grow, index])
+    grow.set(still ? 1 : withDelay(index * 40, withTiming(1, { duration: ui.motion.duration * 4, easing: Easing.bezier(0.16, 1, 0.3, 1) })))
+  }, [grow, index, still, ui.motion.duration])
+  const style = useAnimatedStyle(() => ({ transform: [{ scaleX: grow.value }] }))
   return (
     <Animated.View
       pointerEvents="none"
-      style={{
-        position: "absolute",
-        top: 0,
-        bottom: 0,
-        left: 0,
-        width: `${Math.max(share, 2)}%`,
-        minWidth: 6,
-        borderRadius: radius,
-        backgroundColor: alpha(color, 0.22),
-        transformOrigin: "left",
-        transform: [{ scaleX: grow }],
-      }}
+      style={[
+        {
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          start: 0,
+          width: `${Math.max(share, 2)}%`,
+          minWidth: 6,
+          borderRadius: radius,
+          backgroundColor: alpha(color, 0.22),
+          transformOrigin: I18nManager.isRTL ? "right" : "left",
+        },
+        style,
+      ]}
     />
   )
 }

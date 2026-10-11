@@ -1,53 +1,119 @@
 import * as React from "react"
-import { Animated, Pressable, StyleSheet, type GestureResponderEvent, type PressableProps, type StyleProp, type ViewStyle } from "react-native"
+import { Platform, Pressable, StyleSheet, type GestureResponderEvent, type PressableProps, type PressableStateCallbackType, type StyleProp, type ViewStyle } from "react-native"
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated"
 import * as Haptics from "expo-haptics"
+
+import { useReducedMotion } from "@/components/glass/native/a11y"
+import { useUI } from "@/components/glass/native/ui"
 
 const APressable = Animated.createAnimatedComponent(Pressable)
 
+// ---- haptics: one switch for the app, no-op on the web ----
+
+let hapticsOn = true
+/** Turn every glasscn haptic off (e.g. from a settings screen). */
+export function setHapticsEnabled(on: boolean) {
+  hapticsOn = on
+}
+const can = () => hapticsOn && Platform.OS !== "web"
+
+/** Typed haptics (NAT-20): selection changes, impacts, notifications. Never on scroll or press-in. */
+export const haptics = {
+  selection: () => can() && Haptics.selectionAsync().catch(() => {}),
+  impact: (style: "light" | "medium" | "heavy" | "soft" | "rigid" = "light") =>
+    can() && Haptics.impactAsync({ light: Haptics.ImpactFeedbackStyle.Light, medium: Haptics.ImpactFeedbackStyle.Medium, heavy: Haptics.ImpactFeedbackStyle.Heavy, soft: Haptics.ImpactFeedbackStyle.Soft, rigid: Haptics.ImpactFeedbackStyle.Rigid }[style]).catch(() => {}),
+  notify: (type: "success" | "warning" | "error") =>
+    can() && Haptics.notificationAsync({ success: Haptics.NotificationFeedbackType.Success, warning: Haptics.NotificationFeedbackType.Warning, error: Haptics.NotificationFeedbackType.Error }[type]).catch(() => {}),
+}
+export const useHaptics = () => haptics
+
 export type PressProps = Omit<PressableProps, "style"> & {
+  /** A selection haptic when the press lands (not on press-in, so scrolls never buzz). */
   haptic?: boolean
+  /** Solid press squash; defaults to the theme's `pressScale`. */
   squash?: number
+  /** Hover lift for pointers (web, iPad). */
   hover?: number
+  /** Liquid glass grows on press (`pressGrow`) instead of squashing. */
+  liquid?: boolean
   /**
-   * Dim on press (default). Pass `dim={canFade()}` when the Press wraps `<Glass>`:
-   * Liquid Glass stops rendering under a fading ancestor, so on iOS 26 it gets
-   * the squash and its own interactive response instead.
+   * Dim on press. Off by default; pass `dim={canFade()}` only when the Press doesn't
+   * wrap Liquid Glass — glass stops rendering under a fading ancestor on iOS 26.
    */
   dim?: boolean
-  style?: StyleProp<ViewStyle>
+  style?: StyleProp<ViewStyle> | ((state: PressableStateCallbackType) => StyleProp<ViewStyle>)
 }
 
 /**
- * Every tappable thing: a soft spring squash, a slight dim, a selection haptic
- * when asked, and a hover lift for pointers. Takes a plain style (Animated drops
- * Pressable's function-style form).
+ * Every tappable thing: an elastic spring press (solid squashes wider-and-shorter,
+ * liquid grows), an optional dim, a selection haptic when asked, and a hover lift.
+ * Reanimated on the UI thread; none of it under Reduce Motion.
  */
-export function Press({ haptic = false, squash = 0.97, hover = 1, dim = true, style, onPressIn, onPressOut, disabled, ...props }: PressProps) {
-  const [scale] = React.useState(() => new Animated.Value(1))
-  const [opacity] = React.useState(() => new Animated.Value(1))
-  // the caller's opacity (a disabled dim) composes with the press dim instead of being replaced by it
-  const base = StyleSheet.flatten(style)?.opacity
-  const resting = typeof base === "number" ? base : 1
-  const shown = React.useMemo(() => (resting === 1 ? opacity : Animated.multiply(opacity, resting)), [opacity, resting])
-  const spring = (v: Animated.Value, toValue: number) => Animated.spring(v, { toValue, friction: 8, tension: 380, useNativeDriver: true }).start()
+export function Press({ haptic = false, squash, hover = 1, liquid = false, dim = false, style, onPress, onPressIn, onPressOut, onHoverIn, onHoverOut, disabled, accessibilityRole = "button", ...props }: PressProps) {
+  const ui = useUI()
+  const still = useReducedMotion() || ui.motion.duration === 0
+  const sx = useSharedValue(1)
+  const sy = useSharedValue(1)
+  const fade = useSharedValue(1)
+  const [pressed, setPressed] = React.useState(false)
+  const [hovered, setHovered] = React.useState(false)
+  const spring = ui.motion.springConfig
+
+  const to = (x: number, y: number) => {
+    if (still) return
+    sx.set(withSpring(x, spring))
+    sy.set(withSpring(y, spring))
+  }
+  const down = () => {
+    if (liquid) to(ui.motion.pressGrow, ui.motion.pressGrow)
+    else {
+      const s = squash ?? ui.motion.pressScale
+      const k = ui.motion.pressStretch
+      to(s * (1 + k), s * (1 - k))
+    }
+    if (dim) fade.set(withTiming(0.72, { duration: 80 }))
+  }
+  const up = () => {
+    to(hovered ? hover : 1, hovered ? hover : 1)
+    if (dim) fade.set(withTiming(1, { duration: 160 }))
+  }
+
+  const resolved = typeof style === "function" ? style({ pressed, hovered }) : style
+  // a caller's resting opacity (a disabled dim) composes with the press dim
+  const flat = StyleSheet.flatten(resolved)?.opacity
+  const resting = typeof flat === "number" ? flat : 1
+  const animated = useAnimatedStyle(() => (dim ? { transform: [{ scaleX: sx.value }, { scaleY: sy.value }], opacity: fade.value * resting } : { transform: [{ scaleX: sx.value }, { scaleY: sy.value }] }))
+
   return (
     <APressable
       disabled={disabled}
+      accessibilityRole={accessibilityRole}
+      aria-disabled={disabled || undefined}
+      onPress={(e: GestureResponderEvent) => {
+        if (haptic && !disabled) haptics.selection()
+        onPress?.(e)
+      }}
       onPressIn={(e: GestureResponderEvent) => {
-        if (haptic && !disabled) Haptics.selectionAsync().catch(() => {})
-        spring(scale, squash)
-        if (dim) Animated.timing(opacity, { toValue: 0.72, duration: 80, useNativeDriver: true }).start()
+        setPressed(true)
+        down()
         onPressIn?.(e)
       }}
       onPressOut={(e: GestureResponderEvent) => {
-        spring(scale, 1)
-        if (dim) Animated.timing(opacity, { toValue: 1, duration: 160, useNativeDriver: true }).start()
+        setPressed(false)
+        up()
         onPressOut?.(e)
       }}
-      onHoverIn={() => hover !== 1 && !disabled && spring(scale, hover)}
-      onHoverOut={() => hover !== 1 && spring(scale, 1)}
-      // not dimming: no animated opacity at all, so nothing fades the glass inside
-      style={[style, dim ? { transform: [{ scale }], opacity: shown } : { transform: [{ scale }] }]}
+      onHoverIn={(e) => {
+        setHovered(true)
+        if (hover !== 1 && !disabled) to(hover, hover)
+        onHoverIn?.(e)
+      }}
+      onHoverOut={(e) => {
+        setHovered(false)
+        if (hover !== 1) to(1, 1)
+        onHoverOut?.(e)
+      }}
+      style={[resolved, animated]}
       {...props}
     />
   )

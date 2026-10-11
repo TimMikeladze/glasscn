@@ -1,15 +1,24 @@
 import * as React from "react"
-import { AccessibilityInfo, Animated, Easing, Platform, View, type StyleProp, type ViewProps, type ViewStyle } from "react-native"
+import { View, type StyleProp, type ViewProps, type ViewStyle } from "react-native"
+import Animated, { Easing, useAnimatedProps, useSharedValue, withTiming } from "react-native-reanimated"
 import Svg, { Circle } from "react-native-svg"
 
+import { useReducedMotion } from "@/components/glass/native/a11y"
 import { ringArc } from "@/components/glass/native/chart-math"
 import { alpha, GText, useUI } from "@/components/glass/native/ui"
 
-// Animated sets collapsable={false}, which react-native-svg would pass to the DOM on web — strip it.
-const ACircle = Animated.createAnimatedComponent(({ collapsable, ...p }: React.ComponentProps<typeof Circle> & { collapsable?: boolean }) => {
-  void collapsable
-  return <Circle {...p} />
-})
+const ACircle = Animated.createAnimatedComponent(Circle)
+
+/** A dash offset that draws in from `from` on mount, then eases to each new `to` — on the UI thread. */
+function useDash(to: number, from: number, still: boolean, duration: number) {
+  const v = useSharedValue(still ? to : from)
+  const first = React.useRef(true)
+  React.useEffect(() => {
+    v.set(still ? to : withTiming(to, { duration: first.current ? duration * 5 : duration * 4, easing: Easing.bezier(0.16, 1, 0.3, 1) }))
+    first.current = false
+  }, [v, to, still, duration])
+  return useAnimatedProps(() => ({ strokeDashoffset: v.value }))
+}
 
 /**
  * One ring that closes around its content — a goal, a countdown, a seal.
@@ -22,6 +31,7 @@ export function ProgressRing({
   color,
   style,
   children,
+  accessibilityLabel,
   ...props
 }: Omit<ViewProps, "style"> & { value: number; size?: number; stroke?: number; color?: string; style?: StyleProp<ViewStyle> }) {
   const ui = useUI()
@@ -29,24 +39,13 @@ export function ProgressRing({
   const sw = stroke ?? Math.max(3, size * 0.075)
   const r = size / 2 - sw / 2
   const { circumference, offset } = ringArc(r, Math.min(1, value))
-  const [dash] = React.useState(() => new Animated.Value(circumference))
-  React.useEffect(() => {
-    let anim: Animated.CompositeAnimation | null = null
-    AccessibilityInfo.isReduceMotionEnabled()
-      .catch(() => false)
-      .then((reduce) => {
-        if (reduce) return dash.setValue(offset)
-        anim = Animated.timing(dash, { toValue: offset, duration: 1000, easing: Easing.bezier(0.16, 1, 0.3, 1), useNativeDriver: Platform.OS !== "web" })
-        anim.start()
-      })
-    return () => anim?.stop()
-  }, [dash, offset])
+  const dash = useDash(offset, circumference, useReducedMotion() || ui.motion.duration === 0, ui.motion.duration)
   const now = Math.round(Math.min(1, Math.max(0, value)) * 100)
   return (
     <View
       accessibilityRole="progressbar"
       accessibilityValue={{ min: 0, max: 100, now }}
-      accessibilityLabel={`Progress ${now}%`}
+      accessibilityLabel={accessibilityLabel ?? `Progress ${now}%`}
       style={[{ width: size, height: size, flexShrink: 0, alignItems: "center", justifyContent: "center" }, style]}
       {...props}
     >
@@ -62,7 +61,7 @@ export function ProgressRing({
             strokeWidth={sw}
             strokeLinecap="round"
             strokeDasharray={`${circumference} ${circumference}`}
-            strokeDashoffset={dash}
+            animatedProps={dash}
           />
         </Svg>
       </View>

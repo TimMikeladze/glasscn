@@ -1,6 +1,7 @@
 import * as React from "react"
 import { View, type ViewProps } from "react-native"
 
+import { hitSlop } from "@/components/glass/native/a11y"
 import { Press } from "@/components/glass/native/press"
 import { useUI, web } from "@/components/glass/native/ui"
 
@@ -47,13 +48,14 @@ function RadioGroupItem({ value, disabled, accessibilityLabel, style }: { value:
   return (
     <Press
       haptic
-      hitSlop={13}
+      hitSlop={hitSlop(size)}
       disabled={off}
       onPress={() => g.setValue(value)}
       accessibilityRole="radio"
       accessibilityLabel={accessibilityLabel}
       aria-checked={checked}
       aria-disabled={off}
+      accessibilityState={{ checked, disabled: !!off }}
       style={[
         { width: size, height: size, borderRadius: size / 2, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: checked ? "transparent" : ui.mutedForeground, backgroundColor: checked ? ui.primary : ui.fill, opacity: off ? 0.5 : 1 },
         web({ cursor: off ? "not-allowed" : "pointer" }),
@@ -72,8 +74,12 @@ function RadioGroupCard({ value, style, children, ...props }: ViewProps & { valu
   const checked = g.value === value
   return (
       <Press
+        haptic
         onPress={() => g.setValue(value)}
         disabled={g.disabled}
+        accessibilityRole="radio"
+        aria-checked={checked}
+        accessibilityState={{ checked, disabled: !!g.disabled }}
         style={[{ flexDirection: "row", alignItems: "flex-start", gap: 12, padding: 14, borderRadius: ui.radius.control, backgroundColor: ui.fill, borderWidth: checked ? 2 : 1, borderColor: checked ? ui.primary : ui.glassBorder }, style]}
         {...props}
       >

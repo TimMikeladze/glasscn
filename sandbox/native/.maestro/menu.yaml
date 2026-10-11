@@ -1,0 +1,13 @@
+appId: host.exp.Exponent
+name: Dropdown menu — open, pick an item, toast confirms
+---
+- runFlow:
+    file: _open.yaml
+    env:
+      ROUTE: c/dropdown-menu
+- tapOn: "This night"
+- assertVisible: "Thursday, Oct 8"
+- takeScreenshot: screenshots/menu-open
+- tapOn: "Copy as text"
+- assertNotVisible: "Thursday, Oct 8"
+- assertVisible: "Copied as text"

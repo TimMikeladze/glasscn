@@ -25,7 +25,7 @@ export function RangeChart<Row>({
   ...props
 }: Omit<ViewProps, "style" | "children"> & {
   data: readonly Row[]
-  label: (d: Row) => string
+  label: (d: Row) => React.ReactNode
   low: (d: Row) => number
   high: (d: Row) => number
   current?: (d: Row) => number | null | undefined
@@ -45,7 +45,7 @@ export function RangeChart<Row>({
   const c0 = from ?? ui.charts[4]
   const c1 = to ?? ui.charts[0]
   return (
-    <View style={[{ gap: 8 }, style]} {...props}>
+    <View accessibilityRole="list" style={[{ gap: 8 }, style]} {...props}>
       {data.map((d, i) => {
         const l = Math.min(low(d), high(d))
         const h = Math.max(low(d), high(d))
@@ -53,11 +53,15 @@ export function RangeChart<Row>({
         const x0 = fraction(l, lo, hi) * width
         const x1 = fraction(h, lo, hi) * width
         return (
-          <View key={i} accessible accessibilityLabel={`${label(d)}: low ${valueFormat(l)}, high ${valueFormat(h)}${now == null ? "" : `, now ${valueFormat(now)}`}`} style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-            <GText size="sm" weight="500" style={{ minWidth: 48 }}>
-              {label(d)}
-            </GText>
-            <GText size="sm" tone="muted" style={{ minWidth: 32, textAlign: "right" }}>
+          <View key={i} accessible accessibilityRole="text" accessibilityLabel={`${typeof label(d) === "string" || typeof label(d) === "number" ? label(d) : `Row ${i + 1}`}: low ${valueFormat(l)}, high ${valueFormat(h)}${now == null ? "" : `, now ${valueFormat(now)}`}`} style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+            {typeof label(d) === "string" || typeof label(d) === "number" ? (
+              <GText size="sm" weight="500" style={{ minWidth: 48 }}>
+                {label(d) as string}
+              </GText>
+            ) : (
+              <View style={{ minWidth: 48 }}>{label(d)}</View>
+            )}
+            <GText size="sm" tone="muted" style={{ minWidth: 32, textAlign: "right", fontVariant: ["tabular-nums"] }}>
               {valueFormat(l)}
             </GText>
             <View style={{ flex: 1, height: 10 }} onLayout={i === 0 ? (e) => setWidth(e.nativeEvent.layout.width) : undefined}>

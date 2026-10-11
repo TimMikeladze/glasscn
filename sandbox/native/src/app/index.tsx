@@ -12,6 +12,7 @@ const ITEMS: { href: Href; name: string; item: string; description: string }[] =
   { href: "/glass", name: "Glass", item: "native-glass", description: "Default, tinted, flat, interactive and bar panes." },
   { href: "/aurora", name: "Aurora", item: "native-aurora", description: "The drifting ground, full screen." },
   { href: "/press", name: "Press", item: "native-press", description: "Squash, dim, haptic, hover lift, disabled." },
+  { href: "/tabs-layout" as Href, name: "Tabs layout", item: "native-tabs-layout", description: "NativeTabs themed from tokens: minimize on scroll, bottom accessory, search tab." },
 ]
 
 export default function Index() {

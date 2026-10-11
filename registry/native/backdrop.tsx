@@ -1,7 +1,9 @@
 import * as React from "react"
 import { Image, StyleSheet, View, type StyleProp, type ViewProps, type ViewStyle } from "react-native"
 import { Defs, RadialGradient, Rect, Stop, Svg } from "react-native-svg"
+import { useVideoPlayer, VideoView } from "expo-video"
 
+import { useReducedMotion } from "@/components/glass/native/a11y"
 import { useUI } from "@/components/glass/native/ui"
 
 const MESH = [
@@ -13,8 +15,9 @@ const MESH = [
 
 /**
  * A ground for glass besides the aurora — the web's Backdrop. `image` covers the
- * view with a photo and an optional `dim` scrim; `video` shows its `poster` (play
- * video with expo-video under the glass yourself — it isn't a dependency here);
+ * view with a photo and an optional `dim` scrim; `video` plays `src` muted and
+ * looping with expo-video, showing `poster` until the first frame (and staying
+ * paused on it under Reduce Motion);
  * `mesh` blends four chart colours; `noise` is the plain ground.
  */
 export function Backdrop({
@@ -38,9 +41,11 @@ export function Backdrop({
   void position
   const id = React.useId().replace(/[^a-zA-Z0-9]/g, "")
   const uri = variant === "image" ? src : variant === "video" ? poster : undefined
+  const [ready, setReady] = React.useState(false)
   return (
     <View pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={[StyleSheet.absoluteFill, { backgroundColor: ui.auroraBase, overflow: "hidden" }, style]} {...props}>
-      {uri ? <Image alt="" source={{ uri }} resizeMode="cover" style={StyleSheet.absoluteFill} /> : null}
+      {variant === "video" && src ? <BackdropVideo src={src} onReady={() => setReady(true)} /> : null}
+      {uri && !(variant === "video" && ready) ? <Image alt="" source={{ uri }} resizeMode="cover" style={StyleSheet.absoluteFill} /> : null}
       {variant === "mesh" ? (
         <Svg style={StyleSheet.absoluteFill} width="100%" height="100%">
           <Defs>
@@ -59,4 +64,18 @@ export function Backdrop({
       {dim > 0 ? <View style={[StyleSheet.absoluteFill, { backgroundColor: `rgba(0,0,0,${Math.min(1, dim)})` }]} /> : null}
     </View>
   )
+}
+
+/** Muted, looping, no controls; paused under Reduce Motion. */
+function BackdropVideo({ src, onReady }: { src: string; onReady: () => void }) {
+  const still = useReducedMotion()
+  const player = useVideoPlayer(src, (p) => {
+    p.muted = true
+    p.loop = true
+  })
+  React.useEffect(() => {
+    if (still) player.pause()
+    else player.play()
+  }, [player, still])
+  return <VideoView player={player} nativeControls={false} contentFit="cover" onFirstFrameRender={onReady} style={StyleSheet.absoluteFill} />
 }

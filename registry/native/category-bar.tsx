@@ -50,10 +50,10 @@ export function CategoryBar({
                 height: "100%",
                 backgroundColor: palette[i % palette.length],
                 opacity: active === -1 || i === active ? 1 : 0.4,
-                borderTopLeftRadius: i === 0 ? ui.radius.badge : 0,
-                borderBottomLeftRadius: i === 0 ? ui.radius.badge : 0,
-                borderTopRightRadius: i === segs.length - 1 ? ui.radius.badge : 0,
-                borderBottomRightRadius: i === segs.length - 1 ? ui.radius.badge : 0,
+                borderTopStartRadius: i === 0 ? ui.radius.badge : 0,
+                borderBottomStartRadius: i === 0 ? ui.radius.badge : 0,
+                borderTopEndRadius: i === segs.length - 1 ? ui.radius.badge : 0,
+                borderBottomEndRadius: i === segs.length - 1 ? ui.radius.badge : 0,
               }}
             />
           ))}
@@ -63,25 +63,25 @@ export function CategoryBar({
             accessible
             accessibilityRole="image"
             accessibilityLabel={markerLabel ?? `${marker}`}
-            style={{ position: "absolute", top: -4, bottom: -4, left: `${at}%`, width: 4, marginLeft: -2, borderRadius: 999, backgroundColor: ui.foreground, borderWidth: 1, borderColor: ui.auroraBase }}
+            style={{ position: "absolute", top: -4, bottom: -4, start: `${at}%`, width: 4, marginStart: -2, borderRadius: 999, backgroundColor: ui.foreground, borderWidth: 1, borderColor: ui.auroraBase }}
           />
         )}
       </View>
       {labels ? (
         <View style={{ height: 16 }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-          <Edge style={{ left: 0 }}>0</Edge>
+          <Edge style={{ start: 0 }}>0</Edge>
           {values.map((_, i) => {
             const left = segs[i].start + segs[i].width
             const last = i === values.length - 1
             // drop an inner edge that would collide with its neighbour or the end label
             if (!last && (left - (segs[i - 1] ? segs[i - 1].start + segs[i - 1].width : 0) < 8 || 100 - left < 8)) return null
             return last ? (
-              <Edge key={i} style={{ right: 0 }}>
+              <Edge key={i} style={{ end: 0 }}>
                 {edges[i]}
               </Edge>
             ) : (
               // centre on the edge: a fixed-width box shifted back by half
-              <Edge key={i} style={{ left: `${left}%`, width: 48, marginLeft: -24 }} align="center">
+              <Edge key={i} style={{ start: `${left}%`, width: 48, marginStart: -24 }} align="center">
                 {edges[i]}
               </Edge>
             )

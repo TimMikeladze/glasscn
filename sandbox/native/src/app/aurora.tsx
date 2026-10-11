@@ -9,7 +9,7 @@ export default function AuroraScreen() {
   return (
     <Screen>
       <View style={{ height: 360 }} />
-      <Section title="Aurora" note="Three blobs drift over the base colour on the native driver. Turn on Reduce Motion in Settings → Accessibility and they stop.">
+      <Section title="Aurora" note="Three blobs drift over the base colour on the UI thread (Reanimated), sized to their container, at the motion preset’s aurora speed. Reduce Motion (or motion “none”) stops them.">
         <Glass style={{ padding: 16, gap: 6 }}>
           <Body>base {t.auroraBase}</Body>
           <Body>blobs {t.aurora.join(" · ")}</Body>

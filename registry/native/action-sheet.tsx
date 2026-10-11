@@ -1,10 +1,10 @@
 import * as React from "react"
-import { Animated, StyleSheet, View, type PressableProps, type StyleProp, type ViewStyle } from "react-native"
-import { SafeAreaInsetsContext } from "react-native-safe-area-context"
+import { StyleSheet, View, type PressableProps, type StyleProp, type ViewStyle } from "react-native"
+import Animated from "react-native-reanimated"
 
-import { Backdrop, DialogPortal, glassOpacity, useControllableOpen, usePresence } from "@/components/glass/native/dialog"
+import { Backdrop, DialogPortal, useControllableOpen, useEntrance, useInsets, usePresence } from "@/components/glass/native/dialog"
 import { Glass } from "@/components/glass/native/glass"
-import { Press } from "@/components/glass/native/press"
+import { Press, haptics } from "@/components/glass/native/press"
 import { withGlyphs } from "@/components/glass/native/segmented-control"
 import { GText, useUI, type GTextProps } from "@/components/glass/native/ui"
 
@@ -42,17 +42,17 @@ function ActionSheetContent({ children }: { children?: React.ReactNode }) {
   const ui = useUI()
   const { open, setOpen } = useActionSheet()
   const { mounted, progress } = usePresence(open, 280)
-  const insets = React.useContext(SafeAreaInsetsContext) ?? { top: 0, right: 0, bottom: 0, left: 0 }
+  const insets = useInsets()
+  const entrance = useEntrance(progress, { y: 320 })
   const items = React.Children.toArray(children)
   const cancel = items.filter((c) => React.isValidElement(c) && c.type === ActionSheetCancel)
   const rest = items.filter((c) => !cancel.includes(c))
-  const rise = progress.interpolate({ inputRange: [0, 1], outputRange: [320, 0] })
   return (
     <DialogPortal visible={mounted} onRequestClose={() => setOpen(false)}>
       <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
         <Backdrop progress={progress} onPress={() => setOpen(false)} />
-        <Animated.View role="dialog" aria-modal style={{ position: "absolute", left: 12, right: 12, bottom: insets.bottom + 12, gap: 8, alignSelf: "center", maxWidth: 420, opacity: glassOpacity(progress), transform: [{ translateY: rise }] }}>
-          <Glass radius={ui.radius.surface} style={{ overflow: "hidden" }}>
+        <Animated.View role="dialog" aria-modal accessibilityViewIsModal style={[{ position: "absolute", left: 12, right: 12, bottom: insets.bottom + 12, gap: 8, alignSelf: "center", maxWidth: 420 }, entrance]}>
+          <Glass variant="liquid" visible={open} radius={ui.radius.surface} style={{ overflow: "hidden" }}>
             {rest.map((c, i) => (
               <View key={i} style={i ? { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: ui.separator } : null}>
                 {c}
@@ -78,14 +78,15 @@ function ActionSheetDescription(props: GTextProps) {
   return <GText size="xs" tone="muted" align="center" {...props} />
 }
 
-function Row({ children, onPress, color, bold, ...props }: PressLike & { color: string; bold?: boolean }) {
+function Row({ children, onPress, color, bold, destructive, ...props }: PressLike & { color: string; bold?: boolean; destructive?: boolean }) {
   const ui = useUI()
   const { setOpen } = useActionSheet()
   return (
     <Press
-      haptic
       accessibilityRole="button"
       onPress={(e) => {
+        if (destructive) haptics.notify("warning")
+        else haptics.selection()
         onPress?.(e)
         setOpen(false)
       }}
@@ -100,14 +101,15 @@ function Row({ children, onPress, color, bold, ...props }: PressLike & { color: 
 /** A choice; closes the sheet. */
 function ActionSheetAction({ variant = "default", ...props }: PressLike & { variant?: "default" | "destructive" | "preferred" }) {
   const ui = useUI()
-  return <Row color={variant === "destructive" ? ui.destructive : ui.primary} bold={variant === "preferred"} {...props} />
+  return <Row color={variant === "destructive" ? ui.destructive : ui.primary} bold={variant === "preferred"} destructive={variant === "destructive"} {...props} />
 }
 
 /** Cancel, in its own capsule. */
 function ActionSheetCancel({ children = "Cancel", ...props }: PressLike) {
   const ui = useUI()
+  const { open } = useActionSheet()
   return (
-    <Glass radius={ui.radius.surface}>
+    <Glass variant="liquid" visible={open} radius={ui.radius.surface}>
       <Row color={ui.primary} bold {...props}>
         {children}
       </Row>

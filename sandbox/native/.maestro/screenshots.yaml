@@ -1,0 +1,18 @@
+appId: host.exp.Exponent
+name: Visual baselines — one screen per palette × scheme (NAT-53)
+---
+- repeat:
+    times: 1
+    commands:
+      - runScript: palettes.js
+- repeat:
+    while:
+      true: ${output.i < output.shots.length}
+    commands:
+      - runFlow:
+          file: _open.yaml
+          env:
+            ROUTE: c/card
+            QUERY: palette=${output.shots[output.i].palette}&scheme=${output.shots[output.i].scheme}
+      - takeScreenshot: screenshots/card-${output.shots[output.i].palette}-${output.shots[output.i].scheme}
+      - evalScript: ${output.i = output.i + 1}

@@ -3,7 +3,7 @@ import { ScrollView, TextInput, View, type TextInputProps, type ViewProps } from
 import { SearchIcon } from "lucide-react-native"
 
 import { Dialog, DialogContent, DialogDescription, DialogTitle, type DialogProps } from "@/components/glass/native/dialog"
-import { Press } from "@/components/glass/native/press"
+import { Press, haptics } from "@/components/glass/native/press"
 import { GText, alpha, useUI, web, type GTextProps } from "@/components/glass/native/ui"
 
 /**
@@ -49,6 +49,8 @@ function Command({ style, shouldFilter = true, children, ...props }: ViewProps &
   )
 }
 
+const CommandDialogContext = React.createContext(false)
+
 /** ⌘K on the web; a search sheet here: Command in a glass dialog. */
 function CommandDialog({ title = "Command palette", description = "Search for a command to run…", children, ...props }: DialogProps & { title?: string; description?: string }) {
   return (
@@ -58,7 +60,9 @@ function CommandDialog({ title = "Command palette", description = "Search for a 
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </View>
-        <Command>{children}</Command>
+        <CommandDialogContext.Provider value>
+          <Command>{children}</Command>
+        </CommandDialogContext.Provider>
       </DialogContent>
     </Dialog>
   )
@@ -68,6 +72,8 @@ function CommandDialog({ title = "Command palette", description = "Search for a 
 function CommandInput({ style, onChangeText, ...props }: TextInputProps) {
   const ui = useUI()
   const { query, setQuery } = useCommand()
+  // in a CommandDialog the search takes the keyboard straight away
+  const inDialog = React.useContext(CommandDialogContext)
   return (
     <View style={{ padding: 8, paddingBottom: 4 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8, height: ui.control.default, borderRadius: ui.radius.button, backgroundColor: ui.fill, paddingHorizontal: 12 }}>
@@ -78,6 +84,8 @@ function CommandInput({ style, onChangeText, ...props }: TextInputProps) {
           selectionColor={ui.primary}
           cursorColor={ui.primary}
           autoCorrect={false}
+          autoFocus={inDialog}
+          returnKeyType="search"
           {...props}
           value={query}
           onChangeText={(t) => {
@@ -183,7 +191,10 @@ function CommandItem({
       onHoverOut={() => setHover(false)}
       onPressIn={() => setHover(true)}
       onPressOut={() => setHover(false)}
-      onPress={() => onSelect?.(label)}
+      onPress={() => {
+        haptics.selection()
+        onSelect?.(label)
+      }}
       style={[
         { flexDirection: "row", alignItems: "center", gap: 10, minHeight: 44, paddingHorizontal: 10, borderRadius: ui.radius.control - 4, backgroundColor: hover ? ui.fillStrong : "transparent", opacity: disabled ? 0.5 : 1 },
         web({ cursor: disabled ? "default" : "pointer", outlineStyle: "none" }),

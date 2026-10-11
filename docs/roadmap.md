@@ -44,6 +44,8 @@ The complete backlog from the October 2026 audit: seven parallel reviews (web co
 
 - **2026-10-11 — M3 (parity and forms):** 71 items closed — select, radio-group, field, input-group, button-group, toggle, spinner, skeleton, drawer, context-menu, scroll-area, accordion, alert, item, stepper, empty, confirmation-popover, command, combobox, calendar / date-picker; AI chat parts; chart fixes, data table, summaries, states, selection; widget, kpi, range-chart, backdrop; data-table v2. Spec: [`specs/m3-parity-forms.md`](specs/m3-parity-forms.md).
 
+- **2026-10-11 — M4 (native rebuild):** generated native tokens (all palettes and presets), `native-a11y`, two-layer `Glass`, Reanimated `Press` + typed haptics, `@expo/ui` system controls first (switch, slider, segmented, date picker, menus, bottom sheet), gesture-handler everywhere, NativeTabs recipe, keyboard layer, FullWindowOverlay toasts, accessible Reanimated charts, FlashList chat, activity-rings rebuild, backdrop video; vitest + jest-expo suites, Maestro flows. Spec: [`specs/m4-native.md`](specs/m4-native.md).
+
 ## Milestones (do in order; each ends green on `pnpm typecheck && pnpm lint && pnpm test`, `verify:install`, `verify:native`, and a browser check)
 
 1. **M0 — Stop the bleeding.** Every P0 bug/a11y/token item: ENG-01..03, ENG-10, ENG-40, CMP-X01, CMP-X03, TIP-01, GRL-01, DCK-01, INP-01, SWT-01, SLD-01, BTN-01, KBD-01, PRG-01, SPK-01, HMP-01, CHT-01, CHA-03, SITE-01, SITE-02, AGT-01, NAT-01, NAT-02, NAT-04, UX-01, UX-10, DLG-04 (via NEW-05). Plus QA-01 and QA-05 so they can't come back.
@@ -146,7 +148,7 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 ### 2.5 Export formats
 
 - [ ] **ENG-60** P1 gap — `themeToDtcg()` — W3C design tokens JSON (`$value`, `$type`, `$extensions` light/dark modes); covers Style Dictionary and Tokens Studio.
-- [ ] **ENG-61** P0 gap — `toNativeTheme()` → `registry/native/tokens.generated.ts` (see NAT-60).
+- [x] **ENG-61** P0 gap — `toNativeTheme()` → `registry/native/tokens.generated.ts` (see NAT-60).
 - [ ] **ENG-62** P2 gap — Figma Variables JSON (collection, Light/Dark modes; palette modes) (feeds GRO-05); CSS-in-JS object; shadcn `create` preset URL; Open in v0.
 
 ### 2.6 Theme Studio
@@ -454,90 +456,90 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 
 - [x] **NAT-01** P0 bug — Toast swipe-dismiss throws on iOS/Android: enter/place animations use the native driver on the shared transform (`toaster.tsx:164-199, 216-220`), then release runs a JS-driven `Animated.timing(drag)` → RN throws "Attempting to run JS driven animation on animated node that has been moved to native" (`react-native/Libraries/Animated/animations/Animation.js:73`). Web hides it. → Reanimated shared values + gesture-handler Pan (NAT-30).
 - [x] **NAT-02** P0 bug (verify on device) — `Press` animates its own opacity to 0.72 on every press (`press.tsx:31`), and glass buttons/toasts put `GlassView` inside `Press`; disabled buttons sit at 0.45 → violates native rule 3. → `Press` skips opacity dim when child is glass (`isInteractive` already squashes/shimmers); disabled glass dims the label, not the container.
-- [ ] **NAT-03** P0 paradigm — On iOS 26 every surface (card, stat, grouped list, tooltip, toast, dialog) becomes `GlassView` (`glass.tsx:47`) → content-layer glass and glass-on-glass (`auth-01` button in card; `chat-01` composer in card), plus render cost. → `Glass variant="material" | "liquid" | "liquid-clear"`; material = `BlurView` system materials; liquid only on the control layer.
+- [x] **NAT-03** P0 paradigm — On iOS 26 every surface (card, stat, grouped list, tooltip, toast, dialog) becomes `GlassView` (`glass.tsx:47`) → content-layer glass and glass-on-glass (`auth-01` button in card; `chat-01` composer in card), plus render cost. → `Glass variant="material" | "liquid" | "liquid-clear"`; material = `BlurView` system materials; liquid only on the control layer.
 - [x] **NAT-04** P0 a11y — `BlurView` (iOS < 26), RN-web and Android paths ignore `isReduceTransparencyEnabled` / `reduceTransparencyChanged`, Bold Text, Darker System Colors / High Text Contrast. → `useGlassAccessibility()` → `glassSolid` + stronger borders.
-- [ ] **NAT-05** P0 test — No runtime tests for 53 native files; `verify:native` only installs + type-checks (that is why NAT-01/02 shipped). → See NAT-50..54.
+- [x] **NAT-05** P0 test — No runtime tests for 53 native files; `verify:native` only installs + type-checks (that is why NAT-01/02 shipped). → See NAT-50..54.
 
 ### 8.2 Foundation
 
-- [ ] **NAT-10** P0 parity — `tokens.tsx:10-20` has 6 hand-converted hex palettes (web has 12); nothing checks parity. → Generated tokens (NAT-60).
-- [ ] **NAT-11** P1 parity — `tokens.tsx:44-66` glass opacities/border/shadow are literals → material/shape/motion/density/type presets and studio one-line install can't reach native.
-- [ ] **NAT-12** P1 a11y — No increased-contrast variants of primary/border/muted.
-- [ ] **NAT-13** P2 bug — Nested `GlassThemeProvider` setting only `palette` drops an outer forced `scheme` (`tokens.tsx:71-82`). → Merge with parent context.
-- [ ] **NAT-14** P1 fidelity — `glass.tsx:49` only `"regular"`; `clear`/`none`, `glassEffectStyle={{style, animate, animationDuration}}` (materialise) and `GlassContainer spacing` unused. → Export `GlassGroup` = `GlassContainer` (dock, tabs, segmented).
+- [x] **NAT-10** P0 parity — `tokens.tsx:10-20` has 6 hand-converted hex palettes (web has 12); nothing checks parity. → Generated tokens (NAT-60).
+- [x] **NAT-11** P1 parity — `tokens.tsx:44-66` glass opacities/border/shadow are literals → material/shape/motion/density/type presets and studio one-line install can't reach native.
+- [x] **NAT-12** P1 a11y — No increased-contrast variants of primary/border/muted.
+- [x] **NAT-13** P2 bug — Nested `GlassThemeProvider` setting only `palette` drops an outer forced `scheme` (`tokens.tsx:71-82`). → Merge with parent context.
+- [x] **NAT-14** P1 fidelity — `glass.tsx:49` only `"regular"`; `clear`/`none`, `glassEffectStyle={{style, animate, animationDuration}}` (materialise) and `GlassContainer spacing` unused. → Export `GlassGroup` = `GlassContainer` (dock, tabs, segmented).
 - [x] **NAT-15** P2 bug — `glass.tsx:13` lacks `isGlassEffectAPIAvailable()` (Expo: some iOS 26 betas crash without it).
-- [ ] **NAT-16** P2 bug — iOS < 26 path `overflow: hidden` drops the `raised` shadow (`glass.tsx:86`). → Shadow on outer wrapper.
-- [ ] **NAT-17** P1 android — Translucent fill + `elevation` gives a dark halo (`glass.tsx:77-83`). → No elevation on translucent fills / RN 0.76+ `boxShadow`; opt-in blur tier: expo-blur `BlurTargetView` + `dimezisBlurViewSdk31Plus` (stable from SDK 55; provider pattern with a root target ref).
-- [ ] **NAT-18** P1 parity — RN-web path hard-codes `blur(28px) saturate(180%)` and uses `tint` as background (so `tint={ui.primary}` turns opaque) (`glass.tsx:64-66`). → Tokens; tint as a mix.
-- [ ] **NAT-19** P2 token — Default radius 26 vs `ui.radius.surface` 24 (`glass.tsx:43`).
-- [ ] **NAT-20** P1 fidelity — Haptic fires on `onPressIn` (`press.tsx:29`) so scroll-starts buzz; buttons opt in by default (`button.tsx:107`). → Fire on `onPress`; haptics for selection changes and typed notifications only; `useHaptics()` with global off switch, no-op on web.
-- [ ] **NAT-21** P1 anim — Animated friction/tension springs ≠ web motion tokens. → Reanimated `withSpring({ duration, dampingRatio })` from tokens; gesture-handler pressables so press doesn't fight ScrollView.
-- [ ] **NAT-22** P2 a11y — `Press` has no default `accessibilityRole`; function-style `style` lost.
-- [ ] **NAT-23** P1 a11y — Control heights 28/32/40 < 44pt with no `hitSlop` policy; fixed `height` clips at large Dynamic Type (`ui.tsx:53`). → `minHeight`, `hitSlop` to 44, `maxFontSizeMultiplier` per role (labels ~1.6, display/stat ~1.2).
-- [ ] **NAT-24** P1 token — `ui.tsx:52-58` radius/pad/type/motion literals; fonts ignore type presets; no expo-font loading of theme fonts.
-- [ ] **NAT-25** P2 rtl — No `I18nManager` awareness anywhere.
-- [ ] **NAT-26** P2 perf — Aurora: three full-window SVG gradients animate forever, sized by `useWindowDimensions` not parent (`aurora.tsx:41-65`, wrong in cards/iPad split). → `onLayout`; expo-linear-gradient or Skia.
-- [ ] **NAT-27** P1 a11y — Reduce motion implemented four ways (`aurora:13` state, `segmented-control:8` ref, `dialog:9` never-removed module listener, one-shot promise in charts); ref/one-shot read `false` on first mount so mount animations still play. `switch`, `chat`, `progress` import it from `segmented-control`. → One `native-a11y` foundation item (Reanimated's synchronous `useReducedMotion`).
+- [x] **NAT-16** P2 bug — iOS < 26 path `overflow: hidden` drops the `raised` shadow (`glass.tsx:86`). → Shadow on outer wrapper.
+- [x] **NAT-17** P1 android — Translucent fill + `elevation` gives a dark halo (`glass.tsx:77-83`). → No elevation on translucent fills / RN 0.76+ `boxShadow`; opt-in blur tier: expo-blur `BlurTargetView` + `dimezisBlurViewSdk31Plus` (stable from SDK 55; provider pattern with a root target ref).
+- [x] **NAT-18** P1 parity — RN-web path hard-codes `blur(28px) saturate(180%)` and uses `tint` as background (so `tint={ui.primary}` turns opaque) (`glass.tsx:64-66`). → Tokens; tint as a mix.
+- [x] **NAT-19** P2 token — Default radius 26 vs `ui.radius.surface` 24 (`glass.tsx:43`).
+- [x] **NAT-20** P1 fidelity — Haptic fires on `onPressIn` (`press.tsx:29`) so scroll-starts buzz; buttons opt in by default (`button.tsx:107`). → Fire on `onPress`; haptics for selection changes and typed notifications only; `useHaptics()` with global off switch, no-op on web.
+- [x] **NAT-21** P1 anim — Animated friction/tension springs ≠ web motion tokens. → Reanimated `withSpring({ duration, dampingRatio })` from tokens; gesture-handler pressables so press doesn't fight ScrollView.
+- [x] **NAT-22** P2 a11y — `Press` has no default `accessibilityRole`; function-style `style` lost.
+- [x] **NAT-23** P1 a11y — Control heights 28/32/40 < 44pt with no `hitSlop` policy; fixed `height` clips at large Dynamic Type (`ui.tsx:53`). → `minHeight`, `hitSlop` to 44, `maxFontSizeMultiplier` per role (labels ~1.6, display/stat ~1.2).
+- [x] **NAT-24** P1 token — `ui.tsx:52-58` radius/pad/type/motion literals; fonts ignore type presets; no expo-font loading of theme fonts.
+- [x] **NAT-25** P2 rtl — No `I18nManager` awareness anywhere.
+- [x] **NAT-26** P2 perf — Aurora: three full-window SVG gradients animate forever, sized by `useWindowDimensions` not parent (`aurora.tsx:41-65`, wrong in cards/iPad split). → `onLayout`; expo-linear-gradient or Skia.
+- [x] **NAT-27** P1 a11y — Reduce motion implemented four ways (`aurora:13` state, `segmented-control:8` ref, `dialog:9` never-removed module listener, one-shot promise in charts); ref/one-shot read `false` on first mount so mount animations still play. `switch`, `chat`, `progress` import it from `segmented-control`. → One `native-a11y` foundation item (Reanimated's synchronous `useReducedMotion`).
 
 ### 8.3 Controls
 
-- [ ] **NAT-30** P1 fidelity — Switch is a JS re-implementation: no drag-to-toggle, solid knob, JS-thread translate (`switch.tsx:26`), `sm` 36×22 no hitSlop. → `@expo/ui` `Switch` on iOS/Android (SwiftUI Toggle gets the glass knob free; Compose M3); RN version for web.
-- [ ] **NAT-31** P1 bug — Slider: `onPanResponderTerminate` never calls `onValueCommit` (`slider.tsx:69-72`); grabs responder on touch start and never releases (`:50-52`, likely blocks vertical scroll). → gesture-handler `Pan().activeOffsetX([-8,8]).failOffsetY([-8,8])`.
-- [ ] **NAT-32** P1 rtl — Slider maths in physical x while `left:` flips in RTL. → `translateX`.
-- [ ] **NAT-33** P1 fidelity — Slider: no glass knob while dragging, no ticks/neutral value, 24pt touch height. → `@expo/ui` `Slider` for single values; Reanimated thumb with `GlassView` while active for ranges.
-- [ ] **NAT-34** P2 a11y — VoiceOver adjusts by `step` (100 swipes on 0–100). → 10% steps + `accessibilityValue.text` formatter.
-- [ ] **NAT-35** P1 rtl (verify) — Segmented indicator uses `left: box.x` (`segmented-control:69`) → lands on mirrored segment in RTL. → `translateX`.
-- [ ] **NAT-36** P1 anim — Indicator layout props on JS thread. → Reanimated / `LinearTransition`.
-- [ ] **NAT-37** P1 fidelity — iOS: `@expo/ui` `Picker` segmented style = real `UISegmentedControl` with iOS 26 glass; track heights 28/36 < 44.
-- [ ] **NAT-38** P1 paradigm — `native-dock` duplicates `NativeTabs` for app tabs. → `native-tabs-layout` recipe item (`minimizeBehavior="onScrollDown"`, `BottomAccessory` + `usePlacement`, `role="search"`, Material bar on Android; import path `expo-router/unstable-native-tabs` on SDK 57, `expo-router/native-tabs` on 58). Keep `Dock` for in-screen bars with `GlassContainer` + minimise.
-- [ ] **NAT-39** P1 fidelity — `DockAction` solid primary (`dock.tsx:106-122`). → Tinted `GlassView` (`tintColor=primary`, `isInteractive`).
-- [ ] **NAT-40** P2 bug — `dock.tsx:23` `useSafeAreaInsets()` throws without provider (sheet/toaster fall back).
-- [ ] **NAT-41** P2 a11y — `tabs.tsx:149` `PanelText` uses `Animated.Text`, bypassing `GText` scaling rules.
-- [ ] **NAT-42** P1 a11y — Checkbox 18pt + 10 hitSlop = 38pt; `Input` fixed `height: 40` (`input.tsx:54`); `invalid` not announced. → `minHeight`; `aria-invalid` + error text via `aria-describedby`.
-- [ ] **NAT-43** P2 fidelity — `Label` linking uses Android-only `accessibilityLabelledBy`; `auth-01:47` duplicates labels. → `Label htmlFor` via context.
+- [x] **NAT-30** P1 fidelity — Switch is a JS re-implementation: no drag-to-toggle, solid knob, JS-thread translate (`switch.tsx:26`), `sm` 36×22 no hitSlop. → `@expo/ui` `Switch` on iOS/Android (SwiftUI Toggle gets the glass knob free; Compose M3); RN version for web.
+- [x] **NAT-31** P1 bug — Slider: `onPanResponderTerminate` never calls `onValueCommit` (`slider.tsx:69-72`); grabs responder on touch start and never releases (`:50-52`, likely blocks vertical scroll). → gesture-handler `Pan().activeOffsetX([-8,8]).failOffsetY([-8,8])`.
+- [x] **NAT-32** P1 rtl — Slider maths in physical x while `left:` flips in RTL. → `translateX`.
+- [x] **NAT-33** P1 fidelity — Slider: no glass knob while dragging, no ticks/neutral value, 24pt touch height. → `@expo/ui` `Slider` for single values; Reanimated thumb with `GlassView` while active for ranges.
+- [x] **NAT-34** P2 a11y — VoiceOver adjusts by `step` (100 swipes on 0–100). → 10% steps + `accessibilityValue.text` formatter.
+- [x] **NAT-35** P1 rtl (verify) — Segmented indicator uses `left: box.x` (`segmented-control:69`) → lands on mirrored segment in RTL. → `translateX`.
+- [x] **NAT-36** P1 anim — Indicator layout props on JS thread. → Reanimated / `LinearTransition`.
+- [x] **NAT-37** P1 fidelity — iOS: `@expo/ui` `Picker` segmented style = real `UISegmentedControl` with iOS 26 glass; track heights 28/36 < 44.
+- [x] **NAT-38** P1 paradigm — `native-dock` duplicates `NativeTabs` for app tabs. → `native-tabs-layout` recipe item (`minimizeBehavior="onScrollDown"`, `BottomAccessory` + `usePlacement`, `role="search"`, Material bar on Android; import path `expo-router/unstable-native-tabs` on SDK 57, `expo-router/native-tabs` on 58). Keep `Dock` for in-screen bars with `GlassContainer` + minimise.
+- [x] **NAT-39** P1 fidelity — `DockAction` solid primary (`dock.tsx:106-122`). → Tinted `GlassView` (`tintColor=primary`, `isInteractive`).
+- [x] **NAT-40** P2 bug — `dock.tsx:23` `useSafeAreaInsets()` throws without provider (sheet/toaster fall back).
+- [x] **NAT-41** P2 a11y — `tabs.tsx:149` `PanelText` uses `Animated.Text`, bypassing `GText` scaling rules.
+- [x] **NAT-42** P1 a11y — Checkbox 18pt + 10 hitSlop = 38pt; `Input` fixed `height: 40` (`input.tsx:54`); `invalid` not announced. → `minHeight`; `aria-invalid` + error text via `aria-describedby`.
+- [x] **NAT-43** P2 fidelity — `Label` linking uses Android-only `accessibilityLabelledBy`; `auth-01:47` duplicates labels. → `Label htmlFor` via context.
 
 ### 8.4 Overlays
 
-- [ ] **NAT-44** P1 bug — Dialog/sheet: no keyboard avoidance. → `react-native-keyboard-controller`.
-- [ ] **NAT-45** P1 bug — Dialog content taller than window overflows with no scroll (`dialog.tsx:173-184`). → `maxHeight` + `ScrollView` body.
-- [ ] **NAT-46** P1 fidelity — Sheet: no detents/grabber/drag-dismiss; default side `right` (not a phone idiom). → `@expo/ui` `BottomSheet` (iOS 26 inset glass sheet; Compose `ModalBottomSheet`) or expo-router `formSheet` + `sheetAllowedDetents`; web: Reanimated + Pan with snap points and rubber-banding.
-- [ ] **NAT-47** P2 a11y — Dialog doesn't move focus to title; `accessibilityViewIsModal` set on `GlassView` not modal root.
-- [ ] **NAT-48** P2 motion — iOS 26 entrances translate+scale. → Materialise via `glassEffectStyle={{style:"regular", animate:true}}` from `"none"`.
-- [ ] **NAT-49** P1 fidelity — Dropdown is a JS Modal. → Native `@expo/ui` `Menu`/`ContextMenu` on iOS/Android for plain items (label, icon, destructive, checkbox, radio, submenu) — morphs from button on iOS 26; JS version for custom content and web. Add `native-context-menu`.
-- [ ] **NAT-55** P1 a11y — Dropdown rows `minHeight: 36` (`dropdown-menu.tsx:245`); uppercase label (`:185`); no select haptic.
-- [ ] **NAT-56** P2 bug (verify) — `popover.tsx:39-46` `measureInWindow` inside translucent-status-bar Modal on Android edge-to-edge.
-- [ ] **NAT-57** P1 fidelity — Long-press tooltip isn't an iOS idiom and screen readers never get it. → Tip into trigger `accessibilityHint`; long-press only on Android icon buttons; hover on web/iPad.
-- [ ] **NAT-58** P1 bug — Toaster is a root `View` with `zIndex` (`toaster.tsx:93-98`) → hidden under RN `Modal` and native `modal`/`formSheet`. → iOS `FullWindowOverlay` (react-native-screens); Android overlay/portal.
-- [ ] **NAT-59** P1 a11y — Toast `accessibilityLiveRegion` is Android-only (`:223`); VoiceOver never announces. → `announceForAccessibilityWithOptions(title, { queue: true })`; Android `getRecommendedTimeoutMillis`. P2: typed-toast notification haptics.
+- [x] **NAT-44** P1 bug — Dialog/sheet: no keyboard avoidance. → `react-native-keyboard-controller`.
+- [x] **NAT-45** P1 bug — Dialog content taller than window overflows with no scroll (`dialog.tsx:173-184`). → `maxHeight` + `ScrollView` body.
+- [ ] **NAT-46** P1 fidelity — Sheet: no detents/grabber/drag-dismiss; default side `right` (not a phone idiom). → `@expo/ui` `BottomSheet` (iOS 26 inset glass sheet; Compose `ModalBottomSheet`) or expo-router `formSheet` + `sheetAllowedDetents`; web: Reanimated + Pan with snap points and rubber-banding. *(M4: system sheet can't report/control detents — `detent`/`onBeforeDismiss` use the Reanimated sheet)*
+- [x] **NAT-47** P2 a11y — Dialog doesn't move focus to title; `accessibilityViewIsModal` set on `GlassView` not modal root.
+- [x] **NAT-48** P2 motion — iOS 26 entrances translate+scale. → Materialise via `glassEffectStyle={{style:"regular", animate:true}}` from `"none"`.
+- [ ] **NAT-49** P1 fidelity — Dropdown is a JS Modal. → Native `@expo/ui` `Menu`/`ContextMenu` on iOS/Android for plain items (label, icon, destructive, checkbox, radio, submenu) — morphs from button on iOS 26; JS version for custom content and web. Add `native-context-menu`. *(M4: system menu: no controlled `open`, no `onOpenChange` on iOS, SF Symbols only (`systemImage`))*
+- [x] **NAT-55** P1 a11y — Dropdown rows `minHeight: 36` (`dropdown-menu.tsx:245`); uppercase label (`:185`); no select haptic.
+- [x] **NAT-56** P2 bug (verify) — `popover.tsx:39-46` `measureInWindow` inside translucent-status-bar Modal on Android edge-to-edge.
+- [x] **NAT-57** P1 fidelity — Long-press tooltip isn't an iOS idiom and screen readers never get it. → Tip into trigger `accessibilityHint`; long-press only on Android icon buttons; hover on web/iPad.
+- [x] **NAT-58** P1 bug — Toaster is a root `View` with `zIndex` (`toaster.tsx:93-98`) → hidden under RN `Modal` and native `modal`/`formSheet`. → iOS `FullWindowOverlay` (react-native-screens); Android overlay/portal.
+- [x] **NAT-59** P1 a11y — Toast `accessibilityLiveRegion` is Android-only (`:223`); VoiceOver never announces. → `announceForAccessibilityWithOptions(title, { queue: true })`; Android `getRecommendedTimeoutMillis`. P2: typed-toast notification haptics.
 
 ### 8.5 Chat and data
 
-- [ ] **NAT-61** P1 perf — Chat thread is a plain `ScrollView` (`chat.tsx:99-120`). → FlashList v2 / LegendList with `maintainVisibleContentPosition`, start-at-end.
-- [ ] **NAT-62** P1 bug — No keyboard handling for the floating composer. → `KeyboardStickyView`, interactive dismiss.
-- [ ] **NAT-63** P2 fidelity — `submitBehavior="submit"` on multiline (`chat.tsx:439`) → Return always sends on iOS. → Prop, default newline on native.
-- [ ] **NAT-64** P2 rtl — Bubble corners physical (`chat.tsx:224-228`). → `borderTopStartRadius`/`End`.
-- [ ] **NAT-65** P2 a11y — Send button 32pt; assistant messages not announced.
-- [ ] **NAT-66** P1 a11y — Charts collapse to one `image` (`chart.tsx:299-305`). → `adjustable` role stepping focus + announcing the tooltip row; "view as table".
-- [ ] **NAT-67** P1 perf — Every touch-move `setState` re-renders SVG and remounts a glass tooltip (`chart.tsx:312-321`). → Reanimated focus index + `useAnimatedProps`; Skia for dense series.
-- [ ] **NAT-68** P2 bug — Chart tooltip never clears on lift (no `onResponderRelease`); tick width assumes `length*6.4`; `SvgText` ignores font scale.
-- [ ] **NAT-69** P1 perf/a11y — Heatmap renders ~365 `Press` elements with two Animated values each and 365 VoiceOver stops (`heatmap.tsx:74`; same `tracker.tsx:55`). → Plain cells + one hit-testing gesture layer; summary + adjustable navigation.
-- [ ] **NAT-70** P2 anim — Native-driver `strokeDashoffset` on react-native-svg (rings/gauge/progress-ring) is undocumented. → Reanimated `useAnimatedProps`.
-- [ ] **NAT-71** P1 test — `chart-math.ts` and `placeFloating` (`popover.tsx:17`) are pure TS with no tests (root vitest excludes `registry/native`).
-- [ ] **NAT-72** P2 fidelity — Avatar uses RN `Image`. → expo-image (cache, transition, placeholder).
-- [ ] **NAT-73** P1 fidelity — Grouped list: uppercase headers (`grouped-list.tsx:31`), separator inset 16 not aligned to text, title 15.2pt ≠ iOS body 17pt, `marginLeft` → `marginStart`; offer `@expo/ui` `Form`/`Section` on iOS.
-- [ ] **NAT-74** P2 a11y — `Display` 95pt without `maxFontSizeMultiplier` (`typography.tsx:55`); `Blockquote` `borderLeft` → `borderStart`.
-- [ ] **NAT-75** P2 parity — `stat.tsx:27` ignores `intensity`; `card.tsx:25` maps `subtle` to `ui.fill`.
+- [x] **NAT-61** P1 perf — Chat thread is a plain `ScrollView` (`chat.tsx:99-120`). → FlashList v2 / LegendList with `maintainVisibleContentPosition`, start-at-end.
+- [x] **NAT-62** P1 bug — No keyboard handling for the floating composer. → `KeyboardStickyView`, interactive dismiss.
+- [x] **NAT-63** P2 fidelity — `submitBehavior="submit"` on multiline (`chat.tsx:439`) → Return always sends on iOS. → Prop, default newline on native.
+- [x] **NAT-64** P2 rtl — Bubble corners physical (`chat.tsx:224-228`). → `borderTopStartRadius`/`End`.
+- [x] **NAT-65** P2 a11y — Send button 32pt; assistant messages not announced.
+- [x] **NAT-66** P1 a11y — Charts collapse to one `image` (`chart.tsx:299-305`). → `adjustable` role stepping focus + announcing the tooltip row; "view as table".
+- [x] **NAT-67** P1 perf — Every touch-move `setState` re-renders SVG and remounts a glass tooltip (`chart.tsx:312-321`). → Reanimated focus index + `useAnimatedProps`; Skia for dense series.
+- [x] **NAT-68** P2 bug — Chart tooltip never clears on lift (no `onResponderRelease`); tick width assumes `length*6.4`; `SvgText` ignores font scale.
+- [x] **NAT-69** P1 perf/a11y — Heatmap renders ~365 `Press` elements with two Animated values each and 365 VoiceOver stops (`heatmap.tsx:74`; same `tracker.tsx:55`). → Plain cells + one hit-testing gesture layer; summary + adjustable navigation.
+- [x] **NAT-70** P2 anim — Native-driver `strokeDashoffset` on react-native-svg (rings/gauge/progress-ring) is undocumented. → Reanimated `useAnimatedProps`.
+- [x] **NAT-71** P1 test — `chart-math.ts` and `placeFloating` (`popover.tsx:17`) are pure TS with no tests (root vitest excludes `registry/native`).
+- [ ] **NAT-72** P2 fidelity — Avatar uses RN `Image`. → expo-image (cache, transition, placeholder). *(M4: expo-image not adopted; Avatar on RN `Image`)*
+- [ ] **NAT-73** P1 fidelity — Grouped list: uppercase headers (`grouped-list.tsx:31`), separator inset 16 not aligned to text, title 15.2pt ≠ iOS body 17pt, `marginLeft` → `marginStart`; offer `@expo/ui` `Form`/`Section` on iOS. *(M4: done except an `@expo/ui` Form path on iOS)*
+- [x] **NAT-74** P2 a11y — `Display` 95pt without `maxFontSizeMultiplier` (`typography.tsx:55`); `Blockquote` `borderLeft` → `borderStart`.
+- [x] **NAT-75** P2 parity — `stat.tsx:27` ignores `intensity`; `card.tsx:25` maps `subtle` to `ui.fill`.
 
 ### 8.6 Sandbox, platform, verification
 
-- [ ] **NAT-50** P0 test — Unit (root vitest): chart-math, `placeFloating`, slider snapping, toaster store, **token parity** (generated native tokens vs `createGlassTheme` within ΔE threshold).
-- [ ] **NAT-51** P1 test — Component (jest-expo + RNTL): controlled/uncontrolled state, a11y role/state/value, text-in-`Text` safety, and a structural test failing if `Press` or any opacity-animated node wraps `Glass`.
-- [ ] **NAT-52** P1 test — E2E (Maestro on iOS 26/27 sim + Android emulator in CI): a flow per `/c/<name>` (swipe toast, slider in ScrollView, menu, composer + keyboard) with screenshots; runs with `forceRTL`, largest Dynamic Type, Reduce Transparency, Increase Contrast.
-- [ ] **NAT-53** P1 test — Visual diffs of Maestro screenshots per palette × scheme.
-- [ ] **NAT-54** P1 test — `verify:native` also runs component tests against the shadcn-installed copy.
-- [ ] **NAT-76** P1 infra — Reanimated 4.5, worklets, gesture-handler installed in sandbox but unused by the registry; `@expo/ui` only transitive. → Declare as item deps when adopted.
-- [ ] **NAT-77** P1 platform — iOS 27 SDK requires scene-based lifecycle: SDK 57 needs `ios.enableSceneSupport` (expo ≥ 57.0.23) via `expo-build-properties`; default in SDK 58. Set in sandbox; document.
-- [ ] **NAT-78** P2 platform — `app.json` `"orientation": "portrait"`, no iPad/landscape demos → rotation, form sheets, sidebar untested.
+- [x] **NAT-50** P0 test — Unit (root vitest): chart-math, `placeFloating`, slider snapping, toaster store, **token parity** (generated native tokens vs `createGlassTheme` within ΔE threshold).
+- [x] **NAT-51** P1 test — Component (jest-expo + RNTL): controlled/uncontrolled state, a11y role/state/value, text-in-`Text` safety, and a structural test failing if `Press` or any opacity-animated node wraps `Glass`.
+- [ ] **NAT-52** P1 test — E2E (Maestro on iOS 26/27 sim + Android emulator in CI): a flow per `/c/<name>` (swipe toast, slider in ScrollView, menu, composer + keyboard) with screenshots; runs with `forceRTL`, largest Dynamic Type, Reduce Transparency, Increase Contrast. *(M4: Maestro flows written; toast-swipe passes on the iOS 26.5 sim; slider/composer/menu not yet green, no CI job)*
+- [ ] **NAT-53** P1 test — Visual diffs of Maestro screenshots per palette × scheme. *(M4: no visual baselines recorded yet)*
+- [x] **NAT-54** P1 test — `verify:native` also runs component tests against the shadcn-installed copy.
+- [x] **NAT-76** P1 infra — Reanimated 4.5, worklets, gesture-handler installed in sandbox but unused by the registry; `@expo/ui` only transitive. → Declare as item deps when adopted.
+- [x] **NAT-77** P1 platform — iOS 27 SDK requires scene-based lifecycle: SDK 57 needs `ios.enableSceneSupport` (expo ≥ 57.0.23) via `expo-build-properties`; default in SDK 58. Set in sandbox; document.
+- [x] **NAT-78** P2 platform — `app.json` `"orientation": "portrait"`, no iPad/landscape demos → rotation, form sheets, sidebar untested.
 - [x] **NAT-79** P2 docs — `docs/rules/native.md` rule 3 ("opacity starts below 1") → cite Expo (opacity 0 kills glass; use `animate` / swap to `none`) and point at materialise.
 
 ### 8.7 Native rebuild — target architecture

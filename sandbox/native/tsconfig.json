@@ -6,6 +6,9 @@
       // live registry source — scripts/verify-native.mjs drops every line naming it
       "@/components/glass/native/*": ["../../registry/native/*"],
       "@/*": ["./src/*"],
+      // @expo/ui ships types only through package exports, which "*" below bypasses
+      "@expo/ui": ["./node_modules/@expo/ui/build/universal/index.d.ts"],
+      "@expo/ui/community/*": ["./node_modules/@expo/ui/build/community/*/index.d.ts"],
       // the registry files live outside this app: resolve their imports from here, not the repo root
       "*": ["./node_modules/@types/*", "./node_modules/*"]
     },

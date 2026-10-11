@@ -1,21 +1,24 @@
 import * as React from "react"
-import { AccessibilityInfo, Animated, Easing, Platform, View, type LayoutChangeEvent, type StyleProp, type ViewProps, type ViewStyle } from "react-native"
+import { Platform, View, type LayoutChangeEvent, type StyleProp, type ViewProps, type ViewStyle } from "react-native"
+import { Gesture, GestureDetector } from "react-native-gesture-handler"
+import Animated, { Easing, runOnJS, useAnimatedProps, useAnimatedReaction, useAnimatedStyle, useSharedValue, withDelay, withTiming } from "react-native-reanimated"
 import Svg, { Circle, Defs, Line, LinearGradient, Path, Stop } from "react-native-svg"
 
-import { areaPath, scaleSeries, smoothPath, sanitizeId } from "@/components/glass/native/chart-math"
+import { useReducedMotion } from "@/components/glass/native/a11y"
+import { areaPath, hitIndex, polylineLength, scaleSeries, smoothPath, sanitizeId, stepIndex } from "@/components/glass/native/chart-math"
 import { useUI } from "@/components/glass/native/ui"
 
-// Animated sets collapsable={false}, which react-native-svg would pass to the DOM on web — strip it.
-const APath = Animated.createAnimatedComponent(({ collapsable, ...p }: React.ComponentProps<typeof Path> & { collapsable?: boolean }) => {
-  void collapsable
-  return <Path {...p} />
-})
-const AView = Animated.View
+const APath = Animated.createAnimatedComponent(Path)
+const ease = Easing.bezier(0.16, 1, 0.3, 1)
 
 /**
  * A measure over time: a smooth stroke that draws itself, a soft gradient
  * beneath, the latest point lit. Gaps (`null`) are skipped. Scales to its
  * container's width; set the height with `height`.
+ *
+ * Pass `onScrub` to make it scrubbable: a horizontal drag (or hover) moves a dot
+ * along the values on the UI thread and reports the index; a screen reader
+ * swipes up and down through them.
  */
 export function Sparkline({
   data,
@@ -23,8 +26,10 @@ export function Sparkline({
   color,
   area = true,
   dot = true,
+  onScrub,
   style,
   onLayout,
+  accessibilityLabel,
   ...props
 }: Omit<ViewProps, "children" | "style"> & {
   data: (number | null | undefined)[]
@@ -32,40 +37,85 @@ export function Sparkline({
   color?: string
   area?: boolean
   dot?: boolean
+  /** Called with the scrubbed value's index, or null when the scrub ends. */
+  onScrub?: (index: number | null) => void
   style?: StyleProp<ViewStyle>
 }) {
   const ui = useUI()
   const tone = color ?? ui.primary
   const id = sanitizeId(React.useId())
+  const still = useReducedMotion() || ui.motion.duration === 0
   const [width, setWidth] = React.useState(0)
-  const [draw] = React.useState(() => new Animated.Value(0))
-  const [fade] = React.useState(() => new Animated.Value(0))
+  const draw = useSharedValue(still ? 1 : 0)
+  const fade = useSharedValue(still ? 1 : 0)
+  const focus = useSharedValue(-1)
+  const measured = width > 0
   React.useEffect(() => {
-    if (!width) return
-    let anim: Animated.CompositeAnimation | null = null
-    AccessibilityInfo.isReduceMotionEnabled()
-      .catch(() => false)
-      .then((reduce) => {
-        if (reduce) {
-          draw.setValue(1)
-          fade.setValue(1)
-          return
-        }
-        const driver = Platform.OS !== "web"
-        anim = Animated.parallel([
-          Animated.timing(draw, { toValue: 1, duration: 1100, easing: Easing.bezier(0.16, 1, 0.3, 1), useNativeDriver: driver }),
-          Animated.timing(fade, { toValue: 1, duration: 700, delay: 300, easing: Easing.out(Easing.quad), useNativeDriver: driver }),
-        ])
-        anim.start()
-      })
-    return () => anim?.stop()
-  }, [width, draw, fade])
+    if (!measured) return
+    if (still) {
+      draw.set(1)
+      fade.set(1)
+      return
+    }
+    const d = ui.motion.duration
+    draw.set(withTiming(1, { duration: Math.max(1, d * 5.5), easing: ease }))
+    fade.set(withDelay(d * 1.5, withTiming(1, { duration: Math.max(1, d * 3.5), easing: Easing.out(Easing.quad) })))
+  }, [measured, still, draw, fade, ui.motion.duration])
+
+  const points = width ? scaleSeries(data, width, height, 6) : []
+  // on-screen length, overestimated: the dash only has to cover the curve
+  const length = Math.ceil(polylineLength(points) * 1.2)
+  const strokeProps = useAnimatedProps(() => ({ strokeDashoffset: length * (1 - draw.value) }))
+  const fadeStyle = useAnimatedStyle(() => ({ opacity: fade.value }))
+  const last = points[points.length - 1]
+  const dotStyle = useAnimatedStyle(() => ({ transform: [{ scale: draw.value < 0.8 ? 0 : (draw.value - 0.8) / 0.2 }] }))
+
+  // scrubbing: the index of each present value, and where it sits
+  const present = data.map((v, i) => (typeof v === "number" && Number.isFinite(v) ? i : -1)).filter((i) => i >= 0)
+  const xs = points.map((p) => p.x)
+  const ys = points.map((p) => p.y)
+  const report = (k: number) => onScrub?.(k < 0 ? null : (present[k] ?? null))
+  useAnimatedReaction(
+    () => focus.value,
+    (now, prev) => {
+      if (onScrub && prev !== null && now !== prev) runOnJS(report)(now)
+    },
+    [onScrub]
+  )
+  const gesture = (() => {
+    const targets = { kind: "x" as const, at: xs }
+    const move = (x: number) => {
+      "worklet"
+      const i = hitIndex(targets, x, 0)
+      if (i !== focus.get()) focus.set(i)
+    }
+    const clear = () => {
+      "worklet"
+      focus.set(-1)
+    }
+    const pan = Gesture.Pan()
+      .activeOffsetX([-6, 6])
+      .failOffsetY([-12, 12])
+      .onBegin((e) => move(e.x))
+      .onUpdate((e) => move(e.x))
+      .onFinalize(clear)
+    const hover = Gesture.Hover()
+      .onBegin((e) => move(e.x))
+      .onUpdate((e) => move(e.x))
+      .onFinalize(clear)
+    return Gesture.Simultaneous(pan, hover)
+  })()
+  const scrubStyle = useAnimatedStyle(() => {
+    const i = focus.value
+    if (i < 0 || i >= xs.length) return { opacity: 0 }
+    return { opacity: 1, transform: [{ translateX: xs[i] - 5 }, { translateY: ys[i] - 5 }] }
+  })
+  const [a11y, setA11y] = React.useState<number | null>(null)
 
   const measure = (e: LayoutChangeEvent) => {
     setWidth(Math.round(e.nativeEvent.layout.width))
     onLayout?.(e)
   }
-  const points = width ? scaleSeries(data, width, height, 6) : []
   if (points.length < 2) {
     return (
       <View style={[{ width: "100%", height }, style]} onLayout={measure} accessibilityElementsHidden importantForAccessibility="no-hide-descendants" {...props}>
@@ -77,51 +127,60 @@ export function Sparkline({
       </View>
     )
   }
-  const last = points[points.length - 1]
-  // overestimate the path length: the dash only has to cover it
-  let length = 0
-  for (let i = 1; i < points.length; i++) length += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y)
-  length = Math.ceil(length * 1.2)
-  const present = data.filter((v): v is number => typeof v === "number" && Number.isFinite(v))
+  const values = present.map((i) => data[i] as number)
+  const label = accessibilityLabel ?? `Trend of ${values.length} values from ${values[0]} to ${values[values.length - 1]}, low ${Math.min(...values)}, high ${Math.max(...values)}`
+  const step = (d: 1 | -1) => {
+    const n = stepIndex(a11y, d, present.length)
+    setA11y(n)
+    focus.set(n ?? -1)
+  }
   return (
     <View
       accessible
-      accessibilityRole="image"
-      accessibilityLabel={`Trend of ${present.length} values from ${present[0]} to ${present[present.length - 1]}, low ${Math.min(...present)}, high ${Math.max(...present)}`}
+      accessibilityRole={onScrub ? "adjustable" : "image"}
+      accessibilityLabel={label}
+      accessibilityValue={onScrub && a11y !== null ? { text: String(values[a11y]) } : undefined}
+      accessibilityActions={onScrub ? [{ name: "increment" }, { name: "decrement" }] : undefined}
+      onAccessibilityAction={(e) => step(e.nativeEvent.actionName === "increment" ? 1 : -1)}
       style={[{ width: "100%", height, overflow: "visible" }, style]}
       onLayout={measure}
       {...props}
     >
-      <Svg width={width} height={height} style={{ overflow: "visible" }}>
-        <Defs>
-          <LinearGradient id={`spark-${id}`} x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor={tone} stopOpacity={0.32} />
-            <Stop offset="1" stopColor={tone} stopOpacity={0} />
-          </LinearGradient>
-        </Defs>
-        {area ? <APath d={areaPath(points, height - 2)} fill={`url(#spark-${id})`} opacity={fade} /> : null}
-        <APath
-          d={smoothPath(points)}
-          fill="none"
-          stroke={tone}
-          strokeWidth={2.4}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeDasharray={`${length} ${length}`}
-          strokeDashoffset={draw.interpolate({ inputRange: [0, 1], outputRange: [length, 0] })}
-        />
+      {area ? (
+        <Animated.View pointerEvents="none" style={[{ position: "absolute", top: 0, left: 0 }, fadeStyle]}>
+          <Svg width={width} height={height}>
+            <Defs>
+              <LinearGradient id={`spark-${id}`} x1="0" y1="0" x2="0" y2="1">
+                <Stop offset="0" stopColor={tone} stopOpacity={0.32} />
+                <Stop offset="1" stopColor={tone} stopOpacity={0} />
+              </LinearGradient>
+            </Defs>
+            <Path d={areaPath(points, height - 2)} fill={`url(#spark-${id})`} />
+          </Svg>
+        </Animated.View>
+      ) : null}
+      <Svg width={width} height={height} style={{ position: "absolute", top: 0, left: 0, overflow: "visible" }} pointerEvents="none">
+        <APath d={smoothPath(points)} fill="none" stroke={tone} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" strokeDasharray={`${length} ${length}`} animatedProps={strokeProps} />
       </Svg>
-      {dot ? (
+      {dot && last ? (
         // the lit point pops in once the stroke reaches it
-        <AView
-          pointerEvents="none"
-          style={{ position: "absolute", left: last.x - 7, top: last.y - 7, width: 14, height: 14, transform: [{ scale: draw.interpolate({ inputRange: [0, 0.8, 1], outputRange: [0, 0, 1] }) }] }}
-        >
+        <Animated.View pointerEvents="none" style={[{ position: "absolute", left: last.x - 7, top: last.y - 7, width: 14, height: 14 }, dotStyle]}>
           <Svg width={14} height={14}>
             <Circle cx={7} cy={7} r={7} fill={tone} opacity={0.22} />
             <Circle cx={7} cy={7} r={3.6} fill={tone} stroke={ui.auroraBase} strokeWidth={1.5} />
           </Svg>
-        </AView>
+        </Animated.View>
+      ) : null}
+      {onScrub ? (
+        <>
+          <Animated.View
+            pointerEvents="none"
+            style={[{ position: "absolute", top: 0, left: 0, width: 10, height: 10, borderRadius: 5, backgroundColor: tone, borderWidth: 1.5, borderColor: ui.auroraBase }, scrubStyle]}
+          />
+          <GestureDetector gesture={gesture}>
+            <View collapsable={false} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, ...(Platform.OS === "web" ? ({ cursor: "crosshair" } as object) : {}) }} />
+          </GestureDetector>
+        </>
       ) : null}
     </View>
   )

@@ -1,10 +1,12 @@
 import * as React from "react"
-import { Animated, View, type LayoutChangeEvent, type ViewProps, type ViewStyle } from "react-native"
+import { View, type LayoutChangeEvent, type ViewProps, type ViewStyle } from "react-native"
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
 
+import { useReducedMotion } from "@/components/glass/native/a11y"
 import { Glass, canFade } from "@/components/glass/native/glass"
 import { Press } from "@/components/glass/native/press"
-import { useReduceMotion, useSlidingIndicator, withGlyphs } from "@/components/glass/native/segmented-control"
-import { alpha, useUI, web, type UI } from "@/components/glass/native/ui"
+import { useSlidingSelection, withGlyphs } from "@/components/glass/native/segmented-control"
+import { GText, alpha, useUI, web, type UI } from "@/components/glass/native/ui"
 
 type Orientation = "horizontal" | "vertical"
 type Variant = "default" | "plain" | "line"
@@ -57,7 +59,7 @@ export function tabsListVariants({ variant = "default", ui }: { variant?: Varian
 export function TabsList({ variant = "default", style, children, ...props }: ViewProps & { variant?: Variant }) {
   const ui = useUI()
   const { value, orientation } = useTabs()
-  const { register, style: indicator, box } = useSlidingIndicator(value)
+  const { register, style: indicator } = useSlidingSelection(value)
   const list = React.useMemo(() => ({ variant, register }), [variant, register])
   const base: ViewStyle = {
     flexDirection: orientation === "vertical" ? "column" : "row",
@@ -67,10 +69,9 @@ export function TabsList({ variant = "default", style, children, ...props }: Vie
   }
   const bar =
     variant === "line" ? (
-      <Animated.View
-        pointerEvents="none"
-        style={{ position: "absolute", height: 2, borderRadius: 1, backgroundColor: ui.primary, left: box.x, width: box.w, top: Animated.add(box.y, Animated.add(box.h, -2)) }}
-      />
+      <Animated.View pointerEvents="none" style={indicator}>
+        <View style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 2, borderRadius: 1, backgroundColor: ui.primary }} />
+      </Animated.View>
     ) : (
       <Animated.View pointerEvents="none" style={[indicator, { borderRadius: ui.radius.button, backgroundColor: ui.fillStrong }, web({ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.35)" })]} />
     )
@@ -106,6 +107,7 @@ export function TabsTrigger({ value, disabled, style, children, ...props }: Omit
     <Press
       haptic
       squash={1}
+      hitSlop={6}
       disabled={disabled}
       onLayout={list?.register(value)}
       onPress={() => tabs.select(value)}
@@ -118,6 +120,7 @@ export function TabsTrigger({ value, disabled, style, children, ...props }: Omit
           justifyContent: tabs.orientation === "vertical" ? "flex-start" : "center",
           gap: 6,
           height: line ? 36 : 32,
+          minWidth: 44,
           paddingHorizontal: line ? 8 : 14,
           borderRadius: line ? 0 : ui.radius.button,
           opacity: disabled ? 0.5 : 1,
@@ -144,24 +147,20 @@ export function TabsContent({ value, style, children, ...props }: ViewProps & { 
   )
 }
 
+/** A string panel's text (NAT-41: GText, so it takes the theme's type and Dynamic Type caps). */
 function PanelText({ children }: { children: string }) {
-  const ui = useUI()
-  return <Animated.Text style={{ fontSize: ui.text.sm, lineHeight: 20, color: ui.foreground }}>{children}</Animated.Text>
+  return <GText size="sm">{children}</GText>
 }
 
+/** The panel rises 4pt in; it fades too only where nothing inside could be Liquid Glass's ancestor. */
 function Panel({ style, ...props }: ViewProps) {
   const ui = useUI()
-  const [t] = React.useState(() => new Animated.Value(0))
-  const reduce = useReduceMotion()
+  const reduced = useReducedMotion()
+  const t = useSharedValue(reduced ? 1 : 0)
   React.useEffect(() => {
-    if (reduce.current) t.setValue(1)
-    else Animated.timing(t, { toValue: 1, duration: ui.motion.duration, useNativeDriver: true }).start()
-  }, [t, reduce, ui.motion.duration])
-  return (
-    <Animated.View
-      accessibilityRole="none"
-      style={[{ flex: 1, transform: [{ translateY: t.interpolate({ inputRange: [0, 1], outputRange: [4, 0] }) }] }, canFade() && { opacity: t }, style]}
-      {...props}
-    />
-  )
+    t.set(reduced ? 1 : withSpring(1, ui.motion.springConfig))
+  }, [t, reduced, ui.motion.springConfig])
+  const fade = canFade()
+  const rise = useAnimatedStyle(() => ({ transform: [{ translateY: 4 * (1 - t.value) }], opacity: fade ? Math.min(1, t.value) : 1 }))
+  return <Animated.View role="tabpanel" style={[{ flex: 1 }, rise, style]} {...props} />
 }

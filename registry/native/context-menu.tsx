@@ -22,8 +22,12 @@ import {
 type Ctx = { open: boolean; openFromLongPress: () => void }
 const ContextMenuContext = React.createContext<Ctx | null>(null)
 
-/** Long-press (or right-click on web) opens the glass menu at the trigger; a plain tap doesn't. */
-function ContextMenu({ onOpenChange, children }: { onOpenChange?: (open: boolean) => void; children?: React.ReactNode }) {
+/**
+ * Long-press (or right-click on web) opens the menu at the trigger; a plain tap doesn't.
+ * iOS / Android: plain items open the system context menu (SwiftUI `ContextMenu` with its
+ * lifted preview, Compose `DropdownMenu`); custom content or `native={false}` the glass menu.
+ */
+function ContextMenu({ onOpenChange, native = true, children }: { onOpenChange?: (open: boolean) => void; native?: boolean; children?: React.ReactNode }) {
   const [open, setOpen] = React.useState(false)
   const allow = React.useRef(false)
   const change = (next: boolean) => {
@@ -41,7 +45,7 @@ function ContextMenu({ onOpenChange, children }: { onOpenChange?: (open: boolean
   }
   return (
     <ContextMenuContext.Provider value={ctx}>
-      <DropdownMenu open={open} onOpenChange={change}>
+      <DropdownMenu open={open} onOpenChange={change} native={native} longPress>
         {children}
       </DropdownMenu>
     </ContextMenuContext.Provider>
@@ -62,6 +66,8 @@ function ContextMenuTrigger({ children, ...props }: Omit<React.ComponentProps<ty
     </DropdownMenuTrigger>
   )
 }
+
+Object.assign(ContextMenuTrigger, { menuPart: "trigger" })
 
 /** The lifted preview: grows slightly while the menu is open. */
 function ContextMenuPreview({ style, ...props }: ViewProps) {

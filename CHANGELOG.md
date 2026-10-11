@@ -2,6 +2,20 @@
 
 Registry items are copied into your app, so re-run `npx shadcn add @glasscn-app/<item>` to pick up a change. IDs refer to [`docs/roadmap.md`](docs/roadmap.md).
 
+## Unreleased — M4 native rebuild (2026-10-11)
+
+### Breaking (native)
+- `native-tokens` is generated from the web theme (`tokens.generated.ts`): 12 palettes, every material/shape/motion/density/type preset, increased-contrast overrides. `GlassTheme` gained the label tiers and status colours; `foreground` is the on-glass label. `GlassThemeProvider` takes presets and merges with its parent.
+- `Glass` defaults to `variant="material"` (a system material, never Liquid Glass); pass `variant="liquid"` (or `interactive`) for the control layer.
+- `Press` no longer dims by default; haptics fire on press, not press-in. Native items now need `react-native-reanimated` and `react-native-gesture-handler` (wrap the app in `GestureHandlerRootView`) and, for dialogs/sheets/chat, `react-native-keyboard-controller` (`KeyboardProvider`).
+- Custom charts: `ChartFrame.focused` / `hit` replaced by `targets`, `tooltip`, `dots`.
+
+### Added (native)
+- `native-a11y` (live Reduce Motion / Transparency, Increase Contrast, Bold Text, `announce()`, 44pt `hitSlop`), `native-toast-store`, `native-tabs-layout` (NativeTabs recipe), `GlassBlurTarget` (Android blur tier), `GlassEffectGroup`, `haptics` / `setHapticsEnabled`.
+- `@expo/ui` system controls first: switch, slider, segmented control, date picker, dropdown/context menus, bottom sheet — `native={false}` for the glass version.
+- Sheet detents, grabber, drag-to-dismiss; dock drag-to-scrub; navigation bar follows scroll; confirmation popover → action sheet on phones; toasts above modals and announced; keyboard-aware dialogs and chat composer; FlashList chat; accessible, Reanimated charts with "view as table"; activity rings rebuilt; backdrop video; demos for every native item.
+- Tests: vitest (chart maths, token parity, a11y helpers), jest-expo component + structural suites (also run by `verify:native`), Maestro flows.
+
 ## Unreleased — M3 parity and forms (2026-10-11)
 
 ### Breaking

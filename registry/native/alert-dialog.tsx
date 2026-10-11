@@ -1,14 +1,15 @@
 import * as React from "react"
-import { Animated, Platform, StyleSheet, View, useWindowDimensions, type ViewProps } from "react-native"
+import { Platform, StyleSheet, View, useWindowDimensions, type Text, type ViewProps } from "react-native"
+import Animated, { useAnimatedStyle, type SharedValue } from "react-native-reanimated"
 
 import { Button } from "@/components/glass/native/button"
-import { DialogPortal, glassOpacity, textChildren, useControllableOpen, usePresence } from "@/components/glass/native/dialog"
+import { DialogPortal, KeyboardAvoid, textChildren, useControllableOpen, useEntrance, useInitialFocus, useInsets, usePresence } from "@/components/glass/native/dialog"
 import { Glass } from "@/components/glass/native/glass"
 import { Press } from "@/components/glass/native/press"
 import { GText, useUI, type GTextProps } from "@/components/glass/native/ui"
 
 type Size = "default" | "sm"
-type AlertCtx = { open: boolean; setOpen: (open: boolean) => void; titleId: string; descriptionId: string }
+type AlertCtx = { open: boolean; setOpen: (open: boolean) => void; titleId: string; descriptionId: string; titleRef: React.RefObject<Text | null> }
 const AlertContext = React.createContext<AlertCtx | null>(null)
 function useAlert() {
   const ctx = React.useContext(AlertContext)
@@ -31,7 +32,8 @@ export type AlertDialogProps = { open?: boolean; defaultOpen?: boolean; onOpenCh
 function AlertDialog({ open, defaultOpen, onOpenChange, children }: AlertDialogProps) {
   const [value, setOpen] = useControllableOpen(open, defaultOpen, onOpenChange)
   const id = React.useId().replace(/:/g, "")
-  const ctx = React.useMemo(() => ({ open: value, setOpen, titleId: `alert-title-${id}`, descriptionId: `alert-description-${id}` }), [value, setOpen, id])
+  const titleRef = React.useRef<Text>(null)
+  const ctx = React.useMemo(() => ({ open: value, setOpen, titleId: `alert-title-${id}`, descriptionId: `alert-description-${id}`, titleRef }), [value, setOpen, id])
   return <AlertContext.Provider value={ctx}>{children}</AlertContext.Provider>
 }
 
@@ -63,38 +65,36 @@ const AlertDialogPortal = DialogPortal
  * The page dims behind the alert (the web's --glass-dim: 15% light, 45% dark).
  * Not pressable, no blur — the panel already frosts. A sibling of the glass, so fading it is safe.
  */
-function AlertDialogOverlay({ progress }: { progress: Animated.Value }) {
+function AlertDialogOverlay({ progress }: { progress: SharedValue<number> }) {
   const ui = useUI()
-  return <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity: progress, backgroundColor: ui.scheme === "dark" ? "rgba(0,0,0,0.45)" : "rgba(0,0,0,0.15)" }]} />
+  const fade = useAnimatedStyle(() => ({ opacity: Math.min(1, Math.max(0, progress.value)) }))
+  return <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: ui.dim }, fade]} />
 }
 
-/** Centred strong-glass panel: rises and scales in (fades only where glass may fade — never Liquid Glass). */
+/** Centred liquid-glass panel: rises and scales in, materialising on iOS 26 (never fades Liquid Glass). Rides above the keyboard; the screen reader lands on the title. */
 function AlertDialogContent({ style, children, size = "default", ...props }: ViewProps & { size?: Size }) {
   const ui = useUI()
-  const { open, setOpen, titleId, descriptionId } = useAlert()
+  const { open, setOpen, titleId, descriptionId, titleRef } = useAlert()
   const { mounted, progress } = usePresence(open)
-  const { width } = useWindowDimensions()
+  const { width, height } = useWindowDimensions()
+  const insets = useInsets()
+  const entrance = useEntrance(progress, { y: 16, scale: 0.95 })
+  useInitialFocus(open && mounted, titleRef)
   const pad = size === "sm" ? 20 : 24
   // Screen readers: an alert on iOS/Android, an alertdialog on the web (react-native-web).
   const a11y = Platform.OS === "web" ? ({ role: "alertdialog", "aria-labelledby": titleId, "aria-describedby": descriptionId } as const) : ({ accessibilityRole: "alert" } as const)
   return (
     <AlertDialogPortal visible={mounted} onRequestClose={() => setOpen(false)}>
-      <View style={styles.center} pointerEvents="box-none">
+      <KeyboardAvoid style={styles.center} pointerEvents="box-none">
         <AlertDialogOverlay progress={progress} />
-        <Animated.View
-          style={{
-            width: Math.min(width - 32, size === "sm" ? 320 : 448),
-            opacity: glassOpacity(progress),
-            transform: [{ translateY: progress.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }, { scale: progress.interpolate({ inputRange: [0, 1], outputRange: [0.95, 1] }) }],
-          }}
-        >
+        <Animated.View style={[{ width: Math.min(width - 32, size === "sm" ? 320 : 448), maxHeight: height - insets.top - insets.bottom - 32 }, entrance]}>
           <SizeContext.Provider value={size}>
-            <Glass radius={ui.radius.surface} tint={ui.glassStrong} accessibilityViewIsModal aria-modal {...a11y} style={[{ padding: pad, gap: 16 }, style]} {...props}>
+            <Glass variant="liquid" visible={open} radius={ui.radius.surface} accessibilityViewIsModal aria-modal {...a11y} style={[{ padding: pad, gap: 16 }, style]} {...props}>
               {textChildren(children)}
             </Glass>
           </SizeContext.Provider>
         </Animated.View>
-      </View>
+      </KeyboardAvoid>
     </AlertDialogPortal>
   )
 }
@@ -130,8 +130,8 @@ function AlertDialogFooter({ style, children, ...props }: ViewProps) {
 
 /** Heading type, text-lg; keep it to two lines. */
 function AlertDialogTitle(props: GTextProps) {
-  const { titleId } = useAlert()
-  return <GText font="heading" size="lg" accessibilityRole="header" nativeID={titleId} {...props} />
+  const { titleId, titleRef } = useAlert()
+  return <GText {...({ ref: titleRef } as object)} font="heading" size="lg" accessibilityRole="header" nativeID={titleId} {...props} />
 }
 
 /** Muted supporting text, text-sm. */

@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Platform, Text as RNText, type TextProps, type TextStyle } from "react-native"
 
+import { MAX_FONT_SCALE } from "@/components/glass/native/a11y"
 import { useGlassTheme, type GlassTheme } from "@/components/glass/native/tokens"
 
 /**
@@ -9,53 +10,50 @@ import { useGlassTheme, type GlassTheme } from "@/components/glass/native/tokens
  * Tailwind, no CSS variables, so it runs the same on iOS, Android and web.
  */
 
-export interface UI extends GlassTheme {
-  destructive: string
-  destructiveForeground: string
-  success: string
-  ring: string
-  /** Eight chart series: accent, the two ring companions, green, blue, then a darker blue, a light teal and a near-neutral ("Other") — the web's --chart-1..8. */
+export interface UI extends Omit<GlassTheme, "motion"> {
+  /** Eight chart series — the web's --chart-1..8. */
   charts: [string, string, string, string, string, string, string, string]
-  thumb: string
-  separator: string
+  /** Quiet text: placeholders, unavailable items (label-tertiary). */
   muted: string
-  radius: { surface: number; control: number; button: number; badge: number }
-  /** Control heights (shadcn h-control*) at density 1. */
+  /** Control heights (h-control*) × density. Tappable controls also get hitSlop to 44pt. */
   control: { xs: number; sm: number; default: number; lg: number }
   pad: { xs: number; sm: number; default: number; lg: number }
-  /** Type scale in px, major third from 16. */
+  /** Type steps in pt: the theme's ratio and base scale, like the web's type-step-*. */
   text: { xs: number; sm: number; base: number; lg: number; xl: number; "2xl": number; "3xl": number; "4xl": number; "5xl": number }
-  fonts: { sans?: string; heading?: string; display?: string; mono?: string }
-  weight: { body: "400"; heading: "700"; display: "700" }
-  motion: { duration: number; pressScale: number; spring: { friction: number; tension: number } }
+  weight: { body: TextStyle["fontWeight"]; heading: TextStyle["fontWeight"]; display: TextStyle["fontWeight"] }
+  motion: GlassTheme["motion"] & {
+    /** Reanimated `withSpring` config from the motion tokens (duration-based, so it matches the web's linear() spring). */
+    springConfig: { duration: number; dampingRatio: number }
+    /** Legacy RN Animated spring, for the few parts still on Animated. */
+    spring: { friction: number; tension: number }
+  }
 }
 
-const fonts = {
-  sans: undefined,
-  heading: undefined,
+const SYSTEM_FONTS = {
   display: Platform.select({ ios: "ui-rounded", web: 'ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif', default: undefined }),
   mono: Platform.select({ ios: "Menlo", web: "ui-monospace, Menlo, monospace", default: "monospace" }),
 }
 
+const weight = (n: number) => String(Math.round(n / 100) * 100) as TextStyle["fontWeight"]
+
 export function buildUI(t: GlassTheme): UI {
-  const dark = t.scheme === "dark"
+  const d = t.density
+  const step = (n: number) => Math.round(16 * t.type.scale * t.type.ratio ** n)
+  const still = t.motion.duration === 0
   return {
     ...t,
-    destructive: dark ? "#FF6961" : "#E5372C",
-    destructiveForeground: "#FFFFFF",
-    success: dark ? "#4CD08F" : "#23935F",
-    ring: t.primary,
-    charts: [t.chart[0], t.chart[1], t.chart[2], dark ? "#4CC79A" : "#2E9E73", dark ? "#5AAFE6" : "#2F86C9", dark ? "#6F8FD9" : "#2F55A4", dark ? "#B8E6E8" : "#6FB9BC", dark ? "#8A8D96" : "#8B8F99"],
-    thumb: dark ? "rgba(255,255,255,0.2)" : "#FFFFFF",
-    separator: dark ? "rgba(255,255,255,0.1)" : "rgba(60,60,67,0.13)",
-    muted: dark ? "rgba(235,235,245,0.42)" : "rgba(60,60,67,0.46)",
-    radius: { surface: 24, control: 12, button: 999, badge: 999 },
-    control: { xs: 28, sm: 32, default: 40, lg: 48 },
-    pad: { xs: 10, sm: 12, default: 16, lg: 22 },
-    text: { xs: 12, sm: 14, base: 16, lg: 20, xl: 25, "2xl": 31, "3xl": 39, "4xl": 49, "5xl": 61 },
-    fonts,
-    weight: { body: "400", heading: "700", display: "700" },
-    motion: { duration: 200, pressScale: 0.97, spring: { friction: 8, tension: 380 } },
+    charts: t.chart,
+    muted: t.labelTertiary,
+    control: { xs: Math.round(28 * d), sm: Math.round(32 * d), default: Math.round(40 * d), lg: Math.round(48 * d) },
+    pad: { xs: Math.round(10 * d), sm: Math.round(12 * d), default: Math.round(16 * d), lg: Math.round(22 * d) },
+    text: { xs: Math.round(12 * t.type.scale), sm: step(-1) < 14 ? Math.round(14 * t.type.scale) : step(-1), base: step(0), lg: step(1), xl: step(2), "2xl": step(3), "3xl": step(4), "4xl": step(5), "5xl": step(6) },
+    fonts: { sans: t.fonts.sans, heading: t.fonts.heading ?? t.fonts.sans, display: t.fonts.display ?? t.fonts.heading ?? SYSTEM_FONTS.display, mono: t.fonts.mono ?? SYSTEM_FONTS.mono },
+    weight: { body: weight(t.type.bodyWeight), heading: weight(t.type.headingWeight), display: weight(t.type.displayWeight) },
+    motion: {
+      ...t.motion,
+      springConfig: { duration: Math.max(1, t.motion.duration * 2.2), dampingRatio: still ? 1 : 0.78 },
+      spring: { friction: 8, tension: still ? 1000 : 380 },
+    },
   }
 }
 
@@ -109,20 +107,22 @@ export function toneColor(ui: UI, tone: TextTone = "default") {
 }
 
 /** The base text every ported glasscn component sets type with. */
-export function GText({ size = "base", tone = "default", font = "sans", weight, color, align, style, ...rest }: GTextProps) {
+export function GText({ size = "base", tone = "default", font = "sans", weight, color, align, style, maxFontSizeMultiplier, ...rest }: GTextProps) {
   const ui = useUI()
   const fontSize = ui.text[size]
   const fontWeight = weight ?? (font === "heading" ? ui.weight.heading : font === "display" ? ui.weight.display : ui.weight.body)
   return (
     <RNText
+      // big type grows less under large Dynamic Type (NAT-23)
+      maxFontSizeMultiplier={maxFontSizeMultiplier ?? (font === "display" || fontSize >= 31 ? MAX_FONT_SCALE.display : font === "heading" ? MAX_FONT_SCALE.heading : MAX_FONT_SCALE.body)}
       style={[
         {
           color: color ?? toneColor(ui, tone),
           fontSize,
-          lineHeight: Math.round(fontSize * (font === "heading" || font === "display" ? 1.18 : 1.45)),
+          lineHeight: Math.round(fontSize * (font === "heading" || font === "display" ? ui.type.headingLeading : Math.min(ui.type.leading, 1.5))),
           fontFamily: ui.fonts[font],
           fontWeight,
-          letterSpacing: font === "display" ? -0.03 * fontSize : font === "heading" ? -0.015 * fontSize : 0,
+          letterSpacing: (font === "display" ? ui.type.displayTracking : font === "heading" ? ui.type.headingTracking : ui.type.tracking) * fontSize,
           fontVariant: font === "display" ? ["tabular-nums"] : undefined,
           textAlign: align,
         },

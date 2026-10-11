@@ -15,11 +15,12 @@ An Expo app in `sandbox/native/` that renders every `native-*` item, so the nati
 | Route | Checks |
 |---|---|
 | `/` | Index of items, the platform and the surface `Glass` picked; theme picker |
-| `/tokens` | Every `useGlassTheme()` value as a swatch, for the current palette + scheme |
+| `/tokens` | Preset pickers (material, shape, motion, density, type) and force-a11y chips (`forceA11y`: Reduce Motion / Transparency, Increase Contrast, Bold Text), then every `useGlassTheme()` value as a swatch |
 | `/glass` | `Glass` default, tinted, `raised` off, `interactive`, `bar`; which surface the platform picked (`hasLiquidGlass()`, `canFade()`) |
 | `/aurora` | Full-screen aurora per palette; reduced motion note |
 | `/press` | `Press` with haptic, custom squash, hover, disabled |
-| `/c/<name>` | Every ported component and block (`native-<name>`), every prop and variant: demos in `src/sandbox/demos/<group>.tsx` (basics, controls, overlays, data, composite), keyed by registry name |
+| `/c/<name>` | Every ported component and block (`native-<name>`), every prop and variant: demos in `src/sandbox/demos/<group>.tsx` (basics, controls, forms, overlays, navigation, data, composite), keyed by registry name. Later groups win a key: `navigation` holds the M4 `dock` and `tabs` demos. Bar demos (dock, toolbar, navigation-bar, scroll-edge) run in a short scrolling stage wrapped in `ScrollEdgeProvider`, so minimize-on-scroll shows inside the page |
+| `/tabs-layout` | The `native-tabs-layout` recipe as a real route group (`app/tabs-layout/`): NativeTabs with minimize on scroll, a bottom accessory reading its placement, a badge and a `role="search"` tab |
 
 ## Commands
 
@@ -28,12 +29,18 @@ cd sandbox/native && npm install
 npm run ios        # Expo Go on the booted simulator
 npm run web        # react-native-web in the browser
 npm run typecheck  # sandbox screens + registry/native
+npm test           # jest-expo component tests (docs/testing.md#native)
 pnpm verify:native # from the repo root: install-from-registry check
 ```
 
+The theme picker lists all 12 generated palettes. A deep link's `?palette=ocean&scheme=dark` query sets them on launch (Maestro's screenshot flow uses it).
+
 Don't start Metro with `CI=1` — it turns off the file watcher and serves stale bundles.
+
+Overlays that present system UI (the `@expo/ui` bottom sheet, system menus, `FullWindowOverlay` toasts, NativeTabs) only show their native form on the iOS simulator or Android; the web renders the React Native fallback (glass sheet and menu).
 
 ## Adding a native item
 
 - **Component twin** (`registry/native/<web-name>.tsx`): add the name to `NATIVE_NAMES` in `registry/items.mjs` (deps and registry deps are read from its imports) and a demo under its name in the right `src/sandbox/demos/<group>.tsx`. The index and `/c/<name>` pick it up. `verify:native` installs every native item.
+- **Route recipe** (a layout like `tabs-layout`): add a route group under `sandbox/native/src/app/<name>/`, link it from `ITEMS` and title it in `_layout.tsx`, and give it a link demo under its name.
 - **Foundation item:** add a screen under `sandbox/native/src/app/<name>.tsx`, link it from `ITEMS` in `src/app/index.tsx` and title it in `src/app/_layout.tsx`.

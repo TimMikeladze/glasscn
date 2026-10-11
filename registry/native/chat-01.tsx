@@ -46,6 +46,8 @@ const now = () => new Date().toLocaleTimeString([], { hour: "numeric", minute: "
 
 /** Height of the floating composer plus its margin, kept clear at the thread's foot. */
 const COMPOSER_INSET = 64
+/** …plus the quick-reply row above it. */
+const SUGGESTIONS_INSET = 48
 
 function Coach({ size }: { size?: "lg" }) {
   const ui = useUI()
@@ -114,7 +116,7 @@ export function Chat01({ height = 600 }: { height?: number }) {
       </CardHeader>
 
       <View style={{ position: "relative", flex: 1, minHeight: 0 }}>
-        <ChatThread style={{ flex: 1 }} inset={COMPOSER_INSET} accessibilityLabel="Conversation with Kai">
+        <ChatThread style={{ flex: 1 }} inset={COMPOSER_INSET + (!typing && suggestions.length ? SUGGESTIONS_INSET : 0)} accessibilityLabel="Conversation with Kai">
           <ChatDivider>Today</ChatDivider>
           {messages.map((m, i) => (
             <ChatMessage key={m.id} from={m.from} grouped={messages[i - 1]?.from === m.from} avatar={m.from === "assistant" ? <Coach /> : undefined}>
@@ -127,25 +129,28 @@ export function Chat01({ height = 600 }: { height?: number }) {
               <ChatTyping name="Kai" />
             </ChatMessage>
           ) : null}
+        </ChatThread>
+        {/* quick replies sit above the composer, outside the log, so they aren't read as messages */}
+        <View pointerEvents="box-none" style={{ position: "absolute", left: 0, right: 0, bottom: 12, gap: 8 }}>
           {!typing && suggestions.length ? (
-            <ChatSuggestions key="suggestions" onSelect={send} accessibilityLabel="Quick replies" style={{ marginHorizontal: -ui.pad.sm, marginTop: 16 }}>
+            <ChatSuggestions onSelect={send} accessibilityLabel="Quick replies">
               {suggestions.map((s) => (
                 <ChatSuggestion key={s}>{s}</ChatSuggestion>
               ))}
             </ChatSuggestions>
           ) : null}
-        </ChatThread>
-        <ChatComposer
-          variant="floating"
-          onSubmit={send}
-          placeholder="Message Kai"
-          style={{ position: "absolute", left: 12, right: 12, bottom: 12, width: "auto" }}
-          leading={
-            <Button variant="ghost" size="icon-sm" accessibilityLabel="Attach">
-              <PlusIcon />
-            </Button>
-          }
-        />
+          <ChatComposer
+            variant="floating"
+            onSubmit={send}
+            placeholder="Message Kai"
+            style={{ marginHorizontal: 12, width: "auto" }}
+            leading={
+              <Button variant="ghost" size="icon-sm" accessibilityLabel="Attach">
+                <PlusIcon />
+              </Button>
+            }
+          />
+        </View>
       </View>
     </Card>
   )

@@ -1,0 +1,23 @@
+appId: host.exp.Exponent
+name: Slider inside a ScrollView — horizontal drag moves it, vertical drag scrolls
+---
+- runFlow:
+    file: _open.yaml
+    env:
+      ROUTE: c/slider
+- assertVisible: "value = 40 — iOS/Android render the system slider"
+- swipe:
+    from:
+      label: "Brightness"
+    direction: RIGHT
+    duration: 600
+- assertNotVisible: "value = 40 — iOS/Android render the system slider"
+- takeScreenshot: screenshots/slider-dragged
+# a vertical swipe on the slider scrolls the page instead of moving it
+- swipe:
+    from:
+      label: "Brightness"
+    direction: UP
+- assertVisible:
+    text: "Ticks · neutral value"
+    optional: true

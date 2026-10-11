@@ -22,14 +22,16 @@ function Card({
 }: ViewProps & { size?: CardSize; intensity?: "default" | "strong" | "subtle"; tint?: "none" | "primary" | "destructive"; elevation?: "raised" | "flat" }) {
   const ui = useUI()
   const spacing = size === "sm" ? 16 : 20
-  const base = intensity === "strong" ? ui.glassStrong : intensity === "subtle" ? ui.fill : undefined
-  const tinted = tint === "primary" ? alpha(ui.primary, 0.3) : tint === "destructive" ? alpha(ui.destructive, 0.3) : base
+  // material glass (the content layer), thickness from `intensity` (NAT-75); tint is a wash over the frost
+  const tinted = tint === "primary" ? alpha(ui.primary, 0.3) : tint === "destructive" ? alpha(ui.destructive, 0.3) : undefined
   const kids = React.Children.toArray(children)
   const hasFooter = kids.some((c) => React.isValidElement(c) && c.type === CardFooter)
   const value = React.useMemo(() => ({ size, spacing }), [size, spacing])
   return (
     <CardContext.Provider value={value}>
       <Glass
+        variant="material"
+        intensity={intensity}
         radius={size === "sm" ? ui.radius.surface - 6 : ui.radius.surface}
         tint={tinted}
         raised={elevation === "raised"}

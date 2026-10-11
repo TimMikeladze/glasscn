@@ -1,28 +1,85 @@
 import * as React from "react"
 import { useColorScheme } from "react-native"
+import * as Linking from "expo-linking"
 
-import { GlassThemeProvider, type PaletteName, type Scheme } from "@/components/glass/native/tokens"
+import { forceA11y, type A11ySetting } from "@/components/glass/native/a11y"
+import { GlassThemeProvider, PALETTE_NAMES, type DensityName, type MaterialName, type MotionName, type PaletteName, type Scheme, type ShapeName, type TypeName } from "@/components/glass/native/tokens"
+import { PRESETS } from "@/components/glass/native/tokens.generated"
 
-export const PALETTES: PaletteName[] = ["dusk", "ocean", "rose", "sage", "amber", "graphite"]
+/** Every generated palette (12), straight from tokens.generated.ts. */
+export const PALETTES: PaletteName[] = PALETTE_NAMES
+
+/** Preset names per group, from the generated tokens. */
+export const PRESET_NAMES = {
+  material: Object.keys(PRESETS.material) as MaterialName[],
+  shape: Object.keys(PRESETS.shape) as ShapeName[],
+  motion: Object.keys(PRESETS.motion) as MotionName[],
+  density: Object.keys(PRESETS.density) as DensityName[],
+  type: Object.keys(PRESETS.type) as TypeName[],
+}
+export type PresetGroup = keyof typeof PRESET_NAMES
+type Presets = { material?: MaterialName; shape?: ShapeName; motion?: MotionName; density?: DensityName; type?: TypeName }
+
+export const A11Y_SETTINGS: A11ySetting[] = ["reduceMotion", "reduceTransparency", "highContrast", "boldText"]
 
 type SandboxTheme = {
   palette: PaletteName
   scheme: Scheme
+  presets: Presets
+  /** Settings forced on via `forceA11y` (unset = follow the OS). */
+  a11y: Partial<Record<A11ySetting, boolean>>
   setPalette: (p: PaletteName) => void
   setScheme: (s: Scheme) => void
+  setPreset: <G extends PresetGroup>(group: G, name: Presets[G] | undefined) => void
+  setA11y: (setting: A11ySetting, on: boolean | null) => void
 }
 
 const Ctx = React.createContext<SandboxTheme | null>(null)
 
-/** The palette + scheme every screen renders in; starts on the system scheme. */
+/**
+ * The palette, scheme, presets and forced a11y settings every screen renders in;
+ * starts on the system scheme. A deep link's `?palette=…&scheme=…` query (Maestro's
+ * screenshot flows use it) picks them on launch.
+ */
 export function SandboxThemeProvider({ children }: { children: React.ReactNode }) {
   const system = useColorScheme()
+  const url = Linking.useLinkingURL()
   const [palette, setPalette] = React.useState<PaletteName>("dusk")
   const [scheme, setScheme] = React.useState<Scheme>(system === "dark" ? "dark" : "light")
-  const value = React.useMemo(() => ({ palette, scheme, setPalette, setScheme }), [palette, scheme])
+  const [presets, setPresets] = React.useState<Presets>({})
+  const [a11y, setA11yState] = React.useState<Partial<Record<A11ySetting, boolean>>>({})
+
+  React.useEffect(() => {
+    if (!url) return
+    const q = Linking.parse(url).queryParams ?? {}
+    if (typeof q.palette === "string" && PALETTES.includes(q.palette as PaletteName)) setPalette(q.palette as PaletteName)
+    if (q.scheme === "light" || q.scheme === "dark") setScheme(q.scheme)
+  }, [url])
+
+  const value = React.useMemo<SandboxTheme>(
+    () => ({
+      palette,
+      scheme,
+      presets,
+      a11y,
+      setPalette,
+      setScheme,
+      setPreset: (group, name) => setPresets((p) => ({ ...p, [group]: name })),
+      setA11y: (setting, on) => {
+        forceA11y(setting, on)
+        setA11yState((s) => {
+          const next = { ...s }
+          if (on === null) delete next[setting]
+          else next[setting] = on
+          return next
+        })
+      },
+    }),
+    [palette, scheme, presets, a11y]
+  )
   return (
     <Ctx.Provider value={value}>
-      <GlassThemeProvider palette={palette} scheme={scheme}>
+      <GlassThemeProvider palette={palette} scheme={scheme} {...presets}>
         {children}
       </GlassThemeProvider>
     </Ctx.Provider>
