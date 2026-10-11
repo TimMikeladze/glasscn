@@ -66,10 +66,13 @@ function Blob({ color, i, w, h, dark, still }: { color: string; i: number; w: nu
   )
 }
 
-/** The living ground behind glass: three palette blobs drifting over the base. Fills its parent. */
-export function Aurora() {
+/**
+ * The living ground behind glass: three palette blobs drifting over the base. Fills its parent.
+ * `animate={false}` holds it still — e.g. while a ScrollView over it is being dragged.
+ */
+export function Aurora({ animate = true }: { animate?: boolean } = {}) {
   const t = useGlassTheme()
-  const still = useReducedMotion()
+  const still = useReducedMotion() || !animate
   const { width, height } = useWindowDimensions()
   return (
     <View style={[StyleSheet.absoluteFill, { pointerEvents: "none", backgroundColor: t.auroraBase, overflow: "hidden" }]}>

@@ -2,6 +2,22 @@
 
 Registry items are copied into your app, so re-run `npx shadcn add @glasscn-app/<item>` to pick up a change. IDs refer to [`docs/roadmap.md`](docs/roadmap.md).
 
+## Unreleased — M2 the liquid layer (2026-10-11)
+
+### Breaking
+- `primary-ink` / `destructive-ink` carry 30% accent (was 68%) so tinted labels pass WCAG AA on every palette (BTN-05) — tinted badges, links and dock labels are less saturated.
+- Liquid surfaces draw their rim on `::before`; don't use `::before` on `glass-liquid` elements.
+- Slider names its thumbs from the root `aria-label` (ranges: "… minimum" / "… maximum"); the root no longer carries it.
+
+### Added
+- Light and motion (LG-04/05/06/07/09/10/11/13): `glass-light`, `glass-illuminate` + `use-glass-pointer`, `glass-shadow-adaptive`, `glass-prominent`, `glass-knob-lens`, `glass-materialize`, `glass-morph-origin`, `glass-press` / `glass-press-liquid`, `scroll-edge-soft|hard`; 9 new primitives. Two-tone `glass-focus` (UX-02).
+- `glass-group` (LG-14), `toolbar` (NAV-01), `scroll-edge` (NAV-02), `sidebar` (NAV-04), `search-field` (NAV-05), `navigation-bar` and `action-sheet` (NAV-06) — web and native.
+- Button `prominent`, `loading`, `PullDownButton`, `SplitButton`; switch drag + stretch; slider ticks, icons, value bubble, `neutralValue`, `variant="progress"`; segmented `shape`, scrub, `momentary`.
+- Dock `minimizeBehavior`, `DockAccessory`/`usePlacement`, `DockSearch`, badges, scrub, compact layout; sheet `detents`, grabber, drag-to-dismiss, `modal={false}` inspector; toasts top-center on phones.
+- Overlays materialise and grow from their trigger; dialogs morph from `DialogTrigger` via View Transitions.
+- ProgressRing and Sparkline get default accessible names; aurora pauses while scrolling; previews sit on an aurora ground (UX-04/06).
+- `pnpm test:e2e`: Playwright + axe, visual regression, Chromium/WebKit/Firefox liquid surfaces, blur budget (QA-02/03/09). See `docs/testing.md`.
+
 ## Unreleased — M1 foundations (2026-10-11)
 
 ### Breaking

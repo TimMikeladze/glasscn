@@ -6,18 +6,18 @@ Everything visual in glasscn is a **primitive CSS variable**, grouped into eleve
 
 Primitives live on `:root` / `.dark` (or any element). **Derived values never do.** Colours like the frost, rim and shadow are computed *inside* the utilities and `@theme inline` tokens from the primitives — so they are evaluated on the element that uses them, and overriding a primitive on any subtree re-themes that subtree. (A `--glass: color-mix(…var(--glass-opacity)…)` declared on `:root` would freeze at `:root` and ignore child overrides.)
 
-## Dimensions (88 primitives)
+## Dimensions (97 primitives)
 
 | Group | Primitives |
 |---|---|
 | Colour | `primary` `primary-foreground` `ring` `chart-1..5` `success` `warning` `info` (+ `-foreground`) `aurora-1..3` `aurora-base` |
 | Material | `glass-tint` `glass-opacity` `-strong` `-subtle` `glass-blur` `glass-saturate` `glass-brightness` `glass-sheen` `glass-sheen-angle` `glass-texture` `glass-fill-tint` `glass-fill-opacity` `-strong` `glass-thumb` `glass-knob` `glass-clarity` `glass-label` `glass-label-secondary` `-tertiary` `-quaternary` `glass-separator-opacity` |
 | Liquid | `glass-liquid-opacity` `glass-liquid-clear-opacity` `glass-liquid-clear-dim` `glass-liquid-blur` `glass-liquid-saturate` |
-| Rim | `glass-border-color` `glass-border-opacity` `glass-border-width` `glass-highlight-opacity` |
-| Depth | `glass-shadow-color` `glass-shadow-opacity` `glass-shadow-y` `glass-shadow-blur` `glass-glow` `glass-dim` |
+| Rim | `glass-border-color` `glass-border-opacity` `glass-border-width` `glass-highlight-opacity` `glass-highlight-color` `glass-light-angle` `glass-specular` `glass-edge-shade` `glass-illumination` |
+| Depth | `glass-shadow-color` `glass-shadow-opacity` `glass-shadow-y` `glass-shadow-blur` `glass-shadow-over-content` `glass-glow` `glass-dim` |
 | Shape | `glass-radius-surface` `glass-radius-control` `glass-radius-button` `glass-radius-badge` `glass-ring-width` |
 | Density | `glass-density` (a multiplier on control heights, paddings, card spacing) `glass-hit-min` (touch target) |
-| Motion | `glass-duration` `glass-ease` `glass-press-scale` |
+| Motion | `glass-duration` `glass-ease` `glass-press-scale` `glass-press-stretch` `glass-press-grow` `glass-knob-lens-scale` |
 | Aurora | `aurora-opacity` `aurora-scale` `aurora-speed` `aurora-blur` |
 | Fonts | `glass-font-sans` `-heading` `-display` `-mono` — optional; unset means your app's `--font-*` |
 | Type | `glass-text-scale` `glass-type-ratio` `glass-leading` `glass-tracking` `glass-body-weight` `glass-heading-weight` `-tracking` `-leading` `-case` `-wrap` `glass-display-weight` `-tracking` `glass-numeric` `glass-font-features` `glass-measure` `glass-underline-offset` |
@@ -32,11 +32,25 @@ Two kinds of glass, as in Apple's design: **material** (`glass`, `glass-strong`,
 
 ### Accessibility settings
 
-`prefers-reduced-transparency` makes every pane frostier, `prefers-contrast: more` makes panes nearly opaque with a contrasting rim, `forced-colors` turns them into system colours, `prefers-reduced-motion` zeroes durations and press squash. They override primitives with `!important`, so they win over themes, scopes and per-element overrides.
+`prefers-reduced-transparency` makes every pane frostier, `prefers-contrast: more` makes panes nearly opaque with a contrasting rim, `forced-colors` turns them into system colours, `prefers-reduced-motion` zeroes durations, press squash / stretch / grow and the knob lens, and cross-fades overlays. Reduce transparency and increase contrast also zero `--glass-specular` and `--glass-illumination`. They override primitives with `!important`, so they win over themes, scopes and per-element overrides.
 
 ### Utilities
 
-`glass-focus` / `glass-focus-inset` (focus outline in `--ring`), `hit-area` (≥ 24px, `--glass-hit-min` on touch), `rounded-concentric` (container radius − padding; containers set `--glass-container-radius` / `--glass-container-pad`), Apple text styles `type-large-title`, `type-title-1..3`, `type-headline`, `type-body`, `type-callout`, `type-subheadline`, `type-footnote`, `type-caption-1..2`, tokens `text-glass-label-*`, `border-separator`, `bg-fill-subtle` / `-faint`, `bg-success` / `-warning` / `-info` and their `-ink` text, `shadow-glass-1..4`, `h-control-2xs`, `size-knob`, `rounded-control-xs`.
+`glass-focus` / `glass-focus-inset` (two-tone focus: a `--ring` outline with a halo in the pane colour), `hit-area` (≥ 24px, `--glass-hit-min` on touch), `rounded-concentric` (container radius − padding; containers set `--glass-container-radius` / `--glass-container-pad`), Apple text styles `type-large-title`, `type-title-1..3`, `type-headline`, `type-body`, `type-callout`, `type-subheadline`, `type-footnote`, `type-caption-1..2`, tokens `text-glass-label-*`, `border-separator`, `bg-fill-subtle` / `-faint`, `bg-success` / `-warning` / `-info` and their `-ink` text, `shadow-glass-1..4`, `h-control-2xs`, `size-knob`, `rounded-control-xs`.
+
+The liquid layer (M2):
+
+| Utility | What it does |
+|---|---|
+| `glass-light` | Two-sided rim: specular on the `--glass-light-angle` side, `--glass-edge-shade` opposite (a masked `::before`). Built into `glass-liquid` / `glass-liquid-clear`. |
+| `glass-illuminate` | A glow (`--glass-illumination`, `plus-lighter`) from the pointer while pressed; `useGlassPointer()` feeds `--glass-press-x/y` (centre without it). Uses `::after`. |
+| `glass-shadow-adaptive` | Shadow × `--glass-shadow-over-content` while `[data-over-content]` (set by `ScrollEdge`). |
+| `glass-prominent` | Tinted liquid glass: the accent at 94% in the frost, `primary-foreground` label, rim and glow. Use instead of `glass-liquid`. |
+| `glass-press` / `glass-press-liquid` | Elastic press: solid squashes wider-and-shorter (`--glass-press-scale`, `--glass-press-stretch`); liquid grows (`--glass-press-grow`). |
+| `glass-knob-lens` | A knob that's solid at rest and a liquid lens (× `--glass-knob-lens-scale`, stretched by `--glass-knob-stretch-x`) as the child of a pressed `.group` or under `[data-dragging]`. |
+| `glass-materialize` | Overlay enter/exit on Radix `data-state`: blur, frost and scale (0.96 → 1) together, via the registered `--glass-materialize`. |
+| `glass-morph-origin` | Overlays grow out of their trigger: first frame clipped to `--glass-morph-w/-h` in a capsule, from `--glass-morph-origin`. |
+| `scroll-edge-soft` / `scroll-edge-hard` | A progressive-blur band / a near-opaque strip at a scroll edge (`--glass-scroll-edge-to: top│bottom`). |
 
 ### Text on glass
 

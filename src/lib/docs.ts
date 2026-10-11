@@ -44,7 +44,7 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
     ],
     notes: [
       "Colours come from --aurora-1, --aurora-2, --aurora-3 over --aurora-base — set by the theme items, or by you.",
-      "Cheap when idle: the blobs are GPU layers only while they drift, and the drift pauses while the aurora is off screen (IntersectionObserver).",
+      "Cheap when idle: the blobs are GPU layers only while they drift, and the drift pauses while the aurora is off screen (IntersectionObserver) or the page is scrolling.",
     ],
   },
   typography: {
@@ -95,15 +95,29 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
   },
   button: {
     props: [
-      { name: "variant", type: `"default" | "glass" | "tinted" | "secondary" | "outline" | "ghost" | "destructive" | "link"`, default: `"default"`, description: "Solid accent, liquid glass (the control layer, for buttons floating over content), accent wash, soft fill, rim, bare, danger, or text." },
-      { name: "size", type: `"default" | "xs" | "sm" | "lg" | "icon" | "icon-xs" | "icon-sm" | "icon-lg"`, default: `"default"`, description: "Height and padding; icon sizes are square." },
+      { name: "variant", type: `"default" | "glass" | "prominent" | "tinted" | "secondary" | "outline" | "ghost" | "destructive" | "link"`, default: `"default"`, description: "Solid accent, liquid glass (the control layer, for buttons floating over content), prominent (liquid glass tinted with the accent — one per bar), accent wash, soft fill, rim, bare, danger, or text." },
+      { name: "size", type: `"default" | "xs" | "sm" | "lg" | "icon" | "icon-xs" | "icon-sm" | "icon-lg"`, default: `"default"`, description: "Height and padding; icon sizes are square — circles with the default capsule shape." },
       { name: "shape", type: `"pill" | "rounded"`, default: `"pill"`, description: "Capsule, or shadcn-style rounded corners." },
+      { name: "loading", type: "boolean", default: "false", description: "A spinner replaces the leading icon (or covers the label, keeping the width); aria-busy, clicks ignored." },
+      { name: "loadingText", type: "ReactNode", description: "A label while loading (\"Checking out…\"); the width may change." },
       { name: "asChild", type: "boolean", default: "false", description: "Render a link or other element as the button." },
     ],
-    notes: ["Disabled glass keeps its material and dims the label; the other variants fade as a whole. aria-disabled=\"true\" disables too — use it on an asChild link."],
+    notes: [
+      "Disabled glass keeps its material and dims the label; the other variants fade as a whole. aria-disabled=\"true\" disables too — use it on an asChild link.",
+      "Solid variants squash elastically when pressed (glass-press); glass and prominent grow and light up under the finger (glass-press-liquid, glass-illuminate). Reduced motion turns both off.",
+      "PullDownButton adds a trailing chevron — wrap it in DropdownMenuTrigger asChild. SplitButton joins an action and a PullDownButton into one shape.",
+      "default stays solid for shadcn compatibility; prefer prominent for the one key action in a floating bar.",
+    ],
   },
   badge: { props: [{ name: "variant", type: `"default" | "tinted" | "glass" | "secondary" | "outline" | "destructive"`, default: `"default"`, description: "" }] },
-  switch: { props: [{ name: "size", type: `"default" | "sm"`, default: `"default"`, description: "51×31 iOS size, or a compact 36×22." }], notes: ["All Radix Switch props: checked, defaultChecked, onCheckedChange, disabled…", "The knob slides toward the inline end, so it flips under dir=\"rtl\"."] },
+  switch: {
+    props: [{ name: "size", type: `"default" | "sm"`, default: `"default"`, description: "The iOS 27 63×28 switch with a 38×24 capsule knob, or a compact 44×20." }],
+    notes: [
+      "All Radix Switch props: checked, defaultChecked, onCheckedChange, disabled…",
+      "Pressed, the knob turns into a liquid lens and stretches toward where it's going. Drag it to a side to choose; a drag back to where it started keeps it.",
+      "The knob slides toward the inline end, so it flips under dir=\"rtl\".",
+    ],
+  },
   "glass-preferences": {
     props: [
       { name: "className", type: "string", description: "The panel is a plain grid — put it in a Popover, a Sheet or a settings Card." },
@@ -118,22 +132,121 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
       "Web only: on iOS 26+ the system's own Liquid Glass clarity and Reduce Transparency already apply to native glass.",
     ],
   },
-  slider: { notes: ["Right-to-left: Radix places the thumbs, so give it the direction — wrap the app in Radix's DirectionProvider dir=\"rtl\" or pass dir=\"rtl\"."] },
+  slider: {
+    props: [
+      { name: "variant", type: `"default" | "progress"`, default: `"default"`, description: "progress is thumbless (a media scrubber); its track thickens while dragged." },
+      { name: "ticks", type: "boolean | number[]", description: "true: a mark per step (up to 21); or the values to mark." },
+      { name: "neutralValue", type: "number", description: "The range grows from here instead of min (a balance, an offset)." },
+      { name: "minIcon / maxIcon", type: "ReactNode", description: "Icons at the ends of the track. className then goes on the wrapper." },
+      { name: "valueBubble", type: "boolean | (value: number) => ReactNode", description: "A bubble over the thumb with its value while dragging." },
+    ],
+    notes: [
+      "The knob is a capsule that turns into a liquid lens while dragged, stretching with the drag (glass-knob-lens).",
+      "Right-to-left: Radix places the thumbs, so give it the direction — wrap the app in Radix's DirectionProvider dir=\"rtl\" or pass dir=\"rtl\".",
+    ],
+  },
+  "glass-group": {
+    props: [
+      { name: "indicator (GlassGroup)", type: "boolean", default: "false", description: "A fill that slides to the selected item and morphs to its size and corners." },
+      { name: "orientation (GlassGroup)", type: `"horizontal" | "vertical"`, default: `"horizontal"`, description: "" },
+      { name: "selected (GlassGroupItem)", type: "boolean", description: "Marks it (aria-pressed) for the indicator. Leave undefined for a plain action." },
+      { name: "asChild (GlassGroupItem)", type: "boolean", default: "false", description: "A link as the item (aria-current=\"page\" selects it)." },
+    ],
+    notes: [
+      "Apple's GlassEffectContainer: one liquid backdrop for neighbouring controls, instead of a capsule each — glass can't sample glass. Items are transparent and take fills.",
+      "Used for toolbar groups, button clusters and steppers. Never inside another liquid surface.",
+    ],
+  },
   "segmented-control": {
     props: [
       { name: "value / defaultValue", type: "string", description: "The chosen segment. Controlled or not." },
       { name: "onValueChange", type: "(value: string) => void", description: "Fires with the new segment. Never fires with an empty value — a segmented control always has a selection." },
       { name: "size", type: `"sm" | "default" | "lg"`, default: `"default"`, description: "" },
+      { name: "shape", type: `"capsule" | "rounded"`, default: `"capsule"`, description: "Apple's capsule, or the control radius. The thumb is concentric either way." },
+      { name: "momentary", type: "boolean", default: "false", description: "Segments are actions: onValueChange fires on each press and nothing stays selected." },
     ],
+    notes: ["Drag the thumb across the segments to scrub; while held it becomes a liquid lens."],
   },
   tabs: { props: [{ name: "variant (TabsList)", type: `"default" | "plain" | "line"`, default: `"default"`, description: "Glass capsule with a sliding pill, the pill alone, or a sliding underline." }] },
   dock: {
     props: [
       { name: "position (Dock)", type: `"fixed" | "static"`, default: `"fixed"`, description: "Float at the bottom of the viewport (safe-area aware) or sit in flow. Fixed, it sets --dock-inset on <html> (its height + bottom gap): pad scrolling content with pb-(--dock-inset); the Toaster lifts toasts above it." },
+      { name: "minimizeBehavior (Dock)", type: `"never" | "onScrollDown"`, default: `"never"`, description: "Fold the bar to its current item (glyph only) while the page — or the dock's scroll container — scrolls down; it opens again on scroll up." },
+      { name: "layout (Dock)", type: `"default" | "compact"`, default: `"default"`, description: "compact puts icon and label side by side in shorter items (iPad, landscape)." },
       { name: "active (DockLink)", type: "boolean", default: "false", description: "The current page: sets aria-current=\"page\" and moves the pill to it. DockNav + DockLink are links in a nav landmark — use them for routes." },
       { name: "asChild (DockLink)", type: "boolean", default: "false", description: "Render your router's Link (next/link…) as the item." },
+      { name: "badge (DockItem, DockLink)", type: "ReactNode", description: "A count in a red badge on the item's corner; read as \"3 new\". 0, null and false hide it." },
+      { name: "prominent (DockItem, DockLink)", type: "boolean", default: "false", description: "Tint the item in the accent even when it isn't current." },
       { name: "value / onValueChange (DockBar)", type: "string", description: "DockBar + DockItem: views inside one page (single-choice group). For routes use DockNav." },
       { name: "asChild (DockAction)", type: "boolean", default: "false", description: "Render a link as the action button." },
+    ],
+    notes: [
+      "Drag across the bar to scrub: a DockBar picks each item as the finger passes; a DockNav opens the link under the finger on release.",
+      "DockAccessory sits above the bar (a now-playing strip, a draft) and moves inline beside it when the dock minimizes; read usePlacement() (\"expanded\" | \"inline\") inside it to show less.",
+      "DockSearch is the separate search tab: a round glass button that opens into a SearchField; the bar folds while it is open. It takes SearchField's props.",
+      "DockAction is tinted liquid glass (glass-prominent) — the accent in the frost, a lit rim and a glow where pressed.",
+    ],
+  },
+  toolbar: {
+    props: [
+      { name: "placement (Toolbar)", type: `"top" | "bottom" | "sticky-top" | "sticky-bottom" | "static"`, default: `"top"`, description: "top / bottom float fixed (safe-area aware) and set --toolbar-inset-top / --toolbar-inset-bottom on <html>; sticky-* stick inside a scroll container; static sits in flow." },
+      { name: "minimize (Toolbar)", type: `"never" | "onScrollDown"`, default: `"never"`, description: "Shrink (and hide the title) while content scrolls down; it returns on scroll up, hover or focus." },
+      { name: "prominent (ToolbarItem)", type: "boolean", default: "false", description: "The tinted standalone action (Done, Send) — put it outside any group." },
+      { name: "variant (ToolbarSpacer)", type: `"flexible" | "fixed"`, default: `"flexible"`, description: "flexible pushes what follows to the far edge; fixed is a small gap between groups." },
+    ],
+    notes: [
+      "ToolbarGroup is one piece of liquid glass; its items are transparent — never glass on glass.",
+      "role=toolbar: arrow keys, Home and End move between its controls (mirrored in RTL). Give icon-only items an aria-label.",
+      "ToolbarOverflow is a \"More\" button with a glass menu; its children are DropdownMenu items.",
+    ],
+  },
+  "scroll-edge": {
+    props: [
+      { name: "edge", type: `"top" | "bottom"`, default: `"top"`, description: "Put a top edge first and a bottom edge last inside the scrolling content." },
+      { name: "variant", type: `"automatic" | "soft" | "hard"`, default: `"automatic"`, description: "soft: a progressive blur; hard: a near-opaque strip for dense text and pinned headers; automatic: soft on touch, hard with a fine pointer. (Apple's scrollEdgeEffectStyle — named variant here so it doesn't shadow the style prop.)" },
+    ],
+    notes: [
+      "A sentinel at the content's edge sets data-over-content on the bars at that edge (data-bar-edge) in the same scroll container — Toolbar, Dock, NavigationBar — so their shadows deepen while content is beneath (glass-shadow-adaptive).",
+      "The bars' minimize-on-scroll uses the same module (useScrollMinimized).",
+    ],
+  },
+  "navigation-bar": {
+    props: [
+      { name: "title", type: "ReactNode", description: "The large title (the page's h1) and the inline one it collapses into." },
+      { name: "titleDisplayMode", type: `"large" | "inline"`, default: `"large"`, description: "large starts with a big title under the bar; inline keeps it small in the bar." },
+      { name: "subtitle", type: "ReactNode", description: "A line under the large title." },
+    ],
+    notes: ["The bar is not glass: its buttons are (Button variant=\"glass\" or a ToolbarGroup in NavigationBarLeading / NavigationBarTrailing). Once the large title has scrolled under it, a soft scroll edge keeps the inline title legible."],
+  },
+  sidebar: {
+    props: [
+      { name: "open / defaultOpen / onOpenChange (SidebarProvider)", type: "boolean", default: "true", description: "Expanded or collapsed on wide screens. ⌘B / Ctrl+B toggles." },
+      { name: "side (Sidebar)", type: `"start" | "end"`, default: `"start"`, description: "Logical: start is left in LTR, right in RTL." },
+      { name: "position (Sidebar)", type: `"fixed" | "absolute"`, default: `"fixed"`, description: "absolute keeps it inside a positioned SidebarProvider (a preview, a pane)." },
+      { name: "isActive (SidebarMenuButton)", type: "boolean", default: "false", description: "The current destination (aria-current)." },
+    ],
+    notes: [
+      "A floating, inset liquid panel; the content runs under it on narrow screens, where the trigger opens it over the page (Escape or the backdrop closes it).",
+      "Two levels at most: SidebarMenu and one SidebarMenuSub.",
+      "BackgroundExtension wraps media (a hero image) so a mirrored, blurred copy fills the strip under the sidebar — SwiftUI's backgroundExtensionEffect().",
+    ],
+  },
+  "search-field": {
+    props: [
+      { name: "value / defaultValue / onValueChange", type: "string", description: "The query." },
+      { name: "onSubmit", type: "(value: string) => void", description: "Enter (with no suggestion highlighted)." },
+      { name: "minimized", type: "boolean", default: "false", description: "Start as a round search button that morphs open; it folds back when left empty." },
+      { name: "placement", type: `"inline" | "bottom"`, default: `"inline"`, description: "bottom floats it fixed at the bottom edge and rides the on-screen keyboard (visualViewport)." },
+      { name: "showCancel", type: `"auto" | "always" | "never"`, default: `"auto"`, description: "auto: while focused (or open from minimized). Cancel clears, blurs and folds." },
+      { name: "suggestions / onSuggestionSelect", type: "(string | { value, label })[]", description: "A listbox under the field (over it at the bottom): ↑/↓ to move, Enter to pick. Filter them yourself." },
+    ],
+    notes: ["Escape clears the text, then cancels."],
+  },
+  "action-sheet": {
+    props: [{ name: "variant (ActionSheetAction)", type: `"default" | "destructive" | "preferred"`, default: `"default"`, description: "destructive for the risky choice; preferred sets it in bold." }],
+    notes: [
+      "The choices share one liquid group; ActionSheetCancel (write it last) sits in its own capsule below. Tapping outside cancels; Escape too.",
+      "Bottom-anchored on phones, centred from sm. Built on the alert-dialog primitives: focus is trapped and Cancel takes it on open.",
     ],
   },
   checkbox: { notes: ["All Radix Checkbox props: checked (true | false | \"indeterminate\"), defaultChecked, onCheckedChange, disabled, required, name.", "Indeterminate shows a dash — use it for a parent that controls a group."] },
@@ -333,14 +446,22 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
     ],
   },
   sheet: {
-    props: [{ name: "side (SheetContent)", type: `"top" | "right" | "bottom" | "left" | "start" | "end"`, default: `"right"`, description: "Floats inset from that edge (and the safe area). start / end follow the writing direction." }],
+    props: [
+      { name: "side (SheetContent)", type: `"top" | "right" | "bottom" | "left" | "start" | "end"`, default: `"right"`, description: "Floats inset from that edge (and the safe area). start / end follow the writing direction." },
+      { name: "detents (SheetContent)", type: `("medium" | "large" | number | \`\${number}px\`)[]`, description: "Bottom sheets: the heights it rests at, smallest first. A number is a fraction of the viewport. Full height (large) turns opaque." },
+      { name: "detent / defaultDetent / onDetentChange", type: "number", default: "0", description: "The current detent's index." },
+      { name: "grabber (SheetContent)", type: "boolean", default: "true with detents", description: "The capsule at the top: a button — press, Enter or Space steps to the next detent, ↑/↓ step up or down; drag it to resize or, below the smallest detent, to dismiss." },
+      { name: "onBeforeDismiss (SheetContent)", type: "() => boolean | Promise<boolean>", description: "Asked before a drag-to-dismiss closes the sheet; return false to keep it (\"Discard changes?\")." },
+      { name: "modal (Sheet)", type: "boolean", default: "true", description: "false makes an inspector: no dimmed page, no focus trap, outside clicks don't close it." },
+    ],
     notes: ["Put long content in SheetBody: it fills the space between SheetHeader and SheetFooter and scrolls."],
   },
-  dialog: { notes: ["Never taller than the viewport: a long dialog scrolls. Wrap the middle in DialogBody to keep the header and footer in view while it scrolls."] },
+  dialog: { notes: ["Opened from a DialogTrigger, the trigger morphs into the panel (and back) with a same-document View Transition where the browser supports it; elsewhere, and under reduced motion, the panel materialises in place.", "Never taller than the viewport: a long dialog scrolls. Wrap the middle in DialogBody to keep the header and footer in view while it scrolls."] },
   toaster: {
     notes: [
       "The scheme follows the .dark / .light class on <html> (next-themes, shadcn); pass theme to set it yourself.",
-      "Toasts clear a fixed Dock: the default bottom offsets add --dock-inset. Pass offset / mobileOffset to place them yourself.",
+      "Bottom-right on wide screens, top-centre on narrow ones (≤ 600px) unless you pass position.",
+      "Toasts clear a fixed Dock (--dock-inset) at the bottom and a fixed top Toolbar (--toolbar-inset-top) at the top. Pass offset / mobileOffset to place them yourself.",
     ],
   },
 }

@@ -87,7 +87,7 @@ export function Sparkline({
     <View
       accessible
       accessibilityRole="image"
-      accessibilityLabel={`Trend, latest ${present[present.length - 1]}`}
+      accessibilityLabel={`Trend of ${present.length} values from ${present[0]} to ${present[present.length - 1]}, low ${Math.min(...present)}, high ${Math.max(...present)}`}
       style={[{ width: "100%", height, overflow: "visible" }, style]}
       onLayout={measure}
       {...props}

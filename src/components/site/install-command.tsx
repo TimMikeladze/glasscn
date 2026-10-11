@@ -25,7 +25,7 @@ export function InstallCommand({ args, className }: { args: string; className?: 
           </SegmentedControl>
           <CopyButton value={command} label="Copy command" />
         </div>
-        <pre className="overflow-x-auto px-4 py-3 font-mono text-[0.8rem]">
+        <pre tabIndex={0} className="overflow-x-auto px-4 py-3 font-mono text-[0.8rem]">
           <code>
             <span className="text-primary-ink">{RUNNERS[runner]}</span> shadcn@latest {args}
           </code>

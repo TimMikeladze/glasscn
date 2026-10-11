@@ -12,9 +12,31 @@ import { cn } from "cn"
  * default (`fixed inset-0 -z-10`); pass `className="absolute"` to fill a container.
  *
  * Cheap when idle: the blobs are GPU layers only while they move, the drift
- * pauses while the aurora is off screen, and `speed={0}` (or `animate={false}`)
+ * pauses while the aurora is off screen or the page is scrolling, and `speed={0}` (or `animate={false}`)
  * holds it still.
  */
+// One passive scroll listener for every aurora on the page: the drift pauses while scrolling,
+// so the compositor spends scroll frames on the content, not on repainting blobs under glass.
+const scrolling = new Set<HTMLElement>()
+let scrollTimer: ReturnType<typeof setTimeout> | undefined
+function onScroll() {
+  if (scrollTimer === undefined) scrolling.forEach((el) => el.setAttribute("data-scrolling", ""))
+  clearTimeout(scrollTimer)
+  scrollTimer = setTimeout(() => {
+    scrollTimer = undefined
+    scrolling.forEach((el) => el.removeAttribute("data-scrolling"))
+  }, 150)
+}
+function trackScroll(el: HTMLElement) {
+  if (scrolling.size === 0) window.addEventListener("scroll", onScroll, { passive: true, capture: true })
+  scrolling.add(el)
+  return () => {
+    scrolling.delete(el)
+    el.removeAttribute("data-scrolling")
+    if (scrolling.size === 0) window.removeEventListener("scroll", onScroll, { capture: true })
+  }
+}
+
 function Aurora({
   ref,
   className,
@@ -46,13 +68,16 @@ function Aurora({
     [ref]
   )
   const moving = animate && !(speed !== undefined && speed <= 0)
-  // pause the drift while off screen (an aurora per preview adds up)
+  // pause the drift while off screen (an aurora per preview adds up) or while scrolling
   React.useEffect(() => {
     const el = local.current
-    if (!el || !moving || typeof IntersectionObserver === "undefined") return
+    if (!el || !moving) return
+    const untrack = trackScroll(el)
+    if (typeof IntersectionObserver === "undefined") return untrack
     const observer = new IntersectionObserver((entries) => el.toggleAttribute("data-paused", !entries[entries.length - 1].isIntersecting))
     observer.observe(el)
     return () => {
+      untrack()
       observer.disconnect()
       el.removeAttribute("data-paused")
     }
@@ -70,7 +95,7 @@ function Aurora({
       aria-hidden
       className={cn(
         "absolute aspect-square rounded-full",
-        moving && "will-change-transform group-data-paused/aurora:will-change-auto group-data-paused/aurora:[animation-play-state:paused] motion-reduce:will-change-auto",
+        moving && "will-change-transform group-data-paused/aurora:will-change-auto group-data-paused/aurora:[animation-play-state:paused] group-data-scrolling/aurora:[animation-play-state:paused] motion-reduce:will-change-auto",
         position
       )}
       style={{

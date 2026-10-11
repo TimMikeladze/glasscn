@@ -28,6 +28,7 @@ A shadcn registry of glass components, the theme engine behind it, and its docs 
 pnpm typecheck && pnpm lint && pnpm test
 pnpm verify:install          # when items, files, deps or the stylesheet change (~3 min)
 pnpm verify:native           # when registry/native changes; then look in sandbox/native (docs/sandbox.md)
+pnpm test:e2e                # axe, visual, browser matrix, blur budget (docs/testing.md)
 ```
 
 Then look at it: `pnpm dev` → the item's `/docs/<name>` page and `/themes` (a few palettes, both schemes, `shape-square`, `density-compact`, `matte`).

@@ -14,13 +14,17 @@ export default function SegmentedControlDemo() {
         <SegmentedControlItem value="partly">Partly</SegmentedControlItem>
         <SegmentedControlItem value="no">Didn’t</SegmentedControlItem>
       </SegmentedControl>
-      <SegmentedControl defaultValue="list" aria-label="View">
+      <SegmentedControl defaultValue="list" shape="rounded" aria-label="View">
         <SegmentedControlItem value="list" aria-label="List">
           <ListIcon />
         </SegmentedControlItem>
         <SegmentedControlItem value="grid" aria-label="Grid">
           <LayoutGridIcon />
         </SegmentedControlItem>
+      </SegmentedControl>
+      <SegmentedControl momentary size="sm" onValueChange={(v) => setVerdict(v === "prev" ? "yes" : "no")} aria-label="Jump">
+        <SegmentedControlItem value="prev">Previous</SegmentedControlItem>
+        <SegmentedControlItem value="next">Next</SegmentedControlItem>
       </SegmentedControl>
     </div>
   )

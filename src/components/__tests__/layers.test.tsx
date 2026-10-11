@@ -13,7 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/glass/popo
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/glass/sheet"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/glass/tooltip"
 
-const FROSTED = /(^|\s)(glass|glass-strong|glass-subtle|glass-liquid|glass-liquid-clear)(\s|$)/
+const FROSTED = /(^|\s)(glass|glass-strong|glass-subtle|glass-liquid|glass-liquid-clear|glass-prominent)(\s|$)/
 const LIQUID = /(^|\s)glass-liquid(-clear)?(\s|$)/
 
 /** Every frosted element that has a liquid ancestor. */

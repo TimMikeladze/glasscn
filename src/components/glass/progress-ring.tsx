@@ -19,13 +19,16 @@ function ProgressRing({
   const sw = stroke ?? Math.max(3, size * 0.075)
   const r = size / 2 - sw / 2
   const { circumference, offset } = ringArc(r, Math.min(1, value))
+  const percent = Math.round(Math.min(1, Math.max(0, value)) * 100)
   return (
     <div
       data-slot="progress-ring"
       role="progressbar"
       aria-valuemin={0}
       aria-valuemax={100}
-      aria-valuenow={Math.round(Math.min(1, Math.max(0, value)) * 100)}
+      aria-valuenow={percent}
+      // named by default; pass aria-label (or aria-labelledby) to say what it measures
+      aria-label={props["aria-labelledby"] ? undefined : `Progress ${percent}%`}
       className={cn("relative inline-flex shrink-0 items-center justify-center", className)}
       style={{ width: size, height: size }}
       {...props}

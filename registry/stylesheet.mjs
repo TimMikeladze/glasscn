@@ -13,7 +13,7 @@ const mixed = (colour, amount) => `color-mix(in oklch, ${colour} ${amount}, tran
 const clarity = (o) => `calc(var(${o}) * min(1, var(--glass-clarity) * 2) + (100% - var(${o})) * max(0, var(--glass-clarity) * 2 - 1))`
 const frost = (opacity) => mixed("var(--glass-tinted, var(--glass-tint))", clarity(opacity))
 const rim = mixed("var(--glass-border-color)", "var(--glass-border-opacity)")
-const highlight = mixed("oklch(1 0 0)", "var(--glass-highlight-opacity)")
+const highlight = mixed("var(--glass-highlight-color)", "var(--glass-highlight-opacity)")
 const shadow = mixed("var(--glass-shadow-color)", "var(--glass-shadow-opacity)")
 const glow = mixed("var(--primary)", "var(--glass-glow)")
 const d = (rem) => `calc(${rem}rem * var(--glass-density))`
@@ -62,10 +62,13 @@ export const themeTokens = {
   "color-info": "var(--info)",
   "color-info-foreground": "var(--info-foreground)",
   "color-info-ink": "color-mix(in oklch, var(--info) 68%, var(--glass-label))",
-  // accent-coloured text on a tint of itself (tinted badges and buttons, links): the accent pulled
-  // toward the label colour, so it stays readable on its own 16–22% fill in both schemes
-  "color-primary-ink": "color-mix(in oklch, var(--primary) 68%, var(--glass-label))",
-  "color-destructive-ink": "color-mix(in oklch, var(--destructive) 68%, var(--glass-label))",
+  // accent-coloured text on a tint of itself (tinted badges and buttons, links): the label colour
+  // carrying 30% of the accent (INK_ACCENT in glass-theme.ts), so it stays AA on its own 16–22% fill
+  // on every palette × material (legibilityReport.tintedLabel / destructiveLabel)
+  "color-primary-ink": "color-mix(in oklch, var(--primary) 30%, var(--glass-label))",
+  // shadcn v4 has no destructive-foreground: white unless the app sets one
+  "color-destructive-foreground": "var(--destructive-foreground, oklch(0.985 0 0))",
+  "color-destructive-ink": "color-mix(in oklch, var(--destructive) 30%, var(--glass-label))",
   "color-glass-dim": mixed("oklch(0 0 0)", "var(--glass-dim)"),
   "shadow-glass-knob": `0 3px 8px ${mixed("var(--glass-shadow-color)", "calc(var(--glass-shadow-opacity) + 8%)")}, 0 1px 2px ${mixed("var(--glass-shadow-color)", "calc(var(--glass-shadow-opacity) + 4%)")}`,
   "shadow-glass-accent": `0 8px 22px ${mixed("var(--primary)", "32%")}, inset 0 1px 0 ${mixed("oklch(1 0 0)", "30%")}`,
@@ -102,7 +105,7 @@ export const themeTokens = {
 
 const materialFilter = "blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness))"
 const liquidFilter = "blur(var(--glass-liquid-blur)) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness))"
-const surface = (opacity, filter = materialFilter) => ({
+const surface = (opacity, filter = materialFilter, { inset = true } = {}) => ({
   // text inside a pane uses the material's own label colours (a smoked pane in a light theme
   // needs light text), remapping shadcn's foreground tokens for everything inside it
   color: "var(--glass-label)",
@@ -117,8 +120,43 @@ const surface = (opacity, filter = materialFilter) => ({
   "border-color": rim,
   "-webkit-backdrop-filter": filter,
   "backdrop-filter": filter,
-  "box-shadow": `var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) ${shadow}), inset 0 1px 0 ${highlight}, inset 0 0 calc(var(--glass-shadow-blur) * 0.8) ${glow}`,
+  // liquid glass draws its rim with glass-light (two-sided) instead of the single inset highlight
+  "box-shadow": `var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) ${shadow}), ${inset ? `inset 0 1px 0 ${highlight}, ` : ""}inset 0 0 calc(var(--glass-shadow-blur) * 0.8) ${glow}`,
 })
+
+/**
+ * The two-sided liquid rim (LG-04): a conic stroke from --glass-light-angle — specular on the lit
+ * side, edge-shade opposite — masked to the border ring. Drawn in ::before so it follows the radius.
+ */
+const lightRim = {
+  content: '""',
+  position: "absolute",
+  inset: "calc(var(--glass-border-width) * -1)",
+  padding: "max(1px, var(--glass-border-width))",
+  "border-radius": "inherit",
+  "pointer-events": "none",
+  background: `conic-gradient(from var(--glass-light-angle), ${mixed("var(--glass-highlight-color)", "var(--glass-specular)")}, transparent 25%, ${mixed("oklch(0 0 0)", "var(--glass-edge-shade)")} 50%, transparent 75%, ${mixed("var(--glass-highlight-color)", "var(--glass-specular)")})`,
+  "-webkit-mask": "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
+  "-webkit-mask-composite": "xor",
+  mask: "linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0)",
+}
+/** The press glow (LG-05): a radial light at the pointer (--glass-press-x/y from use-glass-pointer), added with plus-lighter. */
+const illumination = {
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    inset: "0",
+    "border-radius": "inherit",
+    background: `radial-gradient(circle at var(--glass-press-x, 50%) var(--glass-press-y, 50%), ${mixed("var(--glass-highlight-color)", "var(--glass-illumination)")}, transparent 60%)`,
+    "mix-blend-mode": "plus-lighter",
+    opacity: "0",
+    transition: "opacity calc(var(--glass-duration) * 2) ease-out",
+  },
+  "&:active::after, &[data-pressed]:not([data-pressed=false])::after": { opacity: "1", "transition-duration": "calc(var(--glass-duration) * 0.5)" },
+}
+const liquidSurface = (opacity) => ({ ...surface(opacity, liquidFilter, { inset: false }), isolation: "isolate", "&::before": lightRim })
+const springEase = "var(--glass-ease)"
+const pressTransition = `scale calc(var(--glass-duration) * 1.5) ${springEase}`
 
 /**
  * The data-* variants components use (data-open:, data-checked:…). shadcn's own
@@ -151,7 +189,7 @@ export const customVariants = Object.fromEntries([
 
 /** Clear liquid glass: over media only, a dim beneath, bright text on top. */
 const clearSurface = () => {
-  const base = surface("--glass-liquid-clear-opacity", liquidFilter)
+  const base = liquidSurface("--glass-liquid-clear-opacity")
   return {
     ...base,
     color: "oklch(0.985 0 0)",
@@ -185,6 +223,10 @@ const TEXT_STYLES = {
 }
 
 const focusOutline = { outline: "var(--glass-ring-width) solid var(--ring)" }
+// the inner tone of the two-tone ring: the pane's own colour, filling the 2px gap
+const focusHalo = `0 0 0 2px ${mixed("var(--glass-tint)", "92%")}`
+// a closed overlay's shape: the trigger's size (centred) in a capsule
+const morphStart = "inset(calc((100% - var(--glass-morph-h, 100%)) / 2) calc((100% - var(--glass-morph-w, 100%)) / 2) round var(--glass-radius-button))"
 const panes = ".glass, .glass-strong, .glass-subtle, .glass-liquid, .glass-liquid-clear"
 const scopes = ":root, [data-glass-scope]"
 const darkScopes = `:is(:root, [data-glass-scope])${DARK}`
@@ -198,11 +240,119 @@ export const stylesheet = {
   "@utility glass-strong": surface("--glass-opacity-strong"),
   "@utility glass-subtle": surface("--glass-opacity-subtle"),
   /** Liquid glass (regular): the control layer — toolbars, the dock, floating buttons, menus, sheets. */
-  "@utility glass-liquid": surface("--glass-liquid-opacity", liquidFilter),
+  "@utility glass-liquid": liquidSurface("--glass-liquid-opacity"),
   /** Liquid glass (clear): over photos and video only; dims what's behind, text on it is bright. */
   "@utility glass-liquid-clear": clearSurface(),
-  /** Keyboard focus as an outline: survives forced colours, follows the corner radius, never fights a pane's shadow. */
-  "@utility glass-focus": { "&:focus-visible": { ...focusOutline, "outline-offset": "2px" } },
+  /** The two-sided light rim on its own (glass-liquid and glass-liquid-clear include it). Positions the element if it is static. */
+  "@utility glass-light": { "&::before": lightRim },
+  /** A glow from the pointer while pressed. Pair with useGlassPointer for the position (centre without it). */
+  "@utility glass-illuminate": illumination,
+  /** A deeper shadow while content scrolls under the bar (ScrollEdge sets data-over-content). */
+  "@utility glass-shadow-adaptive": {
+    transition: "box-shadow var(--glass-duration) ease-out",
+    "&[data-over-content]:not([data-over-content=false])": {
+      "--glass-elevation": `0 calc(var(--glass-shadow-y) * var(--glass-shadow-over-content)) calc(var(--glass-shadow-blur) * var(--glass-shadow-over-content)) ${mixed("var(--glass-shadow-color)", "min(100%, calc(var(--glass-shadow-opacity) * var(--glass-shadow-over-content)))")}`,
+    },
+  },
+  /**
+   * Prominent (tinted) liquid glass: the accent mixed into the liquid frost, the label in
+   * --primary-foreground, the rim and the press glow. One per bar. Use instead of glass-liquid.
+   */
+  "@utility glass-prominent": {
+    ...liquidSurface("--glass-liquid-opacity"),
+    ...illumination,
+    color: "var(--primary-foreground)",
+    "--foreground": "var(--primary-foreground)",
+    "--muted-foreground": "var(--primary-foreground)",
+    // nearly opaque: the label must stay legible over anything (checked by legibilityReport.prominentLabel)
+    "background-color": mixed("var(--primary)", "94%"),
+    "--glass-specular": "45%",
+  },
+  /** Elastic press for solid controls: squash wider-and-shorter, spring back (LG-13). */
+  "@utility glass-press": {
+    "&:active:not(:disabled, [aria-disabled=true], [aria-haspopup]), &[data-pressed]:not([data-pressed=false])": {
+      scale: "calc(var(--glass-press-scale) * (1 + var(--glass-press-stretch))) calc(var(--glass-press-scale) * (1 - var(--glass-press-stretch)))",
+    },
+  },
+  /** Elastic press for liquid glass: it grows (and stretches a little) instead of squashing. */
+  "@utility glass-press-liquid": {
+    "&:active:not(:disabled, [aria-disabled=true], [aria-haspopup]), &[data-pressed]:not([data-pressed=false])": {
+      scale: "calc(var(--glass-press-grow) * (1 + var(--glass-press-stretch) * 0.5)) calc(var(--glass-press-grow) * (1 - var(--glass-press-stretch) * 0.5))",
+    },
+  },
+  /**
+   * A knob that turns into a lens while held (LG-09): solid at rest; as the child of a pressed .group, or under
+   * [data-dragging] it goes liquid, grows by --glass-knob-lens-scale and stretches toward travel
+   * (--glass-knob-stretch-x, -1…1, set by the component).
+   */
+  "@utility glass-knob-lens": {
+    "background-color": "var(--glass-knob)",
+    "&:is(:where(.group):active > *, [data-dragging]:not([data-dragging=false]), [data-dragging]:not([data-dragging=false]) *)": {
+      "background-color": mixed("var(--glass-knob)", "22%"),
+      "-webkit-backdrop-filter": liquidFilter,
+      "backdrop-filter": liquidFilter,
+      "box-shadow": `0 calc(var(--glass-shadow-y) * 0.4) calc(var(--glass-shadow-blur) * 0.5) ${shadow}, inset 0 0 0 1px ${mixed("var(--glass-highlight-color)", "var(--glass-specular)")}, inset 0 -2px 4px ${mixed("oklch(0 0 0)", "var(--glass-edge-shade)")}`,
+      scale: "calc(var(--glass-knob-lens-scale) * (1 + max(var(--glass-knob-stretch-x, 0), var(--glass-knob-stretch-x, 0) * -1) * 0.12)) calc(var(--glass-knob-lens-scale) * (1 - max(var(--glass-knob-stretch-x, 0), var(--glass-knob-stretch-x, 0) * -1) * 0.06))",
+    },
+  },
+  /**
+   * Overlays materialise (LG-10): blur, frost and scale (0.96 → 1) come in together, driven by the
+   * registered --glass-materialize (0 → 1). Keyed to Radix data-state; closing plays it backwards.
+   */
+  "@utility glass-materialize": {
+    "&:is([data-state=open], [data-state=delayed-open], [data-state=instant-open])": {
+      animation: `glass-materialize calc(var(--glass-duration) * 1.5) ${springEase} both`,
+    },
+    "&[data-state=closed]": { animation: "glass-materialize var(--glass-duration) ease-in reverse both" },
+  },
+  /**
+   * Overlays grow out of their trigger (LG-11): the first frame is clipped to the trigger's size and
+   * a capsule, centred, and transitions to the full panel; scale from the Radix transform origin.
+   * Components set --glass-morph-w / --glass-morph-h (the trigger) and --glass-morph-origin.
+   */
+  "@utility glass-morph-origin": {
+    "transform-origin": "var(--glass-morph-origin, center)",
+    // negative inset: the open panel is not clipped (its shadow shows)
+    "clip-path": "inset(calc(var(--glass-shadow-blur) * -2) round var(--glass-radius-surface))",
+    transition: `clip-path calc(var(--glass-duration) * 1.5) ${springEase}`,
+    "&[data-state=closed]": { "clip-path": morphStart, "transition-timing-function": "ease-in", "transition-duration": "var(--glass-duration)" },
+  },
+  /** Progressive blur band at a scroll edge (NAV-02): stacked backdrop layers, each masked a little further in. */
+  "@utility scroll-edge-soft": {
+    "pointer-events": "none",
+    "-webkit-backdrop-filter": "blur(2px)",
+    "backdrop-filter": "blur(2px)",
+    "-webkit-mask-image": "linear-gradient(to var(--glass-scroll-edge-to, bottom), #000 25%, transparent)",
+    "mask-image": "linear-gradient(to var(--glass-scroll-edge-to, bottom), #000 25%, transparent)",
+    "&::before, &::after": { content: '""', position: "absolute", inset: "0" },
+    "&::before": {
+      "-webkit-backdrop-filter": "blur(6px)",
+      "backdrop-filter": "blur(6px)",
+      "-webkit-mask-image": "linear-gradient(to var(--glass-scroll-edge-to, bottom), #000 15%, transparent 65%)",
+      "mask-image": "linear-gradient(to var(--glass-scroll-edge-to, bottom), #000 15%, transparent 65%)",
+    },
+    "&::after": {
+      "-webkit-backdrop-filter": "blur(var(--glass-blur))",
+      "backdrop-filter": "blur(var(--glass-blur))",
+      "background-color": frost("--glass-opacity-subtle"),
+      "-webkit-mask-image": "linear-gradient(to var(--glass-scroll-edge-to, bottom), #000, transparent 40%)",
+      "mask-image": "linear-gradient(to var(--glass-scroll-edge-to, bottom), #000, transparent 40%)",
+    },
+  },
+  /** A near-opaque material strip at a scroll edge (NAV-02): for dense text, pinned tables, macOS-style bars. */
+  "@utility scroll-edge-hard": {
+    "pointer-events": "none",
+    "background-color": mixed("var(--glass-tint)", "max(var(--glass-opacity-strong), 88%)"),
+    "-webkit-backdrop-filter": materialFilter,
+    "backdrop-filter": materialFilter,
+    "border-color": "var(--glass-scroll-edge-rule, transparent)",
+    "box-shadow": `0 1px 0 ${mixed("var(--glass-label)", "var(--glass-separator-opacity)")}`,
+  },
+  /**
+   * Keyboard focus (UX-02): a two-tone ring — a --ring outline with a contrasting halo between it
+   * and the control — so it reads on any glass, follows the radius and survives forced colours.
+   */
+  "@utility glass-focus": { "&:focus-visible": { ...focusOutline, "outline-offset": "2px", "box-shadow": focusHalo } },
   /** Focus drawn inside the element — rows and cells that sit flush in a list. */
   "@utility glass-focus-inset": { "&:focus-visible": { ...focusOutline, "outline-offset": "calc(var(--glass-ring-width) * -1)" } },
   /** A tap area of at least 24px (fine pointers) or --glass-hit-min (touch), without changing the layout. */
@@ -266,6 +416,18 @@ export const stylesheet = {
   "@keyframes glass-draw": {
     from: { "stroke-dashoffset": "var(--glass-draw-from, 1)" },
   },
+  // registered so it interpolates (an unregistered custom property flips at 50%)
+  "@property --glass-materialize": { syntax: '"<number>"', inherits: "false", "initial-value": "1" },
+  "@keyframes glass-materialize": {
+    from: {
+      "--glass-materialize": "0",
+      opacity: "0",
+      scale: "0.96",
+      "-webkit-backdrop-filter": "blur(0px) saturate(100%)",
+      "backdrop-filter": "blur(0px) saturate(100%)",
+      "background-color": "transparent",
+    },
+  },
   "@keyframes glass-fade": {
     from: { opacity: "0" },
   },
@@ -281,6 +443,16 @@ export const stylesheet = {
     "0%, 60%, 100%": { transform: "translateY(0)", opacity: "0.45" },
     "30%": { transform: "translateY(-0.25rem)", opacity: "1" },
   },
+  // the rim and glow are absolutely positioned pseudo-elements: position static elements, at zero
+  // specificity in the base layer so fixed / absolute / sticky (any utility) win
+  "@layer base": {
+    ":where(.glass-liquid, .glass-liquid-clear, .glass-light, .glass-prominent, .glass-illuminate, .scroll-edge-soft)": { position: "relative" },
+    // default springs for the press and the lens; any transition-* utility on the element replaces them
+    ":where(.glass-press, .glass-press-liquid)": { transition: pressTransition },
+    ":where(.glass-knob-lens)": { transition: `${pressTransition}, background-color var(--glass-duration) ease-out, box-shadow var(--glass-duration) ease-out` },
+  },
+  // first frame of an overlay that grows from its trigger (top level: an at-rule can't nest in @utility)
+  "@starting-style": { ".glass-morph-origin:is([data-state=open], [data-state=delayed-open], [data-state=instant-open])": { "clip-path": morphStart } },
   // No backdrop-filter (old browsers, some WebViews): panes become nearly opaque.
   "@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))": {
     [panes]: { "--glass-bg": mixed("var(--glass-tint)", "92%") },
@@ -290,13 +462,18 @@ export const stylesheet = {
   // predominantly opaque with a contrasting border; Reduce Motion removes elasticity.
   "@media (prefers-reduced-motion: reduce)": {
     "[data-slot=aurora-blob], [data-glass-motion]": { animation: "none !important", transition: "none !important" },
-    [scopes]: important({ "--glass-duration": "0ms", "--glass-press-scale": "1", "--glass-ease": "linear" }),
+    [scopes]: important({ "--glass-duration": "0ms", "--glass-press-scale": "1", "--glass-ease": "linear", "--glass-press-stretch": "0", "--glass-press-grow": "1", "--glass-knob-lens-scale": "1" }),
+    // overlays cross-fade instead of materialising or morphing (a fixed duration: --glass-duration is 0 here)
+    ".glass-materialize:is([data-state=open], [data-state=delayed-open], [data-state=instant-open])": { animation: "glass-fade 150ms ease-out both !important" },
+    ".glass-materialize[data-state=closed]": { animation: "glass-fade 120ms ease-in reverse both !important" },
+    ".glass-morph-origin": { "clip-path": "none !important", transition: "none !important" },
   },
   "@media (prefers-reduced-transparency: reduce)": {
     [scopes]: important({
       "--glass-opacity": "90%", "--glass-opacity-strong": "96%", "--glass-opacity-subtle": "84%",
       "--glass-liquid-opacity": "90%", "--glass-liquid-clear-opacity": "70%", "--glass-clarity": "0.5",
       "--glass-blur": "40px", "--glass-liquid-blur": "30px", "--glass-sheen": "0%", "--glass-texture": "none",
+      "--glass-specular": "0%", "--glass-illumination": "0%",
     }),
   },
   "@media (prefers-contrast: more)": {
@@ -305,6 +482,7 @@ export const stylesheet = {
       "--glass-liquid-opacity": "94%", "--glass-liquid-clear-opacity": "80%", "--glass-clarity": "0.5",
       "--glass-border-width": "1.5px", "--glass-border-opacity": "100%", "--glass-border-color": "oklch(0.25 0 0)",
       "--glass-highlight-opacity": "0%", "--glass-sheen": "0%", "--glass-glow": "0%", "--glass-texture": "none",
+      "--glass-specular": "0%", "--glass-edge-shade": "0%", "--glass-illumination": "0%", "--glass-press-stretch": "0", "--glass-press-grow": "1",
       "--glass-label-secondary": "oklch(0.36 0.01 285)",
     }),
     [darkScopes]: important({ "--glass-border-color": "oklch(1 0 0)", "--glass-label-secondary": "oklch(0.93 0.01 285)" }),
@@ -314,6 +492,10 @@ export const stylesheet = {
       "-webkit-backdrop-filter": "none", "backdrop-filter": "none", "background-color": "Canvas", "background-image": "none",
       color: "CanvasText", "border-color": "CanvasText", "box-shadow": "none",
     },
+    ".glass-prominent": { "-webkit-backdrop-filter": "none", "backdrop-filter": "none", "background-color": "ButtonText", color: "ButtonFace", "box-shadow": "none" },
+    ":is(.glass-liquid, .glass-liquid-clear, .glass-light, .glass-prominent)::before": { display: "none" },
+    // not display:none — the same ::after may be a hit-area
+    ":is(.glass-illuminate, .glass-prominent)::after": { background: "none" },
   },
 }
 

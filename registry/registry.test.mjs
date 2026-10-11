@@ -1,8 +1,8 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs"
 import { describe, expect, it } from "vitest"
 import { blocks, components, foundations, nativeItems } from "./items.mjs"
-import { DENSITIES, FONTS, MATERIALS, MOTIONS, PALETTES, SHAPES, TOKENS, TYPE_PRESETS } from "../src/lib/glass-theme.ts"
-import { DARK, themeTokens } from "./stylesheet.mjs"
+import { DENSITIES, FONTS, INK_ACCENT, MATERIALS, MOTIONS, PALETTES, SHAPES, TOKENS, TYPE_PRESETS } from "../src/lib/glass-theme.ts"
+import { DARK, stylesheet, themeTokens } from "./stylesheet.mjs"
 import { registryUrl } from "../scripts/registry-url.mjs"
 
 const registry = JSON.parse(readFileSync("registry.json", "utf8"))
@@ -123,15 +123,25 @@ describe("registry.json", () => {
   })
   it("ships the liquid surfaces, focus, hit-area, concentric and the accessibility overrides", () => {
     const style = registry.items.find((i) => i.name === "glass-style")
-    for (const k of ["@utility glass-liquid", "@utility glass-liquid-clear", "@utility glass-focus", "@utility hit-area", "@utility rounded-concentric", "@utility type-body", "@media (prefers-reduced-transparency: reduce)", "@media (prefers-contrast: more)", "@media (forced-colors: active)"])
+    for (const k of ["@utility glass-liquid", "@utility glass-liquid-clear", "@utility glass-focus", "@utility glass-light", "@utility glass-illuminate", "@utility glass-shadow-adaptive", "@utility glass-prominent", "@utility glass-press", "@utility glass-press-liquid", "@utility glass-knob-lens", "@utility glass-materialize", "@utility glass-morph-origin", "@utility scroll-edge-soft", "@utility scroll-edge-hard", "@property --glass-materialize", "@starting-style", "@utility hit-area", "@utility rounded-concentric", "@utility type-body", "@media (prefers-reduced-transparency: reduce)", "@media (prefers-contrast: more)", "@media (forced-colors: active)"])
       expect(Object.keys(style.css), k).toContain(k)
+  })
+  it("the ink colours and prominent glass match what legibilityReport checks (BTN-05)", () => {
+    for (const k of ["color-primary-ink", "color-destructive-ink"]) expect(themeTokens[k]).toContain(` ${Math.round(INK_ACCENT * 100)}%, var(--glass-label)`)
+    expect(stylesheet["@utility glass-prominent"]["background-color"]).toContain("var(--primary) 94%")
+  })
+  it("the accessibility overrides still the liquid layer: no specular, glow or elastic press", () => {
+    const rm = stylesheet["@media (prefers-reduced-motion: reduce)"][":root, [data-glass-scope]"]
+    for (const k of ["--glass-press-stretch", "--glass-press-grow", "--glass-knob-lens-scale"]) expect(rm[k], k).toMatch(/^[01] !important$/)
+    for (const q of ["@media (prefers-reduced-transparency: reduce)", "@media (prefers-contrast: more)"])
+      for (const k of ["--glass-specular", "--glass-illumination"]) expect(stylesheet[q][":root, [data-glass-scope]"][k], `${q} ${k}`).toBe("0% !important")
   })
   it("states the real primitive count in the docs", () => {
     for (const f of ["README.md", "docs/theming.md", "docs/spec.md"]) expect(readFileSync(f, "utf8"), f).toContain(`${TOKENS.length} primitives`)
   })
   it("references only primitives that exist", () => {
     // primitives, the two layer hooks, and shadcn's own colour tokens
-    const known = new Set([...TOKENS.map((t) => t.name), "glass-bg", "glass-elevation", "glass-tinted", "glass-draw-from", "glass-container-radius", "glass-container-pad", "glass-concentric-min", "primary", "destructive", "foreground", "muted-foreground"])
+    const known = new Set([...TOKENS.map((t) => t.name), "glass-bg", "glass-elevation", "glass-tinted", "glass-draw-from", "glass-container-radius", "glass-container-pad", "glass-concentric-min", "glass-press-x", "glass-press-y", "glass-knob-stretch-x", "glass-morph-w", "glass-morph-h", "glass-morph-origin", "glass-scroll-edge-to", "glass-scroll-edge-rule", "primary", "primary-foreground", "destructive", "destructive-foreground", "foreground", "muted-foreground"])
     const css = JSON.stringify([themeTokens, ...registry.items.filter((i) => i.css).map((i) => i.css)])
     for (const [, name] of css.matchAll(/var\(--([\w-]+)/g)) expect(known.has(name), name).toBe(true)
   })
@@ -192,7 +202,7 @@ describe("primitives stay plain, and every variable a component uses exists (REG
     const declared = new Set()
     for (const src of Object.values(sources)) for (const [, name] of src.matchAll(/(?:\[|["'`])--([\w-]+)(?::|["'`])/g)) declared.add(name)
     const primitives = new Set(TOKENS.map((t) => t.name))
-    const hooks = new Set(["glass-bg", "glass-elevation", "glass-tinted", "glass-draw-from", "glass-container-radius", "glass-container-pad", "glass-concentric-min"])
+    const hooks = new Set(["glass-bg", "glass-elevation", "glass-tinted", "glass-draw-from", "glass-container-radius", "glass-container-pad", "glass-concentric-min", "glass-press-x", "glass-press-y", "glass-knob-stretch-x", "glass-morph-w", "glass-morph-h", "glass-morph-origin", "glass-scroll-edge-to", "glass-scroll-edge-rule", "glass-materialize"])
     const shadcn = new Set(["background", "foreground", "card", "card-foreground", "popover", "popover-foreground", "primary", "primary-foreground", "secondary", "secondary-foreground", "muted", "muted-foreground", "accent", "accent-foreground", "destructive", "border", "input", "ring", "radius"])
     const theme = new Set(Object.keys(themeTokens))
     // radix's measured vars, the sliding indicator, TanStack Charts' tooltip/series, tw-animate-css

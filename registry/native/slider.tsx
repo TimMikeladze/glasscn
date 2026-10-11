@@ -16,6 +16,15 @@ type SliderProps = {
   accessibilityLabel?: string
   testID?: string
   style?: StyleProp<ViewStyle>
+  /** `progress` is thumbless (a scrubber); the track thickens while dragged. */
+  variant?: "default" | "progress"
+  /** Tick marks: `true` for one per step (up to 21), or the values to mark. */
+  ticks?: boolean | number[]
+  /** The range grows from this value instead of `min`. */
+  neutralValue?: number
+  /** Icons at the ends of the track. */
+  minIcon?: React.ReactNode
+  maxIcon?: React.ReactNode
 }
 
 const KNOB = 24
@@ -74,7 +83,19 @@ function createPan(box: { live: Live; g: Gesture }, setInner: (v: number[]) => v
 }
 
 /** A soft track, an accent range and white glass knobs. One value or a range. */
-export function Slider({ value, defaultValue, onValueChange, onValueCommit, min = 0, max = 100, step = 1, disabled, accessibilityLabel, testID, style }: SliderProps) {
+/** The iOS 27 slider: a soft track, an accent range and a knob that swells into a lens while dragged. */
+export function Slider({ minIcon, maxIcon, style, ...props }: SliderProps) {
+  if (!minIcon && !maxIcon) return <SliderTrack style={style} {...props} />
+  return (
+    <View style={[{ width: "100%", flexDirection: "row", alignItems: "center", gap: 12 }, style]}>
+      {minIcon}
+      <SliderTrack style={{ flex: 1, width: "auto" }} {...props} />
+      {maxIcon}
+    </View>
+  )
+}
+
+function SliderTrack({ value, defaultValue, onValueChange, onValueCommit, min = 0, max = 100, step = 1, disabled, accessibilityLabel, testID, style, variant = "default", ticks, neutralValue }: Omit<SliderProps, "minIcon" | "maxIcon">) {
   const ui = useUI()
   const [inner, setInner] = React.useState<number[]>(() => defaultValue ?? [min])
   const values = value ?? inner
@@ -97,8 +118,11 @@ export function Slider({ value, defaultValue, onValueChange, onValueCommit, min 
 
   const span = Math.max(0, width - KNOB)
   const pos = (v: number) => ((v - min) / (max - min || 1)) * span
-  const lo = values.length > 1 ? pos(Math.min(...values)) : 0
-  const hi = pos(Math.max(...values))
+  const origin = neutralValue !== undefined && values.length === 1 ? pos(Math.min(max, Math.max(min, neutralValue))) : 0
+  const lo = values.length > 1 ? pos(Math.min(...values)) : Math.min(origin, pos(values[0]))
+  const hi = values.length > 1 ? pos(Math.max(...values)) : Math.max(origin, pos(values[0]))
+  const marks = Array.isArray(ticks) ? ticks : ticks && (max - min) / step <= 20 ? Array.from({ length: Math.round((max - min) / step) + 1 }, (_, i) => min + i * step) : []
+  const progress = variant === "progress"
 
   const nudge = (i: number, dir: 1 | -1) => {
     const next = [...values]
@@ -115,9 +139,12 @@ export function Slider({ value, defaultValue, onValueChange, onValueCommit, min 
       style={[{ width: "100%", height: KNOB, justifyContent: "center", opacity: disabled ? 0.5 : 1 }, web({ cursor: disabled ? "default" : "pointer", touchAction: "none", userSelect: "none" }), style]}
       {...pan.panHandlers}
     >
-      <View pointerEvents="none" style={{ marginHorizontal: KNOB / 2, height: 6, borderRadius: 3, overflow: "hidden", backgroundColor: ui.fillStrong }}>
+      <View pointerEvents="none" style={{ marginHorizontal: KNOB / 2, height: progress && active !== null ? 10 : 6, borderRadius: 5, overflow: "hidden", backgroundColor: ui.fillStrong }}>
         <View style={{ position: "absolute", top: 0, bottom: 0, left: lo, width: Math.max(0, hi - lo), backgroundColor: ui.primary }} />
       </View>
+      {marks.map((m) => (
+        <View key={m} pointerEvents="none" style={{ position: "absolute", left: KNOB / 2 + pos(m) - 2, width: 4, height: 4, borderRadius: 2, backgroundColor: ui.mutedForeground, opacity: 0.6 }} />
+      ))}
       {values.map((v, i) => (
         <Knob
           key={i}
@@ -130,16 +157,18 @@ export function Slider({ value, defaultValue, onValueChange, onValueCommit, min 
           disabled={disabled}
           onNudge={(dir) => nudge(i, dir)}
           border={ui.glassBorder}
+          hidden={progress}
         />
       ))}
     </View>
   )
 }
 
-function Knob({ left, pressed, value, min, max, label, disabled, onNudge, border }: { left: number; pressed: boolean; value: number; min: number; max: number; label?: string; disabled?: boolean; onNudge: (dir: 1 | -1) => void; border: string }) {
+function Knob({ left, pressed, value, min, max, label, disabled, onNudge, border, hidden }: { left: number; pressed: boolean; value: number; min: number; max: number; label?: string; disabled?: boolean; onNudge: (dir: 1 | -1) => void; border: string; hidden?: boolean }) {
   const [scale] = React.useState(() => new Animated.Value(1))
   React.useEffect(() => {
-    Animated.spring(scale, { toValue: pressed ? 1.1 : 1, friction: 7, tension: 300, useNativeDriver: true }).start()
+    // the lens: the knob swells while held (Apple's 1.15)
+    Animated.spring(scale, { toValue: pressed ? 1.15 : 1, friction: 7, tension: 300, useNativeDriver: true }).start()
   }, [pressed, scale])
   return (
     <Animated.View
@@ -157,7 +186,8 @@ function Knob({ left, pressed, value, min, max, label, disabled, onNudge, border
         width: KNOB,
         height: KNOB,
         borderRadius: KNOB / 2,
-        backgroundColor: "#FFFFFF",
+        backgroundColor: pressed ? "rgba(255,255,255,0.35)" : "#FFFFFF",
+        opacity: hidden ? 0 : 1,
         borderWidth: 1,
         borderColor: border,
         shadowColor: "#000",

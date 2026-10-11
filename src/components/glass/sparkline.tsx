@@ -58,11 +58,14 @@ function Sparkline({
     )
   }
   const last = points[points.length - 1]
+  // named by default from the data; pass aria-label to say what it measures
+  const values = data.filter((v): v is number => typeof v === "number")
+  const label = `Trend of ${values.length} values from ${values[0]} to ${values[values.length - 1]}, low ${Math.min(...values)}, high ${Math.max(...values)}`
   const line = smoothPath(points)
   // on-screen length, overestimated: the dash only has to cover the curve
   const length = Math.ceil(polylineLength(points, width / W, 1) * 1.2)
   return (
-    <div data-slot="sparkline" role="img" className={cn("relative w-full", className)} style={{ height, ...style }} {...props}>
+    <div data-slot="sparkline" role="img" aria-label={props["aria-labelledby"] ? undefined : label} className={cn("relative w-full", className)} style={{ height, ...style }} {...props}>
       <svg ref={ref} data-slot="sparkline-svg" aria-hidden viewBox={`0 0 ${W} ${height}`} width="100%" height={height} preserveAspectRatio="none" className="block overflow-visible">
         <defs>
           <linearGradient id={`spark-${id}`} x1="0" y1="0" x2="0" y2="1">

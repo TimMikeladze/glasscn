@@ -101,7 +101,7 @@ async function Doc({ params }: { params: PageProps<"/docs/[slug]">["params"] }) 
       ))}
 
       <H2>Source</H2>
-      <div className="grid gap-4">
+      <div className="grid gap-4 [contain-intrinsic-size:auto_1200px] [content-visibility:auto]">
         {files.map((f) => (
           <CodeBlock key={f.path} code={f.code} html={f.html} title={f.path} maxHeight={420} />
         ))}

@@ -60,6 +60,14 @@ export const foundations = [
     files: [{ path: "src/hooks/use-sliding-indicator.ts", type: "registry:hook", target: "@hooks/use-sliding-indicator.ts" }],
   },
   {
+    name: "use-glass-pointer",
+    type: "registry:hook",
+    title: "useGlassPointer",
+    description: "Feeds liquid glass from the pointer: --glass-press-x/y for the glass-illuminate press glow, and optionally turns the rim's light toward a hovering pointer. rAF-batched, no React state.",
+    categories: ["glass", "foundations"],
+    files: [{ path: "src/hooks/use-glass-pointer.ts", type: "registry:hook", target: "@hooks/use-glass-pointer.ts" }],
+  },
+  {
     name: "glass-charts",
     type: "registry:lib",
     title: "Chart maths",
@@ -79,16 +87,17 @@ export const components = [
   ui("typography", "Typography", "Heading, Text, Display, Blockquote, InlineCode, List and TextLink on the theme's modular scale — fonts, weights, case and numerals from the type tokens.", { deps: ["radix-ui", "class-variance-authority"], categories: ["typography"] }),
   ui("prose", "Prose", "Rich text (Markdown, MDX, CMS) set in the theme's type: headings, links, lists, quotes, code, tables.", { deps: ["radix-ui"], categories: ["typography"] }),
   // controls
-  ui("button", "Button", "shadcn's Button with glass, tinted and secondary variants, capsule or rounded, squash on press.", { deps: ["radix-ui", "class-variance-authority"], categories: ["controls"] }),
+  ui("button", "Button", "shadcn's Button with liquid glass, prominent (tinted liquid), tinted and secondary variants; capsule or rounded, elastic press, a loading state, pull-down and split buttons.", { deps: ["radix-ui", "class-variance-authority"], categories: ["controls"] }),
   ui("badge", "Badge", "Small capsule labels: solid, tinted, glass, secondary, outline, destructive.", { deps: ["radix-ui", "class-variance-authority"], categories: ["controls"] }),
   ui("input", "Input", "A filled field for glass: soft fill, accent caret and focus ring.", { categories: ["controls"] }),
   ui("textarea", "Textarea", "A filled, auto-growing text area for glass.", { categories: ["controls"] }),
   ui("label", "Label", "An accessible label.", { deps: ["radix-ui"], categories: ["controls"] }),
-  ui("switch", "Switch", "The iOS switch: capsule track fills with the accent, white knob springs across.", { deps: ["radix-ui"], categories: ["controls"] }),
+  ui("switch", "Switch", "The iOS 27 switch: a wide capsule fills with the accent; the knob stretches toward where it's going, turns into a lens while held and can be dragged.", { deps: ["radix-ui"], categories: ["controls"] }),
   ui("checkbox", "Checkbox", "shadcn's Checkbox on glass: a soft box that fills with the accent, with an indeterminate dash.", { deps: ["radix-ui", "lucide-react"], categories: ["controls"] }),
-  ui("segmented-control", "Segmented control", "The iOS segmented control: one raised thumb slides to the chosen segment; always has a selection.", { deps: ["radix-ui"], reg: [hook], categories: ["controls"] }),
+  ui("segmented-control", "Segmented control", "The iOS segmented control: one concentric thumb slides to the chosen segment and can be dragged across them as a lens; capsule or rounded, or momentary actions.", { deps: ["radix-ui"], reg: [hook], categories: ["controls"] }),
   ui("tabs", "Tabs", "Tabs with a sliding pill (glass capsule, plain) or a sliding underline.", { deps: ["radix-ui", "class-variance-authority"], reg: [hook], categories: ["controls"] }),
-  ui("slider", "Slider", "A soft track, accent range and white glass knobs. Ranges supported.", { deps: ["radix-ui"], categories: ["controls"] }),
+  ui("glass-group", "Glass group", "One shared liquid backdrop for neighbouring controls (Apple's GlassEffectContainer), with an optional selection that slides and morphs between them.", { deps: ["radix-ui"], reg: [hook], categories: ["controls"] }),
+  ui("slider", "Slider", "A soft track, an accent range and capsule knobs that turn into lenses while dragged. Ranges, ticks, a neutral origin, end icons, a value bubble and a thumbless progress variant.", { deps: ["radix-ui"], categories: ["controls"] }),
   ui("progress", "Progress", "A capsule bar filling from the second chart colour into the accent.", { deps: ["radix-ui"], categories: ["controls"] }),
   ui("kbd", "Kbd", "Keycaps on glass, singly or grouped.", { categories: ["controls"] }),
   ui("separator", "Separator", "A hairline that reads on glass.", { deps: ["radix-ui"], categories: ["controls"] }),
@@ -99,15 +108,21 @@ export const components = [
     extraFiles: [{ path: "src/components/glass/glass-preferences-script.tsx", type: "registry:ui", target: "@components/glass/glass-preferences-script.tsx" }],
   }),
   // overlays
-  ui("dialog", "Dialog", "A liquid-glass modal over a dimmed page.", { deps: ["radix-ui", "lucide-react"], reg: [at("button")], categories: ["overlays"] }),
+  ui("dialog", "Dialog", "A liquid-glass modal over a dimmed page that morphs out of its trigger (View Transitions) or materialises in place.", { deps: ["radix-ui", "lucide-react", "react-dom"], reg: [at("button")], categories: ["overlays"] }),
   ui("alert-dialog", "Alert dialog", "An Apple-style alert on strong glass: a bold title, a short message and capsule actions — for confirming destructive or irreversible choices. Only its buttons close it.", { deps: ["radix-ui"], reg: [at("button")], categories: ["overlays"] }),
-  ui("sheet", "Sheet", "A floating glass panel that slides in from any edge, inset like an iPad sheet.", { deps: ["radix-ui", "lucide-react"], reg: [at("button")], categories: ["overlays"] }),
+  ui("sheet", "Sheet", "A floating glass panel that slides in from any edge, inset like an iPad sheet — with detents, a grabber, drag-to-dismiss and a non-modal inspector mode.", { deps: ["radix-ui", "lucide-react"], reg: [at("button")], categories: ["overlays"] }),
+  ui("action-sheet", "Action sheet", "The iOS action sheet: a few choices in one liquid group rising from the bottom, Cancel in its own capsule — on the alert-dialog primitives.", { deps: ["radix-ui"], reg: [at("alert-dialog")], categories: ["overlays"] }),
   ui("popover", "Popover", "Floating glass content anchored to a trigger.", { deps: ["radix-ui"], categories: ["overlays"] }),
   ui("tooltip", "Tooltip", "A small glass capsule on hover and focus.", { deps: ["radix-ui"], categories: ["overlays"] }),
   ui("dropdown-menu", "Dropdown menu", "A glass menu: items, checkbox and radio items, labels, shortcuts, submenus.", { deps: ["radix-ui", "lucide-react"], categories: ["overlays"] }),
-  ui("toaster", "Toaster", "Sonner toasts dressed in glass.", { deps: ["sonner", "lucide-react"], categories: ["overlays"] }),
+  ui("toaster", "Toaster", "Sonner toasts dressed in glass: bottom-right on wide screens, top-centre on phones, clear of the Dock and a top Toolbar.", { deps: ["sonner", "lucide-react"], categories: ["overlays"] }),
   // navigation
-  ui("dock", "Dock", "The floating tab bar: a glass capsule of destinations with a sliding pill, plus a round action button.", { deps: ["radix-ui"], reg: [hook], categories: ["navigation"] }),
+  ui("dock", "Dock", "The floating tab bar: a liquid capsule of destinations with a sliding pill and badges, drag-to-scrub, minimize on scroll, an accessory, a search tab and a tinted action button.", { deps: ["radix-ui"], reg: [hook, at("use-glass-pointer"), at("scroll-edge"), at("search-field")], categories: ["navigation"] }),
+  ui("toolbar", "Toolbar", "A floating toolbar on the control layer: button groups sharing one liquid capsule, spacers, a title, an overflow menu, a prominent action and minimize on scroll.", { deps: ["radix-ui", "lucide-react"], reg: [at("dropdown-menu"), at("glass-group"), at("scroll-edge"), at("use-glass-pointer")], categories: ["navigation"] }),
+  ui("scroll-edge", "Scroll edge", "Keeps bars legible over scrolling content — a progressive blur or a hard strip — and tells the bars when content is under them.", { categories: ["navigation"] }),
+  ui("navigation-bar", "Navigation bar", "iOS's navigation bar: a large title that scrolls away into a small inline one, leading and trailing slots.", { reg: [at("scroll-edge")], categories: ["navigation"] }),
+  ui("sidebar", "Sidebar", "A floating, inset liquid sidebar: collapsible, two levels, an overlay on phones, and BackgroundExtension to run media under it.", { deps: ["radix-ui", "lucide-react"], categories: ["navigation"] }),
+  ui("search-field", "Search field", "A capsule search field: clear and cancel, a minimized button that morphs open, suggestions, and a bottom placement that rides the keyboard.", { deps: ["lucide-react"], categories: ["navigation"] }),
   ui("grouped-list", "Grouped list", "iOS Settings-style inset grouped rows on glass: headers, footers, icon tiles, values, chevrons.", { deps: ["radix-ui", "lucide-react"], categories: ["navigation"] }),
   // data
   ui("activity-rings", "Activity rings", "Concentric Activity-style rings that sweep in and lap past 100%. Server-component safe.", { reg: [charts], categories: ["data"] }),
@@ -160,7 +175,7 @@ const native = (name, title, description, deps, reg = [], ext = "tsx") => ({
   files: [{ path: `registry/native/${name}.${ext}`, type: ext === "ts" ? "registry:lib" : "registry:ui", target: `@components/glass/native/${name}.${ext}` }],
 })
 
-const NATIVE_NAMES = ["typography", "prose", "card", "theme-scope", "button", "badge", "input", "textarea", "label", "kbd", "separator", "avatar", "switch", "checkbox", "segmented-control", "tabs", "slider", "progress", "dock", "grouped-list", "dialog", "alert-dialog", "sheet", "popover", "tooltip", "dropdown-menu", "toaster", "activity-rings", "progress-ring", "sparkline", "stat", "bar-list", "gauge", "tracker", "category-bar", "heatmap", "chart", "area-chart", "bar-chart", "line-chart", "donut-chart", "table", "data-table", "chat", "dashboard-01", "analytics-01", "settings-01", "auth-01", "chat-01"]
+const NATIVE_NAMES = ["typography", "prose", "card", "theme-scope", "button", "badge", "input", "textarea", "label", "kbd", "separator", "avatar", "switch", "checkbox", "segmented-control", "glass-group", "tabs", "slider", "progress", "dock", "toolbar", "scroll-edge", "navigation-bar", "sidebar", "search-field", "grouped-list", "dialog", "alert-dialog", "sheet", "action-sheet", "popover", "tooltip", "dropdown-menu", "toaster", "activity-rings", "progress-ring", "sparkline", "stat", "bar-list", "gauge", "tracker", "category-bar", "heatmap", "chart", "area-chart", "bar-chart", "line-chart", "donut-chart", "table", "data-table", "chat", "dashboard-01", "analytics-01", "settings-01", "auth-01", "chat-01"]
 
 /**
  * The native port of every web component and block: one React Native file per

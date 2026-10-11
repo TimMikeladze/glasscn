@@ -13,7 +13,7 @@ Or set the namespace once in `components.json` — `"registries": { "@glasscn-ap
 
 | | Items |
 |---|---|
-| Foundation | `glass-style` — 76 primitives, `glass` / `glass-strong` / `glass-subtle` utilities, theme tokens, keyframes, fallbacks, `glassVariants`; `glass-theme` (the theme engine); `glass-charts`; `use-sliding-indicator` |
+| Foundation | `glass-style` — 97 primitives, `glass` / `glass-strong` / `glass-subtle` and the liquid-layer utilities, theme tokens, keyframes, fallbacks, `glassVariants`; `glass-theme` (the theme engine); `glass-charts`; `use-sliding-indicator`; `use-glass-pointer` |
 | Palettes (12) | `theme-dusk` `-ocean` `-rose` `-sage` `-amber` `-graphite` `-lavender` `-mint` `-cherry` `-lagoon` `-sand` `-midnight` |
 | Materials (7) | `material-frosted` `-liquid` `-crystal` `-smoked` `-matte` `-vapor` `-neon` |
 | Shape · Motion · Density | `shape-round` `-soft` `-sharp` `-square` · `motion-spring` `-smooth` `-snappy` `-still` · `density-compact` `-default` `-comfortable` |
@@ -29,7 +29,7 @@ Or set the namespace once in `components.json` — `"registries": { "@glasscn-ap
 | React Native | `native-tokens` `native-glass` `native-aurora` `native-press` `native-ui`, plus a `native-<name>` twin of every component and block (iOS, Android and web through react-native-web) |
 
 - **shadcn's APIs, in glass.** Button, Card, Dialog, Tabs… keep their props and parts — swapping is `@/components/ui/x` → `@/components/glass/x`. Files land in `components/glass/`, beside shadcn's, never over them.
-- **88 primitives in eleven groups** — colour, material (frost, blur, saturation, brightness, sheen, grain), rim, depth (shadow, inner glow), shape, density, motion, aurora, fonts, type. Presets compose; any primitive can be overridden on any element (`[--glass-blur:8px]`); `ThemeScope` re-themes a subtree at runtime.
+- **97 primitives in eleven groups** — colour, material (frost, blur, saturation, brightness, sheen, grain), rim, depth (shadow, inner glow), shape, density, motion, aurora, fonts, type. Presets compose; any primitive can be overridden on any element (`[--glass-blur:8px]`); `ThemeScope` re-themes a subtree at runtime.
 - **Theme Studio** at `/themes` — every primitive as a control, a hue-harmony palette generator, randomise, a scoped live preview with its own scheme, a legibility estimate, export as a one-line `npx shadcn add` command / CSS / a shadcn theme item / TypeScript / a share link, and "apply to the whole site".
 - **Standards.** `data-slot` on every part, `cva` variants, `cn`, unified `radix-ui`, `asChild`, Tailwind v4, `prefers-reduced-motion`, a no-`backdrop-filter` fallback.
 

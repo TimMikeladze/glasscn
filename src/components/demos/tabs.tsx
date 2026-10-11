@@ -19,6 +19,9 @@ export default function TabsDemo() {
           <TabsTrigger value="activity">Activity</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
+        <TabsContent value="overview" className="text-muted-foreground">Streak, mood and the week at a glance.</TabsContent>
+        <TabsContent value="activity" className="text-muted-foreground">Every entry, newest first.</TabsContent>
+        <TabsContent value="settings" className="text-muted-foreground">Reminders and privacy.</TabsContent>
       </Tabs>
     </div>
   )

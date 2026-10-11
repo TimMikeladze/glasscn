@@ -15,6 +15,15 @@ function documentScheme(): NonNullable<ToasterProps["theme"]> {
   return classes.contains("dark") ? "dark" : classes.contains("light") ? "light" : "system"
 }
 
+// Phones: toasts drop from the top centre, clear of the thumb and the Dock (Apple's banners).
+const narrowQuery = "(max-width: 600px)"
+function subscribeNarrow(onChange: () => void) {
+  const mq = window.matchMedia(narrowQuery)
+  mq.addEventListener("change", onChange)
+  return () => mq.removeEventListener("change", onChange)
+}
+const isNarrow = () => window.matchMedia(narrowQuery).matches
+
 // Sonner's own button styles sit on attribute selectors, so these win with `!`.
 const button =
   "h-control-xs! rounded-button! px-pad-xs! text-xs! font-medium! transition-[background-color,filter]! duration-(--glass-duration)! ease-glass! glass-focus! focus-visible:shadow-none!"
@@ -24,17 +33,21 @@ const button =
  * the action, cancel and close buttons styled like the theme's buttons.
  *
  * The scheme follows the `.dark` class on <html>; pass `theme` to set it yourself.
- * Toasts clear a fixed Dock: the default offsets add `--dock-inset`, which a fixed Dock
- * sets on the document. Pass `offset` / `mobileOffset` to place them yourself.
+ * Placement: `bottom-right` on wide screens, `top-center` on narrow ones (≤ 600px), unless
+ * you pass `position`. Toasts clear a fixed Dock at the bottom (`--dock-inset`, which a
+ * fixed Dock sets on the document) and a fixed top Toolbar at the top
+ * (`--toolbar-inset-top`). Pass `offset` / `mobileOffset` to place them yourself.
  */
-function Toaster({ theme, ...props }: ToasterProps) {
+function Toaster({ theme, position, ...props }: ToasterProps) {
   const scheme = React.useSyncExternalStore(subscribeScheme, documentScheme, () => "system" as const)
+  const narrow = React.useSyncExternalStore(subscribeNarrow, isNarrow, () => false)
   return (
     <Sonner
       className="toaster group"
       theme={theme ?? scheme}
-      offset={{ bottom: "calc(var(--dock-inset, 12px) + 12px)" }}
-      mobileOffset={{ bottom: "calc(var(--dock-inset, 4px) + 12px)" }}
+      position={position ?? (narrow ? "top-center" : "bottom-right")}
+      offset={{ bottom: "calc(var(--dock-inset, 12px) + 12px)", top: "calc(var(--toolbar-inset-top, 12px) + 12px)" }}
+      mobileOffset={{ bottom: "calc(var(--dock-inset, 4px) + 12px)", top: "calc(var(--toolbar-inset-top, max(4px, env(safe-area-inset-top))) + 12px)" }}
       icons={{
         success: <CircleCheckIcon className="size-4 text-success-ink" />,
         info: <InfoIcon className="size-4 text-primary" />,

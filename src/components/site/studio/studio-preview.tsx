@@ -20,7 +20,7 @@ import { Slider } from "@/components/glass/slider"
 import { Sparkline } from "@/components/glass/sparkline"
 import { Stat, StatIcon, StatLabel, StatTrend, StatValue } from "@/components/glass/stat"
 import { Switch } from "@/components/glass/switch"
-import { Tabs, TabsList, TabsTrigger } from "@/components/glass/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/glass/tabs"
 import { ThemeScope } from "@/components/glass/theme-scope"
 import { Blockquote, Display, Heading, InlineCode, Text, TextLink } from "@/components/glass/typography"
 import { demos } from "@/components/demos"
@@ -139,7 +139,7 @@ export function StudioPreview({ theme, scheme, ground = "aurora" }: { theme: Gla
               <CardDescription>7.9 hours last night</CardDescription>
             </CardHeader>
             <CardContent>
-              <Sparkline data={sleep} height={56} />
+              <Sparkline data={sleep} height={56} aria-label="Hours of sleep, last two weeks" />
             </CardContent>
           </Card>
           <Card size="sm">
@@ -161,6 +161,11 @@ export function StudioPreview({ theme, scheme, ground = "aurora" }: { theme: Gla
                   <TabsTrigger value="month">Month</TabsTrigger>
                   <TabsTrigger value="year">Year</TabsTrigger>
                 </TabsList>
+                {["week", "month", "year"].map((v) => (
+                  <TabsContent key={v} value={v} className="sr-only">
+                    Nights this {v}
+                  </TabsContent>
+                ))}
               </Tabs>
               <Slider defaultValue={[60]} aria-label="Intensity" />
               <div className="flex flex-wrap gap-2">
@@ -249,11 +254,11 @@ export function StudioPreview({ theme, scheme, ground = "aurora" }: { theme: Gla
           <Text variant="small">Straight from the registry — every component and block, with its docs demo.</Text>
         </div>
         {CATALOGUE.map(({ group, items }) => (
-          <section key={group} className="grid gap-3" aria-label={group}>
+          <section key={group} className="grid gap-3 [contain-intrinsic-size:auto_900px] [content-visibility:auto]" aria-label={group}>
             <Text variant="overline">{group}</Text>
             <div className="grid items-start gap-4 md:grid-cols-2">
               {items.map(({ slug, title, Demo }) => (
-                <figure key={slug} className={cn("glass-subtle grid gap-4 rounded-surface p-4 [--glass-elevation:0_0_#0000] sm:p-5", group === "Blocks" && "md:col-span-2")}>
+                <figure key={slug} className={cn("grid gap-4 rounded-surface border border-glass-border p-4 sm:p-5", group === "Blocks" && "md:col-span-2")}>
                   <figcaption className="type-glass-heading text-sm">{title}</figcaption>
                   <div className="flex min-h-32 items-center justify-center overflow-x-auto">
                     <Demo />

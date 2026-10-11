@@ -40,6 +40,8 @@ The complete backlog from the October 2026 audit: seven parallel reviews (web co
 
 - **2026-10-11 — M1 (foundations):** 53 items closed — material/liquid layers, clarity, accessibility overrides, label/status/fill tokens, focus outlines, hit areas, concentric corners, springs, gamut mapping, ThemeScope fixes, component sweep (RTL, tokens, motion), structural and component tests. Spec: [`specs/m1-foundations.md`](specs/m1-foundations.md).
 
+- **2026-10-11 — M2 (the liquid layer):** 32 items closed (+ LG-02) — specular rim, illumination, adaptive shadow, prominent glass, glass knobs, materialise, morph from trigger, elastic press, `GlassGroup`; toolbar, scroll-edge, sidebar, search-field, navigation-bar, action-sheet; dock, sheet, button, switch, slider, segmented upgrades; Playwright axe / visual / browser-matrix / blur-budget suite. Spec: [`specs/m2-liquid-layer.md`](specs/m2-liquid-layer.md).
+
 ## Milestones (do in order; each ends green on `pnpm typecheck && pnpm lint && pnpm test`, `verify:install`, `verify:native`, and a browser check)
 
 1. **M0 — Stop the bleeding.** Every P0 bug/a11y/token item: ENG-01..03, ENG-10, ENG-40, CMP-X01, CMP-X03, TIP-01, GRL-01, DCK-01, INP-01, SWT-01, SLD-01, BTN-01, KBD-01, PRG-01, SPK-01, HMP-01, CHT-01, CHA-03, SITE-01, SITE-02, AGT-01, NAT-01, NAT-02, NAT-04, UX-01, UX-10, DLG-04 (via NEW-05). Plus QA-01 and QA-05 so they can't come back.
@@ -60,17 +62,17 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 - [x] **LG-01** P0 rebuild — **Material vs liquid layers.** Keep `glass`/`-subtle`/`-strong` as the *content material* (Apple's standard materials); add `@utility glass-liquid` (regular) and `glass-liquid-clear` (+ `--glass-dim`, 35% over bright media); `Glass variant="material|liquid|liquid-clear"`. Move control-layer parts to liquid: Dock, DockAction, Toolbar, floating composer + jump button, Tooltip, Popover, DropdownMenu, Sheet, Dialog, active knobs, `Button variant="glass"`. Done when: no component renders liquid inside liquid (structural test) and cards/stats/tiles use material or fills. Needs ENG-34 rename first.
 - [x] **LG-02** P0 docs — **Rules rewrite** (`docs/rules/design.md`, `use-glasscn` skill, AGT-05): liquid only for controls/navigation over content; never liquid on liquid; `regular` default, `clear` only over media with a dim, never mixed; rule 1 becomes "glass needs content beneath it"; one prominent action per bar; colour the glass not the label. Add an "over content" demo scene (photo grid / long article under Toolbar + Dock).
 - [x] **LG-03** P0 gap — **Clarity** primitive `glass-clarity` (0 ultra clear → 1 fully tinted, ≈ iOS 27 slider) feeding derived opacity/blur/dim; `GlassPreferences` item (slider + reduce-transparency switch writing `:root`, persisted); exposed in site header; `legibility()` takes clarity.
-- [ ] **LG-04** P1 gap — **Light**: two-sided specular rim (`::before` conic gradient masked to the border, `glass-light-angle`, `glass-specular`), iOS 27 darkened edge (`glass-edge-shade`), `glass-highlight-color`; liquid surfaces replace the single `inset 0 1px` highlight.
-- [ ] **LG-05** P1 gap — **Illumination**: `use-glass-pointer` hook writes `--glass-press-x/y` in rAF; `::after` radial glow with `plus-lighter` on press; optional pointer-follow light angle on hover devices (off under reduced motion).
-- [ ] **LG-06** P1 gap — **Adaptive shadow**: bars read `data-over-content` (scroll-edge sentinel, NAV-02) and multiply shadow by `glass-shadow-over-content`.
-- [ ] **LG-07** P1 gap — **Prominent tinted glass**: `Button variant="prominent"` (tone range of `--primary` in liquid frost); DockAction, ToolbarItem prominent, chat send use it; `default` stays solid for shadcn parity.
+- [x] **LG-04** P1 gap — **Light**: two-sided specular rim (`::before` conic gradient masked to the border, `glass-light-angle`, `glass-specular`), iOS 27 darkened edge (`glass-edge-shade`), `glass-highlight-color`; liquid surfaces replace the single `inset 0 1px` highlight.
+- [x] **LG-05** P1 gap — **Illumination**: `use-glass-pointer` hook writes `--glass-press-x/y` in rAF; `::after` radial glow with `plus-lighter` on press; optional pointer-follow light angle on hover devices (off under reduced motion).
+- [x] **LG-06** P1 gap — **Adaptive shadow**: bars read `data-over-content` (scroll-edge sentinel, NAV-02) and multiply shadow by `glass-shadow-over-content`.
+- [x] **LG-07** P1 gap — **Prominent tinted glass**: `Button variant="prominent"` (tone range of `--primary` in liquid frost); DockAction, ToolbarItem prominent, chat send use it; `default` stays solid for shadcn parity.
 - [x] **LG-08** P1 gap — **Concentric radii**: containers set `--glass-container-radius`/`--glass-container-pad`; `rounded-concentric` = `max(min, radius − pad)`; used by segmented/tab thumbs, menu items, sheet inner cards, grouped rows, stat tiles, widget tiles; native `concentric(outer, pad, min)` helper replaces `radius − 6`.
-- [ ] **LG-09** P1 gap — **Glass knobs**: switch/slider/segmented thumbs become liquid lenses while `:active`/dragging, scaled ~1.15× and stretched toward travel; solid at rest.
-- [ ] **LG-10** P1 gap — **Materialise**: registered `@property --glass-materialize` (0→1) drives blur + frost + small scale for overlay entrances/exits instead of opacity fades; reduced motion → plain fade (Apple: don't animate into/out of blur).
-- [ ] **LG-11** P1 gap — **Morph from source**: menus/popovers/select grow from the trigger's size and radius (`--radix-*-trigger-width/height`, transform origin, `@starting-style` clip-path); sheets/dialogs from their button via View Transitions (re-enable blur after).
+- [x] **LG-09** P1 gap — **Glass knobs**: switch/slider/segmented thumbs become liquid lenses while `:active`/dragging, scaled ~1.15× and stretched toward travel; solid at rest.
+- [x] **LG-10** P1 gap — **Materialise**: registered `@property --glass-materialize` (0→1) drives blur + frost + small scale for overlay entrances/exits instead of opacity fades; reduced motion → plain fade (Apple: don't animate into/out of blur).
+- [x] **LG-11** P1 gap — **Morph from source**: menus/popovers/select grow from the trigger's size and radius (`--radix-*-trigger-width/height`, transform origin, `@starting-style` clip-path); sheets/dialogs from their button via View Transitions (re-enable blur after).
 - [x] **LG-12** P1 gap — **Real springs**: `spring({ stiffness, damping, mass }) → linear()` in the engine (tested); motion presets emit `linear()` `--glass-ease` with cubic-bezier fallback; overshoot only on transforms (CMP-X07d).
-- [ ] **LG-13** P1 gap — **Elastic press**: `--glass-press-stretch` asymmetric scale on press, spring back; liquid grows (`--glass-press-grow`), solid squashes; disabled under reduced motion.
-- [ ] **LG-14** P1 gap — **`GlassGroup`** (GlassEffectContainer analogue) phase 1: children share one liquid backdrop; generalised sliding/morphing selection (size + radius). Used by toolbar groups, button groups, steppers, segmented. P2 phase 2: SVG goo split/merge (Chromium-first).
+- [x] **LG-13** P1 gap — **Elastic press**: `--glass-press-stretch` asymmetric scale on press, spring back; liquid grows (`--glass-press-grow`), solid squashes; disabled under reduced motion.
+- [x] **LG-14** P1 gap — **`GlassGroup`** (GlassEffectContainer analogue) phase 1: children share one liquid backdrop; generalised sliding/morphing selection (size + radius). Used by toolbar groups, button groups, steppers, segmented. P2 phase 2: SVG goo split/merge (Chromium-first). *(M2: phase 1; phase 2 goo open)*
 - [ ] **LG-15** P2 gap — **Thickness by size**: larger liquid (popover, menu, sheet) reads thicker — deeper shadow, more opaque — than small (tooltip, button). Size-tier tokens.
 - [ ] **LG-16** P2 gap — **Refraction** `use-glass-lens`: convex-squircle bezel displacement map (Snell, n = 1.5, quadrant-mirrored), PNG data URI in an inline filter, ResizeObserver regen, animate only `scale`; optional 3-pass dispersion; primitives `glass-refraction|bezel|dispersion`; **Chromium-gated by engine detection** (Firefox passes `@supports` and renders nothing); small liquid elements only; off under reduced transparency / increased contrast / still.
 - [ ] **LG-17** P2 gap — **Known-background tone** `tone="auto"`: sample aurora blob colours at the element's position or an image's 8×8 average; flip glyphs via `data-tone` with hysteresis.
@@ -178,12 +180,12 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 
 ## 3b. Navigation layer (new and upgraded items)
 
-- [ ] **NAV-01** P1 — `toolbar`: floating liquid bar top/bottom; `ToolbarGroup` (one shared glass per group), `ToolbarSpacer` fixed/flexible, `ToolbarItem prominent` trailing, `ToolbarTitle` (< 15 chars guidance), overflow menu, `minimize="onScrollDown"`, visibility priority; Back/Close as symbols. Docs: ≤ 3 groups; don't mix text and symbols in a group.
-- [ ] **NAV-02** P1 — `scroll-edge`: `<ScrollEdge edge style="automatic|soft|hard">` + utilities; soft = stacked masked `backdrop-filter` progressive blur; hard = near-opaque material strip; automatic = hard behind dense toolbars/pinned headers, soft otherwise (June 2026 HIG); sentinel sets `data-over-content` (LG-06); one per edge, never stacked; switches to dim over dark content.
-- [ ] **NAV-03** P1 — `dock` upgrades: `minimizeBehavior` (icon-only capsule on scroll down; restored by tap or scroll to top), `DockAccessory` (above when expanded, inline when minimised, `usePlacement()`), `DockSearch` (separated trailing capsule expanding into a field), `DockItem prominent`, badges, link semantics (DCK-01), `--dock-inset`.
-- [ ] **NAV-04** P1 — `sidebar`: floating inset liquid sidebar (collapsible, ≤ 2 levels, accent icons, more opaque), `BackgroundExtension` (mirror + blur hero under it), iOS 27 edge-to-edge option.
-- [ ] **NAV-05** P1 — `search-field`: capsule liquid field; `minimized` icon button morphing open; bottom-toolbar placement riding above the virtual keyboard (`visualViewport`); recent searches, suggestions, tokens; Clear trailing, Cancel while focused on touch.
-- [ ] **NAV-06** P1 — Sheet detents/grabber/drag (SHT-03), `navigation-bar` large title (NEW-26), `alert-dialog` (NEW-05), action sheet (NEW-25).
+- [x] **NAV-01** P1 — `toolbar`: floating liquid bar top/bottom; `ToolbarGroup` (one shared glass per group), `ToolbarSpacer` fixed/flexible, `ToolbarItem prominent` trailing, `ToolbarTitle` (< 15 chars guidance), overflow menu, `minimize="onScrollDown"`, visibility priority; Back/Close as symbols. Docs: ≤ 3 groups; don't mix text and symbols in a group. *(M2: overflow is a manual ToolbarOverflow, no auto-collapse by priority)*
+- [x] **NAV-02** P1 — `scroll-edge`: `<ScrollEdge edge style="automatic|soft|hard">` + utilities; soft = stacked masked `backdrop-filter` progressive blur; hard = near-opaque material strip; automatic = hard behind dense toolbars/pinned headers, soft otherwise (June 2026 HIG); sentinel sets `data-over-content` (LG-06); one per edge, never stacked; switches to dim over dark content.
+- [x] **NAV-03** P1 — `dock` upgrades: `minimizeBehavior` (icon-only capsule on scroll down; restored by tap or scroll to top), `DockAccessory` (above when expanded, inline when minimised, `usePlacement()`), `DockSearch` (separated trailing capsule expanding into a field), `DockItem prominent`, badges, link semantics (DCK-01), `--dock-inset`.
+- [x] **NAV-04** P1 — `sidebar`: floating inset liquid sidebar (collapsible, ≤ 2 levels, accent icons, more opaque), `BackgroundExtension` (mirror + blur hero under it), iOS 27 edge-to-edge option.
+- [x] **NAV-05** P1 — `search-field`: capsule liquid field; `minimized` icon button morphing open; bottom-toolbar placement riding above the virtual keyboard (`visualViewport`); recent searches, suggestions, tokens; Clear trailing, Cancel while focused on touch.
+- [x] **NAV-06** P1 — Sheet detents/grabber/drag (SHT-03), `navigation-bar` large title (NEW-26), `alert-dialog` (NEW-05), action sheet (NEW-25). *(M2: native nav bar takes `collapsed`, no overscroll stretch)*
 - [ ] **NAV-07** P2 — Vertical toolbar orientation for side-edge layouts (iPhone Duo / landscape analogue).
 
 ## 4. Web components — cross-cutting
@@ -204,10 +206,10 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 
 ### Button
 - [x] **BTN-01** P0 token — `default` variant shadow literal (`:16`). → `shadow-glass-accent`.
-- [ ] **BTN-02** P1 rebuild (LG) — Press always squashes (0.97). Apple `.interactive()` glass grows, bounces, lights up. → Glass/liquid variants grow (`--glass-press-grow`) + illumination (LG-05); solid fills keep squash.
-- [ ] **BTN-03** P1 gap — `prominent` (tinted liquid) (LG-07), `loading` (spinner replaces leading icon, `aria-busy`, width kept, optional label swap "Checkout" → "Checking out…"), icon-only circle size, pull-down variant (trailing chevron, `aria-haspopup`) + split button.
+- [x] **BTN-02** P1 rebuild (LG) — Press always squashes (0.97). Apple `.interactive()` glass grows, bounces, lights up. → Glass/liquid variants grow (`--glass-press-grow`) + illumination (LG-05); solid fills keep squash.
+- [x] **BTN-03** P1 gap — `prominent` (tinted liquid) (LG-07), `loading` (spinner replaces leading icon, `aria-busy`, width kept, optional label swap "Checkout" → "Checking out…"), icon-only circle size, pull-down variant (trailing chevron, `aria-haspopup`) + split button.
 - [x] **BTN-04** P1 a11y — `disabled:opacity-45` fades the whole glass → dim label, keep material; style `aria-disabled` so `asChild` links can disable.
-- [ ] **BTN-05** P1 a11y — `tinted` (`text-primary` on `primary/16`) and `destructive` can fall < 4.5:1 on light hues → legibility checks.
+- [x] **BTN-05** P1 a11y — `tinted` (`text-primary` on `primary/16`) and `destructive` can fall < 4.5:1 on light hues → legibility checks.
 - [ ] **BTN-06** P2 bug — Comment promises hover lift (none); `hover:brightness-105` snaps (filter not in transition list); `whitespace-nowrap` without `min-w-0/truncate`; `text-[0.8rem]` (→ `type-step-n1`); `pr-4/pl-4` not density-aware. Glass variant elevation 0 — floating liquid buttons need soft shadow. Document no default `type="button"`.
 - [ ] **BTN-07** P2 guidance — Docs: one or two prominent per view; preference by style not size; destructive never primary (HIG §1).
 
@@ -228,13 +230,13 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 
 ### Switch
 - [x] **SWT-01** P0 token — px sizes ignore density; `bg-white`, `rgb()` shadows (`:18,25`).
-- [ ] **SWT-02** P1 rebuild (LG) — iOS 7–18 geometry. iOS 26 switch: capsule knob that **stretches on press** toward its destination, then becomes a glass lens while dragged. → Re-measure from iOS 27 Figma kit; `group-active` stretch; glass knob while active (LG-09); drag-to-toggle.
+- [x] **SWT-02** P1 rebuild (LG) — iOS 7–18 geometry. iOS 26 switch: capsule knob that **stretches on press** toward its destination, then becomes a glass lens while dragged. → Re-measure from iOS 27 Figma kit; `group-active` stretch; glass knob while active (LG-09); drag-to-toggle.
 - [ ] **SWT-03** P1 a11y — RTL translate; off track low contrast; colour-only state → optional I/O glyphs (HIG: don't rely on colour).
 - [ ] **SWT-04** P2 — Overshoot pushes knob past `p-0.5` with `snappy`; `lg` size. Docs: iOS uses switches in list rows; outside lists prefer a toggle button (HIG §2).
 
 ### Segmented control
-- [ ] **SEG-01** P1 improve (LG) — iOS 26 segmented = capsule; ours `rounded-control` track + `rounded-control-sm` thumb (not concentric; tabs use `rounded-button` → disagree). → `shape` prop, capsule default, concentric thumb.
-- [ ] **SEG-02** P1 gap (LG) — Drag-to-scrub across segments; glass-lens thumb while dragging; momentary mode (actions, no selection; HIG §5).
+- [x] **SEG-01** P1 improve (LG) — iOS 26 segmented = capsule; ours `rounded-control` track + `rounded-control-sm` thumb (not concentric; tabs use `rounded-button` → disagree). → `shape` prop, capsule default, concentric thumb.
+- [x] **SEG-02** P1 gap (LG) — Drag-to-scrub across segments; glass-lens thumb while dragging; momentary mode (actions, no selection; HIG §5).
 - [ ] **SEG-03** P1 bug — Ref override + SSR indicator (CMP-X07); off-scale heights (ENG-43).
 - [ ] **SEG-04** P2 — Arrow keys move focus without selecting (WAI-ARIA radio selects on focus) → select on focus or document; long labels overflow (no `truncate`). Guidance: ≤ 5 segments on iPhone; text or icons never mixed.
 
@@ -247,7 +249,7 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 ### Slider
 - [x] **SLD-01** P0 token — `bg-white`, `rgb()` shadows, `size-6`, `focus-visible:ring-4` (not `--glass-ring-width`) (`:33`).
 - [ ] **SLD-02** P1 a11y — No per-thumb names ("Minimum"/"Maximum") or `aria-valuetext` formatter (range demo labels both "Range"). → `thumbLabels`, `getAriaValueText`.
-- [ ] **SLD-03** P1 rebuild (LG) — iOS 26 thumb = horizontal capsule that becomes a stretching glass lens while dragged; plus leading/trailing min-max icons, value bubble while dragging, `ticks` (label min/max only), `neutralValue`, `variant="progress"`, circular slider for wrapping values (P2).
+- [x] **SLD-03** P1 rebuild (LG) — iOS 26 thumb = horizontal capsule that becomes a stretching glass lens while dragged; plus leading/trailing min-max icons, value bubble while dragging, `ticks` (label min/max only), `neutralValue`, `variant="progress"`, circular slider for wrapping values (P2).
 - [ ] **SLD-04** P1 a11y — `hover:scale-105`/`active:scale-110` not stilled; 24px thumb no hit area.
 - [ ] **SLD-05** P2 bug — `disabled:pointer-events-none` on a `<span>` never matches → `data-disabled:`; renders `[min,max]` thumbs when no value (Radix defaults `[min]`).
 
@@ -274,7 +276,7 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 ### Sheet
 - [x] **SHT-01** P1 bug — No scroll container → long content overflows. → `SheetBody` (`flex-1 overflow-y-auto`) + scroll edge under header.
 - [x] **SHT-02** P1 bug — Bottom sheet `bottom-3` ignores `env(safe-area-inset-bottom)` → collides with home indicator.
-- [ ] **SHT-03** P1 gap (LG) — Detents (`medium`/`large`/custom), grabber (tap cycles detents; VoiceOver-operable), drag-to-dismiss with unsaved-changes confirm, morph from source, opaque at full height, `modal={false}` non-dimming inspector, one sheet at a time; HIG button layout (Cancel leading, Done trailing; never Cancel+Done+Back). Merge with `drawer` (NEW-14).
+- [x] **SHT-03** P1 gap (LG) — Detents (`medium`/`large`/custom), grabber (tap cycles detents; VoiceOver-operable), drag-to-dismiss with unsaved-changes confirm, morph from source, opaque at full height, `modal={false}` non-dimming inspector, one sheet at a time; HIG button layout (Cancel leading, Done trailing; never Cancel+Done+Back). Merge with `drawer` (NEW-14).
 - [ ] **SHT-04** P2 bug — Slide 100% while panel inset 0.75rem → sliver + rim visible at start → slide `calc(100% + inset)`; literal scrim/durations; export `SheetOverlay`/`SheetPortal`; logical `side="start|end"`.
 
 ### Popover / Tooltip / Dropdown menu
@@ -290,14 +292,14 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 ### Toaster
 - [x] **TST-01** P1 token — Only `toast`/`description` styled; Sonner `actionButton`/`cancelButton`/`closeButton` render default black/grey. → `buttonVariants`.
 - [x] **TST-02** P1 bug — `theme` not wired → Sonner defaults light; `.dark` sites get light internals.
-- [ ] **TST-03** P1 bug — Default bottom-right, no offset → toasts land on the fixed `Dock`. → Offset from `--dock-inset`; mobile `top-center` (iOS banners). *(M1: offset clears the dock; left: top-center on mobile)*
+- [x] **TST-03** P1 bug — Default bottom-right, no offset → toasts land on the fixed `Dock`. → Offset from `--dock-inset`; mobile `top-center` (iOS banners).
 - [ ] **TST-04** P2 — `sonner` alias name; demo shows mounting; HUD position (centred transient capsule: "Copied", volume).
 
 ### Dock
 - [x] **DCK-01** P0 a11y — Navigation built as a radio group (ToggleGroup) → destinations can't be links (no href, `aria-current="page"`, new tab, prefetch). → `nav` + `DockItem asChild` links, indicator keyed on `aria-current`; `tablist` mode for in-page panels.
 - [x] **DCK-02** P1 bug — `min-w-18` no shrink: 5 items + action ≈ 450px overflows 375px phones. → `flex-1 min-w-0`, truncating labels.
-- [ ] **DCK-03** P1 gap — Export `--dock-inset` for page padding/toasts; count badges on items; drag-to-scrub (pill becomes a lens following the finger, iOS 26 tab bar); icon+label side-by-side in compact height; minimise/accessory/search (NAV-03). *(M1: --dock-inset; left: badges, scrub, compact layout)*
-- [ ] **DCK-04** P1 token — `text-[0.65rem]`, `calc(3.25rem)`/`calc(3.75rem)`; literal accent shadow; solid action → tinted liquid. Guidance: filled symbols in tab bars; never disable/hide tabs; single-word labels.
+- [x] **DCK-03** P1 gap — Export `--dock-inset` for page padding/toasts; count badges on items; drag-to-scrub (pill becomes a lens following the finger, iOS 26 tab bar); icon+label side-by-side in compact height; minimise/accessory/search (NAV-03). *(M1: --dock-inset; left: badges, scrub, compact layout)* *(M2: web done; native has no scrub)*
+- [x] **DCK-04** P1 token — `text-[0.65rem]`, `calc(3.25rem)`/`calc(3.75rem)`; literal accent shadow; solid action → tinted liquid. Guidance: filled symbols in tab bars; never disable/hide tabs; single-word labels.
 
 ### Grouped list
 - [x] **GRL-01** P0 a11y — `role="listitem"` lands on the `asChild` child via Slot → documented `<button>`/`<a>` rows **lose their role**. → `<div role="listitem">` around Slot, or `ul/li`.
@@ -557,11 +559,11 @@ Measured on the dev server with Chrome + Playwright: 23 pages × 1440/390 × lig
 
 ### Site-wide
 - [ ] **UX-01** P0 a11y — Light mode illegible (above). → Raise light frost opacity toward matte for text-bearing surfaces; darken muted/tinted text; dark label or deeper orange on primary (ENG-02); legibility badge reports the worst of muted, tinted badges, button labels (ENG-07, QA-01). *(M0 done: accent to AA, text-on-glass labels, `primary-ink`/`destructive-ink` for tinted text, AA-tested secondary text on segments/tabs, site muted text. Measured on real pixels (8 themes × 7 pages): dusk light `/` 48 → 2 failing texts, most docs pages 0–4 (was 16–32). Left: install-command tabs on `glass-subtle` (3.8–4.5), footer/sidebar links on the light ground (4.0–4.5), a dark-mode ring figure (2.3) — and `legibilityReport` still ignores blur/saturate, so the model reads ~0.5 higher than pixels)*
-- [ ] **UX-02** P1 a11y — Focus ring 3px primary at 50% (orange on orange-red ground, < 3:1); header links get a 1px square browser ring on a rounded bar. → Two-tone ring (light inner + dark outer, or 100% primary + 2px offset) following the element radius.
+- [x] **UX-02** P1 a11y — Focus ring 3px primary at 50% (orange on orange-red ground, < 3:1); header links get a 1px square browser ring on a rounded bar. → Two-tone ring (light inner + dark outer, or 100% primary + 2px offset) following the element radius.
 - [ ] **UX-03** P2 a11y — No skip link (~55 Tabs to reach docs content).
-- [ ] **UX-04** P1 perf — 92–124 blur layers + always-animating aurora = 2–4× scroll cost. → LG-01 (blur only the control layer), `content-visibility: auto` off-screen, pause aurora while scrolling/off-screen; CI budget: ≤ 12 `backdrop-filter` elements in the initial viewport, frame-time budget (QA-06).
+- [x] **UX-04** P1 perf — 92–124 blur layers + always-animating aurora = 2–4× scroll cost. → LG-01 (blur only the control layer), `content-visibility: auto` off-screen, pause aurora while scrolling/off-screen; CI budget: ≤ 12 `backdrop-filter` elements in the initial viewport, frame-time budget (QA-06).
 - [x] **UX-05** P2 bug — In dev, install commands read `http://localhost:3000/r/…` (`src/lib/site.ts:8` fallback) while the site runs on another port. → Derive from the request origin in dev (apps must work on any port).
-- [ ] **UX-06** P1 visual — Glass in glass in glass: block previews are glass panes holding glass cards holding glass lists/docks (`/docs/dashboard-01`, home "Small gains", `/themes` preview). The main reason it reads as 2021 glassmorphism. → Preview frames are an opaque/aurora ground, not a pane; blocks use material/fills (LG-01, STA-01).
+- [x] **UX-06** P1 visual — Glass in glass in glass: block previews are glass panes holding glass cards holding glass lists/docks (`/docs/dashboard-01`, home "Small gains", `/themes` preview). The main reason it reads as 2021 glassmorphism. → Preview frames are an opaque/aurora ground, not a pane; blocks use material/fills (LG-01, STA-01).
 - [ ] **UX-07** P2 copy — "Glassmorphic components" → reposition around Liquid Glass + material (GRO-02).
 - [ ] **UX-08** P2 visual — Uppercase tracked group headers everywhere (sidebar, "ACCOUNT", menu "THURSDAY, OCT 8", "TYPE SPECIMEN") → title case. *(M0 done: grouped-list headers; left: sidebar, menus, overline)*
 
@@ -684,14 +686,14 @@ Ocean-liquid light settings screen is close to Apple-grade (grouped rows, shadow
 ## 13. Quality: tests, lint, CI
 
 - [x] **QA-01** P0 test — **Legibility matrix** across PALETTES × MATERIALS × schemes (× clarity): body ≥ 4.5, muted ≥ 4.5, accent label ≥ 4.5, accent & ring vs ground ≥ 3, chart min ΔE under CVD. Fails today (Dusk, smoked) — fix ENG-02/03/07 with it.
-- [ ] **QA-02** P1 test — Playwright + axe on `/docs/*`, `/themes`, blocks (light/dark × matte/smoked).
-- [ ] **QA-03** P1 test — Visual regression (`toHaveScreenshot`) on docs previews × 3 palettes × 2 schemes × {shape-square, density-compact} — reuse `video/capture.mjs`.
+- [x] **QA-02** P1 test — Playwright + axe on `/docs/*`, `/themes`, blocks (light/dark × matte/smoked).
+- [x] **QA-03** P1 test — Visual regression (`toHaveScreenshot`) on docs previews × 3 palettes × 2 schemes × {shape-square, density-compact} — reuse `video/capture.mjs`. *(M2: curated set, Chromium baselines)*
 - [x] **QA-04** P1 test — Component tests (vitest + jsdom/RTL): controlled/uncontrolled, keyboard, ARIA roles/states, ref composition, Tooltip without provider, GroupedList asChild roles, Dock links.
 - [x] **QA-05** P1 lint — Token rules enforced (custom ESLint rule or vitest scan of `src/components/{glass,blocks}`): ban `bg-white|black`, `text-white`, hex, `bg-zinc-*`, `rounded-[…]`, `h-[Npx]`, raw `backdrop-blur`, `tabular-nums`, `outline-none` without visible focus, self-referencing custom props, physical `ml/mr/pl/pr/left/right` (RTL); require `data-slot` per exported part.
 - [ ] **QA-06** P1 ci — CI adds: `next build` of the site, `git diff --exit-code` on generated files, JS/CSS size budgets, Lighthouse (LCP/TBT) on `/`, `/docs/button`, `/themes`, framework install matrix (DX-05), pinned + latest deps (DX-03).
 - [ ] **QA-07** P1 test — Studio e2e: share-link round trip, apply-to-site survives reload, export → `shadcn add` from `/r/theme/<code>`.
 - [x] **QA-08** P1 test — Engine: ThemeScope CSS (partial props, forced scheme), sanitizer cases (`/*`, ranges, `var()`), decode back-compat fixtures, gamut, tint cycle, generated CSS parsed with lightningcss.
-- [ ] **QA-09** P1 test — Browser matrix (Chromium, WebKit, Firefox) for liquid surfaces; refraction must degrade to frost.
+- [x] **QA-09** P1 test — Browser matrix (Chromium, WebKit, Firefox) for liquid surfaces; refraction must degrade to frost.
 - [ ] **QA-10** P1 test — Native: NAT-50..54.
 
 ---

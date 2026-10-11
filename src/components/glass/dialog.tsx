@@ -4,15 +4,92 @@ import * as React from "react"
 import { cn } from "cn"
 import { Dialog as DialogPrimitive } from "radix-ui"
 import { XIcon } from "lucide-react"
+import { flushSync } from "react-dom"
 
 import { Button } from "@/components/glass/button"
 
-function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
-  return <DialogPrimitive.Root data-slot="dialog" {...props} />
+type Morph = { setTrigger: (el: HTMLElement | null) => void; setContent: (el: HTMLElement | null) => void; morphing: boolean }
+const MorphContext = React.createContext<Morph | null>(null)
+const MORPH_NAME = "glass-dialog"
+
+/** A same-document View Transition between the trigger and the panel, where supported and motion is allowed. */
+type TransitionDocument = Document & { startViewTransition?: (cb: () => void) => { finished: Promise<void> } }
+const canMorph = () =>
+  typeof document !== "undefined" && typeof (document as TransitionDocument).startViewTransition === "function" && !matchMedia("(prefers-reduced-motion: reduce)").matches
+
+function viewTransition(update: () => void, from: HTMLElement | null | undefined, to: () => HTMLElement | null | undefined): Promise<void> {
+  const doc = document as TransitionDocument
+  if (!doc.startViewTransition || !from?.isConnected) {
+    update()
+    return Promise.resolve()
+  }
+  from.style.viewTransitionName = MORPH_NAME
+  const t = doc.startViewTransition(() => {
+    from.style.viewTransitionName = ""
+    flushSync(update)
+    const el = to()
+    if (el) el.style.viewTransitionName = MORPH_NAME
+  })
+  // snapshots are flat images: the live element (and its backdrop blur) takes over when it ends
+  return t.finished.catch(() => {}).finally(() => {
+    const el = to()
+    if (el) el.style.viewTransitionName = ""
+  })
 }
 
-function DialogTrigger({ ...props }: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
-  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
+/**
+ * Opens out of its trigger: the trigger morphs into the panel (and back on close) with a
+ * View Transition where the browser has them; elsewhere, and under reduced motion, the panel
+ * materialises in place. Controlled or not, as Radix's Dialog.
+ */
+function Dialog({ open: openProp, defaultOpen = false, onOpenChange, ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
+  const [inner, setInner] = React.useState(defaultOpen)
+  const [morphing, setMorphing] = React.useState(false)
+  const open = openProp ?? inner
+  const trigger = React.useRef<HTMLElement | null>(null)
+  const content = React.useRef<HTMLElement | null>(null)
+  const morph = React.useMemo<Morph>(
+    () => ({
+      setTrigger: (el) => {
+        trigger.current = el
+      },
+      setContent: (el) => {
+        content.current = el
+      },
+      morphing,
+    }),
+    [morphing]
+  )
+  const setOpen = (next: boolean) => {
+    const apply = () => {
+      if (openProp === undefined) setInner(next)
+      onOpenChange?.(next)
+    }
+    const t = trigger.current
+    if (!t?.isConnected || !canMorph()) return apply()
+    flushSync(() => setMorphing(true))
+    const done = next ? viewTransition(apply, t, () => content.current) : viewTransition(apply, content.current, () => t)
+    done.finally(() => setMorphing(false))
+  }
+  return (
+    <MorphContext.Provider value={morph}>
+      <DialogPrimitive.Root data-slot="dialog" open={open} onOpenChange={setOpen} {...props} />
+    </MorphContext.Provider>
+  )
+}
+
+function DialogTrigger({ onClick, ...props }: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
+  const morph = React.useContext(MorphContext)
+  return (
+    <DialogPrimitive.Trigger
+      data-slot="dialog-trigger"
+      onClick={(e) => {
+        morph?.setTrigger(e.currentTarget)
+        onClick?.(e)
+      }}
+      {...props}
+    />
+  )
 }
 
 function DialogPortal({ ...props }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
@@ -22,10 +99,6 @@ function DialogPortal({ ...props }: React.ComponentProps<typeof DialogPrimitive.
 function DialogClose({ ...props }: React.ComponentProps<typeof DialogPrimitive.Close>) {
   return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
 }
-
-/** Under reduced motion the zoom is dropped — only the fade is left (and data-glass-motion stills even that). */
-const reducedMotionFade =
-  "motion-reduce:[--tw-enter-scale:1]! motion-reduce:[--tw-exit-scale:1]! motion-reduce:[--tw-enter-translate-y:0]! motion-reduce:[--tw-exit-translate-y:0]!"
 
 /** The page dims behind the glass (no blur: a blurred scrim under a frosted pane is blur on blur). */
 function DialogOverlay({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
@@ -51,17 +124,26 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  ref,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & { showCloseButton?: boolean }) {
+  const morph = React.useContext(MorphContext)
+  const setRef = (node: HTMLDivElement | null) => {
+    morph?.setContent(node)
+    if (typeof ref === "function") ref(node)
+    else if (ref) ref.current = node
+  }
   return (
     <DialogPortal>
       <DialogOverlay />
       <DialogPrimitive.Content
+        ref={setRef}
         data-slot="dialog-content"
         data-glass-motion=""
+        // the View Transition is the animation: don't materialise on top of it
+        data-morphing={morph?.morphing || undefined}
         className={cn(
-          "glass-liquid fixed top-1/2 left-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto overscroll-contain rounded-surface p-6 text-sm text-popover-foreground duration-(--glass-duration) ease-glass focus-visible:outline-hidden sm:max-w-md data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
-          reducedMotionFade,
+          "glass-liquid fixed top-1/2 left-1/2 z-50 grid max-h-[calc(100dvh-2rem)] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto overscroll-contain rounded-surface p-6 text-sm text-popover-foreground focus-visible:outline-hidden sm:max-w-md glass-materialize data-morphing:animate-none!",
           className
         )}
         {...props}

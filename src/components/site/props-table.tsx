@@ -2,7 +2,7 @@ import type { PropRow } from "@/lib/docs"
 
 export function PropsTable({ rows }: { rows: PropRow[] }) {
   return (
-    <div className="glass overflow-x-auto rounded-2xl [--glass-elevation:0_0_#0000]">
+    <div tabIndex={0} className="glass overflow-x-auto rounded-2xl [--glass-elevation:0_0_#0000]">
       <table className="w-full text-left text-sm">
         <thead className="text-xs text-muted-foreground">
           <tr className="border-b border-glass-border">

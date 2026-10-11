@@ -1,11 +1,11 @@
 import * as React from "react"
-import { View, type PressableProps, type StyleProp, type TextStyle, type ViewStyle } from "react-native"
+import { ActivityIndicator, View, type PressableProps, type StyleProp, type TextStyle, type ViewStyle } from "react-native"
 
 import { Glass, canFade } from "@/components/glass/native/glass"
 import { Press } from "@/components/glass/native/press"
 import { GText, alpha, useUI, web, type UI } from "@/components/glass/native/ui"
 
-type Variant = "default" | "glass" | "tinted" | "secondary" | "outline" | "ghost" | "destructive" | "link"
+type Variant = "default" | "glass" | "prominent" | "tinted" | "secondary" | "outline" | "ghost" | "destructive" | "link"
 type Size = "default" | "xs" | "sm" | "lg" | "icon" | "icon-xs" | "icon-sm" | "icon-lg"
 type Shape = "pill" | "rounded"
 
@@ -31,6 +31,7 @@ function buttonVariants(ui: UI, { variant = "default", size = "default", shape =
   const bg: Record<Variant, string> = {
     default: ui.primary,
     glass: "transparent",
+    prominent: "transparent",
     tinted: alpha(ui.primary, ui.scheme === "dark" ? 0.22 : 0.16),
     secondary: ui.fill,
     outline: "transparent",
@@ -41,6 +42,7 @@ function buttonVariants(ui: UI, { variant = "default", size = "default", shape =
   const fg: Record<Variant, string> = {
     default: ui.primaryForeground,
     glass: ui.foreground,
+    prominent: ui.primaryForeground,
     tinted: ui.primary,
     secondary: ui.foreground,
     outline: ui.foreground,
@@ -85,28 +87,50 @@ export function decorate(children: React.ReactNode, text: StyleProp<TextStyle>, 
 /**
  * shadcn's Button with glass variants. Capsule by default (`shape="rounded"` for
  * shadcn's corners). Presses squash a touch; hover lifts on pointer devices.
+ * `prominent` is Liquid Glass tinted with the accent; `loading` shows a spinner in place of
+ * the leading icon (or over the label) and ignores presses.
  */
 function Button({
   variant = "default",
   size = "default",
   shape = "pill",
   disabled,
+  loading = false,
   style,
   children,
+  onPress,
   ...props
-}: Omit<PressableProps, "style" | "children"> & { variant?: Variant; size?: Size; shape?: Shape; style?: StyleProp<ViewStyle>; children?: React.ReactNode }) {
+}: Omit<PressableProps, "style" | "children"> & { variant?: Variant; size?: Size; shape?: Shape; loading?: boolean; style?: StyleProp<ViewStyle>; children?: React.ReactNode }) {
   const ui = useUI()
   const v = buttonVariants(ui, { variant, size, shape })
-  const content = decorate(children, v.text, v.color, v.iconSize)
+  const items = React.Children.toArray(children)
+  const leadingIcon = !size.startsWith("icon") && items.length > 1 && React.isValidElement(items[0])
+  const spinner = <ActivityIndicator size="small" color={v.color} />
+  const content = !loading ? (
+    decorate(children, v.text, v.color, v.iconSize)
+  ) : leadingIcon ? (
+    <>
+      {spinner}
+      {decorate(items.slice(1), v.text, v.color, v.iconSize)}
+    </>
+  ) : (
+    // the label stays (hidden) so the width doesn't change
+    <View>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: v.container.gap, opacity: 0 }}>{decorate(children, v.text, v.color, v.iconSize)}</View>
+      <View style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, alignItems: "center", justifyContent: "center" }}>{spinner}</View>
+    </View>
+  )
   const radius = v.container.borderRadius as number
-  const glass = variant === "glass"
+  const glass = variant === "glass" || variant === "prominent"
   // Liquid Glass vanishes under a fading ancestor (native rule 3): a glass button
   // never dims its container — not on press, not when disabled; its label dims instead.
   const fades = !glass || canFade()
   return (
     <Press
       accessibilityRole="button"
+      aria-busy={loading}
       aria-disabled={!!disabled}
+      onPress={loading ? undefined : onPress}
       disabled={disabled}
       haptic
       dim={fades}
@@ -116,7 +140,7 @@ function Button({
       {...props}
     >
       {glass ? (
-        <Glass interactive={!disabled} raised={false} radius={radius} style={{ flexGrow: 1, alignSelf: "stretch", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: v.container.gap, paddingHorizontal: v.container.paddingHorizontal }}>
+        <Glass interactive={!disabled} raised={false} radius={radius} tint={variant === "prominent" ? alpha(ui.primary, 0.94) : undefined} style={{ flexGrow: 1, alignSelf: "stretch", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: v.container.gap, paddingHorizontal: v.container.paddingHorizontal }}>
           {disabled && !fades ? <View style={{ flexDirection: "row", alignItems: "center", gap: v.container.gap, opacity: 0.45 }}>{content}</View> : content}
         </Glass>
       ) : (

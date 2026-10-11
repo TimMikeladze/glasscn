@@ -46,6 +46,7 @@ export function ProgressRing({
     <View
       accessibilityRole="progressbar"
       accessibilityValue={{ min: 0, max: 100, now }}
+      accessibilityLabel={`Progress ${now}%`}
       style={[{ width: size, height: size, flexShrink: 0, alignItems: "center", justifyContent: "center" }, style]}
       {...props}
     >

@@ -19,10 +19,10 @@ function DropdownMenuTrigger({ ...props }: React.ComponentProps<typeof DropdownM
 
 /**
  * A liquid-glass panel (the control layer). Rows inside are fills, never more glass.
- * Under reduced motion the zoom and slide are dropped — only the fade is left (and data-glass-motion stills even that).
+ * It materialises out of its trigger (glass-materialize + glass-morph-origin); reduced motion cross-fades.
  */
 const menuSurface =
-  "glass-liquid z-50 min-w-44 overflow-x-hidden overflow-y-auto overscroll-contain rounded-surface-sm p-1.5 text-popover-foreground duration-(--glass-duration) ease-glass data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 motion-reduce:[--tw-enter-scale:1]! motion-reduce:[--tw-exit-scale:1]! motion-reduce:[--tw-enter-translate-x:0]! motion-reduce:[--tw-enter-translate-y:0]!"
+  "glass-liquid z-50 min-w-44 overflow-x-hidden overflow-y-auto overscroll-contain rounded-surface-sm p-1.5 text-popover-foreground glass-materialize glass-morph-origin [--glass-morph-w:var(--radix-dropdown-menu-trigger-width)] [--glass-morph-h:var(--radix-dropdown-menu-trigger-height)] [--glass-morph-origin:var(--radix-dropdown-menu-content-transform-origin)]"
 
 function DropdownMenuContent({ className, align = "start", sideOffset = 6, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
   return (
@@ -32,7 +32,7 @@ function DropdownMenuContent({ className, align = "start", sideOffset = 6, ...pr
         data-glass-motion=""
         sideOffset={sideOffset}
         align={align}
-        className={cn(menuSurface, "max-h-(--radix-dropdown-menu-content-available-height) origin-(--radix-dropdown-menu-content-transform-origin)", className)}
+        className={cn(menuSurface, "max-h-(--radix-dropdown-menu-content-available-height)", className)}
         {...props}
       />
     </DropdownMenuPrimitive.Portal>
@@ -132,7 +132,7 @@ function DropdownMenuSubContent({ className, ...props }: React.ComponentProps<ty
     <DropdownMenuPrimitive.SubContent
       data-slot="dropdown-menu-sub-content"
       data-glass-motion=""
-      className={cn(menuSurface, "origin-(--radix-dropdown-menu-content-transform-origin)", className)}
+      className={cn(menuSurface, className)}
       {...props}
     />
   )

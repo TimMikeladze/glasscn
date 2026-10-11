@@ -38,7 +38,7 @@ export default function GlassDemo() {
         <figure className="grid gap-2">
           <div className={frame}>
             {/* edge to edge: the content runs under the bars */}
-            <div className="absolute inset-0 overflow-y-auto px-4 pb-28 [scrollbar-width:none]">
+            <div tabIndex={0} aria-label="Field notes" className="absolute inset-0 overflow-y-auto px-4 pb-28 [scrollbar-width:none]">
               <div className="-mx-4 aspect-[4/3]" style={photo(5, 3, 4)} role="img" aria-label="Dunes at dusk" />
               <p className="mt-4 text-xs font-medium text-muted-foreground">Thursday · Field notes</p>
               <h3 className="type-glass-heading mt-1 text-xl">A week on the coast</h3>

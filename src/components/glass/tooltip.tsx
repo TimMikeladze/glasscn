@@ -21,7 +21,7 @@ function TooltipTrigger({ ...props }: React.ComponentProps<typeof TooltipPrimiti
   return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
 }
 
-/** A small liquid-glass capsule (the control layer). */
+/** A small liquid-glass capsule (the control layer) that grows out of its trigger. */
 function TooltipContent({ className, sideOffset = 6, children, ...props }: React.ComponentProps<typeof TooltipPrimitive.Content>) {
   return (
     <TooltipPrimitive.Portal>
@@ -30,9 +30,7 @@ function TooltipContent({ className, sideOffset = 6, children, ...props }: React
         data-glass-motion=""
         sideOffset={sideOffset}
         className={cn(
-          "glass-liquid z-50 inline-flex w-fit max-w-xs origin-(--radix-tooltip-content-transform-origin) items-center gap-1.5 rounded-[min(var(--glass-radius-button),1rem)] px-3 py-1.5 text-xs font-medium text-popover-foreground duration-(--glass-duration) ease-glass [--glass-shadow-y:6px] [--glass-shadow-blur:18px] has-data-[slot=kbd]:pe-1.5 data-[side=bottom]:slide-in-from-top-1 data-[side=left]:slide-in-from-right-1 data-[side=right]:slide-in-from-left-1 data-[side=top]:slide-in-from-bottom-1 data-[state=delayed-open]:animate-in data-[state=delayed-open]:fade-in-0 data-[state=delayed-open]:zoom-in-95 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
-          // under reduced motion the zoom and slide are dropped — only the fade is left (and data-glass-motion stills even that)
-          "motion-reduce:[--tw-enter-scale:1]! motion-reduce:[--tw-exit-scale:1]! motion-reduce:[--tw-enter-translate-x:0]! motion-reduce:[--tw-enter-translate-y:0]!",
+          "glass-liquid z-50 inline-flex w-fit max-w-xs items-center gap-1.5 rounded-[min(var(--glass-radius-button),1rem)] px-3 py-1.5 text-xs font-medium text-popover-foreground [--glass-shadow-y:6px] [--glass-shadow-blur:18px] has-data-[slot=kbd]:pe-1.5 glass-materialize glass-morph-origin [--glass-morph-w:var(--radix-tooltip-trigger-width)] [--glass-morph-h:var(--radix-tooltip-trigger-height)] [--glass-morph-origin:var(--radix-tooltip-content-transform-origin)]",
           className
         )}
         {...props}

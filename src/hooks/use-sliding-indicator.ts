@@ -6,7 +6,10 @@ import * as React from "react"
  * Tracks the selected child of a group and exposes its box as CSS variables on
  * the group, so one indicator element can slide between items:
  *
- *   --indicator-x / --indicator-y / --indicator-w / --indicator-h / --indicator-opacity
+ *   --indicator-x / --indicator-y / --indicator-w / --indicator-h / --indicator-r / --indicator-opacity
+ *
+ * `--indicator-r` is the selected item's corner radius, so a thumb can morph between items of
+ * different shapes (`rounded-(--indicator-r)`, as GlassGroup does).
  *
  * Works for any primitive that marks the selection with an attribute (Radix's
  * `data-state="on"` / `"active"`), controlled or not. Follows the group's size,
@@ -55,6 +58,7 @@ export function useSlidingIndicator<T extends HTMLElement>(selector: string, for
       root.style.setProperty("--indicator-y", `${active.offsetTop}px`)
       root.style.setProperty("--indicator-w", `${active.offsetWidth}px`)
       root.style.setProperty("--indicator-h", `${active.offsetHeight}px`)
+      root.style.setProperty("--indicator-r", getComputedStyle(active).borderTopLeftRadius || "0px")
       root.style.setProperty("--indicator-opacity", "1")
       if (!root.dataset.indicatorReady && !frame) {
         frame = requestAnimationFrame(() => {
@@ -70,7 +74,7 @@ export function useSlidingIndicator<T extends HTMLElement>(selector: string, for
       if (records.some((r) => r.type === "childList")) observeItems()
       update()
     })
-    mutations.observe(root, { subtree: true, childList: true, attributes: true, attributeFilter: ["data-state", "aria-selected", "aria-checked", "dir"] })
+    mutations.observe(root, { subtree: true, childList: true, attributes: true, attributeFilter: ["data-state", "aria-selected", "aria-checked", "aria-pressed", "aria-current", "dir"] })
     return () => {
       cancelAnimationFrame(frame)
       mutations.disconnect()
@@ -92,4 +96,4 @@ export function useSlidingIndicator<T extends HTMLElement>(selector: string, for
  * - `data-glass-motion` belongs on the element too, so reduced motion stills it.
  */
 export const slidingIndicatorClass =
-  "pointer-events-none absolute top-0 left-0 h-(--indicator-h) w-(--indicator-w) [transform:translate(var(--indicator-x),var(--indicator-y))] opacity-(--indicator-opacity) not-in-data-indicator-ready:opacity-0 in-data-indicator-ready:[transition:transform_calc(var(--glass-duration)*1.5)_var(--glass-ease),width_calc(var(--glass-duration)*1.5)_ease-out,height_calc(var(--glass-duration)*1.5)_ease-out,opacity_var(--glass-duration)_ease-out] motion-reduce:transition-none"
+  "pointer-events-none absolute top-0 left-0 h-(--indicator-h) w-(--indicator-w) [transform:translate(var(--indicator-x),var(--indicator-y))] opacity-(--indicator-opacity) not-in-data-indicator-ready:opacity-0 in-data-indicator-ready:[transition:transform_calc(var(--glass-duration)*1.5)_var(--glass-ease),width_calc(var(--glass-duration)*1.5)_ease-out,height_calc(var(--glass-duration)*1.5)_ease-out,border-radius_calc(var(--glass-duration)*1.5)_ease-out,opacity_var(--glass-duration)_ease-out] motion-reduce:transition-none"

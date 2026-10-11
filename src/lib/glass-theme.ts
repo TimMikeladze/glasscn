@@ -248,6 +248,11 @@ export const TOKENS: TokenDef[] = [
   { name: "glass-border-opacity", group: "Rim", label: "Rim", description: "How visible the edge is.", light: "85%", dark: "12%", control: range(0, 100, 1, "%") },
   { name: "glass-border-width", group: "Rim", label: "Rim width", description: "Edge thickness.", light: "1px", dark: "1px", control: range(0, 4, 0.5, "px") },
   { name: "glass-highlight-opacity", group: "Rim", label: "Highlight", description: "The inset top edge catching light.", light: "92%", dark: "14%", control: range(0, 100, 1, "%") },
+  { name: "glass-highlight-color", group: "Rim", label: "Highlight colour", description: "The colour of rims, speculars and the press glow.", light: "oklch(1 0 0)", dark: "oklch(1 0 0)", control: colour },
+  { name: "glass-light-angle", group: "Rim", label: "Light angle", description: "Where the virtual light comes from: the lit side of a liquid rim (-45deg = top left).", light: "-45deg", dark: "-45deg", control: range(-180, 180, 5, "deg") },
+  { name: "glass-specular", group: "Rim", label: "Specular", description: "Rim highlight strength on the lit side of liquid glass.", light: "70%", dark: "30%", control: range(0, 100, 1, "%") },
+  { name: "glass-edge-shade", group: "Rim", label: "Edge shade", description: "The darkened inner edge on the shadow side (iOS 27).", light: "0%", dark: "18%", control: range(0, 60, 1, "%") },
+  { name: "glass-illumination", group: "Rim", label: "Illumination", description: "The glow that spreads from the finger when liquid glass is pressed.", light: "22%", dark: "22%", control: range(0, 60, 1, "%") },
 
   // Depth
   { name: "glass-shadow-color", group: "Depth", label: "Shadow colour", description: "Colour of the drop shadow.", light: "oklch(0.3 0.05 270)", dark: "oklch(0 0 0)", control: colour },
@@ -255,6 +260,7 @@ export const TOKENS: TokenDef[] = [
   { name: "glass-shadow-y", group: "Depth", label: "Shadow offset", description: "How far below the pane the shadow falls.", light: "10px", dark: "10px", control: range(0, 60, 1, "px") },
   { name: "glass-shadow-blur", group: "Depth", label: "Shadow blur", description: "How soft the shadow is.", light: "30px", dark: "30px", control: range(0, 120, 1, "px") },
   { name: "glass-dim", group: "Depth", label: "Dim", description: "The scrim behind dialogs and sheets.", light: "15%", dark: "45%", control: range(0, 80, 1, "%") },
+  { name: "glass-shadow-over-content", group: "Depth", label: "Shadow over content", description: "How much deeper a bar's shadow gets while content scrolls under it.", light: "1.6", dark: "1.6", control: range(1, 3, 0.05, "") },
   { name: "glass-glow", group: "Depth", label: "Inner glow", description: "An accent glow inside every pane.", light: "0%", dark: "0%", control: range(0, 80, 1, "%") },
 
   // Shape
@@ -271,6 +277,9 @@ export const TOKENS: TokenDef[] = [
   { name: "glass-duration", group: "Motion", label: "Duration", description: "Base transition length.", light: "200ms", dark: "200ms", control: range(0, 800, 10, "ms") },
   { name: "glass-ease", group: "Motion", label: "Easing", description: "The curve every transition follows.", light: EASINGS.spring, dark: EASINGS.spring, control: { type: "select", options: Object.entries(EASINGS).map(([label, value]) => ({ label, value })) } },
   { name: "glass-press-scale", group: "Motion", label: "Press", description: "How far buttons squash when pressed.", light: "0.97", dark: "0.97", control: range(0.85, 1, 0.005, "") },
+  { name: "glass-press-stretch", group: "Motion", label: "Press stretch", description: "Elastic asymmetry on press: wider and shorter, springing back.", light: "0.04", dark: "0.04", control: range(0, 0.15, 0.005, "") },
+  { name: "glass-press-grow", group: "Motion", label: "Liquid press", description: "Liquid glass grows when pressed (solid controls squash instead).", light: "1.04", dark: "1.04", control: range(1, 1.2, 0.005, "") },
+  { name: "glass-knob-lens-scale", group: "Motion", label: "Knob lens", description: "How much a switch, slider or segment knob grows into a lens while held.", light: "1.15", dark: "1.15", control: range(1, 1.5, 0.01, "") },
 
   // Aurora
   { name: "aurora-opacity", group: "Aurora", label: "Aurora strength", description: "Opacity of the blobs.", light: "100%", dark: "100%", control: range(0, 100, 1, "%") },
@@ -584,7 +593,7 @@ export const MOTIONS: Record<string, PresetDef> = {
   spring: { title: "Spring", description: "A little overshoot — the default." },
   smooth: { title: "Smooth", description: "Material-style easing, no overshoot.", tokens: { "glass-ease": EASINGS.smooth, "glass-duration": "220ms", "glass-press-scale": "0.98" } },
   snappy: { title: "Snappy", description: "Quick with a bounce.", tokens: { "glass-ease": EASINGS.snappy, "glass-duration": "160ms", "glass-press-scale": "0.94" } },
-  still: { title: "Still", description: "No transitions, no press squash, a frozen aurora.", tokens: { "glass-duration": "0ms", "glass-press-scale": "1", "aurora-speed": "0.0001" } },
+  still: { title: "Still", description: "No transitions, no press squash, a frozen aurora.", tokens: { "glass-duration": "0ms", "glass-press-scale": "1", "glass-press-stretch": "0", "glass-press-grow": "1", "glass-knob-lens-scale": "1", "aurora-speed": "0.0001" } },
 }
 
 export const DENSITIES: Record<string, number> = { compact: 0.85, default: 1, comfortable: 1.15 }
@@ -1016,6 +1025,27 @@ export interface LegibilityReport {
   accentLabel: number
   /** The accent against the ground — switch tracks, rings, slider ranges (WCAG 1.4.11 wants 3). */
   accentOnGround: number
+  /** The label of prominent (tinted liquid) glass: primary-foreground on 94% accent over every ground. */
+  prominentLabel: number
+  /** Tinted buttons: primary-ink on the accent's tint, on a default pane and on the bare ground (BTN-05). */
+  tintedLabel: number
+  /** Destructive buttons: destructive-ink on the destructive tint, same backdrops (BTN-05). */
+  destructiveLabel: number
+}
+
+/** How much accent the *-ink text colours carry (the rest is the label colour) — must match stylesheet.mjs. */
+export const INK_ACCENT = 0.3
+/** shadcn's default destructive (palettes don't set it). */
+const DESTRUCTIVE: Record<Scheme, string> = { light: "oklch(0.577 0.245 27.325)", dark: "oklch(0.704 0.191 22.216)" }
+
+/** CSS `color-mix(in oklch, a p, b)` for opaque colours; an achromatic side takes the other's hue (it's powerless). */
+export function mixOklch(a: [number, number, number, number], b: [number, number, number, number], p: number): [number, number, number, number] {
+  const ha = a[1] < 1e-4 ? b[2] : a[2]
+  const hb = b[1] < 1e-4 ? a[2] : b[2]
+  let dh = hb - ha
+  if (dh > 180) dh -= 360
+  if (dh < -180) dh += 360
+  return [a[0] * p + b[0] * (1 - p), a[1] * p + b[1] * (1 - p), (((ha + dh * (1 - p)) % 360) + 360) % 360, 1]
 }
 
 /**
@@ -1056,11 +1086,30 @@ export function legibilityReport(theme: GlassTheme, scheme: Scheme, { clarity }:
   const primary = col(get("primary"))
   const primaryFg = col(get("primary-foreground"))
   const ground = col(get("aurora-base"))
+  const labelColour = col(label) ?? [scheme === "dark" ? 0.985 : 0.145, 0, 0, 1]
+  // the backdrops a button sits on: a default pane over each ground, and each bare ground
+  const backdrops = grounds.flatMap((g) => {
+    const lit = gammaRgb(g).map((x) => Math.min(1, x * brightness)) as RGB
+    return [over(tintRgb, lit, clarityOpacity(parseFloat(get("glass-opacity") ?? "50") / 100, c) * tint[3])]
+  })
+  const tintLabel = (fill: [number, number, number, number] | null, alpha: number) => {
+    if (!fill || !backdrops.length) return 21
+    const ink = relativeLuminance(mixOklch(fill, labelColour, INK_ACCENT))
+    return round(Math.min(...backdrops.map((b) => contrastRatio(ink, luminanceOfGamma(over(gammaRgb(fill), b, alpha))))), 2)
+  }
+  const destructive = col(t.destructive || DESTRUCTIVE[scheme])
   return {
     text: Object.fromEntries(tiers.map((k) => [k, worst(label, k)])) as Record<Tier, number>,
     secondary: Object.fromEntries(tiers.map((k) => [k, worst(secondary, k)])) as Record<Tier, number>,
     accentLabel: primary && primaryFg ? round(contrastRatio(relativeLuminance(primary), relativeLuminance(primaryFg)), 2) : 21,
     accentOnGround: primary && ground ? round(contrastRatio(relativeLuminance(primary), relativeLuminance(ground)), 2) : 21,
+    prominentLabel:
+      primary && primaryFg && grounds.length
+        ? round(Math.min(...grounds.map((g) => contrastRatio(relativeLuminance(primaryFg), luminanceOfGamma(over(gammaRgb(primary), gammaRgb(g), 0.94))))), 2)
+        : 21,
+    // Button: tinted bg-primary/16 (dark /22), destructive bg-destructive/14
+    tintedLabel: tintLabel(primary, scheme === "dark" ? 0.22 : 0.16),
+    destructiveLabel: tintLabel(destructive, 0.14),
   }
 }
 

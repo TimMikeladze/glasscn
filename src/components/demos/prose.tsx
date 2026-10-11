@@ -17,7 +17,7 @@ export default function ProseDemo() {
       <p>
         The carried answer is stored as <code>carryId</code>:
       </p>
-      <pre>
+      <pre tabIndex={0}>
         <code>{`const promise = entries[yesterday].answers[carryId]`}</code>
       </pre>
       <table>

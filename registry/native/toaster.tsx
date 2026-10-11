@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Animated, Easing, PanResponder, StyleSheet, View, type ViewStyle } from "react-native"
+import { Animated, Easing, PanResponder, StyleSheet, View, useWindowDimensions, type ViewStyle } from "react-native"
 import { SafeAreaInsetsContext } from "react-native-safe-area-context"
 import { CircleCheckIcon, InfoIcon, Loader2Icon, OctagonXIcon, TriangleAlertIcon } from "lucide-react-native"
 
@@ -78,11 +78,14 @@ export type ToasterProps = {
  * sonner (tap the stack to fan it out), swipe or wait to dismiss, clear of the
  * safe area. Mount once, last, at your app root so it overlays every screen.
  */
-function Toaster({ position = "bottom-center", duration = 4000, visibleToasts = 3, expand = false, offset = 16, style }: ToasterProps) {
+function Toaster({ position: positionProp, duration = 4000, visibleToasts = 3, expand = false, offset = 16, style }: ToasterProps) {
   const list = React.useSyncExternalStore(subscribe, snapshot, snapshot)
   const insets = React.useContext(SafeAreaInsetsContext) ?? { top: 0, right: 0, bottom: 0, left: 0 }
   const [expanded, setExpanded] = React.useState(expand)
   const [heights, setHeights] = React.useState<Record<string, number>>({})
+  // phones: from the top centre, clear of the thumb and the Dock
+  const { width } = useWindowDimensions()
+  const position = positionProp ?? (width <= 600 ? "top-center" : "bottom-center")
   const top = position.startsWith("top")
   const horizontal = position.endsWith("left") ? "flex-start" : position.endsWith("right") ? "flex-end" : "center"
   const shown = list.slice(0, visibleToasts)

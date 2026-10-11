@@ -10,7 +10,7 @@ export function CodeBlockClient({ code, title }: { code: string; title?: string 
         <span className="font-mono">{title}</span>
         <CopyButton value={code} />
       </div>
-      <pre className="overflow-x-auto px-4 py-3 font-mono text-[0.8rem] leading-relaxed">
+      <pre tabIndex={0} className="overflow-x-auto px-4 py-3 font-mono text-[0.8rem] leading-relaxed">
         <code>{code}</code>
       </pre>
     </div>

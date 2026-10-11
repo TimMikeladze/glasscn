@@ -87,7 +87,7 @@ export function withGlyphs(children: React.ReactNode, { color, size, text = "sm"
   })
 }
 
-type Ctx = { value: string; select: (v: string) => void; register: (v: string) => (e: LayoutChangeEvent) => void; size: "sm" | "default" | "lg" }
+type Ctx = { value: string; select: (v: string) => void; register: (v: string) => (e: LayoutChangeEvent) => void; size: "sm" | "default" | "lg"; radius: number }
 const SegmentedContext = React.createContext<Ctx | null>(null)
 
 type SegmentedControlProps = Omit<ViewProps, "children"> & {
@@ -95,43 +95,50 @@ type SegmentedControlProps = Omit<ViewProps, "children"> & {
   defaultValue?: string
   onValueChange?: (value: string) => void
   size?: "sm" | "default" | "lg"
+  /** `capsule` (Apple's default) or `rounded` (the control radius). */
+  shape?: "capsule" | "rounded"
+  /** Segments act as buttons: a press calls onValueChange and nothing stays selected. */
+  momentary?: boolean
   disabled?: boolean
   children?: React.ReactNode
 }
 
 /**
  * The iOS segmented control: a soft track with one raised thumb that slides
- * to the chosen segment. Always has a selection — tapping the chosen segment
- * again keeps it (unlike a toggle group).
+ * to the chosen segment, concentric with the track. Always has a selection —
+ * tapping the chosen segment again keeps it (unlike a toggle group).
+ * `momentary` makes the segments plain actions.
  */
-export function SegmentedControl({ value, defaultValue, onValueChange, size = "default", disabled, style, children, ...props }: SegmentedControlProps) {
+export function SegmentedControl({ value, defaultValue, onValueChange, size = "default", shape = "capsule", momentary = false, disabled, style, children, ...props }: SegmentedControlProps) {
   const ui = useUI()
   const [inner, setInner] = React.useState(defaultValue ?? "")
-  const current = value ?? inner
+  const current = momentary ? "" : (value ?? inner)
   const { register, style: thumb } = useSlidingIndicator(current)
   const select = React.useCallback(
     (v: string) => {
       if (disabled || !v) return
-      setInner(v)
+      if (!momentary) setInner(v)
       onValueChange?.(v)
     },
-    [disabled, onValueChange]
+    [disabled, momentary, onValueChange]
   )
   const height = { sm: 28, default: 36, lg: 44 }[size]
-  const ctx = React.useMemo(() => ({ value: current, select, register, size }), [current, select, register, size])
+  // concentric: the thumb's radius is the track's minus its 2pt padding
+  const radius = shape === "capsule" ? Math.min(ui.radius.button, height / 2) : ui.radius.control
+  const ctx = React.useMemo(() => ({ value: current, select, register, size, radius }), [current, select, register, size, radius])
   return (
     <SegmentedContext.Provider value={ctx}>
       <View
         accessibilityRole="radiogroup"
         aria-disabled={disabled}
-        style={[{ flexDirection: "row", alignSelf: "flex-start", alignItems: "stretch", height, padding: 2, borderRadius: ui.radius.control, backgroundColor: ui.fill, opacity: disabled ? 0.5 : 1 }, style]}
+        style={[{ flexDirection: "row", alignSelf: "flex-start", alignItems: "stretch", height, padding: 2, borderRadius: radius, backgroundColor: ui.fill, opacity: disabled ? 0.5 : 1 }, style]}
         {...props}
       >
         <Animated.View
           pointerEvents="none"
           style={[
             thumb,
-            { borderRadius: ui.radius.control - 2, backgroundColor: ui.thumb },
+            { borderRadius: Math.max(0, radius - 2), backgroundColor: ui.thumb },
             ui.scheme === "light" && { shadowColor: "#000", shadowOpacity: 0.12, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
           ]}
         />
@@ -163,7 +170,7 @@ export function SegmentedControlItem({
       accessibilityRole="radio"
       aria-checked={on} aria-selected={on} aria-disabled={disabled}
       style={[
-        { flexGrow: 1, flexShrink: 1, flexBasis: "auto", minWidth: 0, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingHorizontal: ctx.size === "sm" ? 8 : 12, borderRadius: ui.radius.control - 2, opacity: disabled ? 0.4 : 1 },
+        { flexGrow: 1, flexShrink: 1, flexBasis: "auto", minWidth: 0, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingHorizontal: ctx.size === "sm" ? 8 : 12, borderRadius: ctx.radius - 2, opacity: disabled ? 0.4 : 1 },
         web({ cursor: disabled ? "default" : "pointer", userSelect: "none" }),
         style,
       ]}

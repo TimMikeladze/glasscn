@@ -15,7 +15,9 @@
     "test": "node scripts/generate.mjs && vitest run",
     "typecheck": "node scripts/generate.mjs && next typegen && tsc --noEmit",
     "postinstall": "node scripts/setup-skills.mjs",
-    "skills": "node scripts/setup-skills.mjs"
+    "skills": "node scripts/setup-skills.mjs",
+    "test:e2e": "playwright test",
+    "test:e2e:update": "playwright test --update-snapshots"
   },
   "dependencies": {
     "@tanstack/charts": "^1.0.0",
@@ -35,6 +37,8 @@
     "tw-animate-css": "^1.4.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.64.0",
     "@tailwindcss/turbopack": "^4",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",

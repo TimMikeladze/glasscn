@@ -164,6 +164,9 @@ describe("colour maths", () => {
           }
           if (r.accentLabel < 4.5) failures.push(`${id} accent label ${r.accentLabel}`)
           if (r.accentOnGround < 3) failures.push(`${id} accent on ground ${r.accentOnGround}`)
+          if (r.prominentLabel < 4.5) failures.push(`${id} prominent label ${r.prominentLabel}`)
+          if (r.tintedLabel < 4.5) failures.push(`${id} tinted button label ${r.tintedLabel}`)
+          if (r.destructiveLabel < 4.5) failures.push(`${id} destructive button label ${r.destructiveLabel}`)
         }
     expect(failures).toEqual([])
   })

@@ -16,8 +16,15 @@ import Dashboard01 from "./dashboard-01"
 import AlertDialog from "./alert-dialog"
 import Dialog from "./dialog"
 import Dock from "./dock"
+import ActionSheet from "./action-sheet"
+import NavigationBar from "./navigation-bar"
+import ScrollEdge from "./scroll-edge"
+import SearchField from "./search-field"
+import Sidebar from "./sidebar"
+import Toolbar from "./toolbar"
 import DropdownMenu from "./dropdown-menu"
 import Glass from "./glass"
+import GlassGroup from "./glass-group"
 import GlassPreferences from "./glass-preferences"
 import GroupedList from "./grouped-list"
 import BarList from "./bar-list"
@@ -71,6 +78,7 @@ export const demos: Record<string, ComponentType> = {
   "segmented-control": SegmentedControl,
   tabs: Tabs,
   slider: Slider,
+  "glass-group": GlassGroup,
   progress: Progress,
   kbd: Kbd,
   separator: Separator,
@@ -79,11 +87,17 @@ export const demos: Record<string, ComponentType> = {
   dialog: Dialog,
   "alert-dialog": AlertDialog,
   sheet: Sheet,
+  "action-sheet": ActionSheet,
   popover: Popover,
   tooltip: Tooltip,
   "dropdown-menu": DropdownMenu,
   toaster: Toaster,
   dock: Dock,
+  toolbar: Toolbar,
+  "scroll-edge": ScrollEdge,
+  "navigation-bar": NavigationBar,
+  sidebar: Sidebar,
+  "search-field": SearchField,
   "grouped-list": GroupedList,
   chat: Chat,
   "activity-rings": ActivityRings,

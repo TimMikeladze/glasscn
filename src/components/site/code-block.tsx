@@ -15,6 +15,7 @@ export function CodeBlock({ html, code, title, className, maxHeight = 520 }: { h
         <CopyButton value={code} className="float-right m-1.5" />
       )}
       <div
+        tabIndex={0}
         className="overflow-auto px-4 py-3 font-mono text-[0.8rem] leading-relaxed [&_pre]:outline-none"
         style={{ maxHeight }}
         dangerouslySetInnerHTML={{ __html: html }}
