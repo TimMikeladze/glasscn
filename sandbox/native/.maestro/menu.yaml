@@ -5,7 +5,10 @@ name: Dropdown menu — open, pick an item, toast confirms
     file: _open.yaml
     env:
       ROUTE: c/dropdown-menu
-- tapOn: "This night"
+# index 1: index 0 is the section heading of the same name
+- tapOn:
+    text: "This night"
+    index: 1
 - assertVisible: "Thursday, Oct 8"
 - takeScreenshot: screenshots/menu-open
 - tapOn: "Copy as text"

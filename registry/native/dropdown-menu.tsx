@@ -142,6 +142,7 @@ function nativePlan(children: React.ReactNode): Plan | null {
 
 /** iOS / Android: the trigger's face inside the system menu (the menu owns the touch). */
 function SystemMenu({ plan, longPress, onOpenChange }: { plan: Plan; longPress: boolean; onOpenChange?: (open: boolean) => void }) {
+  const ui = useUI()
   const { style, children, accessibilityLabel } = plan.trigger.props
   const face = typeof style === "function" ? style({ pressed: false, hovered: false }) : style
   return (
@@ -156,8 +157,10 @@ function SystemMenu({ plan, longPress, onOpenChange }: { plan: Plan; longPress: 
       }}
       style={{ alignSelf: "flex-start" }}
     >
-      <View pointerEvents="none" accessibilityRole="button" accessibilityLabel={accessibilityLabel} aria-haspopup="menu" style={face}>
-        {textChildren(children)}
+      {/* SwiftUI hosts this (matchContents) and sizes it from the outer view: keep the styled face
+          one level down, or a bare string measures to zero width */}
+      <View pointerEvents="none" accessibilityRole="button" accessibilityLabel={accessibilityLabel} aria-haspopup="menu">
+        <View style={[{ minHeight: ui.control.default, flexDirection: "row", alignItems: "center", justifyContent: "center" }, face]}>{textChildren(children)}</View>
       </View>
     </MenuView>
   )
