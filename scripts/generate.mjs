@@ -43,7 +43,7 @@ const presetItem = (name, title, description, theme, groups, extra = []) => ({
 })
 const themes = [
   ...Object.entries(PALETTES).map(([k, p]) =>
-    presetItem(`theme-${k}`, `${p.title} palette`, `${p.description} Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.`, createGlassTheme({ palette: k }), ["Colour"])
+    presetItem(`theme-${k}`, `${p.title} palette`, `${p.description} Sets the accent, ring, eight chart colours, the aurora and the ground for light and dark.`, createGlassTheme({ palette: k }), ["Colour"])
   ),
   ...Object.entries(MATERIALS).map(([k, m]) =>
     presetItem(`material-${k}`, `${m.title} material`, `${m.description} Sets frost, blur, saturation, sheen, grain, rim and depth.`, createGlassTheme({ material: k }), ["Material", "Rim", "Depth"])

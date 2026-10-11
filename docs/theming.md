@@ -6,7 +6,7 @@ Everything visual in glasscn is a **primitive CSS variable**, grouped into eleve
 
 Primitives live on `:root` / `.dark` (or any element). **Derived values never do.** Colours like the frost, rim and shadow are computed *inside* the utilities and `@theme inline` tokens from the primitives — so they are evaluated on the element that uses them, and overriding a primitive on any subtree re-themes that subtree. (A `--glass: color-mix(…var(--glass-opacity)…)` declared on `:root` would freeze at `:root` and ignore child overrides.)
 
-## Dimensions (97 primitives)
+## Dimensions (101 primitives)
 
 | Group | Primitives |
 |---|---|
@@ -20,7 +20,7 @@ Primitives live on `:root` / `.dark` (or any element). **Derived values never do
 | Motion | `glass-duration` `glass-ease` `glass-press-scale` `glass-press-stretch` `glass-press-grow` `glass-knob-lens-scale` |
 | Aurora | `aurora-opacity` `aurora-scale` `aurora-speed` `aurora-blur` |
 | Fonts | `glass-font-sans` `-heading` `-display` `-mono` — optional; unset means your app's `--font-*` |
-| Type | `glass-text-scale` `glass-type-ratio` `glass-leading` `glass-tracking` `glass-body-weight` `glass-heading-weight` `-tracking` `-leading` `-case` `-wrap` `glass-display-weight` `-tracking` `glass-numeric` `glass-font-features` `glass-measure` `glass-underline-offset` |
+| Type | `glass-text-scale` `glass-type-ratio` `glass-leading` `glass-tracking` `glass-body-weight` `glass-heading-weight` `-tracking` `-leading` `-case` `-wrap` `glass-hyphens` `glass-display-weight` `-tracking` `glass-numeric` `glass-font-features` `glass-measure` `glass-underline-offset` |
 
 Fonts and type in depth: [`typography.md`](typography.md).
 

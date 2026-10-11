@@ -50,10 +50,10 @@ export default function ChatDemo() {
     <div className="glass flex h-[30rem] w-full max-w-md flex-col overflow-hidden rounded-surface">
       <ChatThread className="flex-1">
         <ChatDivider>Today</ChatDivider>
-        <ChatMessage from="assistant" avatar={coach}>
+        <ChatMessage from="assistant" name="Kai" avatar={coach}>
           <ChatBubble>You wrote every evening this week.</ChatBubble>
         </ChatMessage>
-        <ChatMessage from="assistant" avatar={coach} grouped>
+        <ChatMessage from="assistant" name="Kai" avatar={coach} grouped>
           <ChatBubble>What made it easier?</ChatBubble>
         </ChatMessage>
         <ChatMessage from="user">
@@ -68,7 +68,7 @@ export default function ChatDemo() {
             <ChatBubble>{text}</ChatBubble>
           </ChatMessage>
         ))}
-        <ChatMessage from="assistant" avatar={coach} streaming={reply?.streaming ?? false}>
+        <ChatMessage from="assistant" name="Kai" avatar={coach} streaming={reply?.streaming ?? false}>
           {reply ? <ChatBubble>{reply.text}</ChatBubble> : <ChatTyping name="Kai" />}
         </ChatMessage>
       </ChatThread>
@@ -78,7 +78,16 @@ export default function ChatDemo() {
           <ChatSuggestion>Try mornings</ChatSuggestion>
           <ChatSuggestion>Skip tomorrow</ChatSuggestion>
         </ChatSuggestions>
-        <ChatComposer className="mx-3 w-auto" placeholder="Reply to Kai" onSubmit={send} />
+        <ChatComposer
+          className="mx-3 w-auto"
+          placeholder="Reply to Kai"
+          onSubmit={send}
+          status={reply?.streaming ? "streaming" : "ready"}
+          onStop={() => {
+            window.clearInterval(timer.current)
+            setReply((r) => (r ? { ...r, streaming: false } : r))
+          }}
+        />
       </div>
     </div>
   )

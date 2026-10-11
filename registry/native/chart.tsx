@@ -15,9 +15,9 @@ import { axisKind } from "@/components/glass/native/chart-math"
 import { Glass } from "@/components/glass/native/glass"
 import { GText, useUI, type UI } from "@/components/glass/native/ui"
 
-/** The nth series colour, cycling through the theme's five chart colours. */
+/** The nth series colour, cycling through the theme's eight chart colours. */
 export function chartColor(i: number, ui: UI) {
-  return ui.charts[((i % 5) + 5) % 5]
+  return ui.charts[((i % 8) + 8) % 8]
 }
 
 /** `chartColor` bound to the current theme. */

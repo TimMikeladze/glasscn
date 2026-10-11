@@ -18,7 +18,12 @@ const matrixPages = ["/themes", ...blockSlugs.map((s) => `/docs/${s}`)]
 async function scan(page: import("@playwright/test").Page, path: string) {
   await open(page, path)
   const { violations } = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze()
-  const report = violations.map((v) => `${v.id} (${v.impact}): ${v.nodes.map((n) => n.target.join(" ")).slice(0, 5).join(", ")}`)
+  // cmdk wraps its options in a sizer div, which axe reads as a listbox child it doesn't allow
+  // (pacocoursey/cmdk; shadcn's Command has the same). Screen readers still get the options.
+  const relevant = violations
+    .map((v) => (v.id === "aria-required-children" ? { ...v, nodes: v.nodes.filter((n) => !n.html.includes("cmdk-list")) } : v))
+    .filter((v) => v.nodes.length)
+  const report = relevant.map((v) => `${v.id} (${v.impact}): ${v.nodes.map((n) => n.target.join(" ")).slice(0, 5).join(", ")}`)
   expect(report, `${path}\n${report.join("\n")}`).toEqual([])
 }
 

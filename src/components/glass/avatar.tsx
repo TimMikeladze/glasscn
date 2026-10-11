@@ -15,7 +15,7 @@ import { Avatar as AvatarPrimitive } from "radix-ui"
  *   </Avatar>
  */
 const avatarVariants = cva(
-  "group/avatar relative flex shrink-0 overflow-hidden rounded-full select-none after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:border after:border-glass-border",
+  "group/avatar relative flex shrink-0 rounded-full select-none after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:border after:border-glass-border",
   {
     variants: {
       size: {
@@ -37,14 +37,14 @@ function Avatar({
 }
 
 function AvatarImage({ className, ...props }: React.ComponentProps<typeof AvatarPrimitive.Image>) {
-  return <AvatarPrimitive.Image data-slot="avatar-image" className={cn("aspect-square size-full object-cover", className)} {...props} />
+  return <AvatarPrimitive.Image data-slot="avatar-image" className={cn("aspect-square size-full rounded-[inherit] object-cover", className)} {...props} />
 }
 
 function AvatarFallback({ className, ...props }: React.ComponentProps<typeof AvatarPrimitive.Fallback>) {
   return (
     <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
-      className={cn("flex size-full items-center justify-center bg-fill font-medium text-foreground [&_svg:not([class*='size-'])]:size-[55%]", className)}
+      className={cn("flex size-full items-center justify-center rounded-[inherit] bg-fill font-medium text-foreground [&_svg:not([class*='size-'])]:size-[55%]", className)}
       {...props}
     />
   )
@@ -77,4 +77,25 @@ function AvatarGroupCount({ className, size = "default", ...props }: React.Compo
   )
 }
 
-export { Avatar, AvatarImage, AvatarFallback, AvatarGroup, AvatarGroupCount, avatarVariants }
+/**
+ * A status dot (or a small icon) on the avatar's bottom corner — online, away, a verified tick.
+ * Colour it with a class (`bg-success`, `bg-destructive`); the default is the accent. Put it
+ * inside Avatar; the avatar keeps its rim and the badge rings itself in the pane's tint.
+ * Give it an `aria-label` ("Online") — it's otherwise decorative.
+ */
+function AvatarBadge({ className, ...props }: React.ComponentProps<"span">) {
+  return (
+    <span
+      data-slot="avatar-badge"
+      role={props["aria-label"] ? "img" : undefined}
+      aria-hidden={props["aria-label"] ? undefined : true}
+      className={cn(
+        "absolute end-0 bottom-0 z-10 inline-flex size-[30%] min-w-2 min-h-2 items-center justify-center rounded-full bg-primary text-primary-foreground ring-2 ring-(--glass-tint) [&>svg]:size-[70%]",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+export { Avatar, AvatarImage, AvatarFallback, AvatarBadge, AvatarGroup, AvatarGroupCount, avatarVariants }

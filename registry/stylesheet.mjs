@@ -375,6 +375,7 @@ export const stylesheet = {
   "@utility type-glass": {
     "font-family": fontChain.sans,
     "line-height": "var(--glass-leading)",
+    hyphens: "var(--glass-hyphens)",
     "letter-spacing": "var(--glass-tracking)",
     "font-weight": "var(--glass-body-weight)",
     "font-feature-settings": "var(--glass-font-features)",
@@ -442,6 +443,24 @@ export const stylesheet = {
   "@keyframes glass-typing": {
     "0%, 60%, 100%": { transform: "translateY(0)", opacity: "0.45" },
     "30%": { transform: "translateY(-0.25rem)", opacity: "1" },
+  },
+  // Skeleton's shimmer, and its mirror for RTL; the component hides it under reduced motion.
+  "@keyframes glass-shimmer": {
+    from: { transform: "translateX(-100%)" },
+    to: { transform: "translateX(100%)" },
+  },
+  "@keyframes glass-shimmer-rtl": {
+    from: { transform: "translateX(100%)" },
+    to: { transform: "translateX(-100%)" },
+  },
+  // Accordion / Collapsible open and close, from Radix's measured content height.
+  "@keyframes glass-collapsible-down": {
+    from: { height: "0", opacity: "0" },
+    to: { height: "var(--radix-collapsible-content-height)" },
+  },
+  "@keyframes glass-collapsible-up": {
+    from: { height: "var(--radix-collapsible-content-height)" },
+    to: { height: "0", opacity: "0" },
   },
   // the rim and glow are absolutely positioned pseudo-elements: position static elements, at zero
   // specificity in the base layer so fixed / absolute / sticky (any utility) win
@@ -514,6 +533,8 @@ export const proseStylesheet = {
     width: "100%",
     "min-width": "0",
     "overflow-wrap": "break-word",
+    "text-wrap": "pretty",
+    hyphens: "var(--glass-hyphens)",
     color: "var(--foreground)",
     "& :where(h1, h2, h3, h4, h5, h6)": {
       "font-family": fontChain.heading,
@@ -524,7 +545,12 @@ export const proseStylesheet = {
       "text-wrap": "var(--glass-heading-wrap)",
       "margin-top": "1.7em",
       "margin-bottom": "0.55em",
+      "scroll-margin-top": "5rem",
+      hyphens: "manual",
     },
+    // a heading's anchor link (rehype-autolink-headings): quiet until the heading is hovered or the link focused
+    "& :where(h1, h2, h3, h4, h5, h6) > a:where([href^='#'])": { color: "inherit", "text-decoration-line": "none" },
+    "& :where(h2 + *, h3 + *, h4 + *)": { "margin-top": "0" },
     "& :where(h1)": { "font-size": step(4) },
     "& :where(h2)": { "font-size": step(3) },
     "& :where(h3)": { "font-size": step(2) },
@@ -540,6 +566,14 @@ export const proseStylesheet = {
     "& :where(a:hover)": { "text-decoration-color": "var(--primary)" },
     "& :where(strong)": { "font-weight": "650" },
     "& :where(ul)": { "list-style-type": "disc", "padding-inline-start": "1.4em" },
+    "& :where(ul ul)": { "list-style-type": "circle" },
+    "& :where(ul ul ul)": { "list-style-type": "square" },
+    "& :where(ol ol)": { "list-style-type": "lower-alpha" },
+    "& :where(ol ol ol)": { "list-style-type": "lower-roman" },
+    "& :where(li > ul, li > ol)": { "margin-block": "0.3em" },
+    // GFM task lists
+    "& :where(ul.contains-task-list, ul:has(> li > input[type=checkbox]))": { "list-style-type": "none", "padding-inline-start": "0.2em" },
+    "& :where(li > input[type=checkbox])": { "accent-color": "var(--primary)", "margin-inline-end": "0.5em", "vertical-align": "-0.1em" },
     "& :where(ol)": { "list-style-type": "decimal", "padding-inline-start": "1.4em", "font-variant-numeric": "var(--glass-numeric)" },
     "& :where(li)": { "margin-block": "0.3em" },
     "& :where(li)::marker": { color: "var(--primary)" },
@@ -570,10 +604,53 @@ export const proseStylesheet = {
     },
     "& :where(pre code)": { "background-color": "transparent", padding: "0", "font-size": "inherit" },
     "& :where(hr)": { border: "0", "border-top": `1px solid ${rim10}`, "margin-block": "2em" },
-    "& :where(table)": { width: "100%", "border-collapse": "collapse", "font-size": step(-1), "font-variant-numeric": "var(--glass-numeric)" },
+    // a wide table scrolls inside the measure instead of overflowing it
+    "& :where(table)": { display: "block", "max-width": "100%", "overflow-x": "auto", width: "max-content", "min-width": "100%", "border-collapse": "collapse", "font-size": step(-1), "font-variant-numeric": "var(--glass-numeric)" },
     "& :where(th, td)": { padding: "0.55em 0.75em", "border-bottom": `1px solid ${rim10}`, "text-align": "start" },
     "& :where(th)": { "font-weight": "600" },
-    "& :where(img, video)": { "border-radius": "var(--glass-radius-control)" },
+    "& :where(img, video)": { "border-radius": "var(--glass-radius-control)", "max-width": "100%", height: "auto" },
+    "& :where(figure)": { "margin-inline": "0" },
+    "& :where(kbd)": {
+      "font-family": fontChain.mono,
+      "font-size": "0.82em",
+      padding: "0.1em 0.4em",
+      "border-radius": "calc(var(--glass-radius-control) * 0.4)",
+      border: `var(--glass-border-width) solid ${rim10}`,
+      "border-bottom-width": "2px",
+      "background-color": mixed("var(--glass-fill-tint)", "var(--glass-fill-opacity)"),
+    },
+    "& :where(mark)": { "background-color": mixed("var(--primary)", "22%"), color: "inherit", "border-radius": "0.2em", padding: "0 0.15em" },
+    "& :where(del)": { color: "var(--muted-foreground)" },
+    "& :where(ins)": { "text-decoration-color": mixed("var(--success)", "60%") },
+    "& :where(dl)": { "margin-block": "0.9em" },
+    "& :where(dt)": { "font-weight": "600", "margin-top": "0.6em" },
+    "& :where(dd)": { "margin-inline-start": "1.4em", color: "var(--muted-foreground)" },
+    "& :where(details)": {
+      "margin-block": "0.9em",
+      padding: "0.6em 1em",
+      "border-radius": "var(--glass-radius-control)",
+      "background-color": mixed("var(--glass-fill-tint)", "var(--glass-fill-opacity)"),
+    },
+    "& :where(summary)": { cursor: "pointer", "font-weight": "600" },
+    "& :where(details[open] > summary)": { "margin-bottom": "0.5em" },
+    // footnotes (remark-gfm): a small superscript reference, a quiet section at the end
+    "& :where(sup > a[data-footnote-ref], a[data-footnote-ref])": { "text-decoration-line": "none", "font-variant-numeric": "var(--glass-numeric)" },
+    "& :where(section[data-footnotes])": { "margin-top": "2.5em", "padding-top": "1em", "border-top": `1px solid ${rim10}`, "font-size": step(-1), color: "var(--muted-foreground)" },
+    // GitHub alerts (> [!NOTE]) as rendered by remark-github-blockquote-alert / rehype-github-alerts
+    "& :where(.markdown-alert)": {
+      "border-inline-start": "3px solid var(--primary)",
+      "padding-inline-start": "1em",
+      "font-family": "inherit",
+      "font-size": "inherit",
+      "line-height": "inherit",
+      color: "inherit",
+    },
+    "& :where(.markdown-alert-title)": { "font-weight": "600", color: "var(--primary)", display: "flex", "align-items": "center", gap: "0.4em" },
+    "& :where(.markdown-alert-warning, .markdown-alert-caution)": { "border-inline-start-color": "var(--destructive)" },
+    "& :where(.markdown-alert-warning, .markdown-alert-caution) :where(.markdown-alert-title)": { color: "var(--destructive)" },
+    "& :where(.markdown-alert-tip)": { "border-inline-start-color": "var(--success)" },
+    "& :where(.markdown-alert-tip) :where(.markdown-alert-title)": { color: "var(--success)" },
+
     "& :where(figcaption)": { "font-size": step(-1), color: "var(--muted-foreground)", "margin-top": "0.5em" },
     "& > :first-child": { "margin-top": "0" },
     "& > :last-child": { "margin-bottom": "0" },

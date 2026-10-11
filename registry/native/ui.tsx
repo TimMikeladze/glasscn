@@ -14,8 +14,8 @@ export interface UI extends GlassTheme {
   destructiveForeground: string
   success: string
   ring: string
-  /** Five chart series: accent, the two ring companions, then green and blue. */
-  charts: [string, string, string, string, string]
+  /** Eight chart series: accent, the two ring companions, green, blue, then a darker blue, a light teal and a near-neutral ("Other") — the web's --chart-1..8. */
+  charts: [string, string, string, string, string, string, string, string]
   thumb: string
   separator: string
   muted: string
@@ -45,7 +45,7 @@ export function buildUI(t: GlassTheme): UI {
     destructiveForeground: "#FFFFFF",
     success: dark ? "#4CD08F" : "#23935F",
     ring: t.primary,
-    charts: [t.chart[0], t.chart[1], t.chart[2], dark ? "#4CC79A" : "#2E9E73", dark ? "#5AAFE6" : "#2F86C9"],
+    charts: [t.chart[0], t.chart[1], t.chart[2], dark ? "#4CC79A" : "#2E9E73", dark ? "#5AAFE6" : "#2F86C9", dark ? "#6F8FD9" : "#2F55A4", dark ? "#B8E6E8" : "#6FB9BC", dark ? "#8A8D96" : "#8B8F99"],
     thumb: dark ? "rgba(255,255,255,0.2)" : "#FFFFFF",
     separator: dark ? "rgba(255,255,255,0.1)" : "rgba(60,60,67,0.13)",
     muted: dark ? "rgba(235,235,245,0.42)" : "rgba(60,60,67,0.46)",

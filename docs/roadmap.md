@@ -42,6 +42,8 @@ The complete backlog from the October 2026 audit: seven parallel reviews (web co
 
 - **2026-10-11 — M2 (the liquid layer):** 32 items closed (+ LG-02) — specular rim, illumination, adaptive shadow, prominent glass, glass knobs, materialise, morph from trigger, elastic press, `GlassGroup`; toolbar, scroll-edge, sidebar, search-field, navigation-bar, action-sheet; dock, sheet, button, switch, slider, segmented upgrades; Playwright axe / visual / browser-matrix / blur-budget suite. Spec: [`specs/m2-liquid-layer.md`](specs/m2-liquid-layer.md).
 
+- **2026-10-11 — M3 (parity and forms):** 71 items closed — select, radio-group, field, input-group, button-group, toggle, spinner, skeleton, drawer, context-menu, scroll-area, accordion, alert, item, stepper, empty, confirmation-popover, command, combobox, calendar / date-picker; AI chat parts; chart fixes, data table, summaries, states, selection; widget, kpi, range-chart, backdrop; data-table v2. Spec: [`specs/m3-parity-forms.md`](specs/m3-parity-forms.md).
+
 ## Milestones (do in order; each ends green on `pnpm typecheck && pnpm lint && pnpm test`, `verify:install`, `verify:native`, and a browser check)
 
 1. **M0 — Stop the bleeding.** Every P0 bug/a11y/token item: ENG-01..03, ENG-10, ENG-40, CMP-X01, CMP-X03, TIP-01, GRL-01, DCK-01, INP-01, SWT-01, SLD-01, BTN-01, KBD-01, PRG-01, SPK-01, HMP-01, CHT-01, CHA-03, SITE-01, SITE-02, AGT-01, NAT-01, NAT-02, NAT-04, UX-01, UX-10, DLG-04 (via NEW-05). Plus QA-01 and QA-05 so they can't come back.
@@ -214,19 +216,19 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 - [ ] **BTN-07** P2 guidance — Docs: one or two prominent per view; preference by style not size; destructive never primary (HIG §1).
 
 ### Badge
-- [ ] **BDG-01** P1 gap (LG) — Count/dot badge that attaches to `DockItem`, `Avatar`, icon `Button` (Apple: red oval, white number, critical only).
+- [x] **BDG-01** P1 gap (LG) — Count/dot badge that attaches to `DockItem`, `Avatar`, icon `Button` (Apple: red oval, white number, critical only).
 - [ ] **BDG-02** P2 — Height/padding tokens; focused badge links show double outline; no `[a&]:hover`; missing shadcn `ghost`/`link`; clipped long text without ellipsis.
 
 ### Input / Textarea / Label
 - [x] **INP-01** P0 a11y — No border; only `bg-fill` boundary (< 3:1, vanishes in forced-colors). Same for Textarea. → Inset rim `ring-1 ring-glass-border` + forced-colors border.
 - [x] **INP-02** P1 a11y — Invalid = 30% destructive ring that overrides focus (focused invalid ≡ unfocused). → Destructive rim + distinct focus ring.
-- [ ] **INP-03** P1 gap — Sizes `sm|lg`; search type cancel styling; clear button (trailing, HIG §18); password reveal; number spinners styled. → Most via `input-group` (NEW-04).
-- [ ] **INP-04** P1 bug — Textarea `field-sizing-content` without `max-h` (grows forever); no JS autosize fallback; `py-3`/`min-h-24` ignore density; no duration tokens.
-- [ ] **INP-05** P2 — `px-[calc(.875rem*density)]` = `px-pad-sm`; `file:h-7` fixed; `disabled:pointer-events-none` cancels `cursor-not-allowed`; textarea character count/resize control; demo positions icon by hand (`left-3 pl-9`). Label: required marker / optional hint; `leading-none` collides on wrap.
+- [x] **INP-03** P1 gap — Sizes `sm|lg`; search type cancel styling; clear button (trailing, HIG §18); password reveal; number spinners styled. → Most via `input-group` (NEW-04).
+- [x] **INP-04** P1 bug — Textarea `field-sizing-content` without `max-h` (grows forever); no JS autosize fallback; `py-3`/`min-h-24` ignore density; no duration tokens.
+- [x] **INP-05** P2 — `px-[calc(.875rem*density)]` = `px-pad-sm`; `file:h-7` fixed; `disabled:pointer-events-none` cancels `cursor-not-allowed`; textarea character count/resize control; demo positions icon by hand (`left-3 pl-9`). Label: required marker / optional hint; `leading-none` collides on wrap. *(M3: file height, label required/optional, leading fixed; no textarea character count)*
 
 ### Checkbox
-- [ ] **CHK-01** P1 a11y — 18px with no hit area; `border-foreground/25` likely < 3:1.
-- [ ] **CHK-02** P2 — `rounded-[calc(…*0.35)]` → token; `shape="circle"` (iOS selection checkmark); `size` prop; mixed state styling (HIG §2).
+- [x] **CHK-01** P1 a11y — 18px with no hit area; `border-foreground/25` likely < 3:1.
+- [x] **CHK-02** P2 — `rounded-[calc(…*0.35)]` → token; `shape="circle"` (iOS selection checkmark); `size` prop; mixed state styling (HIG §2).
 
 ### Switch
 - [x] **SWT-01** P0 token — px sizes ignore density; `bg-white`, `rgb()` shadows (`:18,25`).
@@ -263,7 +265,7 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 - [x] **KBD-01** P1 bug — `KbdGroup` renders `<div>` → invalid inside `<p>` → hydration error. → `<kbd>`/`<span>`.
 - [ ] **KBD-02** P1 token — `font-glass-sans` but rules say `font-glass-mono` (pick one, update rule); `h-5/min-w-5`; ×0.5 radius. P2: styling inside tooltips / primary buttons.
 - [ ] **SEP-01** P2 — Comment says rim colour, code uses `bg-foreground/10`; not increased-contrast aware; inset variant (list separators start at text); device-pixel hairline.
-- [ ] **AVT-01** P1 parity — `AvatarBadge` (status dot/count).
+- [x] **AVT-01** P1 parity — `AvatarBadge` (status dot/count).
 - [ ] **AVT-02** P2 — `text-[0.6rem]`, `ring-2`, gradient hack (`:74`); `AvatarGroupCount` "+4" needs "4 more"; monogram style (grey gradient, white initials); `xl`.
 
 ### Dialog
@@ -313,31 +315,31 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 ## 6. Missing components
 
 ### 6.1 Form and core (P0)
-- [ ] **NEW-01** P0 — `select` — Radix Select; glass-strong listbox morphing from trigger; leading check; trigger = Input height/radius; `variant="pill"` = Apple pop-up button (current choice shown; mutually exclusive; no submenus).
-- [ ] **NEW-02** P0 — `radio-group` — accent circle + dot; 44px hit; card variant. (Mac guidance: 2–5 options, else pop-up.)
-- [ ] **NEW-03** P0 — `field` (+ form) — `Field`, `FieldLabel`, `FieldDescription`, `FieldError`, `FieldGroup`, `FieldSet`, `FieldLegend`; wires `aria-describedby`/`aria-invalid`; horizontal orientation for switch rows.
-- [ ] **NEW-04** P0 — `input-group` — addons inline-start/end/block, `InputGroupButton`, `InputGroupText`: search icon, clear, password reveal, units, submit in a capsule.
+- [x] **NEW-01** P0 — `select` — Radix Select; glass-strong listbox morphing from trigger; leading check; trigger = Input height/radius; `variant="pill"` = Apple pop-up button (current choice shown; mutually exclusive; no submenus).
+- [x] **NEW-02** P0 — `radio-group` — accent circle + dot; 44px hit; card variant. (Mac guidance: 2–5 options, else pop-up.)
+- [x] **NEW-03** P0 — `field` (+ form) — `Field`, `FieldLabel`, `FieldDescription`, `FieldError`, `FieldGroup`, `FieldSet`, `FieldLegend`; wires `aria-describedby`/`aria-invalid`; horizontal orientation for switch rows. *(M3: Field wires ids/aria itself; no separate react-hook-form `form` item)*
+- [x] **NEW-04** P0 — `input-group` — addons inline-start/end/block, `InputGroupButton`, `InputGroupText`: search icon, clear, password reveal, units, submit in a capsule.
 - [x] **NEW-05** P0 — `alert-dialog` — `role="alertdialog"`, no outside dismiss, bold left-aligned title (≤ 2 lines), ≤ 3 capsule buttons (default trailing/top, Cancel leading/bottom, never Cancel as default), destructive style only for non-deliberate actions, optional source-anchored origin.
 
 ### 6.2 Best-in-class (P1)
-- [ ] **NEW-10** — `button-group` — joined buttons sharing one glass (Apple toolbar grouping), separators, orientation.
-- [ ] **NEW-11** — `toggle` / `toggle-group` — pressed fill/tint; multi-select (also iOS "toggle button" outside lists).
-- [ ] **NEW-12** — `spinner` — iOS radial ticks or ring, `role="status"`, still frame under reduced motion; used by Button `loading`.
-- [ ] **NEW-13** — `skeleton` — fill shimmer on frost; still under reduced motion.
-- [ ] **NEW-14** — `drawer` — bottom sheet with drag/detents/grabber (merge with SHT-03).
-- [ ] **NEW-15** — `command` — cmdk palette in liquid panel, search capsule, groups, shortcuts, `CommandDialog` (powers SITE-03).
-- [ ] **NEW-16** — `combobox` — Popover + Command; single/multi with chips (doubles as token field).
-- [ ] **NEW-17** — `context-menu` — shares `menuSurface`; long-press on touch; optional preview card (clip path matches preview radius); ≤ 3 groups; hide (not dim) unavailable; destructive last in red.
-- [ ] **NEW-18** — `scroll-area` — capsule thumbs on glass; scroll-edge hook.
-- [ ] **NEW-19** — `accordion` / `collapsible` — disclosure rows (chevron trailing→down), `interpolate-size` height, grouped-list styling (Apple DisclosureGroup).
-- [ ] **NEW-20** — `alert` — inline status callout on a fill (not glass); icon/title/description; status variants (ENG-21).
-- [ ] **NEW-21** — `calendar` / `date-picker` — react-day-picker on glass; compact pop-up date button (iOS compact style: value in accent opens calendar); range; time (minute interval divides 60).
-- [ ] **NEW-22** — `item` — shadcn list-row primitive; reconcile with GroupedList.
-- [ ] **NEW-23** — `pull-down-button` — Button + DropdownMenu, trailing chevron, ≥ 3 items, optional split primary action.
-- [ ] **NEW-24** — `stepper` — −/+ capsule pair sharing one glass, `role="spinbutton"`, long-press repeat, Shift ×10; always beside a value field.
-- [ ] **NEW-25** — `confirmation-popover` / `action-sheet` — destructive confirm anchored to source; bottom action sheet on phones (destructive top, Cancel bottom).
-- [ ] **NEW-26** — `navigation-bar` / large title — large title collapsing into inline title under a scroll edge; Back/Close as symbols.
-- [ ] **NEW-27** — `empty` — empty state (icon tile, title, description, actions; search variant shows the query).
+- [x] **NEW-10** — `button-group` — joined buttons sharing one glass (Apple toolbar grouping), separators, orientation.
+- [x] **NEW-11** — `toggle` / `toggle-group` — pressed fill/tint; multi-select (also iOS "toggle button" outside lists).
+- [x] **NEW-12** — `spinner` — iOS radial ticks or ring, `role="status"`, still frame under reduced motion; used by Button `loading`.
+- [x] **NEW-13** — `skeleton` — fill shimmer on frost; still under reduced motion.
+- [x] **NEW-14** — `drawer` — bottom sheet with drag/detents/grabber (merge with SHT-03).
+- [x] **NEW-15** — `command` — cmdk palette in liquid panel, search capsule, groups, shortcuts, `CommandDialog` (powers SITE-03).
+- [x] **NEW-16** — `combobox` — Popover + Command; single/multi with chips (doubles as token field).
+- [x] **NEW-17** — `context-menu` — shares `menuSurface`; long-press on touch; optional preview card (clip path matches preview radius); ≤ 3 groups; hide (not dim) unavailable; destructive last in red.
+- [x] **NEW-18** — `scroll-area` — capsule thumbs on glass; scroll-edge hook.
+- [x] **NEW-19** — `accordion` / `collapsible` — disclosure rows (chevron trailing→down), `interpolate-size` height, grouped-list styling (Apple DisclosureGroup).
+- [x] **NEW-20** — `alert` — inline status callout on a fill (not glass); icon/title/description; status variants (ENG-21).
+- [x] **NEW-21** — `calendar` / `date-picker` — react-day-picker on glass; compact pop-up date button (iOS compact style: value in accent opens calendar); range; time (minute interval divides 60).
+- [x] **NEW-22** — `item` — shadcn list-row primitive; reconcile with GroupedList.
+- [x] **NEW-23** — `pull-down-button` — Button + DropdownMenu, trailing chevron, ≥ 3 items, optional split primary action. *(M2: PullDownButton / SplitButton in button)*
+- [x] **NEW-24** — `stepper` — −/+ capsule pair sharing one glass, `role="spinbutton"`, long-press repeat, Shift ×10; always beside a value field.
+- [x] **NEW-25** — `confirmation-popover` / `action-sheet` — destructive confirm anchored to source; bottom action sheet on phones (destructive top, Cancel bottom). *(M3: `confirmation-popover` shipped; no automatic phone fallback to ActionSheet)*
+- [x] **NEW-26** — `navigation-bar` / large title — large title collapsing into inline title under a scroll edge; Back/Close as symbols.
+- [x] **NEW-27** — `empty` — empty state (icon tile, title, description, actions; search variant shows the query).
 
 ### 6.3 Nice (P2)
 - [ ] **NEW-30** — `hover-card`; `input-otp`; `breadcrumb` (Apple path control, middle truncation menu); `pagination` (extract from data-table); `navigation-menu` / `menubar`; `carousel` (Embla + page control); `resizable` (split view, thin 1pt divider, glass grab handle); `aspect-ratio`; `native-select`.
@@ -346,24 +348,24 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 ## 7. Content layer: surfaces, type, data, charts, tables, chat, blocks
 
 ### 7.1 Surfaces
-- [ ] **SRF-01** P1 gap — Grounds: aurora is the only one; Liquid Glass sits on real content. → `Backdrop` variants `image` (object-position, optional 35% dim for clear glass), `video` (muted, playsInline, poster, paused under reduced motion), `mesh` (4–6 point mesh from palette), `noise`.
+- [x] **SRF-01** P1 gap — Grounds: aurora is the only one; Liquid Glass sits on real content. → `Backdrop` variants `image` (object-position, optional 35% dim for clear glass), `video` (muted, playsInline, poster, paused under reduced motion), `mesh` (4–6 point mesh from palette), `noise`.
 - [x] **SRF-02** P1 perf — Aurora `will-change-transform` always on (even `animate={false}`/reduced motion) → three viewport GPU layers for nothing (`aurora.tsx:42`); `filter: blur()` on animated blobs re-rasterises every frame (`:48`) → bake softness into gradient stops; pause offscreen (IntersectionObserver) — matters with an aurora per ThemeScope preview; flat `--aurora-base` under reduced transparency.
 - [ ] **SRF-03** P2 — `minWidth` floors 560/480/540px (`:45`) → `vmax`/token; `speed={0}` divides by zero (ENG-19); aurora demo body text sits on the ground (rule 6).
-- [ ] **SRF-04** P1 rebuild (LG) — `Card material="regular|thick|solid"` (solid = opaque `--card` for dense screens); `variant="widget"` sizes small/medium/large/extraLarge with container-query layout, 16pt padding, `rounded-concentric` inner tiles; `CardImage`/hero slot; `asChild` link card with press state.
+- [x] **SRF-04** P1 rebuild (LG) — `Card material="regular|thick|solid"` (solid = opaque `--card` for dense screens); `variant="widget"` sizes small/medium/large/extraLarge with container-query layout, 16pt padding, `rounded-concentric` inner tiles; `CardImage`/hero slot; `asChild` link card with press state. *(M3: Card material + CardImage; widget sizes ship as the `widget` item)*
 - [ ] **SRF-05** P2 — Card re-derives `--card-spacing` (`:21`, use `spacing-card`); `text-sm/base` → type steps; `overflow-hidden` clips edge children's focus rings → `overflow-clip` + `overflow-clip-margin`.
 
 ### 7.2 Typography and prose
-- [ ] **TYP-01** P1 gap — Apple text styles on `Text variant` (ENG-29) + `emphasized`.
-- [ ] **TYP-02** P1 improve — Body: `text-wrap: pretty`; `hyphens: auto` primitive (`glass-hyphens`, needs `lang`).
+- [x] **TYP-01** P1 gap — Apple text styles on `Text variant` (ENG-29) + `emphasized`.
+- [x] **TYP-02** P1 improve — Body: `text-wrap: pretty`; `hyphens: auto` primitive (`glass-hyphens`, needs `lang`).
 - [ ] **TYP-03** P2 — Overline hard-codes `tracking-[0.12em] uppercase` (`:49`); `xl` arbitrary `pow(…,8)` (ENG-47); physical `border-l-[3px] pl-4`, `pl-[1.4em]` (`:80,99`); `rounded-[calc(…*0.5)]` → `rounded-control-xs`; `List` `Omit<…,"ref">` drops React 19 ref.
-- [ ] **PRS-01** P1 bug — Prose `img`/`video` no `max-width: 100%; height: auto` → overflow measure (`stylesheet.mjs:232`); wide `table` overflows (`:229`) → `display:block; overflow-x:auto`.
-- [ ] **PRS-02** P1 gap — Missing elements: `kbd`, `mark`, `del/ins`, footnotes, `dl/dt/dd`, `details/summary`, GFM task lists, GitHub alerts (`> [!NOTE]`), `figure`, nested list markers, heading `scroll-margin-top` + anchors, `h2 + *` rhythm, Shiki light/dark token colours.
+- [x] **PRS-01** P1 bug — Prose `img`/`video` no `max-width: 100%; height: auto` → overflow measure (`stylesheet.mjs:232`); wide `table` overflows (`:229`) → `display:block; overflow-x:auto`.
+- [x] **PRS-02** P1 gap — Missing elements: `kbd`, `mark`, `del/ins`, footnotes, `dl/dt/dd`, `details/summary`, GFM task lists, GitHub alerts (`> [!NOTE]`), `figure`, nested list markers, heading `scroll-margin-top` + anchors, `h2 + *` rhythm, Shiki light/dark token colours. *(M3: all but Shiki light/dark token colours)*
 - [ ] **PRS-03** P2 — Physical props (`:198-204, 230`); hard-coded weights 650/600, `3px`, `1px`; prose blockquote styled as pull quote (multi-paragraph Markdown quotes look wrong); `pre` frost without backdrop → `bg-fill-strong` + copy button; `dangerouslySetInnerHTML` docs need a sanitise warning.
 - [ ] **FNT-01** P2 bug — `editorial` sets `glass-numeric: oldstyle-nums`, applied to tables/tooltips/pagination → misaligned columns. Tables/tooltips force `tabular-nums lining-nums`.
 
 ### 7.3 Compact data visuals
-- [ ] **RNG-01** P1 rebuild — Activity rings ≠ Apple anatomy: flat colour (Apple: angular gradient dark start → light end), second lap at 0.85 opacity capped at 200% (Apple keeps winding with drop shadow under the leading cap), no start glyph. → Track + full ring + `value % 1` arc, gradient along arc, cap shadow only when > 1, per-ring `icon`, unlimited laps.
-- [ ] **RNG-02** P1 token — Hard-coded `1.2s cubic-bezier(…)`/`0.8s` → `motion-still` ignored. Same: progress-ring:48-49, sparkline:59,71, gauge:72, bar-list:54, chat:217. → `calc(var(--glass-duration) * k)`, `var(--glass-ease)`.
+- [x] **RNG-01** P1 rebuild — Activity rings ≠ Apple anatomy: flat colour (Apple: angular gradient dark start → light end), second lap at 0.85 opacity capped at 200% (Apple keeps winding with drop shadow under the leading cap), no start glyph. → Track + full ring + `value % 1` arc, gradient along arc, cap shadow only when > 1, per-ring `icon`, unlimited laps.
+- [x] **RNG-02** P1 token — Hard-coded `1.2s cubic-bezier(…)`/`0.8s` → `motion-still` ignored. Same: progress-ring:48-49, sparkline:59,71, gauge:72, bar-list:54, chat:217. → `calc(var(--glass-duration) * k)`, `var(--glass-ease)`.
 - [ ] **RNG-03** P2 — `strokeOpacity={0.2}` → `--glass-track-opacity`; centre slot; responsive `size="100%"`; index keys; default label "Ring 1" (English) → require `label`.
 - [ ] **PRR-01** P1 a11y — Progress ring `role="progressbar"` without name or `aria-valuetext` → `label` (required), `valueText`. P2: indeterminate arc; > 1 lap; content text in `--primary` on glass → `text-foreground`.
 - [x] **SPK-01** P0 bug — Fixed `W=300` viewBox + `preserveAspectRatio="none"` → **dots stretch into ellipses** at any other width. → HTML overlay dots by % or ResizeObserver real width.
@@ -371,7 +373,7 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 - [x] **SPK-03** P2 — `useId().replace(/:/g,"")` misses React 19 `«»`/`_r_` → shared sanitiser; `Math.min(...arr)` overflows ~100k points.
 - [x] **STA-01** P1 rebuild — Stat is its own glass pane → tiles in a card are glass-on-glass; content tiles shouldn't be glass. → `bg-fill` + `rounded-concentric` inside cards; glass opt-in standalone.
 - [x] **STA-02** P1 bug — `direction` conflates direction and sentiment (latency up = green); no flat. → `direction: up|down|flat` + `sentiment: positive|negative|neutral`; sr-only "increased/decreased".
-- [ ] **STA-03** P2 — Token sizes; `StatDescription` ("vs last week"), `StatChart` slot, Intl compact formatting, `title` on truncation, skeleton.
+- [x] **STA-03** P2 — Token sizes; `StatDescription` ("vs last week"), `StatChart` slot, Intl compact formatting, `title` on truncation, skeleton.
 - [x] **HMP-01** P0 bug — Default `today = isoDate(new Date())` server UTC vs client local → **hydration mismatch** (`heatmap.tsx:17`; also in dashboard-01).
 - [x] **HMP-02** P1 bug — Weekdays use `undefined` locale (server ≠ browser), months hard-coded `en-US` → `locale` prop throughout.
 - [ ] **HMP-03** P1 a11y — `onSelect` puts ~182 cells in tab order → `role="grid"` + roving tabindex (arrows, Home/End, PageUp/Down by month); non-interactive values only in `title` → root summary + hidden table.
@@ -385,41 +387,41 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 
 ### 7.4 Charts
 - [x] **CHT-01** P0 bug — Area gradient ids `area-${i}` fixed → **two area charts on a page share colours** (`area-chart.tsx:67,81-82`). → `useId()` prefix + `idPrefix`.
-- [ ] **CHT-02** P1 bug — Preset memos depend on `x`, `series`, `valueFormat`, `xFormat` passed inline by every demo/block → definition rebuilds every parent render (area:102, line:80, bar:95, donut:74; analytics-01:102,106). → Latest accessors in a ref; memo on data/structure.
-- [ ] **CHT-03** P1 bug — `drawIn` fixed 900ms ignores `motion-still` (`chart.tsx:27`) → read `--glass-duration`; `initial:false` at 0; consider TanStack spring to match `--glass-ease`.
-- [ ] **CHT-04** P1 bug — `useControlRadius` starts at 8 then corrects (rebuild/re-animate); observes `<html>` + `<head>` but ThemeScope writes `<style>` in body → scoped shape never reaches bars/slices. → `useSyncExternalStore` + ResizeObserver on host + nearest `[data-glass-scope]`, or CSS var radius.
-- [ ] **CHT-05** P1 bug — No `initialWidth`/`idPrefix` → SSR at fallback width (CLS). → `initialWidth` (default 640), `idPrefix={useId()}`.
-- [ ] **CHT-06** P1 a11y — `ariaDescription` not surfaced; no exact-value alternative. → `ChartDataTable` (hidden/toggle `<table>`) + `ChartSummary` (auto min/max/latest/trend); P2 audio graph (Web Audio sonification). Hide axis text from AT; per-mark labels with context.
-- [ ] **CHT-07** P1 gap — Empty/loading/error states → `ChartContainer state` (skeleton axes with shimmer, "No data for this range", retry).
-- [ ] **CHT-08** P1 gap — Touch scrubbing/selection: press-and-drag rule + top annotation (Swift Charts `chartXSelection` + `.annotation(position:.top, overflowResolution:.fit)`), whole plot area as target, keyboard by x; `selectedX`/`onSelect(row)` on presets.
-- [ ] **CHT-09** P1 improve — Apple axis style: y axis trailing, no domain lines, hairline grid ~10–15%, caption2 labels; bars start at zero; units in title. → `axisPosition="trailing"` default, `--chart-grid-opacity`, `type-step-n2`.
-- [ ] **CHT-10** P1 bug — Chart palette not CVD-safe (ENG-14); `chartColor` cycles 5 → 6th series silently repeats → `--chart-6..8` or "Other"; separators between stacked segments (HIG).
+- [x] **CHT-02** P1 bug — Preset memos depend on `x`, `series`, `valueFormat`, `xFormat` passed inline by every demo/block → definition rebuilds every parent render (area:102, line:80, bar:95, donut:74; analytics-01:102,106). → Latest accessors in a ref; memo on data/structure.
+- [x] **CHT-03** P1 bug — `drawIn` fixed 900ms ignores `motion-still` (`chart.tsx:27`) → read `--glass-duration`; `initial:false` at 0; consider TanStack spring to match `--glass-ease`.
+- [x] **CHT-04** P1 bug — `useControlRadius` starts at 8 then corrects (rebuild/re-animate); observes `<html>` + `<head>` but ThemeScope writes `<style>` in body → scoped shape never reaches bars/slices. → `useSyncExternalStore` + ResizeObserver on host + nearest `[data-glass-scope]`, or CSS var radius. *(M3: a radius change still rebuilds once)*
+- [x] **CHT-05** P1 bug — No `initialWidth`/`idPrefix` → SSR at fallback width (CLS). → `initialWidth` (default 640), `idPrefix={useId()}`.
+- [x] **CHT-06** P1 a11y — `ariaDescription` not surfaced; no exact-value alternative. → `ChartDataTable` (hidden/toggle `<table>`) + `ChartSummary` (auto min/max/latest/trend); P2 audio graph (Web Audio sonification). Hide axis text from AT; per-mark labels with context.
+- [x] **CHT-07** P1 gap — Empty/loading/error states → `ChartContainer state` (skeleton axes with shimmer, "No data for this range", retry).
+- [x] **CHT-08** P1 gap — Touch scrubbing/selection: press-and-drag rule + top annotation (Swift Charts `chartXSelection` + `.annotation(position:.top, overflowResolution:.fit)`), whole plot area as target, keyboard by x; `selectedX`/`onSelect(row)` on presets.
+- [x] **CHT-09** P1 improve — Apple axis style: y axis trailing, no domain lines, hairline grid ~10–15%, caption2 labels; bars start at zero; units in title. → `axisPosition="trailing"` default, `--chart-grid-opacity`, `type-step-n2`.
+- [x] **CHT-10** P1 bug — Chart palette not CVD-safe (ENG-14); `chartColor` cycles 5 → 6th series silently repeats → `--chart-6..8` or "Other"; separators between stacked segments (HIG). *(M3: --chart-6..8 + separators; CVD not test-validated)*
 - [ ] **CHT-11** P2 — Legend keyed by label, round swatch for lines (should be dashes), not interactive → TanStack `interactiveColorLegend` (`aria-pressed`, hover linking). `ChartHeader` (headline value, delta, period like Health/Stocks); reference lines/bands/annotations (`RuleMark`/`RectangleMark`); export; tooltip uses liquid + tokens (`chart.tsx:115-116`).
-- [ ] **CHT-12** P2 — Area: mixed-sign stacking wrong (`stackOffsetDiverging`); tooltip order = reverse stack + total; `expand` 100% stack; latest-point dot; forecast dashes.
-- [ ] **CHT-13** P1 bug — Bar: Dates labelled via `toISOString().slice(0,10)` (UTC, off by a day) (`bar-chart.tsx:57`); band key = formatted label → two "Mon"s merge (`:55-58`). P2: `Math.min(radius, 8)`, `maxThickness: 44` px; value labels on bars; negative baseline; selected bar.
+- [x] **CHT-12** P2 — Area: mixed-sign stacking wrong (`stackOffsetDiverging`); tooltip order = reverse stack + total; `expand` 100% stack; latest-point dot; forecast dashes. *(M3: forecast dashes open)*
+- [x] **CHT-13** P1 bug — Bar: Dates labelled via `toISOString().slice(0,10)` (UTC, off by a day) (`bar-chart.tsx:57`); band key = formatted label → two "Mon"s merge (`:55-58`). P2: `Math.min(radius, 8)`, `maxThickness: 44` px; value labels on bars; negative baseline; selected bar.
 - [ ] **CHT-14** P2 — Line: `sort` mis-indented (prettier); end labels (direct labelling), step curve, log scale, dual axis, brush/zoom, per-series dash pattern.
-- [ ] **CHT-15** P1 — Donut: `Intl.NumberFormat("en-US")` hard-coded (`:43,68`); key/colour by label (dupes, > 5 cycle) → index + "Other"; selection (`chartAngleSelection`: centre shows selected label/value; legend rows show value and %); per-slice text alternative.
+- [x] **CHT-15** P1 — Donut: `Intl.NumberFormat("en-US")` hard-coded (`:43,68`); key/colour by label (dupes, > 5 cycle) → index + "Other"; selection (`chartAngleSelection`: centre shows selected label/value; legend rows show value and %); per-slice text alternative.
 - [ ] **CHT-16** P2 a11y — Chart demo encodes workout vs rest by colour alone → symbol channel/direct labels.
 
 ### 7.5 Tables
 - [ ] **TBL-01** P2 — `table.tsx`: `text-left`, `pr-0` → logical; heights/paddings → tokens; overflow container not focusable (`scrollable-region-focusable`) → `tabIndex=0 role="region" aria-label`; `align`/`numeric` on Head/Cell; sticky header with hard scroll edge; sr-only caption; inset-grouped variant. *(M1: align/numeric, focusable region; left: sticky header, caption, inset variant)*
-- [ ] **DTB-01** P0 parity — Data table vs shadcn: no column visibility, rows-per-page, first/last page, faceted filters, row actions, pinning, resizing, expanding, grouping. → Register features + ship `DataTableToolbar`, `DataTableViewOptions`, `DataTableFacetedFilter`, `DataTableRowActions`.
-- [ ] **DTB-02** P0 gap — Uncontrolled only: no `state`/`onStateChange`, no `manual*` + `rowCount` → server data and URL sync impossible. → `tableOptions` passthrough + controlled props.
-- [ ] **DTB-03** P1 — Virtual mode (`@tanstack/react-virtual`, sticky header, `contain: strict`); loading skeleton rows + error row.
-- [ ] **DTB-04** P1 bug — Clickable `tr` fires `onRowClick` for nested links/buttons; Space doesn't activate → ignore interactive descendants or stretched primary link.
-- [ ] **DTB-05** P2 — `aria-live` count announces every keystroke (debounce); English-only strings → `labels`; RTL `left-[…]`/`pl-[…]`; select-all-across-pages banner; debounced search; narrow-screen list layout (Apple uses lists on iPhone); CSV export.
+- [x] **DTB-01** P0 parity — Data table vs shadcn: no column visibility, rows-per-page, first/last page, faceted filters, row actions, pinning, resizing, expanding, grouping. → Register features + ship `DataTableToolbar`, `DataTableViewOptions`, `DataTableFacetedFilter`, `DataTableRowActions`.
+- [x] **DTB-02** P0 gap — Uncontrolled only: no `state`/`onStateChange`, no `manual*` + `rowCount` → server data and URL sync impossible. → `tableOptions` passthrough + controlled props.
+- [x] **DTB-03** P1 — Virtual mode (`@tanstack/react-virtual`, sticky header, `contain: strict`); loading skeleton rows + error row.
+- [x] **DTB-04** P1 bug — Clickable `tr` fires `onRowClick` for nested links/buttons; Space doesn't activate → ignore interactive descendants or stretched primary link.
+- [x] **DTB-05** P2 — `aria-live` count announces every keystroke (debounce); English-only strings → `labels`; RTL `left-[…]`/`pl-[…]`; select-all-across-pages banner; debounced search; narrow-screen list layout (Apple uses lists on iPhone); CSV export.
 
 ### 7.6 Chat
-- [ ] **CHA-01** P0 gap — AI SDK `UIMessage.parts`: `ChatMarkdown` (streaming-safe, unclosed fences), `ChatCodeBlock` (language, copy, wrap, Shiki), `ChatReasoning` ("Thought for 12s", auto-open while streaming), `ChatTool` (states `input-streaming|input-available|output-available|output-error`, JSON in/out, approve/deny), `ChatSources`/`ChatCitation`, `ChatFile`/`ChatAttachment`, `ChatError` (retry); `renderParts(message)`.
-- [ ] **CHA-02** P0 gap — Composer: `status` → send becomes Stop (`onStop`) during `submitted|streaming`; `trailing` slot (model picker, mic); attachments (paste, drop, chips); `maxLength` counter; `submitOnEnter`; send = tinted prominent, not solid.
+- [x] **CHA-01** P0 gap — AI SDK `UIMessage.parts`: `ChatMarkdown` (streaming-safe, unclosed fences), `ChatCodeBlock` (language, copy, wrap, Shiki), `ChatReasoning` ("Thought for 12s", auto-open while streaming), `ChatTool` (states `input-streaming|input-available|output-available|output-error`, JSON in/out, approve/deny), `ChatSources`/`ChatCitation`, `ChatFile`/`ChatAttachment`, `ChatError` (retry); `renderParts(message)`.
+- [x] **CHA-02** P0 gap — Composer: `status` → send becomes Stop (`onStop`) during `submitted|streaming`; `trailing` slot (model picker, mic); attachments (paste, drop, chips); `maxLength` counter; `submitOnEnter`; send = tinted prominent, not solid.
 - [x] **CHA-03** P0 a11y — `role="log"` + `aria-live="polite"` re-announces every streamed token → `aria-busy` on streaming message + hidden `role="status"` announcing the whole message once.
-- [ ] **CHA-04** P1 bug — `whitespace-pre-wrap` on every bubble adds blank lines between Markdown blocks → plain text only.
-- [ ] **CHA-05** P1 rebuild — Assistant turns always bubbles; modern AI chats render assistant as full-width prose → `layout="bubble|document"`.
-- [ ] **CHA-06** P1 a11y — Speaker identity visual only → `role="article"` + `aria-label` per message, `<time dateTime>` in `ChatMeta`; suggestions inside the log are announced as entries → move above composer.
-- [ ] **CHA-07** P1 gap — `ChatActions` (copy, regenerate, edit, thumbs, share), `ChatReactions` (tapbacks as a liquid capsule on the bubble corner), message status (sending, failed + retry, edited).
-- [ ] **CHA-08** P1 bug — Prepending older history jumps scroll → `overflow-anchor` + anchor-preserving `loadOlder`.
-- [ ] **CHA-09** P1 token/LG — `text-[0.7rem]`, `max-w-[min(80%,36rem)]` (→ `--chat-bubble-max`), calc paddings; jump button + floating composer → liquid; jump button materialises, not fades.
-- [ ] **CHA-10** P2 — Virtualisation (reverse mode) + unread count on jump button; per-token re-render (`querySelectorAll` + `setAtBottom(true)` each resize); `textareaProps.ref` overrides internal ref (merge; prefer `field-sizing: content`); suggestions row edge fades + scroll-snap.
+- [x] **CHA-04** P1 bug — `whitespace-pre-wrap` on every bubble adds blank lines between Markdown blocks → plain text only.
+- [x] **CHA-05** P1 rebuild — Assistant turns always bubbles; modern AI chats render assistant as full-width prose → `layout="bubble|document"`.
+- [x] **CHA-06** P1 a11y — Speaker identity visual only → `role="article"` + `aria-label` per message, `<time dateTime>` in `ChatMeta`; suggestions inside the log are announced as entries → move above composer.
+- [x] **CHA-07** P1 gap — `ChatActions` (copy, regenerate, edit, thumbs, share), `ChatReactions` (tapbacks as a liquid capsule on the bubble corner), message status (sending, failed + retry, edited).
+- [x] **CHA-08** P1 bug — Prepending older history jumps scroll → `overflow-anchor` + anchor-preserving `loadOlder`.
+- [x] **CHA-09** P1 token/LG — `text-[0.7rem]`, `max-w-[min(80%,36rem)]` (→ `--chat-bubble-max`), calc paddings; jump button + floating composer → liquid; jump button materialises, not fades.
+- [x] **CHA-10** P2 — Virtualisation (reverse mode) + unread count on jump button; per-token re-render (`querySelectorAll` + `setAtBottom(true)` each resize); `textareaProps.ref` overrides internal ref (merge; prefer `field-sizing: content`); suggestions row edge fades + scroll-snap. *(M3: all but virtualisation)*
 
 ### 7.7 Blocks (existing)
 - [ ] **BLK-01** P1 — dashboard-01: `tabular-nums` + `font-glass-heading font-bold` on figures (rule) → `type-glass-display numeric-glass`; heatmap hydration (HMP-01); three stats in `grid-cols-3` truncate at 375px; ring vs legend labels disagree, duplicated colours. Rebuild as Fitness/Health "Summary": large title, widget cards, floating liquid toolbar + tab bar. *(M1: token fixes; left: phone truncation, Health-style rebuild)*
@@ -429,13 +431,13 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 - [ ] **BLK-05** P2 — chat-01: `h-[min(600px,80svh)]` → `dvh`.
 
 ### 7.8 New data components
-- [ ] **DAT-01** P0 — `chart-data-table` / `ChartSummary` for every preset (one `accessibilityTable` prop).
-- [ ] **DAT-02** P0 — Data table v2 toolbar + server + virtual modes (DTB-01..03).
-- [ ] **DAT-03** P1 — Shared chart selection/scrubber (line, area, bar, sparkline).
-- [ ] **DAT-04** P1 — `widget` (small/medium/large/XL; lock-screen `circular` 76², `rectangular` 172×76, `inline`; 16pt margins, 11pt min text; accented rendering).
-- [ ] **DAT-05** P1 — `kpi` / Stat v2.
-- [ ] **DAT-06** P1 — `range-chart` (Health heart rate, Weather temperature capsules with current dot) + `candlestick`.
-- [ ] **DAT-07** P1 — Shared chart/table skeleton + empty + error.
+- [x] **DAT-01** P0 — `chart-data-table` / `ChartSummary` for every preset (one `accessibilityTable` prop).
+- [x] **DAT-02** P0 — Data table v2 toolbar + server + virtual modes (DTB-01..03).
+- [x] **DAT-03** P1 — Shared chart selection/scrubber (line, area, bar, sparkline).
+- [x] **DAT-04** P1 — `widget` (small/medium/large/XL; lock-screen `circular` 76², `rectangular` 172×76, `inline`; 16pt margins, 11pt min text; accented rendering).
+- [x] **DAT-05** P1 — `kpi` / Stat v2.
+- [x] **DAT-06** P1 — `range-chart` (Health heart rate, Weather temperature capsules with current dot) + `candlestick`. *(M3: range-chart; candlestick deferred)*
+- [x] **DAT-07** P1 — Shared chart/table skeleton + empty + error.
 - [ ] **DAT-08** P2 — `scatter`/`bubble` (sqrt radius, ordinal colour + shape), `radial-bar` (Screen Time), year calendar heatmap + punch card, storage `segmented-bar` + linear `meter`, `timeline`/activity feed, `funnel`/`waterfall`/`treemap`, `json-viewer`/key-value list.
 
 ### 7.9 New blocks — Liquid Glass showcases first

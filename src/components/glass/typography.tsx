@@ -41,7 +41,7 @@ function Heading({
 const textVariants = cva("", {
   variants: {
     variant: {
-      body: "type-step-0",
+      body: "type-step-0 text-pretty [hyphens:var(--glass-hyphens)]",
       lead: "type-step-1 max-w-(--glass-measure) text-muted-foreground [line-height:var(--glass-leading)]",
       large: "type-step-1 font-semibold [line-height:var(--glass-leading)]",
       small: "type-step-n1 leading-snug",
@@ -49,15 +49,40 @@ const textVariants = cva("", {
       // title case as written (Apple style); add `uppercase` for the all-caps eyebrow
       overline: "type-step-n2 font-semibold tracking-wide text-muted-foreground",
       caption: "type-step-n2 text-muted-foreground",
+      // Apple's text styles (Dynamic Type at the default size), on the theme's fonts
+      "large-title": "type-large-title",
+      "title-1": "type-title-1",
+      "title-2": "type-title-2",
+      "title-3": "type-title-3",
+      headline: "type-headline",
+      "apple-body": "type-body text-pretty [hyphens:var(--glass-hyphens)]",
+      callout: "type-callout",
+      subheadline: "type-subheadline",
+      footnote: "type-footnote",
+      "caption-1": "type-caption-1",
+      "caption-2": "type-caption-2",
     },
+    // Apple's emphasized weight for a style: semibold for body sizes, bold for titles
+    emphasized: { true: "font-semibold", false: "" },
   },
-  defaultVariants: { variant: "body" },
+  compoundVariants: [{ variant: ["large-title", "title-1", "title-2", "title-3"], emphasized: true, class: "font-bold" }],
+  defaultVariants: { variant: "body", emphasized: false },
 })
 
-/** Running text. `variant`: body, lead, large, small, muted, overline, caption. */
-function Text({ variant = "body", asChild = false, className, ...props }: React.ComponentProps<"p"> & VariantProps<typeof textVariants> & { asChild?: boolean }) {
+/**
+ * Running text. `variant`: body, lead, large, small, muted, overline, caption — on the theme's
+ * modular scale — or one of Apple's text styles: large-title, title-1…3, headline, apple-body,
+ * callout, subheadline, footnote, caption-1/2. `emphasized` is Apple's bolder weight of a style.
+ */
+function Text({
+  variant = "body",
+  emphasized = false,
+  asChild = false,
+  className,
+  ...props
+}: React.ComponentProps<"p"> & VariantProps<typeof textVariants> & { asChild?: boolean }) {
   const Comp = asChild ? Slot.Root : "p"
-  return <Comp data-slot="text" data-variant={variant} className={cn(textVariants({ variant }), className)} {...props} />
+  return <Comp data-slot="text" data-variant={variant} data-emphasized={emphasized || undefined} className={cn(textVariants({ variant, emphasized }), className)} {...props} />
 }
 
 const displayVariants = cva("type-glass-display text-foreground", {

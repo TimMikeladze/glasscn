@@ -143,7 +143,8 @@ describe("registry.json", () => {
     // primitives, the two layer hooks, and shadcn's own colour tokens
     const known = new Set([...TOKENS.map((t) => t.name), "glass-bg", "glass-elevation", "glass-tinted", "glass-draw-from", "glass-container-radius", "glass-container-pad", "glass-concentric-min", "glass-press-x", "glass-press-y", "glass-knob-stretch-x", "glass-morph-w", "glass-morph-h", "glass-morph-origin", "glass-scroll-edge-to", "glass-scroll-edge-rule", "primary", "primary-foreground", "destructive", "destructive-foreground", "foreground", "muted-foreground"])
     const css = JSON.stringify([themeTokens, ...registry.items.filter((i) => i.css).map((i) => i.css)])
-    for (const [, name] of css.matchAll(/var\(--([\w-]+)/g)) expect(known.has(name), name).toBe(true)
+    // Radix's measured sizes (the accordion / collapsible keyframes) come from the element
+    for (const [, name] of css.matchAll(/var\(--([\w-]+)/g)) expect(known.has(name) || name.startsWith("radix-"), name).toBe(true)
   })
 })
 

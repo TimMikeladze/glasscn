@@ -9,6 +9,7 @@ import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle }
 import { createDataTableColumnHelper, DataTable, DataTableColumnHeader } from "@/components/glass/data-table"
 import { DonutChart } from "@/components/glass/donut-chart"
 import { Gauge } from "@/components/glass/gauge"
+import { Kpi } from "@/components/glass/kpi"
 import { SegmentedControl, SegmentedControlItem } from "@/components/glass/segmented-control"
 
 interface Day {
@@ -63,7 +64,7 @@ const sessions: Session[] = [
 
 const col = createDataTableColumnHelper<Session>()
 const columns = col.columns([
-  col.accessor("date", { header: "Day" }),
+  col.accessor("id", { id: "day", meta: { label: "Day" }, header: ({ column }) => <DataTableColumnHeader column={column} title="Day" />, cell: (info) => info.row.original.date }),
   col.accessor("activity", { header: ({ column }) => <DataTableColumnHeader column={column} title="Activity" />, cell: (info) => <span className="font-medium">{info.getValue()}</span> }),
   col.accessor("minutes", {
     meta: { numeric: true },
@@ -83,8 +84,20 @@ export function Analytics01() {
     [data]
   )
   const total = mix.reduce((sum, m) => sum + m.minutes, 0)
+  // the same range just before this one, for the deltas
+  const before = React.useMemo(() => days(Number(range) * 2).slice(0, Number(range)), [range])
+  const sum = (rows: Day[], f: (d: Day) => number) => rows.reduce((s, d) => s + f(d), 0)
+  const change = (now: number, then: number) => (then ? (now - then) / then : 0)
+  const all = (d: Day) => d.cardio + d.strength + d.mobility
   return (
     <div className="grid gap-4 lg:grid-cols-3">
+      <Card className="lg:col-span-3" size="sm">
+        <CardContent className="grid gap-3 sm:grid-cols-3">
+          <Kpi label="Active minutes" value={sum(data, all)} format={(v) => `${v.toLocaleString("en")} min`} trend={{ value: change(sum(data, all), sum(before, all)) }} description={`vs the ${range} days before`} />
+          <Kpi label="Active days" value={data.filter((d) => all(d) > 20).length} format={(v) => `${v} of ${range}`} trend={{ value: change(data.filter((d) => all(d) > 20).length, before.filter((d) => all(d) > 20).length) }} description="20+ minutes" />
+          <Kpi label="Strength share" value={total ? mix[1].minutes / total : 0} format={(v) => `${Math.round(v * 100)}%`} description="of all training" />
+        </CardContent>
+      </Card>
       <Card className="lg:col-span-2">
         <CardHeader>
           <CardTitle>Active minutes</CardTitle>
@@ -133,7 +146,7 @@ export function Analytics01() {
           </Gauge>
         </CardContent>
       </Card>
-      <Card>
+      <Card className="lg:col-span-2">
         <CardHeader>
           <CardTitle>Top habits</CardTitle>
           <CardDescription>Days kept this month</CardDescription>
@@ -142,7 +155,7 @@ export function Analytics01() {
           <BarList data={habits} max={30} valueFormat={(v) => `${v}/30`} />
         </CardContent>
       </Card>
-      <Card>
+      <Card className="lg:col-span-3">
         <CardHeader>
           <CardTitle>Recent sessions</CardTitle>
           <CardDescription>The last eight</CardDescription>

@@ -124,4 +124,16 @@ function AvatarGroupCount({ size = "default", style, children, ...props }: ViewP
   )
 }
 
-export { Avatar, AvatarImage, AvatarFallback, AvatarGroup, AvatarGroupCount, avatarVariants }
+/** A status dot on the avatar's bottom-end corner; colour it with `color` (default: the accent). Give it an accessibilityLabel ("Online"). */
+function AvatarBadge({ color, style, ...props }: ViewProps & { color?: string }) {
+  const ui = useUI()
+  return (
+    <View
+      accessible={!!props.accessibilityLabel}
+      style={[{ position: "absolute", right: 0, bottom: 0, zIndex: 10, width: "30%", height: "30%", minWidth: 8, minHeight: 8, borderRadius: 999, backgroundColor: color ?? ui.primary, borderWidth: 2, borderColor: ui.glassTint }, style]}
+      {...props}
+    />
+  )
+}
+
+export { Avatar, AvatarImage, AvatarFallback, AvatarBadge, AvatarGroup, AvatarGroupCount, avatarVariants }

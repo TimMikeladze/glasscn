@@ -58,7 +58,7 @@ async function Doc({ params }: { params: PageProps<"/docs/[slug]">["params"] }) 
   return (
     <article>
       <div className="flex flex-col gap-2 pb-6">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge variant="tinted">{doc.group}</Badge>
           {doc.dependencies.map((d) => (
             <Badge key={d} variant="secondary" className="font-mono font-normal">

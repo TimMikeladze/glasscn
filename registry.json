@@ -170,6 +170,7 @@
           "glass-heading-leading": "1.15",
           "glass-heading-case": "none",
           "glass-heading-wrap": "balance",
+          "glass-hyphens": "manual",
           "glass-display-weight": "700",
           "glass-display-tracking": "-0.03em",
           "glass-numeric": "tabular-nums",
@@ -257,6 +258,7 @@
           "glass-heading-leading": "1.15",
           "glass-heading-case": "none",
           "glass-heading-wrap": "balance",
+          "glass-hyphens": "manual",
           "glass-display-weight": "700",
           "glass-display-tracking": "-0.03em",
           "glass-numeric": "tabular-nums",
@@ -642,6 +644,7 @@
         "@utility type-glass": {
           "font-family": "var(--glass-font-sans, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif))",
           "line-height": "var(--glass-leading)",
+          "hyphens": "var(--glass-hyphens)",
           "letter-spacing": "var(--glass-tracking)",
           "font-weight": "var(--glass-body-weight)",
           "font-feature-settings": "var(--glass-font-features)"
@@ -764,6 +767,40 @@
           "30%": {
             "transform": "translateY(-0.25rem)",
             "opacity": "1"
+          }
+        },
+        "@keyframes glass-shimmer": {
+          "from": {
+            "transform": "translateX(-100%)"
+          },
+          "to": {
+            "transform": "translateX(100%)"
+          }
+        },
+        "@keyframes glass-shimmer-rtl": {
+          "from": {
+            "transform": "translateX(100%)"
+          },
+          "to": {
+            "transform": "translateX(-100%)"
+          }
+        },
+        "@keyframes glass-collapsible-down": {
+          "from": {
+            "height": "0",
+            "opacity": "0"
+          },
+          "to": {
+            "height": "var(--radix-collapsible-content-height)"
+          }
+        },
+        "@keyframes glass-collapsible-up": {
+          "from": {
+            "height": "var(--radix-collapsible-content-height)"
+          },
+          "to": {
+            "height": "0",
+            "opacity": "0"
           }
         },
         "@layer base": {
@@ -952,7 +989,7 @@
       "name": "theme-dusk",
       "type": "registry:theme",
       "title": "Dusk palette",
-      "description": "Coral over violet and peach — the default. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
+      "description": "Coral over violet and peach — the default. Sets the accent, ring, eight chart colours, the aurora and the ground for light and dark.",
       "categories": [
         "glass",
         "themes"
@@ -967,6 +1004,9 @@
           "chart-3": "oklch(0.803 0.159 69.8)",
           "chart-4": "oklch(0.55 0.113 95)",
           "chart-5": "oklch(0.85 0.096 335)",
+          "chart-6": "oklch(0.48 0.112 253)",
+          "chart-7": "oklch(0.74 0.08 121)",
+          "chart-8": "oklch(0.62 0.02 35)",
           "aurora-1": "oklch(0.829 0.097 37.8)",
           "aurora-2": "oklch(0.809 0.108 296.4)",
           "aurora-3": "oklch(0.907 0.07 70.2)",
@@ -987,6 +1027,9 @@
           "chart-3": "oklch(0.803 0.159 69.8)",
           "chart-4": "oklch(0.66 0.128 95)",
           "chart-5": "oklch(0.86 0.096 335)",
+          "chart-6": "oklch(0.62 0.112 253)",
+          "chart-7": "oklch(0.9 0.08 121)",
+          "chart-8": "oklch(0.6 0.02 35)",
           "aurora-1": "oklch(0.48 0.132 31.7)",
           "aurora-2": "oklch(0.401 0.159 289.2)",
           "aurora-3": "oklch(0.456 0.088 60.9)",
@@ -1004,7 +1047,7 @@
       "name": "theme-ocean",
       "type": "registry:theme",
       "title": "Ocean palette",
-      "description": "Blue, teal and periwinkle. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
+      "description": "Blue, teal and periwinkle. Sets the accent, ring, eight chart colours, the aurora and the ground for light and dark.",
       "categories": [
         "glass",
         "themes"
@@ -1019,6 +1062,9 @@
           "chart-3": "oklch(0.665 0.187 286.4)",
           "chart-4": "oklch(0.55 0.128 319)",
           "chart-5": "oklch(0.85 0.096 199)",
+          "chart-6": "oklch(0.48 0.111 117)",
+          "chart-7": "oklch(0.74 0.08 345)",
+          "chart-8": "oklch(0.62 0.02 259)",
           "aurora-1": "oklch(0.817 0.092 256.2)",
           "aurora-2": "oklch(0.899 0.073 185.2)",
           "aurora-3": "oklch(0.828 0.093 291.7)",
@@ -1039,6 +1085,9 @@
           "chart-3": "oklch(0.665 0.187 286.4)",
           "chart-4": "oklch(0.66 0.128 319)",
           "chart-5": "oklch(0.86 0.096 199)",
+          "chart-6": "oklch(0.62 0.112 117)",
+          "chart-7": "oklch(0.9 0.065 345)",
+          "chart-8": "oklch(0.6 0.02 259)",
           "aurora-1": "oklch(0.389 0.133 260.3)",
           "aurora-2": "oklch(0.442 0.071 205.5)",
           "aurora-3": "oklch(0.36 0.154 280)",
@@ -1056,7 +1105,7 @@
       "name": "theme-rose",
       "type": "registry:theme",
       "title": "Rose palette",
-      "description": "Pink over lilac. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
+      "description": "Pink over lilac. Sets the accent, ring, eight chart colours, the aurora and the ground for light and dark.",
       "categories": [
         "glass",
         "themes"
@@ -1071,6 +1120,9 @@
           "chart-3": "oklch(0.771 0.142 43.5)",
           "chart-4": "oklch(0.55 0.119 70)",
           "chart-5": "oklch(0.85 0.096 310)",
+          "chart-6": "oklch(0.48 0.094 228)",
+          "chart-7": "oklch(0.74 0.08 96)",
+          "chart-8": "oklch(0.62 0.02 10)",
           "aurora-1": "oklch(0.844 0.092 1.1)",
           "aurora-2": "oklch(0.843 0.106 311.1)",
           "aurora-3": "oklch(0.907 0.051 1.4)",
@@ -1091,6 +1143,9 @@
           "chart-3": "oklch(0.771 0.142 43.5)",
           "chart-4": "oklch(0.66 0.128 70)",
           "chart-5": "oklch(0.86 0.092 310)",
+          "chart-6": "oklch(0.62 0.112 228)",
+          "chart-7": "oklch(0.9 0.08 96)",
+          "chart-8": "oklch(0.6 0.02 10)",
           "aurora-1": "oklch(0.431 0.14 4.8)",
           "aurora-2": "oklch(0.407 0.146 306.5)",
           "aurora-3": "oklch(0.339 0.122 309.2)",
@@ -1108,7 +1163,7 @@
       "name": "theme-sage",
       "type": "registry:theme",
       "title": "Sage palette",
-      "description": "Green, lime and sea glass. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
+      "description": "Green, lime and sea glass. Sets the accent, ring, eight chart colours, the aurora and the ground for light and dark.",
       "categories": [
         "glass",
         "themes"
@@ -1123,6 +1178,9 @@
           "chart-3": "oklch(0.711 0.118 221.5)",
           "chart-4": "oklch(0.55 0.099 218)",
           "chart-5": "oklch(0.85 0.096 98)",
+          "chart-6": "oklch(0.48 0.112 16)",
+          "chart-7": "oklch(0.74 0.08 244)",
+          "chart-8": "oklch(0.62 0.02 158)",
           "aurora-1": "oklch(0.89 0.071 160.3)",
           "aurora-2": "oklch(0.927 0.098 121.8)",
           "aurora-3": "oklch(0.87 0.057 211.5)",
@@ -1143,6 +1201,9 @@
           "chart-3": "oklch(0.711 0.118 221.5)",
           "chart-4": "oklch(0.66 0.118 218)",
           "chart-5": "oklch(0.86 0.096 98)",
+          "chart-6": "oklch(0.62 0.112 16)",
+          "chart-7": "oklch(0.9 0.052 244)",
+          "chart-8": "oklch(0.6 0.02 158)",
           "aurora-1": "oklch(0.456 0.091 159.1)",
           "aurora-2": "oklch(0.47 0.105 130.5)",
           "aurora-3": "oklch(0.432 0.068 211.9)",
@@ -1160,7 +1221,7 @@
       "name": "theme-amber",
       "type": "registry:theme",
       "title": "Amber palette",
-      "description": "Honey, apricot and lemon. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
+      "description": "Honey, apricot and lemon. Sets the accent, ring, eight chart colours, the aurora and the ground for light and dark.",
       "categories": [
         "glass",
         "themes"
@@ -1175,6 +1236,9 @@
           "chart-3": "oklch(0.823 0.164 94.1)",
           "chart-4": "oklch(0.55 0.128 126)",
           "chart-5": "oklch(0.85 0.085 6)",
+          "chart-6": "oklch(0.48 0.112 284)",
+          "chart-7": "oklch(0.74 0.08 152)",
+          "chart-8": "oklch(0.62 0.02 66)",
           "aurora-1": "oklch(0.901 0.091 79.5)",
           "aurora-2": "oklch(0.849 0.085 40.3)",
           "aurora-3": "oklch(0.953 0.078 95.9)",
@@ -1195,6 +1259,9 @@
           "chart-3": "oklch(0.823 0.164 94.1)",
           "chart-4": "oklch(0.66 0.128 126)",
           "chart-5": "oklch(0.86 0.078 6)",
+          "chart-6": "oklch(0.62 0.112 284)",
+          "chart-7": "oklch(0.9 0.08 152)",
+          "chart-8": "oklch(0.6 0.02 66)",
           "aurora-1": "oklch(0.471 0.094 74)",
           "aurora-2": "oklch(0.414 0.106 35.8)",
           "aurora-3": "oklch(0.448 0.085 102.3)",
@@ -1212,7 +1279,7 @@
       "name": "theme-graphite",
       "type": "registry:theme",
       "title": "Graphite palette",
-      "description": "Monochrome — ink on frost. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
+      "description": "Monochrome — ink on frost. Sets the accent, ring, eight chart colours, the aurora and the ground for light and dark.",
       "categories": [
         "glass",
         "themes"
@@ -1227,6 +1294,9 @@
           "chart-3": "oklch(0.753 0.008 286.2)",
           "chart-4": "oklch(0.55 0.016 346)",
           "chart-5": "oklch(0.85 0.012 226)",
+          "chart-6": "oklch(0.48 0.014 144)",
+          "chart-7": "oklch(0.74 0.01 12)",
+          "chart-8": "oklch(0.62 0.02 286)",
           "aurora-1": "oklch(0.881 0.015 264.5)",
           "aurora-2": "oklch(0.911 0.025 301.1)",
           "aurora-3": "oklch(0.892 0.024 227.8)",
@@ -1247,6 +1317,9 @@
           "chart-3": "oklch(0.753 0.008 286.2)",
           "chart-4": "oklch(0.66 0.016 346)",
           "chart-5": "oklch(0.86 0.012 226)",
+          "chart-6": "oklch(0.62 0.014 144)",
+          "chart-7": "oklch(0.9 0.01 12)",
+          "chart-8": "oklch(0.6 0.02 286)",
           "aurora-1": "oklch(0.326 0.02 269.5)",
           "aurora-2": "oklch(0.339 0.032 300)",
           "aurora-3": "oklch(0.315 0.028 236.2)",
@@ -1264,7 +1337,7 @@
       "name": "theme-lavender",
       "type": "registry:theme",
       "title": "Lavender palette",
-      "description": "Soft violet with lilac and periwinkle. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
+      "description": "Soft violet with lilac and periwinkle. Sets the accent, ring, eight chart colours, the aurora and the ground for light and dark.",
       "categories": [
         "glass",
         "themes"
@@ -1279,6 +1352,9 @@
           "chart-3": "oklch(0.78 0.111 266)",
           "chart-4": "oklch(0.55 0.12 0)",
           "chart-5": "oklch(0.85 0.083 240)",
+          "chart-6": "oklch(0.48 0.105 158)",
+          "chart-7": "oklch(0.74 0.075 26)",
+          "chart-8": "oklch(0.62 0.02 300)",
           "aurora-1": "oklch(0.84 0.083 300)",
           "aurora-2": "oklch(0.83 0.09 338)",
           "aurora-3": "oklch(0.9 0.048 266)",
@@ -1299,6 +1375,9 @@
           "chart-3": "oklch(0.82 0.089 266)",
           "chart-4": "oklch(0.66 0.12 0)",
           "chart-5": "oklch(0.86 0.077 240)",
+          "chart-6": "oklch(0.62 0.105 158)",
+          "chart-7": "oklch(0.9 0.052 26)",
+          "chart-8": "oklch(0.6 0.02 300)",
           "aurora-1": "oklch(0.44 0.117 300)",
           "aurora-2": "oklch(0.38 0.135 338)",
           "aurora-3": "oklch(0.42 0.09 266)",
@@ -1316,7 +1395,7 @@
       "name": "theme-mint",
       "type": "registry:theme",
       "title": "Mint palette",
-      "description": "Fresh green against blue sky. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
+      "description": "Fresh green against blue sky. Sets the accent, ring, eight chart colours, the aurora and the ground for light and dark.",
       "categories": [
         "glass",
         "themes"
@@ -1331,6 +1410,9 @@
           "chart-3": "oklch(0.78 0.111 15)",
           "chart-4": "oklch(0.55 0.104 225)",
           "chart-5": "oklch(0.85 0.078 105)",
+          "chart-6": "oklch(0.48 0.091 135)",
+          "chart-7": "oklch(0.74 0.065 135)",
+          "chart-8": "oklch(0.62 0.02 165)",
           "aurora-1": "oklch(0.84 0.072 165)",
           "aurora-2": "oklch(0.83 0.078 315)",
           "aurora-3": "oklch(0.9 0.052 15)",
@@ -1351,6 +1433,9 @@
           "chart-3": "oklch(0.82 0.102 15)",
           "chart-4": "oklch(0.66 0.104 225)",
           "chart-5": "oklch(0.86 0.078 105)",
+          "chart-6": "oklch(0.62 0.091 135)",
+          "chart-7": "oklch(0.9 0.065 135)",
+          "chart-8": "oklch(0.6 0.02 165)",
           "aurora-1": "oklch(0.44 0.093 165)",
           "aurora-2": "oklch(0.38 0.117 315)",
           "aurora-3": "oklch(0.42 0.078 15)",
@@ -1368,7 +1453,7 @@
       "name": "theme-cherry",
       "type": "registry:theme",
       "title": "Cherry palette",
-      "description": "Red with a cool complement. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
+      "description": "Red with a cool complement. Sets the accent, ring, eight chart colours, the aurora and the ground for light and dark.",
       "categories": [
         "glass",
         "themes"
@@ -1383,6 +1468,9 @@
           "chart-3": "oklch(0.78 0.138 46)",
           "chart-4": "oklch(0.55 0.113 82)",
           "chart-5": "oklch(0.85 0.12 322)",
+          "chart-6": "oklch(0.48 0.14 22)",
+          "chart-7": "oklch(0.74 0.1 166)",
+          "chart-8": "oklch(0.62 0.02 22)",
           "aurora-1": "oklch(0.84 0.087 22)",
           "aurora-2": "oklch(0.83 0.12 202)",
           "aurora-3": "oklch(0.9 0.056 46)",
@@ -1403,6 +1491,9 @@
           "chart-3": "oklch(0.82 0.108 46)",
           "chart-4": "oklch(0.66 0.136 82)",
           "chart-5": "oklch(0.86 0.117 322)",
+          "chart-6": "oklch(0.62 0.14 22)",
+          "chart-7": "oklch(0.9 0.1 166)",
+          "chart-8": "oklch(0.6 0.02 22)",
           "aurora-1": "oklch(0.44 0.156 22)",
           "aurora-2": "oklch(0.38 0.065 202)",
           "aurora-3": "oklch(0.42 0.119 46)",
@@ -1420,7 +1511,7 @@
       "name": "theme-lagoon",
       "type": "registry:theme",
       "title": "Lagoon palette",
-      "description": "Teal, aqua and deep blue. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
+      "description": "Teal, aqua and deep blue. Sets the accent, ring, eight chart colours, the aurora and the ground for light and dark.",
       "categories": [
         "glass",
         "themes"
@@ -1435,6 +1526,9 @@
           "chart-3": "oklch(0.78 0.119 166)",
           "chart-4": "oklch(0.55 0.112 260)",
           "chart-5": "oklch(0.85 0.084 140)",
+          "chart-6": "oklch(0.48 0.098 58)",
+          "chart-7": "oklch(0.74 0.07 286)",
+          "chart-8": "oklch(0.62 0.02 200)",
           "aurora-1": "oklch(0.84 0.077 200)",
           "aurora-2": "oklch(0.83 0.084 238)",
           "aurora-3": "oklch(0.9 0.059 166)",
@@ -1455,6 +1549,9 @@
           "chart-3": "oklch(0.82 0.119 166)",
           "chart-4": "oklch(0.66 0.112 260)",
           "chart-5": "oklch(0.86 0.084 140)",
+          "chart-6": "oklch(0.62 0.098 58)",
+          "chart-7": "oklch(0.9 0.05 286)",
+          "chart-8": "oklch(0.6 0.02 200)",
           "aurora-1": "oklch(0.44 0.075 200)",
           "aurora-2": "oklch(0.38 0.085 238)",
           "aurora-3": "oklch(0.42 0.084 166)",
@@ -1472,7 +1569,7 @@
       "name": "theme-sand",
       "type": "registry:theme",
       "title": "Sand palette",
-      "description": "Warm neutrals, barely tinted. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
+      "description": "Warm neutrals, barely tinted. Sets the accent, ring, eight chart colours, the aurora and the ground for light and dark.",
       "categories": [
         "glass",
         "themes"
@@ -1487,6 +1584,9 @@
           "chart-3": "oklch(0.78 0.06 62)",
           "chart-4": "oklch(0.55 0.056 130)",
           "chart-5": "oklch(0.85 0.042 10)",
+          "chart-6": "oklch(0.48 0.049 258)",
+          "chart-7": "oklch(0.74 0.035 182)",
+          "chart-8": "oklch(0.62 0.02 70)",
           "aurora-1": "oklch(0.8 0.039 70)",
           "aurora-2": "oklch(0.88 0.042 78)",
           "aurora-3": "oklch(0.92 0.029 62)",
@@ -1507,6 +1607,9 @@
           "chart-3": "oklch(0.82 0.06 62)",
           "chart-4": "oklch(0.66 0.056 130)",
           "chart-5": "oklch(0.86 0.042 10)",
+          "chart-6": "oklch(0.62 0.049 258)",
+          "chart-7": "oklch(0.9 0.035 182)",
+          "chart-8": "oklch(0.6 0.02 70)",
           "aurora-1": "oklch(0.44 0.055 70)",
           "aurora-2": "oklch(0.38 0.063 78)",
           "aurora-3": "oklch(0.42 0.042 62)",
@@ -1524,7 +1627,7 @@
       "name": "theme-midnight",
       "type": "registry:theme",
       "title": "Midnight palette",
-      "description": "Indigo, magenta and cyan — made for dark. Sets the accent, ring, five chart colours, the aurora and the ground for light and dark.",
+      "description": "Indigo, magenta and cyan — made for dark. Sets the accent, ring, eight chart colours, the aurora and the ground for light and dark.",
       "categories": [
         "glass",
         "themes"
@@ -1539,6 +1642,9 @@
           "chart-3": "oklch(0.78 0.162 155)",
           "chart-4": "oklch(0.55 0.152 335)",
           "chart-5": "oklch(0.85 0.114 215)",
+          "chart-6": "oklch(0.48 0.085 215)",
+          "chart-7": "oklch(0.74 0.095 275)",
+          "chart-8": "oklch(0.62 0.02 275)",
           "aurora-1": "oklch(0.84 0.079 275)",
           "aurora-2": "oklch(0.83 0.096 35)",
           "aurora-3": "oklch(0.9 0.08 155)",
@@ -1559,6 +1665,9 @@
           "chart-3": "oklch(0.82 0.162 155)",
           "chart-4": "oklch(0.66 0.152 335)",
           "chart-5": "oklch(0.86 0.112 215)",
+          "chart-6": "oklch(0.62 0.109 215)",
+          "chart-7": "oklch(0.9 0.048 275)",
+          "chart-8": "oklch(0.6 0.02 275)",
           "aurora-1": "oklch(0.44 0.148 275)",
           "aurora-2": "oklch(0.38 0.135 35)",
           "aurora-3": "oklch(0.42 0.104 155)",
@@ -2447,6 +2556,7 @@
           "glass-heading-leading": "1.15",
           "glass-heading-case": "none",
           "glass-heading-wrap": "balance",
+          "glass-hyphens": "manual",
           "glass-display-weight": "700",
           "glass-display-tracking": "-0.03em",
           "glass-numeric": "tabular-nums",
@@ -2465,6 +2575,7 @@
           "glass-heading-leading": "1.15",
           "glass-heading-case": "none",
           "glass-heading-wrap": "balance",
+          "glass-hyphens": "manual",
           "glass-display-weight": "700",
           "glass-display-tracking": "-0.03em",
           "glass-numeric": "tabular-nums",
@@ -2495,6 +2606,7 @@
           "glass-heading-leading": "1.15",
           "glass-heading-case": "none",
           "glass-heading-wrap": "balance",
+          "glass-hyphens": "manual",
           "glass-display-weight": "700",
           "glass-display-tracking": "-0.03em",
           "glass-numeric": "tabular-nums",
@@ -2517,6 +2629,7 @@
           "glass-heading-leading": "1.15",
           "glass-heading-case": "none",
           "glass-heading-wrap": "balance",
+          "glass-hyphens": "manual",
           "glass-display-weight": "700",
           "glass-display-tracking": "-0.03em",
           "glass-numeric": "tabular-nums",
@@ -2551,6 +2664,7 @@
           "glass-heading-leading": "1.15",
           "glass-heading-case": "none",
           "glass-heading-wrap": "balance",
+          "glass-hyphens": "manual",
           "glass-display-weight": "700",
           "glass-display-tracking": "-0.04em",
           "glass-numeric": "tabular-nums",
@@ -2569,6 +2683,7 @@
           "glass-heading-leading": "1.15",
           "glass-heading-case": "none",
           "glass-heading-wrap": "balance",
+          "glass-hyphens": "manual",
           "glass-display-weight": "700",
           "glass-display-tracking": "-0.04em",
           "glass-numeric": "tabular-nums",
@@ -2604,6 +2719,7 @@
           "glass-heading-leading": "1.05",
           "glass-heading-case": "none",
           "glass-heading-wrap": "balance",
+          "glass-hyphens": "manual",
           "glass-display-weight": "400",
           "glass-display-tracking": "-0.02em",
           "glass-numeric": "oldstyle-nums",
@@ -2622,6 +2738,7 @@
           "glass-heading-leading": "1.05",
           "glass-heading-case": "none",
           "glass-heading-wrap": "balance",
+          "glass-hyphens": "manual",
           "glass-display-weight": "400",
           "glass-display-tracking": "-0.02em",
           "glass-numeric": "oldstyle-nums",
@@ -2657,6 +2774,7 @@
           "glass-heading-leading": "1.15",
           "glass-heading-case": "none",
           "glass-heading-wrap": "balance",
+          "glass-hyphens": "manual",
           "glass-display-weight": "900",
           "glass-display-tracking": "-0.03em",
           "glass-numeric": "tabular-nums",
@@ -2675,6 +2793,7 @@
           "glass-heading-leading": "1.15",
           "glass-heading-case": "none",
           "glass-heading-wrap": "balance",
+          "glass-hyphens": "manual",
           "glass-display-weight": "900",
           "glass-display-tracking": "-0.03em",
           "glass-numeric": "tabular-nums",
@@ -2709,6 +2828,7 @@
           "glass-heading-leading": "1.15",
           "glass-heading-case": "uppercase",
           "glass-heading-wrap": "balance",
+          "glass-hyphens": "manual",
           "glass-display-weight": "500",
           "glass-display-tracking": "-0.02em",
           "glass-numeric": "tabular-nums slashed-zero",
@@ -2727,6 +2847,7 @@
           "glass-heading-leading": "1.15",
           "glass-heading-case": "uppercase",
           "glass-heading-wrap": "balance",
+          "glass-hyphens": "manual",
           "glass-display-weight": "500",
           "glass-display-tracking": "-0.02em",
           "glass-numeric": "tabular-nums slashed-zero",
@@ -2763,6 +2884,7 @@
           "glass-heading-leading": "1.15",
           "glass-heading-case": "none",
           "glass-heading-wrap": "balance",
+          "glass-hyphens": "manual",
           "glass-display-weight": "700",
           "glass-display-tracking": "-0.03em",
           "glass-numeric": "oldstyle-nums",
@@ -2781,6 +2903,7 @@
           "glass-heading-leading": "1.15",
           "glass-heading-case": "none",
           "glass-heading-wrap": "balance",
+          "glass-hyphens": "manual",
           "glass-display-weight": "700",
           "glass-display-tracking": "-0.03em",
           "glass-numeric": "oldstyle-nums",
@@ -2816,6 +2939,7 @@
           "glass-heading-leading": "1.15",
           "glass-heading-case": "none",
           "glass-heading-wrap": "balance",
+          "glass-hyphens": "manual",
           "glass-display-weight": "800",
           "glass-display-tracking": "-0.05em",
           "glass-numeric": "tabular-nums",
@@ -2834,6 +2958,7 @@
           "glass-heading-leading": "1.15",
           "glass-heading-case": "none",
           "glass-heading-wrap": "balance",
+          "glass-hyphens": "manual",
           "glass-display-weight": "800",
           "glass-display-tracking": "-0.05em",
           "glass-numeric": "tabular-nums",
@@ -4435,6 +4560,29 @@
       ]
     },
     {
+      "name": "backdrop",
+      "type": "registry:ui",
+      "title": "Backdrop",
+      "description": "A ground for glass besides the aurora: a photo with an optional scrim, a muted looping video (paused under reduced motion), a palette mesh, or a fine noise.",
+      "categories": [
+        "glass",
+        "surfaces"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/backdrop.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/backdrop.tsx"
+        }
+      ]
+    },
+    {
       "name": "glass",
       "type": "registry:ui",
       "title": "Glass",
@@ -4462,13 +4610,14 @@
       "name": "card",
       "type": "registry:ui",
       "title": "Card",
-      "description": "shadcn's Card API on glass: header, title, description, action, content, footer.",
+      "description": "shadcn's Card API on glass: header, title, description, action, content, footer, a hero image — regular, thick or solid material, and asChild for a pressable link card.",
       "categories": [
         "glass",
         "surfaces"
       ],
       "dependencies": [
-        "cn"
+        "cn",
+        "radix-ui"
       ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/glass-style.json"
@@ -4565,6 +4714,8 @@
           "width": "100%",
           "min-width": "0",
           "overflow-wrap": "break-word",
+          "text-wrap": "pretty",
+          "hyphens": "var(--glass-hyphens)",
           "color": "var(--foreground)",
           "& :where(h1, h2, h3, h4, h5, h6)": {
             "font-family": "var(--glass-font-heading, --theme(--font-heading, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif)))",
@@ -4574,7 +4725,16 @@
             "text-transform": "var(--glass-heading-case)",
             "text-wrap": "var(--glass-heading-wrap)",
             "margin-top": "1.7em",
-            "margin-bottom": "0.55em"
+            "margin-bottom": "0.55em",
+            "scroll-margin-top": "5rem",
+            "hyphens": "manual"
+          },
+          "& :where(h1, h2, h3, h4, h5, h6) > a:where([href^='#'])": {
+            "color": "inherit",
+            "text-decoration-line": "none"
+          },
+          "& :where(h2 + *, h3 + *, h4 + *)": {
+            "margin-top": "0"
           },
           "& :where(h1)": {
             "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), 4))"
@@ -4609,6 +4769,30 @@
           "& :where(ul)": {
             "list-style-type": "disc",
             "padding-inline-start": "1.4em"
+          },
+          "& :where(ul ul)": {
+            "list-style-type": "circle"
+          },
+          "& :where(ul ul ul)": {
+            "list-style-type": "square"
+          },
+          "& :where(ol ol)": {
+            "list-style-type": "lower-alpha"
+          },
+          "& :where(ol ol ol)": {
+            "list-style-type": "lower-roman"
+          },
+          "& :where(li > ul, li > ol)": {
+            "margin-block": "0.3em"
+          },
+          "& :where(ul.contains-task-list, ul:has(> li > input[type=checkbox]))": {
+            "list-style-type": "none",
+            "padding-inline-start": "0.2em"
+          },
+          "& :where(li > input[type=checkbox])": {
+            "accent-color": "var(--primary)",
+            "margin-inline-end": "0.5em",
+            "vertical-align": "-0.1em"
           },
           "& :where(ol)": {
             "list-style-type": "decimal",
@@ -4657,7 +4841,11 @@
             "margin-block": "2em"
           },
           "& :where(table)": {
-            "width": "100%",
+            "display": "block",
+            "max-width": "100%",
+            "overflow-x": "auto",
+            "width": "max-content",
+            "min-width": "100%",
             "border-collapse": "collapse",
             "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), -1))",
             "font-variant-numeric": "var(--glass-numeric)"
@@ -4671,7 +4859,95 @@
             "font-weight": "600"
           },
           "& :where(img, video)": {
-            "border-radius": "var(--glass-radius-control)"
+            "border-radius": "var(--glass-radius-control)",
+            "max-width": "100%",
+            "height": "auto"
+          },
+          "& :where(figure)": {
+            "margin-inline": "0"
+          },
+          "& :where(kbd)": {
+            "font-family": "var(--glass-font-mono, --theme(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace))",
+            "font-size": "0.82em",
+            "padding": "0.1em 0.4em",
+            "border-radius": "calc(var(--glass-radius-control) * 0.4)",
+            "border": "var(--glass-border-width) solid color-mix(in oklch, var(--foreground) 10%, transparent)",
+            "border-bottom-width": "2px",
+            "background-color": "color-mix(in oklch, var(--glass-fill-tint) var(--glass-fill-opacity), transparent)"
+          },
+          "& :where(mark)": {
+            "background-color": "color-mix(in oklch, var(--primary) 22%, transparent)",
+            "color": "inherit",
+            "border-radius": "0.2em",
+            "padding": "0 0.15em"
+          },
+          "& :where(del)": {
+            "color": "var(--muted-foreground)"
+          },
+          "& :where(ins)": {
+            "text-decoration-color": "color-mix(in oklch, var(--success) 60%, transparent)"
+          },
+          "& :where(dl)": {
+            "margin-block": "0.9em"
+          },
+          "& :where(dt)": {
+            "font-weight": "600",
+            "margin-top": "0.6em"
+          },
+          "& :where(dd)": {
+            "margin-inline-start": "1.4em",
+            "color": "var(--muted-foreground)"
+          },
+          "& :where(details)": {
+            "margin-block": "0.9em",
+            "padding": "0.6em 1em",
+            "border-radius": "var(--glass-radius-control)",
+            "background-color": "color-mix(in oklch, var(--glass-fill-tint) var(--glass-fill-opacity), transparent)"
+          },
+          "& :where(summary)": {
+            "cursor": "pointer",
+            "font-weight": "600"
+          },
+          "& :where(details[open] > summary)": {
+            "margin-bottom": "0.5em"
+          },
+          "& :where(sup > a[data-footnote-ref], a[data-footnote-ref])": {
+            "text-decoration-line": "none",
+            "font-variant-numeric": "var(--glass-numeric)"
+          },
+          "& :where(section[data-footnotes])": {
+            "margin-top": "2.5em",
+            "padding-top": "1em",
+            "border-top": "1px solid color-mix(in oklch, var(--foreground) 10%, transparent)",
+            "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), -1))",
+            "color": "var(--muted-foreground)"
+          },
+          "& :where(.markdown-alert)": {
+            "border-inline-start": "3px solid var(--primary)",
+            "padding-inline-start": "1em",
+            "font-family": "inherit",
+            "font-size": "inherit",
+            "line-height": "inherit",
+            "color": "inherit"
+          },
+          "& :where(.markdown-alert-title)": {
+            "font-weight": "600",
+            "color": "var(--primary)",
+            "display": "flex",
+            "align-items": "center",
+            "gap": "0.4em"
+          },
+          "& :where(.markdown-alert-warning, .markdown-alert-caution)": {
+            "border-inline-start-color": "var(--destructive)"
+          },
+          "& :where(.markdown-alert-warning, .markdown-alert-caution) :where(.markdown-alert-title)": {
+            "color": "var(--destructive)"
+          },
+          "& :where(.markdown-alert-tip)": {
+            "border-inline-start-color": "var(--success)"
+          },
+          "& :where(.markdown-alert-tip) :where(.markdown-alert-title)": {
+            "color": "var(--success)"
           },
           "& :where(figcaption)": {
             "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), -1))",
@@ -4702,7 +4978,8 @@
         "class-variance-authority"
       ],
       "registryDependencies": [
-        "{REGISTRY_URL}/r/glass-style.json"
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/spinner.json"
       ],
       "files": [
         {
@@ -5466,7 +5743,7 @@
       "name": "activity-rings",
       "type": "registry:ui",
       "title": "Activity rings",
-      "description": "Concentric Activity-style rings that sweep in and lap past 100%. Server-component safe.",
+      "description": "Apple's Activity rings: an angular gradient along each arc, round caps, endless laps past 100% with a shadow under the leading cap, and a glyph per ring. Server-component safe.",
       "categories": [
         "glass",
         "data"
@@ -5538,7 +5815,7 @@
       "name": "stat",
       "type": "registry:ui",
       "title": "Stat",
-      "description": "A figure on a fill tile (glass when standalone): label, value, trend with sentiment.",
+      "description": "A figure on a fill tile (glass when standalone): label, value, trend with sentiment, a description, a chart slot, compact formatting and a skeleton.",
       "categories": [
         "glass",
         "data"
@@ -5555,6 +5832,77 @@
           "path": "src/components/glass/stat.tsx",
           "type": "registry:ui",
           "target": "@components/glass/stat.tsx"
+        }
+      ]
+    },
+    {
+      "name": "kpi",
+      "type": "registry:ui",
+      "title": "KPI",
+      "description": "A key figure from Stat: compact value, a trend coloured by whether up is good, context and a sparkline slot — or a skeleton while it loads.",
+      "categories": [
+        "glass",
+        "data"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/stat.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/kpi.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/kpi.tsx"
+        }
+      ]
+    },
+    {
+      "name": "widget",
+      "type": "registry:ui",
+      "title": "Widget",
+      "description": "Glanceable widgets at Apple's sizes — small, medium, large, extra large and the lock-screen circular, rectangular and inline — laid out by container queries, with an accented mode.",
+      "categories": [
+        "glass",
+        "data"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/widget.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/widget.tsx"
+        }
+      ]
+    },
+    {
+      "name": "range-chart",
+      "type": "registry:ui",
+      "title": "Range chart",
+      "description": "Low-to-high capsules on a shared scale with a current dot — Weather's ten-day temperatures, Health's heart-rate ranges. Server-component safe.",
+      "categories": [
+        "glass",
+        "data"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-charts.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/range-chart.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/range-chart.tsx"
         }
       ]
     },
@@ -5681,7 +6029,7 @@
       "name": "chart",
       "type": "registry:ui",
       "title": "Chart",
-      "description": "The chart host: TanStack Charts in a container that maps glass tokens — series colours from --chart-*, a glass-strong tooltip, inherited type — plus an HTML legend and chartColor().",
+      "description": "The chart host: TanStack Charts in a container that maps glass tokens — eight series colours, a glass-strong tooltip, Apple-style axes — plus loading/empty/error states, ChartDataTable and ChartSummary text alternatives, a legend and stable accessors.",
       "categories": [
         "glass",
         "data"
@@ -5707,7 +6055,7 @@
       "name": "area-chart",
       "type": "registry:ui",
       "title": "Area chart",
-      "description": "Volume over time: gradient areas under a line per series, optionally stacked, with a grouped glass tooltip.",
+      "description": "Volume over time: gradient areas under a line per series — stacked (diverging for negatives) or 100% — with scrubbing, selection and a grouped glass tooltip.",
       "categories": [
         "glass",
         "data"
@@ -5733,7 +6081,7 @@
       "name": "bar-chart",
       "type": "registry:ui",
       "title": "Bar chart",
-      "description": "Amounts per category, grouped or stacked, vertical or horizontal, with theme-rounded bar ends.",
+      "description": "Amounts per category, grouped or stacked with separators, vertical or horizontal, theme-rounded bar ends and a selected bar.",
       "categories": [
         "glass",
         "data"
@@ -5744,7 +6092,8 @@
       ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/glass-style.json",
-        "{REGISTRY_URL}/r/chart.json"
+        "{REGISTRY_URL}/r/chart.json",
+        "{REGISTRY_URL}/r/glass-charts.json"
       ],
       "files": [
         {
@@ -5758,7 +6107,7 @@
       "name": "line-chart",
       "type": "registry:ui",
       "title": "Line chart",
-      "description": "Measures over time, one smooth line per series, with a grouped glass tooltip and a crosshair.",
+      "description": "Measures over time, one smooth (or stepped) line per series, with scrubbing, selection, a grouped glass tooltip and a crosshair.",
       "categories": [
         "glass",
         "data"
@@ -5784,7 +6133,7 @@
       "name": "donut-chart",
       "type": "registry:ui",
       "title": "Donut chart",
-      "description": "Parts of a whole as a ring of rounded slices, with content in the hole and a legend.",
+      "description": "Parts of a whole as a ring of rounded slices: an \"Other\" past eight, a selected slice in the hole, legend values and shares in your locale.",
       "categories": [
         "glass",
         "data"
@@ -5795,7 +6144,8 @@
       ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/glass-style.json",
-        "{REGISTRY_URL}/r/chart.json"
+        "{REGISTRY_URL}/r/chart.json",
+        "{REGISTRY_URL}/r/glass-charts.json"
       ],
       "files": [
         {
@@ -5832,7 +6182,7 @@
       "name": "data-table",
       "type": "registry:ui",
       "title": "Data table",
-      "description": "A sortable, searchable, paginated table with row selection — TanStack Table v9 on the glass table.",
+      "description": "shadcn's data table as one component on TanStack Table v9: search, faceted filters, column visibility, selection, rows per page — controlled, server (manual) and virtual modes, loading and error rows.",
       "categories": [
         "glass",
         "data"
@@ -5840,6 +6190,7 @@
       "dependencies": [
         "cn",
         "@tanstack/react-table",
+        "@tanstack/react-virtual",
         "lucide-react"
       ],
       "registryDependencies": [
@@ -5847,7 +6198,9 @@
         "{REGISTRY_URL}/r/table.json",
         "{REGISTRY_URL}/r/input.json",
         "{REGISTRY_URL}/r/button.json",
-        "{REGISTRY_URL}/r/checkbox.json"
+        "{REGISTRY_URL}/r/checkbox.json",
+        "{REGISTRY_URL}/r/dropdown-menu.json",
+        "{REGISTRY_URL}/r/glass-charts.json"
       ],
       "files": [
         {
@@ -5880,6 +6233,637 @@
           "path": "src/components/glass/chat.tsx",
           "type": "registry:ui",
           "target": "@components/glass/chat.tsx"
+        }
+      ]
+    },
+    {
+      "name": "chat-markdown",
+      "type": "registry:ui",
+      "title": "Chat markdown",
+      "description": "Streaming-safe Markdown for chat replies — unclosed fences and marks closed as tokens arrive, GitHub tables and task lists — and ChatCodeBlock with language, copy, wrap and optional Shiki highlighting.",
+      "categories": [
+        "glass",
+        "chat"
+      ],
+      "dependencies": [
+        "cn",
+        "lucide-react",
+        "react-markdown",
+        "remark-gfm"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/button.json",
+        "{REGISTRY_URL}/r/prose.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/chat-markdown.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/chat-markdown.tsx"
+        }
+      ]
+    },
+    {
+      "name": "chat-parts",
+      "type": "registry:ui",
+      "title": "Chat parts",
+      "description": "AI SDK UIMessage parts on glass: reasoning (\"Thought for 12s\"), tool calls with approve/deny, sources and citations, files and attachment chips, errors with retry, message actions, reactions — and renderParts(message).",
+      "categories": [
+        "glass",
+        "chat"
+      ],
+      "dependencies": [
+        "cn",
+        "lucide-react",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/button.json",
+        "{REGISTRY_URL}/r/chat.json",
+        "{REGISTRY_URL}/r/chat-markdown.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/chat-parts.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/chat-parts.tsx"
+        }
+      ]
+    },
+    {
+      "name": "command",
+      "type": "registry:ui",
+      "title": "Command",
+      "description": "A cmdk command palette: a search capsule, groups, fill rows and shortcuts — CommandDialog floats it in a liquid panel for ⌘K.",
+      "categories": [
+        "glass",
+        "overlays"
+      ],
+      "dependencies": [
+        "cn",
+        "cmdk",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/dialog.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/command.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/command.tsx"
+        }
+      ]
+    },
+    {
+      "name": "combobox",
+      "type": "registry:ui",
+      "title": "Combobox",
+      "description": "A searchable select (Popover + Command): single, or multiple with removable chips — a token field.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/command.json",
+        "{REGISTRY_URL}/r/popover.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/combobox.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/combobox.tsx"
+        }
+      ]
+    },
+    {
+      "name": "calendar",
+      "type": "registry:ui",
+      "title": "Calendar",
+      "description": "react-day-picker on glass: circular days, an accent today, capsule-ended ranges, dropdown captions, RTL.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "react-day-picker",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/button.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/calendar.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/calendar.tsx"
+        }
+      ]
+    },
+    {
+      "name": "date-picker",
+      "type": "registry:ui",
+      "title": "Date picker",
+      "description": "A date, range or date-and-time behind a button — iOS's compact accent capsule or a form field — opening a calendar in a liquid popover; minute steps that divide 60.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "react-day-picker",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/calendar.json",
+        "{REGISTRY_URL}/r/popover.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/date-picker.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/date-picker.tsx"
+        }
+      ]
+    },
+    {
+      "name": "spinner",
+      "type": "registry:ui",
+      "title": "Spinner",
+      "description": "An activity indicator: an arc or iOS's radial ticks, a status with a label, a still frame under reduced motion. Button's loading state uses it.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/spinner.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/spinner.tsx"
+        }
+      ]
+    },
+    {
+      "name": "skeleton",
+      "type": "registry:ui",
+      "title": "Skeleton",
+      "description": "A loading placeholder: a fill with a soft shimmer, still under reduced motion.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/skeleton.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/skeleton.tsx"
+        }
+      ]
+    },
+    {
+      "name": "select",
+      "type": "registry:ui",
+      "title": "Select",
+      "description": "shadcn's Select on glass: a field trigger, a liquid list that grows out of it with a leading check, groups and labels — or a pill pop-up button showing the current choice.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/select.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/select.tsx"
+        }
+      ]
+    },
+    {
+      "name": "radio-group",
+      "type": "registry:ui",
+      "title": "Radio group",
+      "description": "shadcn's RadioGroup on glass: accent circles with a dot, 44pt hit areas, and a card variant where the whole tile selects.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/radio-group.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/radio-group.tsx"
+        }
+      ]
+    },
+    {
+      "name": "field",
+      "type": "registry:ui",
+      "title": "Field",
+      "description": "shadcn's Field: label, control, description and error laid out together — and wired: ids, htmlFor, aria-describedby and aria-invalid. Sets, legends, groups, horizontal rows.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/label.json",
+        "{REGISTRY_URL}/r/separator.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/field.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/field.tsx"
+        }
+      ]
+    },
+    {
+      "name": "input-group",
+      "type": "registry:ui",
+      "title": "Input group",
+      "description": "One filled field holding an input or textarea and addons: a search icon, units, clear, password reveal, a submit capsule.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/button.json",
+        "{REGISTRY_URL}/r/input.json",
+        "{REGISTRY_URL}/r/textarea.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/input-group.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/input-group.tsx"
+        }
+      ]
+    },
+    {
+      "name": "button-group",
+      "type": "registry:ui",
+      "title": "Button group",
+      "description": "Buttons joined into one control — shared corners, hairlines between, either orientation — or floating on one liquid capsule like an Apple toolbar group.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/separator.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/button-group.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/button-group.tsx"
+        }
+      ]
+    },
+    {
+      "name": "toggle",
+      "type": "registry:ui",
+      "title": "Toggle",
+      "description": "shadcn's Toggle: a two-state button that takes the accent's tint when on.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/toggle.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/toggle.tsx"
+        }
+      ]
+    },
+    {
+      "name": "toggle-group",
+      "type": "registry:ui",
+      "title": "Toggle group",
+      "description": "Toggles in a row, single or multiple choice, joined or spaced.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/toggle.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/toggle-group.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/toggle-group.tsx"
+        }
+      ]
+    },
+    {
+      "name": "stepper",
+      "type": "registry:ui",
+      "title": "Stepper",
+      "description": "Apple's − / + capsule pair: a spinbutton with arrow keys, Shift ×10 and hold-to-repeat, beside the value it changes.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/stepper.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/stepper.tsx"
+        }
+      ]
+    },
+    {
+      "name": "drawer",
+      "type": "registry:ui",
+      "title": "Drawer",
+      "description": "shadcn's Drawer API on the bottom Sheet: a grabber, medium and large detents, drag to resize or dismiss — no vaul.",
+      "categories": [
+        "glass",
+        "overlays"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/sheet.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/drawer.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/drawer.tsx"
+        }
+      ]
+    },
+    {
+      "name": "context-menu",
+      "type": "registry:ui",
+      "title": "Context menu",
+      "description": "Right-click or long-press for the dropdown menu's liquid panel at the pointer, with a preview that lifts while it's open.",
+      "categories": [
+        "glass",
+        "overlays"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/context-menu.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/context-menu.tsx"
+        }
+      ]
+    },
+    {
+      "name": "confirmation-popover",
+      "type": "registry:ui",
+      "title": "Confirmation popover",
+      "description": "A destructive confirm anchored to the button that asked — an alertdialog popover with Cancel focused.",
+      "categories": [
+        "glass",
+        "overlays"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/button.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/confirmation-popover.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/confirmation-popover.tsx"
+        }
+      ]
+    },
+    {
+      "name": "scroll-area",
+      "type": "registry:ui",
+      "title": "Scroll area",
+      "description": "shadcn's ScrollArea with capsule thumbs that read on glass, a focusable viewport and optional faded edges.",
+      "categories": [
+        "glass",
+        "surfaces"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/scroll-area.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/scroll-area.tsx"
+        }
+      ]
+    },
+    {
+      "name": "accordion",
+      "type": "registry:ui",
+      "title": "Accordion",
+      "description": "Apple's disclosure rows: a trailing chevron that turns down, content that slides open, plain or as an inset grouped list.",
+      "categories": [
+        "glass",
+        "surfaces"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/accordion.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/accordion.tsx"
+        }
+      ]
+    },
+    {
+      "name": "collapsible",
+      "type": "registry:ui",
+      "title": "Collapsible",
+      "description": "Show and hide a region from a trigger, with a measured height animation.",
+      "categories": [
+        "glass",
+        "surfaces"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/collapsible.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/collapsible.tsx"
+        }
+      ]
+    },
+    {
+      "name": "alert",
+      "type": "registry:ui",
+      "title": "Alert",
+      "description": "An inline callout on a fill: icon, title, description and an action; info, success and destructive tints.",
+      "categories": [
+        "glass",
+        "surfaces"
+      ],
+      "dependencies": [
+        "cn",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/alert.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/alert.tsx"
+        }
+      ]
+    },
+    {
+      "name": "item",
+      "type": "registry:ui",
+      "title": "Item",
+      "description": "shadcn's Item: a flexible row of media, title, description and actions — plain, outlined or filled, in groups.",
+      "categories": [
+        "glass",
+        "surfaces"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/separator.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/item.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/item.tsx"
+        }
+      ]
+    },
+    {
+      "name": "empty",
+      "type": "registry:ui",
+      "title": "Empty",
+      "description": "An empty state: an icon tile, a title (or “No results for …”), a description and actions.",
+      "categories": [
+        "glass",
+        "surfaces"
+      ],
+      "dependencies": [
+        "cn",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/empty.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/empty.tsx"
         }
       ]
     },
@@ -5917,7 +6901,7 @@
       "name": "analytics-01",
       "type": "registry:block",
       "title": "Analytics",
-      "description": "Stacked active minutes over a range, the training mix as a donut, a recovery gauge, top habits and a sortable table of recent sessions.",
+      "description": "KPIs with deltas over the range, stacked active minutes, the training mix as a donut, a recovery gauge, top habits and a sortable table of recent sessions.",
       "categories": [
         "glass",
         "blocks"
@@ -5932,6 +6916,7 @@
         "{REGISTRY_URL}/r/data-table.json",
         "{REGISTRY_URL}/r/donut-chart.json",
         "{REGISTRY_URL}/r/gauge.json",
+        "{REGISTRY_URL}/r/kpi.json",
         "{REGISTRY_URL}/r/segmented-control.json"
       ],
       "files": [
@@ -5999,7 +6984,7 @@
       "name": "chat-01",
       "type": "registry:block",
       "title": "Chat",
-      "description": "A conversation on glass: grouped turns with avatars, a read receipt, typing that resolves into a reply, quick replies and a floating composer.",
+      "description": "A conversation on glass: grouped turns with avatars, a read receipt, typing that streams into a reply you can stop, message actions and a reaction, quick replies above a floating composer.",
       "categories": [
         "glass",
         "blocks"
@@ -6011,7 +6996,8 @@
         "{REGISTRY_URL}/r/avatar.json",
         "{REGISTRY_URL}/r/button.json",
         "{REGISTRY_URL}/r/card.json",
-        "{REGISTRY_URL}/r/chat.json"
+        "{REGISTRY_URL}/r/chat.json",
+        "{REGISTRY_URL}/r/chat-parts.json"
       ],
       "files": [
         {
@@ -6195,7 +7181,7 @@
       "name": "native-card",
       "type": "registry:ui",
       "title": "Card (native)",
-      "description": "shadcn's Card API on glass: header, title, description, action, content, footer. React Native: iOS, Android and web.",
+      "description": "shadcn's Card API on glass: header, title, description, action, content, footer, a hero image — regular, thick or solid material, and asChild for a pressable link card. React Native: iOS, Android and web.",
       "categories": [
         "glass",
         "native"
@@ -6956,7 +7942,7 @@
       "name": "native-activity-rings",
       "type": "registry:ui",
       "title": "Activity rings (native)",
-      "description": "Concentric Activity-style rings that sweep in and lap past 100%. Server-component safe. React Native: iOS, Android and web.",
+      "description": "Apple's Activity rings: an angular gradient along each arc, round caps, endless laps past 100% with a shadow under the leading cap, and a glyph per ring. Server-component safe. React Native: iOS, Android and web.",
       "categories": [
         "glass",
         "native"
@@ -7028,7 +8014,7 @@
       "name": "native-stat",
       "type": "registry:ui",
       "title": "Stat (native)",
-      "description": "A figure on a fill tile (glass when standalone): label, value, trend with sentiment. React Native: iOS, Android and web.",
+      "description": "A figure on a fill tile (glass when standalone): label, value, trend with sentiment, a description, a chart slot, compact formatting and a skeleton. React Native: iOS, Android and web.",
       "categories": [
         "glass",
         "native"
@@ -7166,7 +8152,7 @@
       "name": "native-chart",
       "type": "registry:ui",
       "title": "Chart (native)",
-      "description": "The chart host: TanStack Charts in a container that maps glass tokens — series colours from --chart-*, a glass-strong tooltip, inherited type — plus an HTML legend and chartColor(). React Native: iOS, Android and web.",
+      "description": "The chart host: TanStack Charts in a container that maps glass tokens — eight series colours, a glass-strong tooltip, Apple-style axes — plus loading/empty/error states, ChartDataTable and ChartSummary text alternatives, a legend and stable accessors. React Native: iOS, Android and web.",
       "categories": [
         "glass",
         "native"
@@ -7191,7 +8177,7 @@
       "name": "native-area-chart",
       "type": "registry:ui",
       "title": "Area chart (native)",
-      "description": "Volume over time: gradient areas under a line per series, optionally stacked, with a grouped glass tooltip. React Native: iOS, Android and web.",
+      "description": "Volume over time: gradient areas under a line per series — stacked (diverging for negatives) or 100% — with scrubbing, selection and a grouped glass tooltip. React Native: iOS, Android and web.",
       "categories": [
         "glass",
         "native"
@@ -7216,7 +8202,7 @@
       "name": "native-bar-chart",
       "type": "registry:ui",
       "title": "Bar chart (native)",
-      "description": "Amounts per category, grouped or stacked, vertical or horizontal, with theme-rounded bar ends. React Native: iOS, Android and web.",
+      "description": "Amounts per category, grouped or stacked with separators, vertical or horizontal, theme-rounded bar ends and a selected bar. React Native: iOS, Android and web.",
       "categories": [
         "glass",
         "native"
@@ -7241,7 +8227,7 @@
       "name": "native-line-chart",
       "type": "registry:ui",
       "title": "Line chart (native)",
-      "description": "Measures over time, one smooth line per series, with a grouped glass tooltip and a crosshair. React Native: iOS, Android and web.",
+      "description": "Measures over time, one smooth (or stepped) line per series, with scrubbing, selection, a grouped glass tooltip and a crosshair. React Native: iOS, Android and web.",
       "categories": [
         "glass",
         "native"
@@ -7266,7 +8252,7 @@
       "name": "native-donut-chart",
       "type": "registry:ui",
       "title": "Donut chart (native)",
-      "description": "Parts of a whole as a ring of rounded slices, with content in the hole and a legend. React Native: iOS, Android and web.",
+      "description": "Parts of a whole as a ring of rounded slices: an \"Other\" past eight, a selected slice in the hole, legend values and shares in your locale. React Native: iOS, Android and web.",
       "categories": [
         "glass",
         "native"
@@ -7312,7 +8298,7 @@
       "name": "native-data-table",
       "type": "registry:ui",
       "title": "Data table (native)",
-      "description": "A sortable, searchable, paginated table with row selection — TanStack Table v9 on the glass table. React Native: iOS, Android and web.",
+      "description": "shadcn's data table as one component on TanStack Table v9: search, faceted filters, column visibility, selection, rows per page — controlled, server (manual) and virtual modes, loading and error rows. React Native: iOS, Android and web.",
       "categories": [
         "glass",
         "native"
@@ -7397,7 +8383,7 @@
       "name": "native-analytics-01",
       "type": "registry:ui",
       "title": "Analytics (native)",
-      "description": "Stacked active minutes over a range, the training mix as a donut, a recovery gauge, top habits and a sortable table of recent sessions. React Native: iOS, Android and web.",
+      "description": "KPIs with deltas over the range, stacked active minutes, the training mix as a donut, a recovery gauge, top habits and a sortable table of recent sessions. React Native: iOS, Android and web.",
       "categories": [
         "glass",
         "native"
@@ -7480,7 +8466,7 @@
       "name": "native-chat-01",
       "type": "registry:ui",
       "title": "Chat (native)",
-      "description": "A conversation on glass: grouped turns with avatars, a read receipt, typing that resolves into a reply, quick replies and a floating composer. React Native: iOS, Android and web.",
+      "description": "A conversation on glass: grouped turns with avatars, a read receipt, typing that streams into a reply you can stop, message actions and a reaction, quick replies above a floating composer. React Native: iOS, Android and web.",
       "categories": [
         "glass",
         "native"
@@ -7500,6 +8486,671 @@
           "path": "registry/native/chat-01.tsx",
           "type": "registry:ui",
           "target": "@components/glass/native/chat-01.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-chat-markdown",
+      "type": "registry:ui",
+      "title": "Chat markdown (native)",
+      "description": "Streaming-safe Markdown for chat replies — unclosed fences and marks closed as tokens arrive, GitHub tables and task lists — and ChatCodeBlock with language, copy, wrap and optional Shiki highlighting. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-button.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/chat-markdown.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/chat-markdown.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-chat-parts",
+      "type": "registry:ui",
+      "title": "Chat parts (native)",
+      "description": "AI SDK UIMessage parts on glass: reasoning (\"Thought for 12s\"), tool calls with approve/deny, sources and citations, files and attachment chips, errors with retry, message actions, reactions — and renderParts(message). React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-button.json",
+        "{REGISTRY_URL}/r/native-chat.json",
+        "{REGISTRY_URL}/r/native-chat-markdown.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/chat-parts.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/chat-parts.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-command",
+      "type": "registry:ui",
+      "title": "Command (native)",
+      "description": "A cmdk command palette: a search capsule, groups, fill rows and shortcuts — CommandDialog floats it in a liquid panel for ⌘K. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-dialog.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/command.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/command.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-combobox",
+      "type": "registry:ui",
+      "title": "Combobox (native)",
+      "description": "A searchable select (Popover + Command): single, or multiple with removable chips — a token field. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-command.json",
+        "{REGISTRY_URL}/r/native-popover.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/combobox.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/combobox.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-calendar",
+      "type": "registry:ui",
+      "title": "Calendar (native)",
+      "description": "react-day-picker on glass: circular days, an accent today, capsule-ended ranges, dropdown captions, RTL. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-button.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/calendar.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/calendar.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-date-picker",
+      "type": "registry:ui",
+      "title": "Date picker (native)",
+      "description": "A date, range or date-and-time behind a button — iOS's compact accent capsule or a form field — opening a calendar in a liquid popover; minute steps that divide 60. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-calendar.json",
+        "{REGISTRY_URL}/r/native-popover.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/date-picker.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/date-picker.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-spinner",
+      "type": "registry:ui",
+      "title": "Spinner (native)",
+      "description": "An activity indicator: an arc or iOS's radial ticks, a status with a label, a still frame under reduced motion. Button's loading state uses it. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/spinner.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/spinner.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-skeleton",
+      "type": "registry:ui",
+      "title": "Skeleton (native)",
+      "description": "A loading placeholder: a fill with a soft shimmer, still under reduced motion. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/skeleton.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/skeleton.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-select",
+      "type": "registry:ui",
+      "title": "Select (native)",
+      "description": "shadcn's Select on glass: a field trigger, a liquid list that grows out of it with a leading check, groups and labels — or a pill pop-up button showing the current choice. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-dropdown-menu.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/select.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/select.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-radio-group",
+      "type": "registry:ui",
+      "title": "Radio group (native)",
+      "description": "shadcn's RadioGroup on glass: accent circles with a dot, 44pt hit areas, and a card variant where the whole tile selects. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/radio-group.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/radio-group.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-field",
+      "type": "registry:ui",
+      "title": "Field (native)",
+      "description": "shadcn's Field: label, control, description and error laid out together — and wired: ids, htmlFor, aria-describedby and aria-invalid. Sets, legends, groups, horizontal rows. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-label.json",
+        "{REGISTRY_URL}/r/native-separator.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/field.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/field.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-input-group",
+      "type": "registry:ui",
+      "title": "Input group (native)",
+      "description": "One filled field holding an input or textarea and addons: a search icon, units, clear, password reveal, a submit capsule. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-button.json",
+        "{REGISTRY_URL}/r/native-input.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/input-group.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/input-group.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-button-group",
+      "type": "registry:ui",
+      "title": "Button group (native)",
+      "description": "Buttons joined into one control — shared corners, hairlines between, either orientation — or floating on one liquid capsule like an Apple toolbar group. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-separator.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/button-group.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/button-group.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-toggle",
+      "type": "registry:ui",
+      "title": "Toggle (native)",
+      "description": "shadcn's Toggle: a two-state button that takes the accent's tint when on. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-button.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/toggle.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/toggle.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-toggle-group",
+      "type": "registry:ui",
+      "title": "Toggle group (native)",
+      "description": "Toggles in a row, single or multiple choice, joined or spaced. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-toggle.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/toggle-group.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/toggle-group.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-stepper",
+      "type": "registry:ui",
+      "title": "Stepper (native)",
+      "description": "Apple's − / + capsule pair: a spinbutton with arrow keys, Shift ×10 and hold-to-repeat, beside the value it changes. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/stepper.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/stepper.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-drawer",
+      "type": "registry:ui",
+      "title": "Drawer (native)",
+      "description": "shadcn's Drawer API on the bottom Sheet: a grabber, medium and large detents, drag to resize or dismiss — no vaul. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-sheet.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/drawer.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/drawer.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-context-menu",
+      "type": "registry:ui",
+      "title": "Context menu (native)",
+      "description": "Right-click or long-press for the dropdown menu's liquid panel at the pointer, with a preview that lifts while it's open. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-dropdown-menu.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/context-menu.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/context-menu.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-confirmation-popover",
+      "type": "registry:ui",
+      "title": "Confirmation popover (native)",
+      "description": "A destructive confirm anchored to the button that asked — an alertdialog popover with Cancel focused. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-button.json",
+        "{REGISTRY_URL}/r/native-popover.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/confirmation-popover.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/confirmation-popover.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-scroll-area",
+      "type": "registry:ui",
+      "title": "Scroll area (native)",
+      "description": "shadcn's ScrollArea with capsule thumbs that read on glass, a focusable viewport and optional faded edges. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/native/scroll-area.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/scroll-area.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-accordion",
+      "type": "registry:ui",
+      "title": "Accordion (native)",
+      "description": "Apple's disclosure rows: a trailing chevron that turns down, content that slides open, plain or as an inset grouped list. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-dialog.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/accordion.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/accordion.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-collapsible",
+      "type": "registry:ui",
+      "title": "Collapsible (native)",
+      "description": "Show and hide a region from a trigger, with a measured height animation. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-dialog.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/collapsible.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/collapsible.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-alert",
+      "type": "registry:ui",
+      "title": "Alert (native)",
+      "description": "An inline callout on a fill: icon, title, description and an action; info, success and destructive tints. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/alert.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/alert.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-item",
+      "type": "registry:ui",
+      "title": "Item (native)",
+      "description": "shadcn's Item: a flexible row of media, title, description and actions — plain, outlined or filled, in groups. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-separator.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/item.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/item.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-empty",
+      "type": "registry:ui",
+      "title": "Empty (native)",
+      "description": "An empty state: an icon tile, a title (or “No results for …”), a description and actions. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/empty.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/empty.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-backdrop",
+      "type": "registry:ui",
+      "title": "Backdrop (native)",
+      "description": "A ground for glass besides the aurora: a photo with an optional scrim, a muted looping video (paused under reduced motion), a palette mesh, or a fine noise. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "react-native-svg"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/backdrop.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/backdrop.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-kpi",
+      "type": "registry:ui",
+      "title": "KPI (native)",
+      "description": "A key figure from Stat: compact value, a trend coloured by whether up is good, context and a sparkline slot — or a skeleton while it loads. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-stat.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/kpi.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/kpi.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-widget",
+      "type": "registry:ui",
+      "title": "Widget (native)",
+      "description": "Glanceable widgets at Apple's sizes — small, medium, large, extra large and the lock-screen circular, rectangular and inline — laid out by container queries, with an accented mode. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/widget.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/widget.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-range-chart",
+      "type": "registry:ui",
+      "title": "Range chart (native)",
+      "description": "Low-to-high capsules on a shared scale with a current dot — Weather's ten-day temperatures, Health's heart-rate ranges. Server-component safe. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "react-native-svg"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-chart-math.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/range-chart.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/range-chart.tsx"
         }
       ]
     }

@@ -1,7 +1,8 @@
 import { BookOpenIcon, FlameIcon, TimerIcon } from "lucide-react"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/glass/card"
-import { Stat, StatIcon, StatLabel, StatTrend, StatValue } from "@/components/glass/stat"
+import { Sparkline } from "@/components/glass/sparkline"
+import { Stat, StatChart, StatDescription, StatIcon, StatLabel, StatTrend, StatValue, formatStat } from "@/components/glass/stat"
 
 export default function StatDemo() {
   return (
@@ -24,9 +25,13 @@ export default function StatDemo() {
             <StatIcon>
               <BookOpenIcon />
             </StatIcon>
-            <StatValue>311</StatValue>
-            <StatLabel>Nights</StatLabel>
+            <StatValue>{formatStat(12480)}</StatValue>
+            <StatLabel>Pages read</StatLabel>
             <StatTrend>12%</StatTrend>
+            <StatDescription>vs last week</StatDescription>
+            <StatChart>
+              <Sparkline data={[3, 5, 4, 7, 6, 8, 9]} height={28} dot={false} />
+            </StatChart>
           </Stat>
           <Stat>
             <StatIcon>

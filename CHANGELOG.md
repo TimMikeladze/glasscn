@@ -2,6 +2,23 @@
 
 Registry items are copied into your app, so re-run `npx shadcn add @glasscn-app/<item>` to pick up a change. IDs refer to [`docs/roadmap.md`](docs/roadmap.md).
 
+## Unreleased — M3 parity and forms (2026-10-11)
+
+### Breaking
+- `button` depends on the new `spinner` item; a loading button keeps its label in the accessibility tree.
+- Avatar root no longer clips (for `AvatarBadge`); `primary` line-tab label uses `text-primary-ink`.
+- Chart presets show an "empty" state on empty data; the value axis sits on the trailing side.
+
+### Added
+- Forms: `select`, `radio-group`, `field`, `input-group`, `button-group`, `toggle` / `toggle-group`, `spinner`, `skeleton`, `drawer`, `context-menu`, `scroll-area`, `accordion` / `collapsible`, `alert`, `item`, `stepper`, `empty`, `confirmation-popover`; Input `size`, Textarea `maxRows`, Checkbox `shape="circle"` / `size`, `BadgeCount`, `AvatarBadge`, Text Apple styles + `emphasized`, `glass-hyphens`.
+- Pickers: `command` (+ `CommandDialog`), `combobox` (single / multi chips), `calendar`, `date-picker`.
+- AI chat: `chat-markdown` (streaming-safe), `chat-parts` (reasoning, tools, sources, files, errors, `renderParts`), composer status / Stop / attachments / counter, `layout="bubble|document"`, actions, reactions, message status, history anchoring, liquid jump button with unread count.
+- Data: `ChartDataTable` / `ChartSummary` (`accessibilityTable`), chart `state` (loading / empty / error), selection and scrubbing, `--chart-6..8`, donut selection and locale, area diverging / expand stacks; `widget`, `kpi`, `range-chart`, `backdrop`; Card `material`; data-table v2 (toolbar, faceted filters, column visibility, pagination, controlled / manual, virtual); activity rings rebuilt.
+
+### Fixed
+- Charts inside a `ThemeScope` no longer hang the page (radius probe re-triggered its own observer).
+- Bar chart dates no longer shift a day (UTC); same-label bars no longer merge.
+
 ## Unreleased — M2 the liquid layer (2026-10-11)
 
 ### Breaking

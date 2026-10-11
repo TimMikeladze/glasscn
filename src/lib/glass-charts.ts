@@ -246,6 +246,20 @@ export function runningTotals(values: (number | null | undefined)[]): number[] {
   return values.map((v) => (sum += typeof v === "number" && Number.isFinite(v) ? v : 0))
 }
 
+/** Layer i's [bottom, top] in a diverging stack: positives pile up from zero, negatives down. */
+export function stackEdges(values: readonly (number | null | undefined)[], i: number): [number, number] {
+  let up = 0
+  let down = 0
+  for (let j = 0; j < i; j++) {
+    const v = values[j]
+    if (typeof v !== "number" || !Number.isFinite(v)) continue
+    if (v >= 0) up += v
+    else down += v
+  }
+  const v = values[i] ?? 0
+  return v >= 0 ? [up, up + v] : [down, down + v]
+}
+
 type XY = readonly (readonly [number, number])[]
 
 /** Tangents for a monotone cubic through `pts` (Steffen's method, as d3's curveMonotoneX): never overshoots a peak. */
@@ -326,4 +340,127 @@ export function parseDuration(value: string | null | undefined, fallback = 200):
   if (!m) return fallback
   const n = Number(m[1]) * (m[2]?.toLowerCase() === "s" ? 1000 : 1)
   return Number.isFinite(n) ? Math.max(0, n) : fallback
+}
+
+// ---- chart text alternatives ----
+
+export interface SeriesSummary {
+  count: number
+  min: number
+  max: number
+  first: number
+  latest: number
+  /** Latest against first: up, down or flat (within 1% of the range). */
+  trend: "up" | "down" | "flat"
+}
+
+/** Count, min, max, first, latest and trend of a column of values; null when nothing is plotted. */
+export function summarize(values: readonly (number | null | undefined)[]): SeriesSummary | null {
+  const present = values.filter((v): v is number => typeof v === "number" && Number.isFinite(v))
+  if (!present.length) return null
+  const min = Math.min(...present)
+  const max = Math.max(...present)
+  const first = present[0]
+  const latest = present[present.length - 1]
+  const delta = latest - first
+  const trend = Math.abs(delta) <= (max - min) * 0.01 ? "flat" : delta > 0 ? "up" : "down"
+  return { count: present.length, min, max, first, latest, trend }
+}
+
+/** "Steps: 12 values, low 3,200, high 9,800, latest 7,400, trending up." */
+export function summarySentence(label: string, s: SeriesSummary | null, format: (v: number) => string = (v) => v.toLocaleString()): string {
+  if (!s) return `${label}: no data.`
+  const trend = s.trend === "flat" ? "holding steady" : `trending ${s.trend}`
+  return `${label}: ${s.count} ${s.count === 1 ? "value" : "values"}, low ${format(s.min)}, high ${format(s.max)}, latest ${format(s.latest)}, ${trend}.`
+}
+
+// ---- categorical ----
+
+/** How many distinct series colours the theme has (`--chart-1..8`). */
+export const CHART_COLORS = 8
+
+/**
+ * Keep the `limit - 1` largest slices in their order and fold the rest into one
+ * "Other" slice, so a part-of-whole never repeats a colour. Returns indices into
+ * `values` per kept slice, plus the folded total (null when nothing folds).
+ */
+export function foldOther(values: readonly number[], limit = CHART_COLORS): { keep: number[]; other: number | null; folded: number[] } {
+  if (values.length <= limit) return { keep: values.map((_, i) => i), other: null, folded: [] }
+  const ranked = values.map((v, i) => ({ v: Number.isFinite(v) ? v : 0, i })).sort((a, b) => b.v - a.v)
+  const kept = new Set(ranked.slice(0, limit - 1).map((r) => r.i))
+  const keep = values.map((_, i) => i).filter((i) => kept.has(i))
+  const folded = values.map((_, i) => i).filter((i) => !kept.has(i))
+  return { keep, other: folded.reduce((sum, i) => sum + (Number.isFinite(values[i]) ? values[i] : 0), 0), folded }
+}
+
+/** A band key for a category value: dates by local calendar day (never UTC), others as strings, made unique by row index. */
+export function categoryKey(value: string | number | Date, index: number): string {
+  const v = value instanceof Date ? isoDate(value) : String(value)
+  return `${v}\u0000${index}`
+}
+
+/** The display part of a `categoryKey`. */
+export function categoryLabel(key: string): string {
+  const at = key.indexOf("\u0000")
+  return at < 0 ? key : key.slice(0, at)
+}
+
+/** Intl compact figure: 12.4K, 3.1M — in `locale` (default: the runtime's). */
+export function formatCompact(value: number, locale?: string, options?: Intl.NumberFormatOptions): string {
+  if (!Number.isFinite(value)) return "–"
+  return new Intl.NumberFormat(locale, { notation: "compact", maximumFractionDigits: 1, ...options }).format(value)
+}
+
+// ---- range chart ----
+
+/** Where a low–high capsule sits in a shared `[min, max]` domain, as start/width percentages (0–100). */
+export function rangeSpan(low: number, high: number, min: number, max: number): { start: number; width: number } {
+  const lo = Math.min(low, high)
+  const hi = Math.max(low, high)
+  const start = fraction(lo, min, max) * 100
+  const end = fraction(hi, min, max) * 100
+  return { start, width: Math.max(0, end - start) }
+}
+
+// ---- activity rings ----
+
+/** A ring's laps for `value` (1 = one full lap): full laps drawn under, plus the partial arc on top (0–1). */
+export function ringLaps(value: number): { full: number; partial: number } {
+  const v = Math.max(0, Number.isFinite(value) ? value : 0)
+  const full = Math.floor(v)
+  const partial = v - full
+  // an exact lap count reads as a closed ring, not an empty partial
+  return full > 0 && partial < 1e-6 ? { full: full - 1, partial: 1 } : { full, partial }
+}
+
+// ---- data table ----
+
+/** True when a click or key event inside a clickable row came from an interactive descendant (link, button, input…), which handles it itself. */
+export function fromInteractive(target: EventTarget | null, row: Element): boolean {
+  let el = target as Element | null
+  while (el && el !== row) {
+    if (el.matches?.("a[href],button,input,select,textarea,label,summary,[role=button],[role=checkbox],[role=menuitem],[role=link],[role=switch],[contenteditable=true]")) return true
+    el = el.parentElement
+  }
+  return false
+}
+
+/** A step curve (value holds until the midpoint between samples) in the same `{ line, area }` contract as `monotoneCurve`. */
+export const stepCurve = {
+  line(points: XY): string {
+    if (!points.length) return ""
+    const f = (n: number) => Number(n.toFixed(2))
+    let d = `M${f(points[0][0])},${f(points[0][1])}`
+    for (let i = 1; i < points.length; i++) {
+      const mid = (points[i - 1][0] + points[i][0]) / 2
+      d += ` H${f(mid)} V${f(points[i][1])}`
+    }
+    return `${d} H${f(points[points.length - 1][0])}`
+  },
+  area(top: XY, bottom: XY): string {
+    if (!top.length) return ""
+    const back = [...bottom].reverse()
+    const f = (n: number) => Number(n.toFixed(2))
+    return `${stepCurve.line(top)} L${f(back[0]?.[0] ?? top[top.length - 1][0])},${f(back[0]?.[1] ?? 0)}${stepCurve.line(back).replace(/^M/, " L")} Z`
+  },
 }

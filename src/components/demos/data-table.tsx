@@ -4,7 +4,8 @@ import * as React from "react"
 
 import { Badge } from "@/components/glass/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/glass/card"
-import { createDataTableColumnHelper, DataTable, DataTableColumnHeader, selectColumn } from "@/components/glass/data-table"
+import { createDataTableColumnHelper, DataTable, DataTableColumnHeader, DataTableRowActions, selectColumn, type DataTableFilter } from "@/components/glass/data-table"
+import { DropdownMenuItem, DropdownMenuSeparator } from "@/components/glass/dropdown-menu"
 
 type Workout = {
   id: string
@@ -60,16 +61,18 @@ const columns = col.columns([
     cell: (info) => dateFormat.format(new Date(info.getValue())),
   }),
   col.accessor("activity", {
+    filterFn: "arrIncludesSome",
+    meta: { label: "Activity" },
     header: ({ column }) => <DataTableColumnHeader column={column} title="Activity" />,
     cell: (info) => <span className="font-medium">{info.getValue()}</span>,
   }),
   col.accessor("minutes", {
-    meta: { numeric: true },
+    meta: { numeric: true, label: "Duration" },
     header: ({ column }) => <DataTableColumnHeader column={column} title="Duration" />,
     cell: (info) => `${info.getValue()} min`,
   }),
   col.accessor("km", {
-    meta: { numeric: true },
+    meta: { numeric: true, label: "Distance" },
     sortUndefined: "last",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Distance" />,
     cell: (info) => {
@@ -78,6 +81,7 @@ const columns = col.columns([
     },
   }),
   col.accessor("effort", {
+    meta: { label: "Effort" },
     header: ({ column }) => <DataTableColumnHeader column={column} title="Effort" />,
     cell: (info) => {
       const effort = info.getValue()
@@ -88,7 +92,23 @@ const columns = col.columns([
       )
     },
   }),
+  col.display({
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => (
+      <DataTableRowActions label={`Actions for ${row.original.activity} on ${row.original.date}`}>
+        <DropdownMenuItem>Edit</DropdownMenuItem>
+        <DropdownMenuItem>Duplicate</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+      </DataTableRowActions>
+    ),
+  }),
 ])
+
+const filters: DataTableFilter[] = [
+  { column: "activity", title: "Activity", options: ["Run", "Ride", "Swim", "Yoga", "Strength", "Walk"].map((a) => ({ value: a, label: a })) },
+]
 
 export default function DataTableDemo() {
   const [opened, setOpened] = React.useState<Workout | null>(null)
@@ -96,7 +116,7 @@ export default function DataTableDemo() {
     <Card className="w-full max-w-3xl">
       <CardHeader>
         <CardTitle>Training log</CardTitle>
-        <CardDescription>{opened ? `Opened ${opened.activity.toLowerCase()} on ${dateFormat.format(new Date(opened.date))}.` : "Four weeks of sessions. Click a row to open it."}</CardDescription>
+        <CardDescription>{opened ? `Opened ${opened.activity.toLowerCase()} on ${dateFormat.format(new Date(opened.date))}.` : "Four weeks of sessions. Filter by activity, hide columns, click a row to open it."}</CardDescription>
       </CardHeader>
       <CardContent>
         <DataTable
@@ -104,6 +124,7 @@ export default function DataTableDemo() {
           data={workouts}
           getRowId={getRowId}
           searchPlaceholder="Search sessions…"
+          filters={filters}
           initialSorting={[{ id: "date", desc: true }]}
           onRowClick={setOpened}
           empty="No sessions match."

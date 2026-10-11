@@ -1,5 +1,5 @@
 import * as React from "react"
-import { View, type ViewProps } from "react-native"
+import { Text, View, type ViewProps } from "react-native"
 
 import { decorate } from "@/components/glass/native/button"
 import { Glass } from "@/components/glass/native/glass"
@@ -63,4 +63,25 @@ function Badge({ variant = "default", style, children, ...props }: ViewProps & {
   )
 }
 
-export { Badge, badgeVariants }
+/** A count or dot pinned to its parent's top-end corner (the parent needs position: relative). Over `max` reads "99+"; 0 hides unless `showZero`; no count is a dot. */
+function BadgeCount({ count, max = 99, showZero = false, label, style, ...props }: ViewProps & { count?: number; max?: number; showZero?: boolean; label?: string }) {
+  const ui = useUI()
+  if (count !== undefined && count <= 0 && !showZero) return null
+  const dot = count === undefined
+  const text = dot ? "" : count > max ? `${max}+` : String(count)
+  return (
+    <View
+      pointerEvents="none"
+      accessibilityLabel={label ? `${text} ${label}`.trim() : text || undefined}
+      style={[
+        { position: "absolute", zIndex: 10, top: dot ? 0 : -4, right: dot ? 0 : -4, minWidth: dot ? 10 : 18, height: dot ? 10 : 18, paddingHorizontal: dot ? 0 : 4, borderRadius: 999, alignItems: "center", justifyContent: "center", backgroundColor: ui.destructive, borderWidth: 2, borderColor: ui.glassTint },
+        style,
+      ]}
+      {...props}
+    >
+      {dot ? null : <Text style={{ color: ui.destructiveForeground, fontSize: 11, lineHeight: 13, fontWeight: "600", fontVariant: ["tabular-nums"] }}>{text}</Text>}
+    </View>
+  )
+}
+
+export { Badge, BadgeCount, badgeVariants }

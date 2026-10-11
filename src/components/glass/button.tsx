@@ -3,6 +3,8 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "cn"
 import { Slot } from "radix-ui"
 
+import { Spinner as ActivitySpinner } from "@/components/glass/spinner"
+
 /**
  * shadcn's Button with glass variants. Capsule by default (`shape="rounded"` for
  * shadcn's corners), so icon sizes are circles. Solid variants squash elastically when
@@ -57,15 +59,8 @@ const buttonVariants = cva(
   }
 )
 
-/** The activity indicator a loading button shows. Keeps spinning under reduced motion (Apple does too). */
-function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
-  return (
-    <svg data-slot="button-spinner" viewBox="0 0 24 24" fill="none" aria-hidden className={cn("animate-spin", className)} {...props}>
-      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeOpacity="0.25" strokeWidth="3" />
-      <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-    </svg>
-  )
-}
+/** The activity indicator a loading button shows; the button's aria-busy announces it. */
+const Spinner = (props: React.ComponentProps<"svg">) => <ActivitySpinner data-slot="button-spinner" aria-hidden className="motion-reduce:animate-spin" {...props} />
 
 /**
  * While `loading` the button is busy (`aria-busy`, clicks ignored) and keeps its width: a
@@ -91,7 +86,7 @@ function withLoading(children: React.ReactNode, size: string | null | undefined,
     )
   return (
     <>
-      <span className="invisible contents">{children}</span>
+      <span className="inline-flex items-center gap-[inherit] opacity-0">{children}</span>
       <span className="absolute inset-0 flex items-center justify-center">
         <Spinner />
       </span>

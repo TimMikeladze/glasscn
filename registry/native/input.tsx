@@ -49,9 +49,10 @@ export function useField({ invalid, disabled, onFocus, onBlur, editable }: Input
 }
 
 /** A filled field on glass: soft fill, no border, accent caret and ring. */
-function Input({ invalid, disabled, style, onFocus, onBlur, editable, ...props }: InputProps) {
+function Input({ invalid, disabled, style, onFocus, onBlur, editable, size = "default", ...props }: InputProps & { size?: "sm" | "default" | "lg" }) {
   const f = useField({ invalid, disabled, onFocus, onBlur, editable })
-  return <TextInput {...f.props} style={[f.style, { height: f.ui.control.default }, style]} {...props} />
+  const pad = size === "sm" ? { paddingHorizontal: f.ui.pad.xs, fontSize: f.ui.text.sm } : size === "lg" ? { paddingHorizontal: f.ui.pad.default } : null
+  return <TextInput {...f.props} style={[f.style, { height: f.ui.control[size] }, pad, style]} {...props} />
 }
 
 export { Input }

@@ -194,6 +194,9 @@ export const TOKENS: TokenDef[] = [
   { name: "chart-3", group: "Colour", label: "Chart 3", description: "Third data series.", light: "oklch(0.803 0.159 69.8)", dark: "oklch(0.803 0.159 69.8)", control: colour },
   { name: "chart-4", group: "Colour", label: "Chart 4", description: "Fourth data series.", light: "oklch(0.7 0.14 160)", dark: "oklch(0.75 0.14 160)", control: colour },
   { name: "chart-5", group: "Colour", label: "Chart 5", description: "Fifth data series.", light: "oklch(0.68 0.15 230)", dark: "oklch(0.74 0.14 230)", control: colour },
+  { name: "chart-6", group: "Colour", label: "Chart 6", description: "Sixth data series — darker, so it parts from its neighbours by lightness as well as hue.", light: "oklch(0.48 0.12 255)", dark: "oklch(0.62 0.12 255)", control: colour },
+  { name: "chart-7", group: "Colour", label: "Chart 7", description: "Seventh data series — lighter.", light: "oklch(0.74 0.09 195)", dark: "oklch(0.88 0.08 195)", control: colour },
+  { name: "chart-8", group: "Colour", label: "Chart 8", description: "Eighth series and \"Other\" — a near-neutral.", light: "oklch(0.62 0.02 260)", dark: "oklch(0.6 0.02 260)", control: colour },
   { name: "aurora-1", group: "Colour", label: "Aurora 1", description: "Top-left blob.", light: "oklch(0.829 0.098 37.8)", dark: "oklch(0.48 0.132 31.7)", control: colour },
   { name: "aurora-2", group: "Colour", label: "Aurora 2", description: "Right blob.", light: "oklch(0.809 0.109 296.4)", dark: "oklch(0.401 0.159 289.2)", control: colour },
   { name: "aurora-3", group: "Colour", label: "Aurora 3", description: "Bottom blob.", light: "oklch(0.907 0.07 70.2)", dark: "oklch(0.456 0.088 60.9)", control: colour },
@@ -306,6 +309,7 @@ export const TOKENS: TokenDef[] = [
   { name: "glass-heading-leading", group: "Type", label: "Title line height", description: "Line height of titles and headings.", light: "1.15", dark: "1.15", control: range(0.9, 1.5, 0.01, "") },
   { name: "glass-heading-case", group: "Type", label: "Title case", description: "Text transform for titles and headings.", light: "none", dark: "none", control: { type: "select", options: [{ label: "as written", value: "none" }, { label: "UPPER", value: "uppercase" }, { label: "Capitalised", value: "capitalize" }, { label: "lower", value: "lowercase" }] } },
   { name: "glass-heading-wrap", group: "Type", label: "Title wrapping", description: "Balance lines, avoid orphans, or wrap normally.", light: "balance", dark: "balance", control: { type: "select", options: [{ label: "balance", value: "balance" }, { label: "pretty", value: "pretty" }, { label: "normal", value: "wrap" }] } },
+  { name: "glass-hyphens", group: "Type", label: "Hyphenation", description: "Hyphenate body text and prose (needs a lang attribute on the page).", light: "manual", dark: "manual", control: { type: "select", options: [{ label: "off (manual)", value: "manual" }, { label: "auto", value: "auto" }] } },
   { name: "glass-display-weight", group: "Type", label: "Display weight", description: "Big figures: stats, rings, Display.", light: "700", dark: "700", control: range(100, 900, 50, "") },
   { name: "glass-display-tracking", group: "Type", label: "Display tracking", description: "Letter spacing of big figures.", light: "-0.03em", dark: "-0.03em", control: range(-0.08, 0.05, 0.005, "em") },
   { name: "glass-numeric", group: "Type", label: "Numerals", description: "Figures in stats, rings and tables.", light: "tabular-nums", dark: "tabular-nums", control: { type: "select", options: [{ label: "tabular", value: "tabular-nums" }, { label: "proportional", value: "proportional-nums" }, { label: "old-style", value: "oldstyle-nums" }, { label: "slashed zero", value: "tabular-nums slashed-zero" }] } },
@@ -397,7 +401,7 @@ export function statusColours(accentHue: number, dark: boolean): Tokens {
   return out
 }
 
-/** A whole palette — accent, ring, five chart colours, three aurora blobs and a ground — from one hue. */
+/** A whole palette — accent, ring, eight chart colours, three aurora blobs and a ground — from one hue. */
 export function paletteFromHue({ hue, harmony = "analogous", chroma = 0.17, tintedGround = true }: HueSpec): GlassTheme {
   const [a, b, c] = HARMONY[harmony].map((d) => hue + d)
   const mono = harmony === "monochrome"
@@ -414,6 +418,10 @@ export function paletteFromHue({ hue, harmony = "analogous", chroma = 0.17, tint
       "chart-3": oklch(dark ? 0.82 : 0.78, chroma * 0.85, c),
       "chart-4": oklch(dark ? 0.66 : 0.55, chroma * 0.8, a + 60),
       "chart-5": oklch(dark ? 0.86 : 0.85, chroma * 0.6, a - 60),
+      // 6–8 extend the set with a lightness ladder (dark, light, near-neutral) so series still part under colour-vision deficiency
+      "chart-6": oklch(dark ? 0.62 : 0.48, chroma * 0.7, b + 180),
+      "chart-7": oklch(dark ? 0.9 : 0.74, chroma * 0.5, c + 120),
+      "chart-8": oklch(dark ? 0.6 : 0.62, 0.02, hue),
       "aurora-1": dark ? oklch(0.44, chroma * 0.78, a) : oklch(mono ? 0.8 : 0.84, chroma * 0.55, a),
       "aurora-2": dark ? oklch(0.38, chroma * 0.9, b) : oklch(mono ? 0.88 : 0.83, chroma * 0.6, b),
       "aurora-3": dark ? oklch(0.42, chroma * 0.6, c) : oklch(mono ? 0.92 : 0.9, chroma * 0.42, c),

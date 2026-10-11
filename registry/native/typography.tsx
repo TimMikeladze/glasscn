@@ -23,10 +23,35 @@ function Heading({ level = 2, size, ...props }: Omit<GTextProps, "size"> & { lev
   return <GText accessibilityRole="header" aria-level={level} font="heading" size={headingVariants({ size: size ?? (String(level) as HeadingSize) }).size} {...props} />
 }
 
-type TextVariant = "body" | "lead" | "large" | "small" | "muted" | "overline" | "caption"
+type AppleStyle = "large-title" | "title-1" | "title-2" | "title-3" | "headline" | "apple-body" | "callout" | "subheadline" | "footnote" | "caption-1" | "caption-2"
+type TextVariant = "body" | "lead" | "large" | "small" | "muted" | "overline" | "caption" | AppleStyle
+
+/** Apple's text styles at the default Dynamic Type size: [size, line height, weight, heading font]. */
+const APPLE: Record<AppleStyle, [number, number, "400" | "600", boolean]> = {
+  "large-title": [34, 41, "400", true],
+  "title-1": [28, 34, "400", true],
+  "title-2": [22, 28, "400", true],
+  "title-3": [20, 25, "400", true],
+  headline: [17, 22, "600", false],
+  "apple-body": [17, 22, "400", false],
+  callout: [16, 21, "400", false],
+  subheadline: [15, 20, "400", false],
+  footnote: [13, 18, "400", false],
+  "caption-1": [12, 16, "400", false],
+  "caption-2": [11, 13, "400", false],
+}
 
 /** Props for a Text variant — the native stand-in for the web's cva helper. */
-function textVariants({ variant = "body" }: { variant?: TextVariant } = {}): Pick<GTextProps, "size" | "tone" | "weight" | "style"> {
+function textVariants({ variant = "body", emphasized = false }: { variant?: TextVariant; emphasized?: boolean } = {}): Pick<GTextProps, "size" | "tone" | "weight" | "style" | "font"> {
+  if (variant in APPLE) {
+    const [px, leading, weight, heading] = APPLE[variant as AppleStyle]
+    return { font: heading ? "heading" : "sans", weight: emphasized ? (heading ? "700" : "600") : weight, style: { fontSize: px, lineHeight: leading } }
+  }
+  const base = textVariantsBase(variant)
+  return emphasized ? { ...base, weight: "600" } : base
+}
+
+function textVariantsBase(variant: TextVariant): Pick<GTextProps, "size" | "tone" | "weight" | "style"> {
   switch (variant) {
     case "lead":
       return { size: "lg", tone: "muted", style: { maxWidth: 640 } }
@@ -45,9 +70,9 @@ function textVariants({ variant = "body" }: { variant?: TextVariant } = {}): Pic
   }
 }
 
-/** Running text. `variant`: body, lead, large, small, muted, overline, caption. */
-function Text({ variant = "body", style, ...props }: GTextProps & { variant?: TextVariant }) {
-  const v = textVariants({ variant })
+/** Running text. `variant`: body, lead, large, small, muted, overline, caption, or an Apple text style; `emphasized` is its bolder weight. */
+function Text({ variant = "body", emphasized = false, style, ...props }: GTextProps & { variant?: TextVariant; emphasized?: boolean }) {
+  const v = textVariants({ variant, emphasized })
   return <GText {...v} style={[v.style, style]} {...props} />
 }
 

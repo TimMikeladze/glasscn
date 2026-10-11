@@ -14,7 +14,7 @@ import {
   type ViewProps,
   type ViewStyle,
 } from "react-native"
-import { ArrowDownIcon, ArrowUpIcon } from "lucide-react-native"
+import { ArrowDownIcon, ArrowUpIcon, SquareIcon } from "lucide-react-native"
 
 import { Button } from "@/components/glass/native/button"
 import { Glass, canFade } from "@/components/glass/native/glass"
@@ -145,7 +145,7 @@ function ChatThread({ style, children, inset = 0, ...props }: ViewProps & { inse
   )
 }
 
-type ChatMessageProps = ViewProps & { from?: ChatFrom; grouped?: boolean; streaming?: boolean; avatar?: React.ReactNode }
+type ChatMessageProps = ViewProps & { from?: ChatFrom; name?: string; grouped?: boolean; streaming?: boolean; avatar?: React.ReactNode }
 
 /** The plain text inside a tree of elements — what a finished message announces. */
 function textOf(node: React.ReactNode): string {
@@ -162,7 +162,7 @@ function textOf(node: React.ReactNode): string {
  * `streaming` marks a reply still arriving: it's busy (and the thread's live region
  * quiet) until it turns false, then its full text is announced once.
  */
-function ChatMessage({ style, from = "assistant", grouped = false, streaming = false, avatar, children, ...props }: ChatMessageProps) {
+function ChatMessage({ style, from = "assistant", name, grouped = false, streaming = false, avatar, children, ...props }: ChatMessageProps) {
   const first = React.useContext(FirstContext)
   const nextGrouped = React.useContext(NextGroupedContext)
   const wasStreaming = React.useRef(streaming)
@@ -187,6 +187,9 @@ function ChatMessage({ style, from = "assistant", grouped = false, streaming = f
           },
           style,
         ]}
+        role="article"
+        aria-label={name ?? (from === "user" ? "You" : from === "system" ? "System" : "Assistant")}
+        aria-busy={streaming || undefined}
         accessibilityState={streaming ? { busy: true } : undefined}
         {...props}
       >
@@ -402,8 +405,13 @@ type ChatComposerProps = Omit<ViewProps, "children"> & {
   onValueChange?: (value: string) => void
   placeholder?: string
   disabled?: boolean
+  /** AI SDK `status`: while `submitted` or `streaming` the send button becomes Stop. */
+  status?: "ready" | "submitted" | "streaming" | "error"
+  onStop?: () => void
   /** Before the field — an attach button, say. */
   leading?: React.ReactNode
+  /** After the field, before send — a model picker or a mic. */
+  trailing?: React.ReactNode
   textInputProps?: TextInputProps
 }
 
@@ -425,7 +433,10 @@ function ChatComposer({
   onValueChange,
   placeholder = "Message",
   disabled = false,
+  status = "ready",
+  onStop,
   leading,
+  trailing,
   textInputProps,
   ...props
 }: ChatComposerProps) {
@@ -442,8 +453,9 @@ function ChatComposer({
     onValueChange?.(next)
   }
 
+  const busy = status === "submitted" || status === "streaming"
   const send = () => {
-    if (empty || disabled) return
+    if (empty || disabled || busy) return
     onSubmit?.(text.trim())
     setText("")
   }
@@ -509,9 +521,16 @@ function ChatComposer({
           textInputProps?.style,
         ]}
       />
-      <Button size="icon-sm" accessibilityLabel="Send" disabled={disabled || empty} onPress={send}>
-        <ArrowUpIcon />
-      </Button>
+      {trailing}
+      {busy && onStop ? (
+        <Button variant="tinted" size="icon-sm" accessibilityLabel="Stop" onPress={onStop}>
+          <SquareIcon />
+        </Button>
+      ) : (
+        <Button variant="tinted" size="icon-sm" accessibilityLabel="Send" disabled={disabled || empty || busy} onPress={send}>
+          <ArrowUpIcon />
+        </Button>
+      )}
     </>
   )
   const base = chatComposerVariants(ui, { variant })

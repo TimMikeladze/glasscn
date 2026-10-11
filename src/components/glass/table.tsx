@@ -16,7 +16,7 @@ import { cn } from "cn"
  * When the table is wider than its container, the scroll container becomes a
  * focusable, named region so keyboard users can scroll it.
  */
-function Table({ className, ...props }: React.ComponentProps<"table">) {
+function Table({ className, containerClassName, ...props }: React.ComponentProps<"table"> & { /** Classes for the scroll container (e.g. a max height for a sticky header). */ containerClassName?: string }) {
   const ref = React.useRef<HTMLDivElement>(null)
   const [overflowing, setOverflowing] = React.useState(false)
   React.useEffect(() => {
@@ -37,7 +37,7 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
       role={overflowing ? "region" : undefined}
       tabIndex={overflowing ? 0 : undefined}
       aria-label={overflowing ? (props["aria-label"] ?? "Table") : undefined}
-      className="glass-focus relative w-full overflow-x-auto"
+      className={cn("glass-focus relative w-full overflow-x-auto", containerClassName)}
     >
       <table data-slot="table" className={cn("w-full caption-bottom text-sm numeric-glass", className)} {...props} />
     </div>

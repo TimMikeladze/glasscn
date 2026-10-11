@@ -6,6 +6,12 @@ import Auth01 from "./auth-01"
 import Avatar from "./avatar"
 import Chat from "./chat"
 import Chat01 from "./chat-01"
+import ChatMarkdown from "./chat-markdown"
+import ChatParts from "./chat-parts"
+import Command from "./command"
+import Combobox from "./combobox"
+import Calendar from "./calendar"
+import DatePicker from "./date-picker"
 import Aurora from "./aurora"
 import Badge from "./badge"
 import Button from "./button"
@@ -59,7 +65,30 @@ import Typography from "./typography"
 import Prose from "./prose"
 import Toaster from "./toaster"
 import Tooltip from "./tooltip"
+import Backdrop from "./backdrop"
+import Kpi from "./kpi"
+import RangeChart from "./range-chart"
+import Widget from "./widget"
 
+import SpinnerDemo from "./spinner"
+import SkeletonDemo from "./skeleton"
+import SelectDemo from "./select"
+import RadioGroupDemo from "./radio-group"
+import FieldDemo from "./field"
+import InputGroupDemo from "./input-group"
+import ButtonGroupDemo from "./button-group"
+import ToggleDemo from "./toggle"
+import ToggleGroupDemo from "./toggle-group"
+import StepperDemo from "./stepper"
+import DrawerDemo from "./drawer"
+import ContextMenuDemo from "./context-menu"
+import ConfirmationPopoverDemo from "./confirmation-popover"
+import ScrollAreaDemo from "./scroll-area"
+import AccordionDemo from "./accordion"
+import CollapsibleDemo from "./collapsible"
+import AlertDemo from "./alert"
+import ItemDemo from "./item"
+import EmptyDemo from "./empty"
 /** One live example per documented item. Their source is the "Usage" on each page. */
 export const demos: Record<string, ComponentType> = {
   aurora: Aurora,
@@ -100,6 +129,12 @@ export const demos: Record<string, ComponentType> = {
   "search-field": SearchField,
   "grouped-list": GroupedList,
   chat: Chat,
+  "chat-markdown": ChatMarkdown,
+  "chat-parts": ChatParts,
+  command: Command,
+  combobox: Combobox,
+  calendar: Calendar,
+  "date-picker": DatePicker,
   "activity-rings": ActivityRings,
   "progress-ring": ProgressRing,
   sparkline: Sparkline,
@@ -116,9 +151,32 @@ export const demos: Record<string, ComponentType> = {
   gauge: Gauge,
   tracker: Tracker,
   "category-bar": CategoryBar,
+  backdrop: Backdrop,
+  kpi: Kpi,
+  "range-chart": RangeChart,
+  widget: Widget,
   "dashboard-01": Dashboard01,
   "analytics-01": Analytics01,
   "settings-01": Settings01,
   "auth-01": Auth01,
   "chat-01": Chat01,
+  spinner: SpinnerDemo,
+  skeleton: SkeletonDemo,
+  select: SelectDemo,
+  "radio-group": RadioGroupDemo,
+  field: FieldDemo,
+  "input-group": InputGroupDemo,
+  "button-group": ButtonGroupDemo,
+  toggle: ToggleDemo,
+  "toggle-group": ToggleGroupDemo,
+  stepper: StepperDemo,
+  drawer: DrawerDemo,
+  "context-menu": ContextMenuDemo,
+  "confirmation-popover": ConfirmationPopoverDemo,
+  "scroll-area": ScrollAreaDemo,
+  accordion: AccordionDemo,
+  collapsible: CollapsibleDemo,
+  alert: AlertDemo,
+  item: ItemDemo,
+  empty: EmptyDemo,
 }

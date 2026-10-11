@@ -1,5 +1,7 @@
 "use client"
 
+import * as React from "react"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/glass/card"
 import { LineChart } from "@/components/glass/line-chart"
 
@@ -19,11 +21,12 @@ const checkins: Checkin[] = evenings.map(([mood, energy], i) => ({ day: new Date
 const day = (d: string | number | Date) => (d instanceof Date ? d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" }) : String(d))
 
 export default function LineChartDemo() {
+  const [picked, setPicked] = React.useState<Checkin | null>(null)
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader>
         <CardTitle>Mood &amp; energy</CardTitle>
-        <CardDescription>Evening check-ins, last 14 days</CardDescription>
+        <CardDescription>{picked ? `${day(picked.day)}: mood ${picked.mood}/10, energy ${picked.energy ?? "–"}/10` : "Evening check-ins, last 14 days. Tap a day to pin it."}</CardDescription>
       </CardHeader>
       <CardContent>
         <LineChart
@@ -36,6 +39,8 @@ export default function LineChartDemo() {
           xFormat={day}
           valueFormat={(v) => `${v}/10`}
           points
+          selectedX={picked?.day ?? null}
+          onSelect={setPicked}
           ariaLabel="Mood and energy check-ins over the last 14 days, scored 1 to 10"
         />
       </CardContent>

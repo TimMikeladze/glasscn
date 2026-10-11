@@ -47,12 +47,55 @@ function StatIcon({ className, ...props }: React.ComponentProps<"span">) {
   return <span data-slot="stat-icon" className={cn("text-muted-foreground [&_svg:not([class*='size-'])]:size-4", className)} {...props} />
 }
 
-function StatValue({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="stat-value" className={cn("truncate type-glass-display type-step-3", className)} {...props} />
+/** Text children become the `title`, so a truncated figure or label can still be read in full. */
+const titleOf = (children: React.ReactNode, title?: string) => title ?? (typeof children === "string" || typeof children === "number" ? String(children) : undefined)
+
+function StatValue({ className, title, children, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div data-slot="stat-value" title={titleOf(children, title)} className={cn("truncate type-glass-display type-step-3 numeric-glass", className)} {...props}>
+      {children}
+    </div>
+  )
 }
 
-function StatLabel({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="stat-label" className={cn("truncate type-step-n1 text-muted-foreground", className)} {...props} />
+function StatLabel({ className, title, children, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div data-slot="stat-label" title={titleOf(children, title)} className={cn("truncate type-step-n1 text-muted-foreground", className)} {...props}>
+      {children}
+    </div>
+  )
+}
+
+/** Context for the figure — "vs last week", "of 10,000". */
+function StatDescription({ className, ...props }: React.ComponentProps<"p">) {
+  return <p data-slot="stat-description" className={cn("type-step-n2 text-muted-foreground", className)} {...props} />
+}
+
+/** A slot for a small chart under the figure (a Sparkline); it fills the tile's width. */
+function StatChart({ className, ...props }: React.ComponentProps<"div">) {
+  return <div data-slot="stat-chart" className={cn("-mx-1 mt-auto min-w-0", className)} {...props} />
+}
+
+/** A tile's placeholder while its figure loads: label, value and trend bars with a shimmer. */
+function StatSkeleton({ className, ...props }: React.ComponentProps<"div">) {
+  const bar = "rounded-badge bg-fill motion-safe:animate-pulse"
+  return (
+    <div data-slot="stat-skeleton" role="status" aria-busy className={cn("flex min-w-0 flex-col gap-2 rounded-concentric bg-fill-subtle p-card-sm", className)} {...props}>
+      <span className={cn(bar, "h-3 w-1/2")} />
+      <span className={cn(bar, "h-7 w-2/3")} />
+      <span className={cn(bar, "h-4 w-1/4")} />
+      <span className="sr-only">Loading</span>
+    </div>
+  )
+}
+
+/**
+ * A figure in compact notation for `locale` (12.4K, 3.1M) — what fits a tile.
+ * Pass Intl options to change the unit (`{ style: "currency", currency: "USD" }`).
+ */
+function formatStat(value: number, { locale, compact = true, ...options }: Intl.NumberFormatOptions & { locale?: string; compact?: boolean } = {}) {
+  if (!Number.isFinite(value)) return "–"
+  return new Intl.NumberFormat(locale, compact ? { notation: "compact", maximumFractionDigits: 1, ...options } : options).format(value)
 }
 
 type TrendDirection = "up" | "down" | "flat"
@@ -103,4 +146,4 @@ function StatTrend({
   )
 }
 
-export { Stat, StatIcon, StatValue, StatLabel, StatTrend }
+export { Stat, StatIcon, StatValue, StatLabel, StatTrend, StatDescription, StatChart, StatSkeleton, formatStat }

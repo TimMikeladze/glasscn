@@ -23,7 +23,7 @@ export default function DonutChartDemo() {
     <Card className="w-full max-w-sm">
       <CardHeader>
         <CardTitle>Where the minutes went</CardTitle>
-        <CardDescription>Active time this week</CardDescription>
+        <CardDescription>Active time this week. Tap a slice to see it in the middle.</CardDescription>
       </CardHeader>
       <CardContent>
         <DonutChart
@@ -31,6 +31,7 @@ export default function DonutChartDemo() {
           label={(d) => d.name}
           value={(d) => d.minutes}
           valueFormat={(m) => `${m} min`}
+          legendValues
           ariaLabel={`Active minutes this week by activity, ${total} minutes in all`}
         >
           <span className="type-glass-display numeric-glass text-3xl">{total}</span>
