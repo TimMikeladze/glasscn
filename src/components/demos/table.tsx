@@ -24,8 +24,8 @@ export default function TableDemo() {
             <TableRow>
               <TableHead>Day</TableHead>
               <TableHead>Ritual</TableHead>
-              <TableHead className="text-right">Minutes</TableHead>
-              <TableHead className="text-right">Streak</TableHead>
+              <TableHead numeric>Minutes</TableHead>
+              <TableHead numeric>Streak</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -33,15 +33,15 @@ export default function TableDemo() {
               <TableRow key={d.day}>
                 <TableCell className="font-medium">{d.day}</TableCell>
                 <TableCell className="text-muted-foreground">{d.ritual}</TableCell>
-                <TableCell className="text-right">{d.minutes}</TableCell>
-                <TableCell className="text-right">{d.streak} days</TableCell>
+                <TableCell numeric>{d.minutes}</TableCell>
+                <TableCell numeric>{d.streak} days</TableCell>
               </TableRow>
             ))}
           </TableBody>
           <TableFooter>
             <TableRow>
               <TableCell colSpan={2}>Total</TableCell>
-              <TableCell className="text-right">{total}</TableCell>
+              <TableCell numeric>{total}</TableCell>
               <TableCell />
             </TableRow>
           </TableFooter>

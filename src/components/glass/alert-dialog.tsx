@@ -24,6 +24,9 @@ function AlertDialogPortal({ ...props }: React.ComponentProps<typeof AlertDialog
   return <AlertDialogPrimitive.Portal data-slot="alert-dialog-portal" {...props} />
 }
 
+/** Under reduced motion the zoom is dropped — only the fade is left (and data-glass-motion stills even that). */
+const reducedMotionFade = "motion-reduce:[--tw-enter-scale:1]! motion-reduce:[--tw-exit-scale:1]!"
+
 /** The page dims behind the alert (--glass-dim). No blur: the panel already frosts. */
 function AlertDialogOverlay({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Overlay>) {
   return (
@@ -39,6 +42,7 @@ function AlertDialogOverlay({ className, ...props }: React.ComponentProps<typeof
   )
 }
 
+/** A liquid-glass panel (the control layer). Never taller than the viewport — a long message scrolls. */
 function AlertDialogContent({
   className,
   size = "default",
@@ -52,7 +56,8 @@ function AlertDialogContent({
         data-size={size}
         data-glass-motion=""
         className={cn(
-          "group/alert-dialog-content glass-strong fixed inset-0 z-50 m-auto grid h-fit w-full max-w-[calc(100%-2rem)] gap-4 rounded-surface p-(--alert-spacing) text-sm text-popover-foreground outline-hidden duration-(--glass-duration) ease-glass [--alert-spacing:calc(1.5rem*var(--glass-density))] data-[size=default]:sm:max-w-md data-[size=sm]:max-w-xs data-[size=sm]:[--alert-spacing:calc(1.25rem*var(--glass-density))] data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "group/alert-dialog-content glass-liquid fixed inset-0 z-50 m-auto grid h-fit max-h-[calc(100dvh-2rem)] w-full max-w-[calc(100%-2rem)] gap-4 overflow-y-auto overscroll-contain rounded-surface p-(--alert-spacing) text-sm text-popover-foreground outline-hidden duration-(--glass-duration) ease-glass [--alert-spacing:calc(1.5rem*var(--glass-density))] data-[size=default]:sm:max-w-md data-[size=sm]:max-w-xs data-[size=sm]:[--alert-spacing:calc(1.25rem*var(--glass-density))] data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          reducedMotionFade,
           className
         )}
         {...props}

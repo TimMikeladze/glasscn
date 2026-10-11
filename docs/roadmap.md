@@ -38,6 +38,8 @@ The complete backlog from the October 2026 audit: seven parallel reviews (web co
 
 - **2026-10-11 — M0 (stop the bleeding):** 44 items closed (ticked below), with tests. See the M0 notes in each item.
 
+- **2026-10-11 — M1 (foundations):** 53 items closed — material/liquid layers, clarity, accessibility overrides, label/status/fill tokens, focus outlines, hit areas, concentric corners, springs, gamut mapping, ThemeScope fixes, component sweep (RTL, tokens, motion), structural and component tests. Spec: [`specs/m1-foundations.md`](specs/m1-foundations.md).
+
 ## Milestones (do in order; each ends green on `pnpm typecheck && pnpm lint && pnpm test`, `verify:install`, `verify:native`, and a browser check)
 
 1. **M0 — Stop the bleeding.** Every P0 bug/a11y/token item: ENG-01..03, ENG-10, ENG-40, CMP-X01, CMP-X03, TIP-01, GRL-01, DCK-01, INP-01, SWT-01, SLD-01, BTN-01, KBD-01, PRG-01, SPK-01, HMP-01, CHT-01, CHA-03, SITE-01, SITE-02, AGT-01, NAT-01, NAT-02, NAT-04, UX-01, UX-10, DLG-04 (via NEW-05). Plus QA-01 and QA-05 so they can't come back.
@@ -55,18 +57,18 @@ The complete backlog from the October 2026 audit: seven parallel reviews (web co
 
 Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 
-- [ ] **LG-01** P0 rebuild — **Material vs liquid layers.** Keep `glass`/`-subtle`/`-strong` as the *content material* (Apple's standard materials); add `@utility glass-liquid` (regular) and `glass-liquid-clear` (+ `--glass-dim`, 35% over bright media); `Glass variant="material|liquid|liquid-clear"`. Move control-layer parts to liquid: Dock, DockAction, Toolbar, floating composer + jump button, Tooltip, Popover, DropdownMenu, Sheet, Dialog, active knobs, `Button variant="glass"`. Done when: no component renders liquid inside liquid (structural test) and cards/stats/tiles use material or fills. Needs ENG-34 rename first.
-- [ ] **LG-02** P0 docs — **Rules rewrite** (`docs/rules/design.md`, `use-glasscn` skill, AGT-05): liquid only for controls/navigation over content; never liquid on liquid; `regular` default, `clear` only over media with a dim, never mixed; rule 1 becomes "glass needs content beneath it"; one prominent action per bar; colour the glass not the label. Add an "over content" demo scene (photo grid / long article under Toolbar + Dock).
-- [ ] **LG-03** P0 gap — **Clarity** primitive `glass-clarity` (0 ultra clear → 1 fully tinted, ≈ iOS 27 slider) feeding derived opacity/blur/dim; `GlassPreferences` item (slider + reduce-transparency switch writing `:root`, persisted); exposed in site header; `legibility()` takes clarity.
+- [x] **LG-01** P0 rebuild — **Material vs liquid layers.** Keep `glass`/`-subtle`/`-strong` as the *content material* (Apple's standard materials); add `@utility glass-liquid` (regular) and `glass-liquid-clear` (+ `--glass-dim`, 35% over bright media); `Glass variant="material|liquid|liquid-clear"`. Move control-layer parts to liquid: Dock, DockAction, Toolbar, floating composer + jump button, Tooltip, Popover, DropdownMenu, Sheet, Dialog, active knobs, `Button variant="glass"`. Done when: no component renders liquid inside liquid (structural test) and cards/stats/tiles use material or fills. Needs ENG-34 rename first.
+- [x] **LG-02** P0 docs — **Rules rewrite** (`docs/rules/design.md`, `use-glasscn` skill, AGT-05): liquid only for controls/navigation over content; never liquid on liquid; `regular` default, `clear` only over media with a dim, never mixed; rule 1 becomes "glass needs content beneath it"; one prominent action per bar; colour the glass not the label. Add an "over content" demo scene (photo grid / long article under Toolbar + Dock).
+- [x] **LG-03** P0 gap — **Clarity** primitive `glass-clarity` (0 ultra clear → 1 fully tinted, ≈ iOS 27 slider) feeding derived opacity/blur/dim; `GlassPreferences` item (slider + reduce-transparency switch writing `:root`, persisted); exposed in site header; `legibility()` takes clarity.
 - [ ] **LG-04** P1 gap — **Light**: two-sided specular rim (`::before` conic gradient masked to the border, `glass-light-angle`, `glass-specular`), iOS 27 darkened edge (`glass-edge-shade`), `glass-highlight-color`; liquid surfaces replace the single `inset 0 1px` highlight.
 - [ ] **LG-05** P1 gap — **Illumination**: `use-glass-pointer` hook writes `--glass-press-x/y` in rAF; `::after` radial glow with `plus-lighter` on press; optional pointer-follow light angle on hover devices (off under reduced motion).
 - [ ] **LG-06** P1 gap — **Adaptive shadow**: bars read `data-over-content` (scroll-edge sentinel, NAV-02) and multiply shadow by `glass-shadow-over-content`.
 - [ ] **LG-07** P1 gap — **Prominent tinted glass**: `Button variant="prominent"` (tone range of `--primary` in liquid frost); DockAction, ToolbarItem prominent, chat send use it; `default` stays solid for shadcn parity.
-- [ ] **LG-08** P1 gap — **Concentric radii**: containers set `--glass-container-radius`/`--glass-container-pad`; `rounded-concentric` = `max(min, radius − pad)`; used by segmented/tab thumbs, menu items, sheet inner cards, grouped rows, stat tiles, widget tiles; native `concentric(outer, pad, min)` helper replaces `radius − 6`.
+- [x] **LG-08** P1 gap — **Concentric radii**: containers set `--glass-container-radius`/`--glass-container-pad`; `rounded-concentric` = `max(min, radius − pad)`; used by segmented/tab thumbs, menu items, sheet inner cards, grouped rows, stat tiles, widget tiles; native `concentric(outer, pad, min)` helper replaces `radius − 6`.
 - [ ] **LG-09** P1 gap — **Glass knobs**: switch/slider/segmented thumbs become liquid lenses while `:active`/dragging, scaled ~1.15× and stretched toward travel; solid at rest.
 - [ ] **LG-10** P1 gap — **Materialise**: registered `@property --glass-materialize` (0→1) drives blur + frost + small scale for overlay entrances/exits instead of opacity fades; reduced motion → plain fade (Apple: don't animate into/out of blur).
 - [ ] **LG-11** P1 gap — **Morph from source**: menus/popovers/select grow from the trigger's size and radius (`--radix-*-trigger-width/height`, transform origin, `@starting-style` clip-path); sheets/dialogs from their button via View Transitions (re-enable blur after).
-- [ ] **LG-12** P1 gap — **Real springs**: `spring({ stiffness, damping, mass }) → linear()` in the engine (tested); motion presets emit `linear()` `--glass-ease` with cubic-bezier fallback; overshoot only on transforms (CMP-X07d).
+- [x] **LG-12** P1 gap — **Real springs**: `spring({ stiffness, damping, mass }) → linear()` in the engine (tested); motion presets emit `linear()` `--glass-ease` with cubic-bezier fallback; overshoot only on transforms (CMP-X07d).
 - [ ] **LG-13** P1 gap — **Elastic press**: `--glass-press-stretch` asymmetric scale on press, spring back; liquid grows (`--glass-press-grow`), solid squashes; disabled under reduced motion.
 - [ ] **LG-14** P1 gap — **`GlassGroup`** (GlassEffectContainer analogue) phase 1: children share one liquid backdrop; generalised sliding/morphing selection (size + radius). Used by toolbar groups, button groups, steppers, segmented. P2 phase 2: SVG goo split/merge (Chromium-first).
 - [ ] **LG-15** P2 gap — **Thickness by size**: larger liquid (popover, menu, sheet) reads thicker — deeper shadow, more opaque — than small (tooltip, button). Size-tier tokens.
@@ -83,12 +85,12 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 - [x] **ENG-01** P0 bug — `Glass tint="primary|destructive"` renders **fully transparent**: `glass-variants.ts:22-23` sets `--glass-tint: color-mix(…, var(--glass-tint))` on the same element → cycle → invalid → `rgba(0,0,0,0)` (confirmed in Chrome). Live in `demos/glass.tsx:9`, `/docs/theming:67`. → Separate hook (`--glass-tint-mix`) or a `glass-tinted` utility. Test: reject `[--x:…var(--x)…]` anywhere.
 - [x] **ENG-02** P0 bug/a11y — `primary-foreground` is always `oklch(0.99 0 0)` in light (`:306, :335`): accent-label contrast fails AA on **all 11 coloured palettes** (Dusk 3.32, Amber 3.25, Lagoon 3.42, Mint 3.58, Sage 3.78, Sand 3.88, Rose 3.94, Midnight 4.04, Lavender 4.08, Ocean 4.23, Cherry 4.24; hue sweep 2.85–4.46). → Pick black/white by contrast or lower accent L until ≥ 4.5; test every palette + 0–360° sweep.
 - [x] **ENG-03** P0 bug — `smoked` material darkens the light frost but leaves text/fill/thumb tuned for light: muted text **1.22:1**; `legibility` says "AA 5.08" because it only checks the darkest text. → Materials set label roles (ENG-20) or force dark text tokens on their surfaces.
-- [ ] **ENG-04** P1 a11y — Accent vs ground non-text contrast Amber 2.94, Dusk 3.00; components draw rings at `ring/50` (≈ halves it) → switch track, checkbox, slider range, focus ring fail WCAG 1.4.11. → Enforce primary/ground ≥ 3; ring-opacity primitive default 100%.
-- [ ] **ENG-05** P1 bug — No gamut mapping: out-of-sRGB tokens in 9/12 palettes (Cherry dark 8, Midnight dark 7); at chroma 0.26 every hue but 330 puts primary out of gamut → per-channel browser clipping shifts hue and differs sRGB vs P3. → CSS Color 4 chroma-reduction gamut map; optional P3 under `@media (color-gamut: p3)`. Share the helper with `oklchToLinearRgb` (`:773-785`, which clamps per channel).
+- [x] **ENG-04** P1 a11y — Accent vs ground non-text contrast Amber 2.94, Dusk 3.00; components draw rings at `ring/50` (≈ halves it) → switch track, checkbox, slider range, focus ring fail WCAG 1.4.11. → Enforce primary/ground ≥ 3; ring-opacity primitive default 100%.
+- [x] **ENG-05** P1 bug — No gamut mapping: out-of-sRGB tokens in 9/12 palettes (Cherry dark 8, Midnight dark 7); at chroma 0.26 every hue but 330 puts primary out of gamut → per-channel browser clipping shifts hue and differs sRGB vs P3. → CSS Color 4 chroma-reduction gamut map; optional P3 under `@media (color-gamut: p3)`. Share the helper with `oklchToLinearRgb` (`:773-785`, which clamps per channel).
 - [x] **ENG-06** P1 bug — `legibility()` composites in linear light; browsers composite gamma-encoded sRGB → light over-estimated by 0.4–0.5:1, dark under-estimated by 1.0–1.3:1 (Dusk dark 9.02 vs real 10.37). → Mix in gamma sRGB.
-- [ ] **ENG-07** P1 gap — `legibility()` ignores brightness (smoked 85%), saturate, aurora opacity/blur, sheen (up to +22% white), grain, glow, strong/subtle tiers, the theme's own `--foreground` (hard-coded `FOREGROUND` `:793`), muted text, accent label, display type on aurora. Measured muted on default panes 3.15–4.3, subtle 2.97–3.7. → Return a matrix {foreground, muted, primary-fg/primary, ring/ground, chart/pane} × {subtle, default, strong} × schemes (+ clarity, LG-03). *(M0 done: `legibilityReport` — text + secondary per tier, accent label, accent vs ground, brightness; left: sheen, grain, glow, chart ΔE)*
-- [ ] **ENG-08** P1 bug — Unknown palette/material/shape/motion/type/density keys silently fall back (`:575-590`); types `keyof … | string` defeat checking. → Narrow types; throw (dev warn) on unknown keys.
-- [ ] **ENG-09** P1 bug — `themeToRegistryItem` skips the `display` font role (`:706`) → a Google display font ≠ heading ships a stack nothing loads (a test asserts this). → Map display to a `font-heading-*` dep or add the `@import`.
+- [ ] **ENG-07** P1 gap — `legibility()` ignores brightness (smoked 85%), saturate, aurora opacity/blur, sheen (up to +22% white), grain, glow, strong/subtle tiers, the theme's own `--foreground` (hard-coded `FOREGROUND` `:793`), muted text, accent label, display type on aurora. Measured muted on default panes 3.15–4.3, subtle 2.97–3.7. → Return a matrix {foreground, muted, primary-fg/primary, ring/ground, chart/pane} × {subtle, default, strong} × schemes (+ clarity, LG-03). *(M0 done: `legibilityReport` — text + secondary per tier, accent label, accent vs ground, brightness; left: sheen, grain, glow, chart ΔE)* *(M1: + sheen, liquid tier, clarity; left: saturate, grain, glow, chart ΔE)*
+- [x] **ENG-08** P1 bug — Unknown palette/material/shape/motion/type/density keys silently fall back (`:575-590`); types `keyof … | string` defeat checking. → Narrow types; throw (dev warn) on unknown keys.
+- [x] **ENG-09** P1 bug — `themeToRegistryItem` skips the `display` font role (`:706`) → a Google display font ≠ heading ships a stack nothing loads (a test asserts this). → Map display to a `font-heading-*` dep or add the `@import`.
 - [x] **ENG-10** P1 security — Sanitizer holes (`:600-617`): allows `/*` `*/` (confirmed: `glass-shadow-y: "10px /*"` comments out all later declarations, can swallow `}` and `.dark {`, voids the rest of a ThemeScope `<style>`); `var(--anything)` passes (references page vars, cycles); no type check (`glass-blur: red`, `glass-density: -5|0` pass; `decodeTheme` keeps 0 → collapsed controls). → Reject comments; validate each value against its `TokenDef.control` (range: number+unit within min/max; colour: parseable; select: option/pattern).
 - [ ] **ENG-11** P1 bug — Share codes unversioned and diffed against `defaultTheme()` at decode time → changing a default re-themes old links, while `/r/theme/[code]` is cached `immutable` for a year (`route.ts:10`). → `{ v: 1, recipe, overrides }` + migrations on decode.
 - [ ] **ENG-12** P2 bug — Non-OKLCH colours (hex allowed by sanitizer/tests) parse to null → silent white-tint fallback (`#000` tint at 90% reports AAA 18.87; real ≈ 1.2). → Parse hex/rgb/hsl or reject.
@@ -97,43 +99,43 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 - [ ] **ENG-15** P2 bug — `fontDependencies` matches stacks by exact string, light scheme only (`:659-666`). → Match first family.
 - [ ] **ENG-16** P2 improve — `EXTRA_NAMES` (`foreground`, `muted-foreground`, `background`…) bypass the schema: accepted from share links, not editable, not shipped by `glass-style`. → Promote into a Label group (ENG-20) or drop.
 - [ ] **ENG-17** P2 improve — `randomTheme` never checks legibility → re-roll until worst case ≥ AA.
-- [ ] **ENG-18** P2 improve — `glass-ring-width` lives in Shape but declared after Aurora; shape presets reset it; range starts at 0 (themes can remove focus). → Focus group; min 2px.
-- [ ] **ENG-19** P2 improve — `still` motion uses `aurora-speed: 0.0001`; `aurora.tsx:49` divides by zero at 0. → `aurora-play-state` primitive; 0 = paused.
+- [x] **ENG-18** P2 improve — `glass-ring-width` lives in Shape but declared after Aurora; shape presets reset it; range starts at 0 (themes can remove focus). → Focus group; min 2px.
+- [x] **ENG-19** P2 improve — `still` motion uses `aurora-speed: 0.0001`; `aurora.tsx:49` divides by zero at 0. → `aurora-play-state` primitive; 0 = paused.
 
 ### 2.2 Token model (missing roles)
 
-- [ ] **ENG-20** P0 gap — **Label roles**: no text tokens of our own; we rely on shadcn's `foreground`/`muted-foreground` (not shipped, not contrast-checked). → `label`, `label-secondary`, `label-tertiary`, `label-quaternary` (Apple's four tiers) computed per material and scheme. Fixes ENG-03 and muted failures. *(M0 done: `glass-label`, `glass-label-secondary` remapped inside panes; left: tertiary/quaternary tiers)*
-- [ ] **ENG-21** P1 gap — **Status roles**: only shadcn `destructive` (hue 27, collides with Dusk 35, Cherry 22, Rose 10). → `success`, `warning`, `info`, `destructive` + `-foreground`, generated per palette with hue avoidance.
-- [ ] **ENG-22** P1 gap — **Fills/separators/grouped**: 2 fills vs Apple's 4; no separator token (uses rim or `foreground/10`); no grouped backgrounds. → `fill-secondary|tertiary|quaternary`, `separator`, `separator-opaque`, `grouped-bg`.
-- [ ] **ENG-23** P1 gap — **Elevation + z-index**: one shadow; `z-50` hard-coded. → `glass-elevation-1..4`; `z-dropdown|sticky|overlay|modal|toast|tooltip`.
-- [ ] **ENG-24** P1 gap — **Hit targets**: `control-xs` = 1.75rem × density → 21px at 0.75, 23.8px compact (< WCAG 2.5.8's 24px; Apple 44pt). → `--glass-hit-min` + `max(24px, …)` + `hit-area` utility (CMP-X05).
+- [x] **ENG-20** P0 gap — **Label roles**: no text tokens of our own; we rely on shadcn's `foreground`/`muted-foreground` (not shipped, not contrast-checked). → `label`, `label-secondary`, `label-tertiary`, `label-quaternary` (Apple's four tiers) computed per material and scheme. Fixes ENG-03 and muted failures. *(M0 done: `glass-label`, `glass-label-secondary` remapped inside panes; left: tertiary/quaternary tiers)*
+- [x] **ENG-21** P1 gap — **Status roles**: only shadcn `destructive` (hue 27, collides with Dusk 35, Cherry 22, Rose 10). → `success`, `warning`, `info`, `destructive` + `-foreground`, generated per palette with hue avoidance.
+- [ ] **ENG-22** P1 gap — **Fills/separators/grouped**: 2 fills vs Apple's 4; no separator token (uses rim or `foreground/10`); no grouped backgrounds. → `fill-secondary|tertiary|quaternary`, `separator`, `separator-opaque`, `grouped-bg`. *(M1: fill-subtle/faint, separator; left: grouped backgrounds)*
+- [ ] **ENG-23** P1 gap — **Elevation + z-index**: one shadow; `z-50` hard-coded. → `glass-elevation-1..4`; `z-dropdown|sticky|overlay|modal|toast|tooltip`. *(M1: shadow-glass-1..4; left: z-index scale)*
+- [x] **ENG-24** P1 gap — **Hit targets**: `control-xs` = 1.75rem × density → 21px at 0.75, 23.8px compact (< WCAG 2.5.8's 24px; Apple 44pt). → `--glass-hit-min` + `max(24px, …)` + `hit-area` utility (CMP-X05).
 - [ ] **ENG-25** P1 gap — **Knob/dim/accent-shadow**: `bg-white` knobs, `rgb()` shadows, `bg-black/15 dark:bg-black/45` scrims, literal accent shadows. → `glass-knob`, `glass-knob-shadow`, `glass-dim`, derived `shadow-glass-accent` (`glass-thumb` can't serve as a switch knob in dark). *(M0 done: `glass-knob`, `glass-dim`, `shadow-glass-knob`, `shadow-glass-accent`)*
 - [ ] **ENG-26** P2 gap — Focus offset + ring opacity, `::selection` (site-only today), link/hover/visited, scrim tokens.
 - [ ] **ENG-27** P2 gap — Chart: 5 colours → 8 categorical + `chart-seq-*` + `chart-div-*` (OKLCH generated, CVD-tested).
 - [ ] **ENG-28** P2 gap — Spacing scale `space-1..8` and icon sizes `icon-sm|md|lg`, density-scaled (`gap-*`, `size-4` hard-coded today).
-- [ ] **ENG-29** P1 gap — **Apple text styles**: modular steps (16/20/25/31…) don't map to largeTitle 34, title1 28, title2 22, title3 20, headline 17 semibold, body 17, callout 16, subheadline 15, footnote 13, caption1 12, caption2 11. → Semantic `type-large-title … type-caption-2` utilities + per-role leading + `emphasized` twins; a `type-apple` preset with a fixed table. Display leading fixed at 1 (`stylesheet.mjs:113`).
+- [x] **ENG-29** P1 gap — **Apple text styles**: modular steps (16/20/25/31…) don't map to largeTitle 34, title1 28, title2 22, title3 20, headline 17 semibold, body 17, callout 16, subheadline 15, footnote 13, caption1 12, caption2 11. → Semantic `type-large-title … type-caption-2` utilities + per-role leading + `emphasized` twins; a `type-apple` preset with a fixed table. Display leading fixed at 1 (`stylesheet.mjs:113`).
 - [ ] **ENG-30** P2 gap — Five material thicknesses (ultraThin, thin, regular, thick, chrome) vs our three; vibrancy text levels. (Pairs with LG-01.)
 - [ ] **ENG-31** P2 cleanup — Unused tokens `font-weight-title`, `tracking-title`, `spacing-card(-sm)` (card.tsx re-derives it), `color-glass-highlight`, `color-aurora-1..3` in components.
 - [ ] **ENG-32** P2 gap — Highlight/sheen colour hard-coded `oklch(1 0 0)` (`stylesheet.mjs:12,71`) → `glass-highlight-color` (neon, smoked).
 - [ ] **ENG-33** P2 gap — Foundation never sets `color-scheme` → add in light/dark blocks and on forced `ThemeScope`.
-- [ ] **ENG-34** P1 rename — Material preset `liquid` collides with the planned `glass-liquid` surface (`glass-theme.ts:426`). → Rename (e.g. `vapor-soft`/`gel`) before LG-01 ships.
+- [x] **ENG-34** P1 rename — Material preset `liquid` collides with the planned `glass-liquid` surface (`glass-theme.ts:426`). → Rename (e.g. `vapor-soft`/`gel`) before LG-01 ships.
 
 ### 2.3 Stylesheet and install contract
 
 - [x] **ENG-40** P0 bug — Components depend on `shadcn/tailwind.css` custom variants (`data-open|closed|checked|unchecked|disabled|horizontal|vertical`) and `tw-animate-css` (`animate-in`, `zoom-in-95`…) — neither shipped nor declared. Without them: **Switch never shows its on state** (`data-checked` falls back to `[data-checked]`, which Radix never sets), overlay animations do nothing, Tabs root loses `flex-col`. → Put the `@custom-variant`s in `glass-style` css, declare `tw-animate-css`, add a verify fixture without shadcn's CSS.
-- [ ] **ENG-41** P1 bug — Reduced motion only stills aurora + `[data-glass-motion]`; press scale, overlay zoom/slide, sheet slides, tabs content slide, thumb scaling keep running. → Under `prefers-reduced-motion`, override primitives (`--glass-duration: 0ms; --glass-press-scale: 1`) on `:root, [data-glass-scope]`; tag overlays/indicators/thumbs `data-glass-motion`; crossfade.
-- [ ] **ENG-42** P1 token — Hard-coded durations: dialog 200, sheet 300/200, popover/dropdown 150, progress `duration-700 ease-out`, segmented/tab `transition-colors` default 150 → `--glass-duration` multiples.
-- [ ] **ENG-43** P1 token — Control sizes off-scale: segmented 1.75/2.25/2.75rem vs control 2/2.5/3rem (misaligns with Button in a toolbar); tabs `calc(2rem*density)` = `h-control-sm`; line tabs `h-9`; badge, kbd `h-5`, switch px, slider `size-6`/`h-1.5`, progress `h-2.5`. → `control-2xs`, `knob-*` tokens.
-- [ ] **ENG-44** P1 token — `rounded-full` ignores shape presets (slider, progress, tabs indicator); ad-hoc multipliers (checkbox ×0.35, kbd ×0.5, grouped icon ×0.75, typography code ×0.5). → `rounded-button` / named `radius-control-xs` / `rounded-concentric` (LG-08).
+- [x] **ENG-41** P1 bug — Reduced motion only stills aurora + `[data-glass-motion]`; press scale, overlay zoom/slide, sheet slides, tabs content slide, thumb scaling keep running. → Under `prefers-reduced-motion`, override primitives (`--glass-duration: 0ms; --glass-press-scale: 1`) on `:root, [data-glass-scope]`; tag overlays/indicators/thumbs `data-glass-motion`; crossfade.
+- [x] **ENG-42** P1 token — Hard-coded durations: dialog 200, sheet 300/200, popover/dropdown 150, progress `duration-700 ease-out`, segmented/tab `transition-colors` default 150 → `--glass-duration` multiples.
+- [ ] **ENG-43** P1 token — Control sizes off-scale: segmented 1.75/2.25/2.75rem vs control 2/2.5/3rem (misaligns with Button in a toolbar); tabs `calc(2rem*density)` = `h-control-sm`; line tabs `h-9`; badge, kbd `h-5`, switch px, slider `size-6`/`h-1.5`, progress `h-2.5`. → `control-2xs`, `knob-*` tokens. *(M1: control-2xs, knob, aligned segmented/tabs; left: switch knob sizes, kbd/track heights)*
+- [x] **ENG-44** P1 token — `rounded-full` ignores shape presets (slider, progress, tabs indicator); ad-hoc multipliers (checkbox ×0.35, kbd ×0.5, grouped icon ×0.75, typography code ×0.5). → `rounded-button` / named `radius-control-xs` / `rounded-concentric` (LG-08).
 - [ ] **ENG-45** P2 improve — `chart.tsx:117` hand-rolls backdrop filter without `brightness()` or the no-backdrop fallback → reuse utility.
 - [ ] **ENG-46** P2 improve — `pow()` in type steps has no fallback (Chrome < 120, Safari < 15.4 → invalid font-size). → `@supports not` fallback steps.
 - [ ] **ENG-47** P2 gap — `type-step-7/8` utilities (typography `xl` uses arbitrary `pow(…,8)`).
 
 ### 2.4 ThemeScope, apply-to-site
 
-- [ ] **ENG-50** P1 bug — `ThemeScope scheme="light"` inside `.dark` still matches `@custom-variant dark (&:is(.dark *))` → every `dark:` utility applies in a forced-light scope; it forces only four text colours (`--background`, `--border`, `--input`, `--muted`, `--secondary`, `--accent`, `--destructive`, `--popover`, `--card` keep page scheme). → Dark variant `&:where(.dark, .dark *):not(:where(.light, .light *) *)` (or `[data-scheme]`), ship full neutrals per scheme, set `color-scheme`.
-- [ ] **ENG-51** P1 bug — Partial props (`<ThemeScope shape="sharp">`) resolve a full theme (Dusk, frosted…) → overrides page palette/custom theme. → Emit only the named groups (`partial` mode in `createGlassTheme`).
-- [ ] **ENG-52** P1 perf — Every scope writes 64 values × 2 schemes; home has 9 scopes = 38 KB inline CSS. → Diff against page or class-based presets.
+- [x] **ENG-50** P1 bug — `ThemeScope scheme="light"` inside `.dark` still matches `@custom-variant dark (&:is(.dark *))` → every `dark:` utility applies in a forced-light scope; it forces only four text colours (`--background`, `--border`, `--input`, `--muted`, `--secondary`, `--accent`, `--destructive`, `--popover`, `--card` keep page scheme). → Dark variant `&:where(.dark, .dark *):not(:where(.light, .light *) *)` (or `[data-scheme]`), ship full neutrals per scheme, set `color-scheme`.
+- [x] **ENG-51** P1 bug — Partial props (`<ThemeScope shape="sharp">`) resolve a full theme (Dusk, frosted…) → overrides page palette/custom theme. → Emit only the named groups (`partial` mode in `createGlassTheme`).
+- [x] **ENG-52** P1 perf — Every scope writes 64 values × 2 schemes; home has 9 scopes = 38 KB inline CSS. → Diff against page or class-based presets.
 - [ ] **ENG-53** P2 bug — `:root[data-glass-custom]` vs `:root[data-palette=x]` equal specificity → winner depends on `<style>` vs `<link>` order (palette dock clicks can appear dead) (`providers.tsx:101`). → `:root:root[data-glass-custom]`; store the share code, re-render through the engine (stored CSS is unvalidated and goes stale after renames).
 - [ ] **ENG-54** P2 improve — ThemeScope `loadFonts`: no `preconnect`; React 19 `precedence` suspends subtree; no `size-adjust` fallback metrics. → Preconnect, document, metric fallbacks.
 
@@ -153,24 +155,24 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 - [ ] **STU-06** P2 perf — Effect with no deps re-encodes hash and rewrites site CSS every render (`:136`); preview re-renders ~50 frosted demos per slider drag; token-control requests ~22 Google families on open. → Deps; rAF throttle; virtualise/cap catalogue; debounce font loads.
 - [ ] **STU-07** P2 gap — Undo/redo; A/B split compare; saved themes + gallery with thumbnails; image → palette (k-means in OKLab → hue/harmony); hex/rgb input → OKLCH; per-component focus mode; lock groups before randomise.
 - [ ] **STU-08** P2 gap — Phone layout: controls sit above preview below `lg` (`:179`). → Sticky preview + Controls/Preview tabs.
-- [ ] **STU-09** P1 gap — Liquid controls in studio: clarity (LG-03), light angle/specular/edge shade (LG-04), refraction (LG-16) once they exist; "over content" preview ground (photo/article) besides aurora.
+- [ ] **STU-09** P1 gap — Liquid controls in studio: clarity (LG-03), light angle/specular/edge shade (LG-04), refraction (LG-16) once they exist; "over content" preview ground (photo/article) besides aurora. *(M1: liquid group, clarity, content ground; left: light/refraction controls)*
 
 ### 2.7 Registry pipeline
 
-- [ ] **REG-01** P1 test — "In sync" test compares item counts only; `pnpm test` regenerates first → stale committed `registry.json` never caught. → CI `git diff --exit-code registry.json` after generate.
-- [ ] **REG-02** P1 test — No-derived-values check covers `glass-style` only, looks only for `var(`. → Every `registry:theme` item; also `calc(`/`color-mix(` referencing vars.
-- [ ] **REG-03** P2 test — Unknown-variable scan covers stylesheet only. → Also component class strings (`[--glass-…]`, `var(--glass-…)`).
-- [ ] **REG-04** P2 bug — Every Vercel deploy (previews too) stamped `https://glasscn.app` (`build-registry.mjs:15`) → previews depend on prod items. → `VERCEL_BRANCH_URL`/`VERCEL_URL` for non-prod.
-- [ ] **REG-05** P2 improve — `verify-install` uses `create-next-app@latest`, `shadcn@latest` → pin; bump deliberately.
-- [ ] **REG-06** P2 improve — `generate.mjs` rewrites three files every run (HMR churn) → write only on change.
+- [x] **REG-01** P1 test — "In sync" test compares item counts only; `pnpm test` regenerates first → stale committed `registry.json` never caught. → CI `git diff --exit-code registry.json` after generate.
+- [x] **REG-02** P1 test — No-derived-values check covers `glass-style` only, looks only for `var(`. → Every `registry:theme` item; also `calc(`/`color-mix(` referencing vars.
+- [x] **REG-03** P2 test — Unknown-variable scan covers stylesheet only. → Also component class strings (`[--glass-…]`, `var(--glass-…)`).
+- [x] **REG-04** P2 bug — Every Vercel deploy (previews too) stamped `https://glasscn.app` (`build-registry.mjs:15`) → previews depend on prod items. → `VERCEL_BRANCH_URL`/`VERCEL_URL` for non-prod.
+- [x] **REG-05** P2 improve — `verify-install` uses `create-next-app@latest`, `shadcn@latest` → pin; bump deliberately.
+- [x] **REG-06** P2 improve — `generate.mjs` rewrites three files every run (HMR churn) → write only on change.
 - [ ] **REG-07** P2 perf — Budgets: `glass.generated.css` 29 KB, `registry.json` 180 KB, `public/r` 1.3 MB/192 files, dev CSS 184 KB → CSS-size budget test; parse generated CSS with lightningcss to catch invalid declarations.
 
 ## 3. Accessibility adaptivity
 
-- [ ] **A11Y-01** P0 gap — `@media (prefers-reduced-transparency: reduce)` → override *primitives* on `:root, [data-glass-scope]` (frost 80–94%, blur up, texture/refraction/specular off). Safari lacks the query → LG-03 clarity covers it.
-- [ ] **A11Y-02** P0 gap — `@media (prefers-contrast: more)` → near-opaque frost, 1.5px full-opacity rim in a contrasting colour per scheme, sheen/specular/glow/texture off, increased-contrast palette variants (ENG/palette work).
-- [ ] **A11Y-03** P0 gap — `@media (forced-colors: active)` → no backdrop, `Canvas` / `CanvasText` / `Highlight`, real outlines (CMP-X01), borders on inputs.
-- [ ] **A11Y-04** P1 gap — Reduced motion done properly: primitives override (ENG-41), all overlays/indicators/thumbs tagged, x/y/z transitions → fades, no blur animations, no elasticity (Apple).
+- [x] **A11Y-01** P0 gap — `@media (prefers-reduced-transparency: reduce)` → override *primitives* on `:root, [data-glass-scope]` (frost 80–94%, blur up, texture/refraction/specular off). Safari lacks the query → LG-03 clarity covers it.
+- [x] **A11Y-02** P0 gap — `@media (prefers-contrast: more)` → near-opaque frost, 1.5px full-opacity rim in a contrasting colour per scheme, sheen/specular/glow/texture off, increased-contrast palette variants (ENG/palette work).
+- [x] **A11Y-03** P0 gap — `@media (forced-colors: active)` → no backdrop, `Canvas` / `CanvasText` / `Highlight`, real outlines (CMP-X01), borders on inputs.
+- [x] **A11Y-04** P1 gap — Reduced motion done properly: primitives override (ENG-41), all overlays/indicators/thumbs tagged, x/y/z transitions → fades, no blur animations, no elasticity (Apple).
 - [ ] **A11Y-05** P1 docs — Published accessibility statement (WCAG 2.2 AA target, what adapts, known limits — Safari reduced transparency, refraction) at `/docs/accessibility` (SITE-22); per-item a11y sections (SITE-07).
 - [ ] **A11Y-06** P1 test — axe in Playwright on every docs page × light/dark × matte/smoked (QA-02); legibility matrix test (QA-04).
 
@@ -187,14 +189,14 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 ## 4. Web components — cross-cutting
 
 - [x] **CMP-X01** P0 a11y — `outline-none` (Tailwind v4 = `outline-style: none`) + box-shadow ring → **no focus indicator in forced-colors** (box-shadows stripped). button:11, input:11, textarea:9, checkbox:14, switch:18, slider:33, segmented:72, tabs:63,75, dock:71,86, grouped-list:56. → `outline-hidden` (transparent outline forced-colors paints) or real `focus-visible:outline`; forced-colors block (A11Y-03).
-- [ ] **CMP-X02** P1 a11y — Rings drawn at `ring/40`–`ring/50` on frost, likely < 3:1 (WCAG 1.4.11/2.4.13). → Full-opacity ring + contrasting offset halo in `--glass-tint`; min width 2px (ENG-18).
+- [x] **CMP-X02** P1 a11y — Rings drawn at `ring/40`–`ring/50` on frost, likely < 3:1 (WCAG 1.4.11/2.4.13). → Full-opacity ring + contrasting offset halo in `--glass-tint`; min width 2px (ENG-18).
 - [x] **CMP-X03** P0 token — Literal colours on themed parts: `bg-white` + `rgb()` shadows (switch:25, slider:33), `rgb()` shadow (segmented:59), `oklch(1 0 0/30%)` + `color-mix` shadows (button:16, dock:86), `text-white` (grouped-list:69), `bg-black/15 dark:bg-black/45` scrims (dialog:32, sheet:31). → ENG-25 tokens.
-- [ ] **CMP-X04** P1 a11y/RTL — Physical properties break `dir="rtl"`: switch knob `translate-x`, progress `translateX(-…)`, close buttons `right-3.5` + `pr-8`/`pr-14` (dialog:60,72; sheet:72,84), menu `pr-8 right-2.5 pl-8.5 ml-auto` + unflipped chevron (dropdown:42,63,65,80-82,96,107,118), grouped-list `text-left` + chevron (:56,88), button `has-data-[icon]:pr-4/pl-4` (:26). → `ps/pe/start/end`, `rtl:-translate-x-*`, `rtl:rotate-180`; RTL demo + test (DX-08).
-- [ ] **CMP-X05** P1 a11y — Touch targets < 44px with no expanded hit area: checkbox 18, switch sm 22, slider thumb 24, icon-xs/sm 28/32, `h-control` 40, menu rows ~36, tab triggers 32. → `hit-area` utility (transparent `::after` grown to 44px) + `pointer-coarse:` size bumps.
-- [ ] **CMP-X06** P1 a11y — `legibility()` checks body only; components use `muted-foreground`, `/80` placeholders, `foreground/65` tabs, `/70` segmented, `muted-foreground/70` chevrons. → Include each (ENG-07); test shipped palettes.
-- [ ] **CMP-X07** P1 bug — `use-sliding-indicator`: (a) user `ref` overrides hook ref because `{...props}` spreads after `ref` (segmented:38/52, tabs:42, dock:47/58) → compose refs; (b) `--indicator-*` unset before hydration → **active pill invisible on first paint / no-JS** → CSS fallback `not-in-data-indicator-ready:data-[state=on]:bg-…`; (c) only root observed (`:42`) → children resizing (badge counts, font swap) don't update; (d) overshooting `ease-glass` (spring 1.12, snappy 1.4) applies to width/height → pill grows past track; overshoot on transform only. *(M0 done: (a) ref composition; left: (b) SSR fallback, (c) child resize, (d) overshoot)*
-- [ ] **CMP-X08** P1 token — Hard-coded durations (ENG-42), off-scale sizes (ENG-43), `rounded-full` and ad-hoc radii (ENG-44).
-- [ ] **CMP-X09** P1 a11y — Reduced motion misses overlays/indicators/thumbs (ENG-41).
+- [x] **CMP-X04** P1 a11y/RTL — Physical properties break `dir="rtl"`: switch knob `translate-x`, progress `translateX(-…)`, close buttons `right-3.5` + `pr-8`/`pr-14` (dialog:60,72; sheet:72,84), menu `pr-8 right-2.5 pl-8.5 ml-auto` + unflipped chevron (dropdown:42,63,65,80-82,96,107,118), grouped-list `text-left` + chevron (:56,88), button `has-data-[icon]:pr-4/pl-4` (:26). → `ps/pe/start/end`, `rtl:-translate-x-*`, `rtl:rotate-180`; RTL demo + test (DX-08).
+- [x] **CMP-X05** P1 a11y — Touch targets < 44px with no expanded hit area: checkbox 18, switch sm 22, slider thumb 24, icon-xs/sm 28/32, `h-control` 40, menu rows ~36, tab triggers 32. → `hit-area` utility (transparent `::after` grown to 44px) + `pointer-coarse:` size bumps.
+- [x] **CMP-X06** P1 a11y — `legibility()` checks body only; components use `muted-foreground`, `/80` placeholders, `foreground/65` tabs, `/70` segmented, `muted-foreground/70` chevrons. → Include each (ENG-07); test shipped palettes.
+- [x] **CMP-X07** P1 bug — `use-sliding-indicator`: (a) user `ref` overrides hook ref because `{...props}` spreads after `ref` (segmented:38/52, tabs:42, dock:47/58) → compose refs; (b) `--indicator-*` unset before hydration → **active pill invisible on first paint / no-JS** → CSS fallback `not-in-data-indicator-ready:data-[state=on]:bg-…`; (c) only root observed (`:42`) → children resizing (badge counts, font swap) don't update; (d) overshooting `ease-glass` (spring 1.12, snappy 1.4) applies to width/height → pill grows past track; overshoot on transform only. *(M0 done: (a) ref composition; left: (b) SSR fallback, (c) child resize, (d) overshoot)*
+- [x] **CMP-X08** P1 token — Hard-coded durations (ENG-42), off-scale sizes (ENG-43), `rounded-full` and ad-hoc radii (ENG-44).
+- [x] **CMP-X09** P1 a11y — Reduced motion misses overlays/indicators/thumbs (ENG-41).
 - [ ] **CMP-X10** P1 docs — Missing props/notes for input, textarea, label, slider, progress, kbd, separator, dialog (`showCloseButton`), popover, tooltip (Provider), dropdown-menu (`variant`, `inset`), toaster (mounting, theme); badge description empty (`docs.ts:91`); switch docs claim fixed "51×31". (SITE-05)
 - [ ] **CMP-X11** P2 improve — `data-shape`, `data-tint`, `data-elevation` attributes missing (state on `data-*` rule).
 
@@ -204,7 +206,7 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 - [x] **BTN-01** P0 token — `default` variant shadow literal (`:16`). → `shadow-glass-accent`.
 - [ ] **BTN-02** P1 rebuild (LG) — Press always squashes (0.97). Apple `.interactive()` glass grows, bounces, lights up. → Glass/liquid variants grow (`--glass-press-grow`) + illumination (LG-05); solid fills keep squash.
 - [ ] **BTN-03** P1 gap — `prominent` (tinted liquid) (LG-07), `loading` (spinner replaces leading icon, `aria-busy`, width kept, optional label swap "Checkout" → "Checking out…"), icon-only circle size, pull-down variant (trailing chevron, `aria-haspopup`) + split button.
-- [ ] **BTN-04** P1 a11y — `disabled:opacity-45` fades the whole glass → dim label, keep material; style `aria-disabled` so `asChild` links can disable.
+- [x] **BTN-04** P1 a11y — `disabled:opacity-45` fades the whole glass → dim label, keep material; style `aria-disabled` so `asChild` links can disable.
 - [ ] **BTN-05** P1 a11y — `tinted` (`text-primary` on `primary/16`) and `destructive` can fall < 4.5:1 on light hues → legibility checks.
 - [ ] **BTN-06** P2 bug — Comment promises hover lift (none); `hover:brightness-105` snaps (filter not in transition list); `whitespace-nowrap` without `min-w-0/truncate`; `text-[0.8rem]` (→ `type-step-n1`); `pr-4/pl-4` not density-aware. Glass variant elevation 0 — floating liquid buttons need soft shadow. Document no default `type="button"`.
 - [ ] **BTN-07** P2 guidance — Docs: one or two prominent per view; preference by style not size; destructive never primary (HIG §1).
@@ -263,45 +265,45 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 - [ ] **AVT-02** P2 — `text-[0.6rem]`, `ring-2`, gradient hack (`:74`); `AvatarGroupCount` "+4" needs "4 more"; monogram style (grey gradient, white initials); `xl`.
 
 ### Dialog
-- [ ] **DLG-01** P1 bug — No `max-h`/overflow → long content runs off phones. → `max-h-[calc(100dvh-2rem)] overflow-y-auto` / `DialogBody`.
+- [x] **DLG-01** P1 bug — No `max-h`/overflow → long content runs off phones. → `max-h-[calc(100dvh-2rem)] overflow-y-auto` / `DialogBody`.
 - [x] **DLG-02** P1 rebuild — Footer close + demo Cancel are `variant="glass"` inside `glass-strong` → glass on glass (design rule 3, Apple). → `secondary` (fill).
 - [x] **DLG-03** P1 token/perf — Scrim `bg-black/15 dark:bg-black/45 backdrop-blur-[3px]` under `glass-strong` = blur on blur (perf rule 5). → `--glass-dim`, no scrim blur.
 - [x] **DLG-04** P0 gap — Destructive-confirm demo uses Dialog not `role="alertdialog"` → `alert-dialog` (NEW-05).
 - [ ] **DLG-05** P2 (LG) — iOS 26 modal header: leading `xmark` glass circle, centred title, trailing prominent ✓ → `DialogToolbar`; physical close/padding (CMP-X04); `p-6 gap-4` ignore card spacing.
 
 ### Sheet
-- [ ] **SHT-01** P1 bug — No scroll container → long content overflows. → `SheetBody` (`flex-1 overflow-y-auto`) + scroll edge under header.
-- [ ] **SHT-02** P1 bug — Bottom sheet `bottom-3` ignores `env(safe-area-inset-bottom)` → collides with home indicator.
+- [x] **SHT-01** P1 bug — No scroll container → long content overflows. → `SheetBody` (`flex-1 overflow-y-auto`) + scroll edge under header.
+- [x] **SHT-02** P1 bug — Bottom sheet `bottom-3` ignores `env(safe-area-inset-bottom)` → collides with home indicator.
 - [ ] **SHT-03** P1 gap (LG) — Detents (`medium`/`large`/custom), grabber (tap cycles detents; VoiceOver-operable), drag-to-dismiss with unsaved-changes confirm, morph from source, opaque at full height, `modal={false}` non-dimming inspector, one sheet at a time; HIG button layout (Cancel leading, Done trailing; never Cancel+Done+Back). Merge with `drawer` (NEW-14).
 - [ ] **SHT-04** P2 bug — Slide 100% while panel inset 0.75rem → sliver + rim visible at start → slide `calc(100% + inset)`; literal scrim/durations; export `SheetOverlay`/`SheetPortal`; logical `side="start|end"`.
 
 ### Popover / Tooltip / Dropdown menu
-- [ ] **POP-01** P1 bug — No `max-h-(--radix-popover-content-available-height)` → tall content clips.
+- [x] **POP-01** P1 bug — No `max-h-(--radix-popover-content-available-height)` → tall content clips.
 - [ ] **POP-02** P2 parity — `PopoverHeader/Title/Description`, optional `PopoverArrow`; larger glass should read thicker than a tooltip (same `glass-strong` today); animate size changes; auto-save on dismiss guidance.
 - [x] **TIP-01** P0 parity — `Tooltip` doesn't wrap its own `TooltipProvider` → **code copied from shadcn crashes** (Radix throws). Demo/site mask it. → Wrap Root in Provider.
 - [x] **TIP-02** P1 bug — `rounded-button` capsule + `max-w-xs` → multi-line tooltips become stretched pills, corners clip. → `rounded-control` when wrapping.
 - [ ] **TIP-03** P2 — Raw px shadow vars; delay 120 vs shadcn 0; document no-touch (icon buttons need `aria-label`); arrow omission documented.
-- [ ] **MNU-01** P1 improve (LG/touch) — Rows ~36px; iOS 44pt → `pointer-coarse:py-3`.
+- [x] **MNU-01** P1 improve (LG/touch) — Rows ~36px; iOS 44pt → `pointer-coarse:py-3`.
 - [ ] **MNU-02** P2 (LG) — Check indicator trailing; iOS 26/macOS put it leading in the icon column. HIG: all items in a group get an icon or none; submenus one level ≤ 5 items; iOS palette row (`preferredElementSize` small/medium); inline-expanding submenus on touch (not cascading glass-on-glass, `:123`); item description line.
 - [ ] **MNU-03** P2 bug — `SubContent` no `max-h`; `duration-150`; uppercase labels; demo doesn't exercise Sub/RadioGroup/inset.
 
 ### Toaster
-- [ ] **TST-01** P1 token — Only `toast`/`description` styled; Sonner `actionButton`/`cancelButton`/`closeButton` render default black/grey. → `buttonVariants`.
-- [ ] **TST-02** P1 bug — `theme` not wired → Sonner defaults light; `.dark` sites get light internals.
-- [ ] **TST-03** P1 bug — Default bottom-right, no offset → toasts land on the fixed `Dock`. → Offset from `--dock-inset`; mobile `top-center` (iOS banners).
+- [x] **TST-01** P1 token — Only `toast`/`description` styled; Sonner `actionButton`/`cancelButton`/`closeButton` render default black/grey. → `buttonVariants`.
+- [x] **TST-02** P1 bug — `theme` not wired → Sonner defaults light; `.dark` sites get light internals.
+- [ ] **TST-03** P1 bug — Default bottom-right, no offset → toasts land on the fixed `Dock`. → Offset from `--dock-inset`; mobile `top-center` (iOS banners). *(M1: offset clears the dock; left: top-center on mobile)*
 - [ ] **TST-04** P2 — `sonner` alias name; demo shows mounting; HUD position (centred transient capsule: "Copied", volume).
 
 ### Dock
 - [x] **DCK-01** P0 a11y — Navigation built as a radio group (ToggleGroup) → destinations can't be links (no href, `aria-current="page"`, new tab, prefetch). → `nav` + `DockItem asChild` links, indicator keyed on `aria-current`; `tablist` mode for in-page panels.
 - [x] **DCK-02** P1 bug — `min-w-18` no shrink: 5 items + action ≈ 450px overflows 375px phones. → `flex-1 min-w-0`, truncating labels.
-- [ ] **DCK-03** P1 gap — Export `--dock-inset` for page padding/toasts; count badges on items; drag-to-scrub (pill becomes a lens following the finger, iOS 26 tab bar); icon+label side-by-side in compact height; minimise/accessory/search (NAV-03).
+- [ ] **DCK-03** P1 gap — Export `--dock-inset` for page padding/toasts; count badges on items; drag-to-scrub (pill becomes a lens following the finger, iOS 26 tab bar); icon+label side-by-side in compact height; minimise/accessory/search (NAV-03). *(M1: --dock-inset; left: badges, scrub, compact layout)*
 - [ ] **DCK-04** P1 token — `text-[0.65rem]`, `calc(3.25rem)`/`calc(3.75rem)`; literal accent shadow; solid action → tinted liquid. Guidance: filled symbols in tab bars; never disable/hide tabs; single-word labels.
 
 ### Grouped list
 - [x] **GRL-01** P0 a11y — `role="listitem"` lands on the `asChild` child via Slot → documented `<button>`/`<a>` rows **lose their role**. → `<div role="listitem">` around Slot, or `ul/li`.
 - [x] **GRL-02** P1 a11y — Focus = `bg-fill-strong` only, `outline-none`, no ring.
 - [ ] **GRL-03** P1 token — `text-white` icon tile → `text-primary-foreground`; `size-7.5`; radius ×0.75; `text-[0.95rem]`. *(M0 done: icon tile label token; left: sizes, radius)*
-- [ ] **GRL-04** P2 (LG) — Full-width separators (iOS insets to text start); hard-coded `h3`; uppercase headers → title case; row accessories (switch, checkmark, info button — info ≠ navigation; chevron drills in), disabled rows, swipe actions; align API with shadcn `Item` (`ItemMedia`, `ItemContent`, `ItemActions`).
+- [ ] **GRL-04** P2 (LG) — Full-width separators (iOS insets to text start); hard-coded `h3`; uppercase headers → title case; row accessories (switch, checkmark, info button — info ≠ navigation; chevron drills in), disabled rows, swipe actions; align API with shadcn `Item` (`ItemMedia`, `ItemContent`, `ItemActions`). *(M1: inset separators, disabled rows; left: accessories, swipe actions)*
 
 ### Glass
 - [ ] **GLS-01** P2 — Only `data-intensity` exposed; `tint` only primary/destructive (→ `prominent` tone range, LG-07).
@@ -343,7 +345,7 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 
 ### 7.1 Surfaces
 - [ ] **SRF-01** P1 gap — Grounds: aurora is the only one; Liquid Glass sits on real content. → `Backdrop` variants `image` (object-position, optional 35% dim for clear glass), `video` (muted, playsInline, poster, paused under reduced motion), `mesh` (4–6 point mesh from palette), `noise`.
-- [ ] **SRF-02** P1 perf — Aurora `will-change-transform` always on (even `animate={false}`/reduced motion) → three viewport GPU layers for nothing (`aurora.tsx:42`); `filter: blur()` on animated blobs re-rasterises every frame (`:48`) → bake softness into gradient stops; pause offscreen (IntersectionObserver) — matters with an aurora per ThemeScope preview; flat `--aurora-base` under reduced transparency.
+- [x] **SRF-02** P1 perf — Aurora `will-change-transform` always on (even `animate={false}`/reduced motion) → three viewport GPU layers for nothing (`aurora.tsx:42`); `filter: blur()` on animated blobs re-rasterises every frame (`:48`) → bake softness into gradient stops; pause offscreen (IntersectionObserver) — matters with an aurora per ThemeScope preview; flat `--aurora-base` under reduced transparency.
 - [ ] **SRF-03** P2 — `minWidth` floors 560/480/540px (`:45`) → `vmax`/token; `speed={0}` divides by zero (ENG-19); aurora demo body text sits on the ground (rule 6).
 - [ ] **SRF-04** P1 rebuild (LG) — `Card material="regular|thick|solid"` (solid = opaque `--card` for dense screens); `variant="widget"` sizes small/medium/large/extraLarge with container-query layout, 16pt padding, `rounded-concentric` inner tiles; `CardImage`/hero slot; `asChild` link card with press state.
 - [ ] **SRF-05** P2 — Card re-derives `--card-spacing` (`:21`, use `spacing-card`); `text-sm/base` → type steps; `overflow-hidden` clips edge children's focus rings → `overflow-clip` + `overflow-clip-margin`.
@@ -365,8 +367,8 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 - [x] **SPK-01** P0 bug — Fixed `W=300` viewBox + `preserveAspectRatio="none"` → **dots stretch into ellipses** at any other width. → HTML overlay dots by % or ResizeObserver real width.
 - [ ] **SPK-02** P1 — `role="img"` without default name → require `aria-label` or derive "min–max, latest N"; scrubbing (lollipop rule), baseline/reference line (previous close), `bar`/`win-loss` variants, min/max dots, trend colour.
 - [x] **SPK-03** P2 — `useId().replace(/:/g,"")` misses React 19 `«»`/`_r_` → shared sanitiser; `Math.min(...arr)` overflows ~100k points.
-- [ ] **STA-01** P1 rebuild — Stat is its own glass pane → tiles in a card are glass-on-glass; content tiles shouldn't be glass. → `bg-fill` + `rounded-concentric` inside cards; glass opt-in standalone.
-- [ ] **STA-02** P1 bug — `direction` conflates direction and sentiment (latency up = green); no flat. → `direction: up|down|flat` + `sentiment: positive|negative|neutral`; sr-only "increased/decreased".
+- [x] **STA-01** P1 rebuild — Stat is its own glass pane → tiles in a card are glass-on-glass; content tiles shouldn't be glass. → `bg-fill` + `rounded-concentric` inside cards; glass opt-in standalone.
+- [x] **STA-02** P1 bug — `direction` conflates direction and sentiment (latency up = green); no flat. → `direction: up|down|flat` + `sentiment: positive|negative|neutral`; sr-only "increased/decreased".
 - [ ] **STA-03** P2 — Token sizes; `StatDescription` ("vs last week"), `StatChart` slot, Intl compact formatting, `title` on truncation, skeleton.
 - [x] **HMP-01** P0 bug — Default `today = isoDate(new Date())` server UTC vs client local → **hydration mismatch** (`heatmap.tsx:17`; also in dashboard-01).
 - [x] **HMP-02** P1 bug — Weekdays use `undefined` locale (server ≠ browser), months hard-coded `en-US` → `locale` prop throughout.
@@ -398,7 +400,7 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 - [ ] **CHT-16** P2 a11y — Chart demo encodes workout vs rest by colour alone → symbol channel/direct labels.
 
 ### 7.5 Tables
-- [ ] **TBL-01** P2 — `table.tsx`: `text-left`, `pr-0` → logical; heights/paddings → tokens; overflow container not focusable (`scrollable-region-focusable`) → `tabIndex=0 role="region" aria-label`; `align`/`numeric` on Head/Cell; sticky header with hard scroll edge; sr-only caption; inset-grouped variant.
+- [ ] **TBL-01** P2 — `table.tsx`: `text-left`, `pr-0` → logical; heights/paddings → tokens; overflow container not focusable (`scrollable-region-focusable`) → `tabIndex=0 role="region" aria-label`; `align`/`numeric` on Head/Cell; sticky header with hard scroll edge; sr-only caption; inset-grouped variant. *(M1: align/numeric, focusable region; left: sticky header, caption, inset variant)*
 - [ ] **DTB-01** P0 parity — Data table vs shadcn: no column visibility, rows-per-page, first/last page, faceted filters, row actions, pinning, resizing, expanding, grouping. → Register features + ship `DataTableToolbar`, `DataTableViewOptions`, `DataTableFacetedFilter`, `DataTableRowActions`.
 - [ ] **DTB-02** P0 gap — Uncontrolled only: no `state`/`onStateChange`, no `manual*` + `rowCount` → server data and URL sync impossible. → `tableOptions` passthrough + controlled props.
 - [ ] **DTB-03** P1 — Virtual mode (`@tanstack/react-virtual`, sticky header, `contain: strict`); loading skeleton rows + error row.
@@ -418,7 +420,7 @@ Design detail for every item here: [`liquid-glass.md`](liquid-glass.md) Part 3.
 - [ ] **CHA-10** P2 — Virtualisation (reverse mode) + unread count on jump button; per-token re-render (`querySelectorAll` + `setAtBottom(true)` each resize); `textareaProps.ref` overrides internal ref (merge; prefer `field-sizing: content`); suggestions row edge fades + scroll-snap.
 
 ### 7.7 Blocks (existing)
-- [ ] **BLK-01** P1 — dashboard-01: `tabular-nums` + `font-glass-heading font-bold` on figures (rule) → `type-glass-display numeric-glass`; heatmap hydration (HMP-01); three stats in `grid-cols-3` truncate at 375px; ring vs legend labels disagree, duplicated colours. Rebuild as Fitness/Health "Summary": large title, widget cards, floating liquid toolbar + tab bar.
+- [ ] **BLK-01** P1 — dashboard-01: `tabular-nums` + `font-glass-heading font-bold` on figures (rule) → `type-glass-display numeric-glass`; heatmap hydration (HMP-01); three stats in `grid-cols-3` truncate at 375px; ring vs legend labels disagree, duplicated colours. Rebuild as Fitness/Health "Summary": large title, widget cards, floating liquid toolbar + tab bar. *(M1: token fixes; left: phone truncation, Health-style rebuild)*
 - [ ] **BLK-02** P1 — analytics-01: inline `x`/`valueFormat` (CHT-02); ⅓-width DataTable cramped; `text-right`; Day column unsortable; KPI deltas, date-range picker, loading/empty demos.
 - [ ] **BLK-03** P2 — settings-01: `text-[0.95rem]`, `tabular-nums`; segmented/slider change nothing → wire to local `ThemeScope`; inert "Reminder time"; push/detail navigation, large-title header, search; title-case headers.
 - [ ] **BLK-04** P2 — auth-01: `autoComplete="username webauthn"` for passkeys + icon; error/pending states; `href="#"`; float as a sheet over a photo/video ground.
@@ -644,7 +646,7 @@ Ocean-liquid light settings screen is close to Apple-grade (grouped rows, shadow
 - [ ] **AGT-02** P1 gap — `/docs/<slug>.md` (text/markdown) + "Copy page" button.
 - [ ] **AGT-03** P1 gap — `use-glasscn` skill never reaches consumers. → Ship as `registry:file` targeting `.claude/skills/use-glasscn/SKILL.md` and `.agents/skills/…` (`shadcn add @glasscn/skill`) + `npx skills add`; move contributor skills (`build-glass-component`, `extend-theme`, `ship-registry`, `port-to-native`) to a separate dir.
 - [ ] **AGT-04** P1 gap — "AI agents" docs page: copyable consumer AGENTS.md block, shadcn MCP setup with `@glasscn`, llms links, skill install.
-- [ ] **AGT-05** P1 rebuild — Rewrite `use-glasscn` rules for the material/liquid split *first* when LG-01 lands (agents copy rules literally; today it says "cards are glass, two levels max").
+- [x] **AGT-05** P1 rebuild — Rewrite `use-glasscn` rules for the material/liquid split *first* when LG-01 lands (agents copy rules literally; today it says "cards are glass, two levels max").
 - [ ] **AGT-06** P2 gap — `@glasscn/mcp` with theme tools (`create_theme(hue, material, …)` → studio code → `/r/theme/<code>`, `check_legibility`) — unique; nobody else has an engine to expose.
 - [ ] **AGT-07** P2 gap — 3–4 full screens as `registry:example` items (app shell, settings, dashboard, media) that agents install and edit.
 - [ ] **AGT-08** P2 gap — `shadcn create` / `preset` / `apply` support: ship palette+material+shape+type bundles in the format those commands accept (verify against the shadcn changelog first).
@@ -684,11 +686,11 @@ Ocean-liquid light settings screen is close to Apple-grade (grouped rows, shadow
 - [x] **QA-01** P0 test — **Legibility matrix** across PALETTES × MATERIALS × schemes (× clarity): body ≥ 4.5, muted ≥ 4.5, accent label ≥ 4.5, accent & ring vs ground ≥ 3, chart min ΔE under CVD. Fails today (Dusk, smoked) — fix ENG-02/03/07 with it.
 - [ ] **QA-02** P1 test — Playwright + axe on `/docs/*`, `/themes`, blocks (light/dark × matte/smoked).
 - [ ] **QA-03** P1 test — Visual regression (`toHaveScreenshot`) on docs previews × 3 palettes × 2 schemes × {shape-square, density-compact} — reuse `video/capture.mjs`.
-- [ ] **QA-04** P1 test — Component tests (vitest + jsdom/RTL): controlled/uncontrolled, keyboard, ARIA roles/states, ref composition, Tooltip without provider, GroupedList asChild roles, Dock links.
+- [x] **QA-04** P1 test — Component tests (vitest + jsdom/RTL): controlled/uncontrolled, keyboard, ARIA roles/states, ref composition, Tooltip without provider, GroupedList asChild roles, Dock links.
 - [x] **QA-05** P1 lint — Token rules enforced (custom ESLint rule or vitest scan of `src/components/{glass,blocks}`): ban `bg-white|black`, `text-white`, hex, `bg-zinc-*`, `rounded-[…]`, `h-[Npx]`, raw `backdrop-blur`, `tabular-nums`, `outline-none` without visible focus, self-referencing custom props, physical `ml/mr/pl/pr/left/right` (RTL); require `data-slot` per exported part.
 - [ ] **QA-06** P1 ci — CI adds: `next build` of the site, `git diff --exit-code` on generated files, JS/CSS size budgets, Lighthouse (LCP/TBT) on `/`, `/docs/button`, `/themes`, framework install matrix (DX-05), pinned + latest deps (DX-03).
 - [ ] **QA-07** P1 test — Studio e2e: share-link round trip, apply-to-site survives reload, export → `shadcn add` from `/r/theme/<code>`.
-- [ ] **QA-08** P1 test — Engine: ThemeScope CSS (partial props, forced scheme), sanitizer cases (`/*`, ranges, `var()`), decode back-compat fixtures, gamut, tint cycle, generated CSS parsed with lightningcss.
+- [x] **QA-08** P1 test — Engine: ThemeScope CSS (partial props, forced scheme), sanitizer cases (`/*`, ranges, `var()`), decode back-compat fixtures, gamut, tint cycle, generated CSS parsed with lightningcss.
 - [ ] **QA-09** P1 test — Browser matrix (Chromium, WebKit, Firefox) for liquid surfaces; refraction must degrade to frost.
 - [ ] **QA-10** P1 test — Native: NAT-50..54.
 

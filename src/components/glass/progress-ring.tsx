@@ -1,7 +1,7 @@
 import * as React from "react"
 import { cn } from "cn"
 
-import { ringArc } from "@/lib/glass-charts"
+import { drawEase, glassTime, ringArc } from "@/lib/glass-charts"
 
 /**
  * One ring that closes around its content — a goal, a countdown, a seal.
@@ -45,8 +45,8 @@ function ProgressRing({
           data-glass-motion
           style={{
             ["--glass-draw-from" as string]: `${circumference}`,
-            animation: "glass-draw 1s cubic-bezier(0.16,1,0.3,1) both",
-            transition: "stroke-dashoffset 0.8s cubic-bezier(0.16,1,0.3,1)",
+            animation: `glass-draw ${glassTime(5)} ${drawEase} both`,
+            transition: `stroke-dashoffset ${glassTime(4)} ${drawEase}`,
           }}
         />
       </svg>

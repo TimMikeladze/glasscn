@@ -1,4 +1,4 @@
-import { BellIcon, ClockIcon, DropletIcon } from "lucide-react"
+import { BellIcon, ClockIcon, CloudIcon, DropletIcon } from "lucide-react"
 
 import { Badge } from "@/components/glass/badge"
 import {
@@ -44,6 +44,16 @@ export default function GroupedListDemo() {
           </GroupedListIcon>
           <GroupedListTitle>Palette</GroupedListTitle>
           <Badge variant="tinted">Dusk</Badge>
+        </GroupedListItem>
+        <GroupedListItem asChild disabled>
+          <button type="button">
+            <GroupedListIcon className="bg-chart-1">
+              <CloudIcon />
+            </GroupedListIcon>
+            <GroupedListTitle>Sync</GroupedListTitle>
+            <GroupedListValue>Signed out</GroupedListValue>
+            <GroupedListChevron />
+          </button>
         </GroupedListItem>
       </GroupedListContent>
       <GroupedListFooter>Changes save instantly.</GroupedListFooter>

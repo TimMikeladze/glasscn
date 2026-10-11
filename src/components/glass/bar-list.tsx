@@ -1,7 +1,7 @@
 import * as React from "react"
 import { cn } from "cn"
 
-import { barShares } from "@/lib/glass-charts"
+import { barShares, drawEase, glassTime } from "@/lib/glass-charts"
 
 export interface BarListItem {
   name: React.ReactNode
@@ -47,14 +47,14 @@ function BarList({
                 data-slot="bar-list-bar"
                 aria-hidden
                 data-glass-motion
-                className="absolute inset-y-0 left-0 origin-left rounded-control-sm"
+                className="absolute inset-y-0 start-0 origin-left rounded-control-sm rtl:origin-right"
                 style={{
                   width: `max(${shares[i]}%, 0.375rem)`,
                   background: `color-mix(in oklch, ${color} 22%, transparent)`,
-                  animation: `glass-grow 0.8s cubic-bezier(0.16,1,0.3,1) ${i * 40}ms both`,
+                  animation: `glass-grow ${glassTime(4)} ${drawEase} ${glassTime(i * 0.2)} both`,
                 }}
               />
-              <span className="relative flex h-[calc(2rem*var(--glass-density))] items-center gap-2 px-2.5 text-sm">
+              <span className="relative flex h-control-sm items-center gap-2 px-pad-xs text-sm">
                 {item.icon ? <span className="shrink-0 text-muted-foreground [&_svg:not([class*='size-'])]:size-4">{item.icon}</span> : null}
                 <span className="truncate">{item.name}</span>
               </span>
@@ -64,16 +64,16 @@ function BarList({
             </span>
           </>
         )
-        const row = "flex w-full items-center gap-3 rounded-control-sm text-left focus-visible:outline-hidden focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/50"
+        const row = "glass-focus flex w-full items-center gap-3 rounded-control-sm text-start"
         const key = item.key ?? (typeof item.name === "string" ? item.name : i)
         return (
           <li key={key} data-slot="bar-list-item">
             {item.href ? (
-              <a href={item.href} className={cn(row, "hover:bg-fill")} onClick={onSelect ? () => onSelect(item, i) : undefined}>
+              <a href={item.href} className={cn(row, "transition-colors duration-(--glass-duration) ease-glass hover:bg-fill")} onClick={onSelect ? () => onSelect(item, i) : undefined}>
                 {body}
               </a>
             ) : onSelect ? (
-              <button type="button" className={cn(row, "cursor-pointer hover:bg-fill")} onClick={() => onSelect(item, i)}>
+              <button type="button" className={cn(row, "cursor-pointer transition-colors duration-(--glass-duration) ease-glass hover:bg-fill")} onClick={() => onSelect(item, i)}>
                 {body}
               </button>
             ) : (

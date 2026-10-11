@@ -3,10 +3,16 @@ import { cn } from "cn"
 
 import { glassVariants, type GlassVariantProps } from "@/lib/glass-variants"
 
-/** shadcn's Card API on a glass pane. Same parts, same props — swap the import. */
+/**
+ * shadcn's Card API on a glass pane. Same parts, same props — swap the import.
+ * Padding is `--card-spacing` (the `card` / `card-sm` spacing tokens); the card
+ * publishes its radius and padding as `--glass-container-radius` / `--glass-container-pad`
+ * so tiles inside can take `rounded-concentric`.
+ */
 function Card({
   className,
   size = "default",
+  variant,
   intensity,
   tint,
   elevation,
@@ -17,8 +23,8 @@ function Card({
       data-slot="card"
       data-size={size}
       className={cn(
-        glassVariants({ intensity, tint, elevation }),
-        "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-surface py-(--card-spacing) text-sm text-card-foreground [--card-spacing:calc(1.25rem*var(--glass-density))] has-data-[slot=card-footer]:pb-0 data-[size=sm]:[--card-spacing:calc(1rem*var(--glass-density))] data-[size=sm]:rounded-surface-sm data-[size=sm]:has-data-[slot=card-footer]:pb-0",
+        glassVariants({ variant, intensity, tint, elevation }),
+        "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-surface py-(--card-spacing) text-[calc(0.875rem*var(--glass-text-scale))] text-card-foreground [--card-spacing:--theme(--spacing-card)] [--glass-container-pad:var(--card-spacing)] [--glass-container-radius:var(--glass-radius-surface)] has-data-[slot=card-footer]:pb-0 data-[size=sm]:rounded-surface-sm data-[size=sm]:[--card-spacing:--theme(--spacing-card-sm)] data-[size=sm]:[--glass-container-radius:calc(var(--glass-radius-surface)*0.75)] data-[size=sm]:has-data-[slot=card-footer]:pb-0",
         className
       )}
       {...props}
@@ -43,14 +49,14 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-title"
-      className={cn("type-glass-heading text-base group-data-[size=sm]/card:text-sm", className)}
+      className={cn("type-glass-heading type-step-0 group-data-[size=sm]/card:text-[calc(0.875rem*var(--glass-text-scale))]", className)}
       {...props}
     />
   )
 }
 
 function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="card-description" className={cn("text-sm text-muted-foreground", className)} {...props} />
+  return <div data-slot="card-description" className={cn("text-[calc(0.875rem*var(--glass-text-scale))] text-muted-foreground", className)} {...props} />
 }
 
 function CardAction({ className, ...props }: React.ComponentProps<"div">) {
@@ -71,7 +77,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-footer"
-      className={cn("flex items-center gap-2 border-t border-glass-border bg-fill/40 p-(--card-spacing)", className)}
+      className={cn("flex items-center gap-2 border-t border-separator bg-fill-faint p-(--card-spacing)", className)}
       {...props}
     />
   )

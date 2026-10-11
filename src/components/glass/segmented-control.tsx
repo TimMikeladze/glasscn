@@ -47,18 +47,18 @@ function SegmentedControl({
         onValueChange?.(v)
       }}
       className={cn(
-        "group/segmented relative inline-flex w-fit items-stretch rounded-control bg-fill p-0.5 data-[size=default]:h-[calc(2.25rem*var(--glass-density))] data-[size=lg]:h-[calc(2.75rem*var(--glass-density))] data-[size=sm]:h-[calc(1.75rem*var(--glass-density))]",
+        // heights match Button's (h-control-sm / h-control / h-control-lg) so they line up in a toolbar;
+        // the container radius + padding make the thumb concentric (rounded-concentric)
+        "group/segmented relative inline-flex w-fit items-stretch rounded-control bg-fill [--glass-container-pad:0.125rem] [--glass-container-radius:var(--glass-radius-control)] p-(--glass-container-pad) data-[size=default]:h-control data-[size=lg]:h-control-lg data-[size=sm]:h-control-sm",
         className
       )}
       {...props}
     >
       <span
         data-slot="segmented-control-thumb"
+        data-glass-motion
         aria-hidden
-        className={cn(
-          slidingIndicatorClass,
-          "rounded-control-sm bg-glass-thumb shadow-glass-knob"
-        )}
+        className={cn(slidingIndicatorClass, "rounded-concentric bg-glass-thumb shadow-glass-knob")}
       />
       {children}
     </ToggleGroupPrimitive.Root>
@@ -70,7 +70,8 @@ function SegmentedControlItem({ className, ...props }: React.ComponentProps<type
     <ToggleGroupPrimitive.Item
       data-slot="segmented-control-item"
       className={cn(
-        "relative z-10 inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-control-sm px-3 text-sm font-medium whitespace-nowrap text-muted-foreground transition-colors focus-visible:outline-hidden hover:text-foreground focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-40 data-[state=on]:font-semibold data-[state=on]:text-foreground group-data-[size=lg]/segmented:text-base group-data-[size=sm]/segmented:px-2 group-data-[size=sm]/segmented:text-xs [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
+        // before the thumb is measured (server render, no JS) the chosen item draws the thumb itself
+        "relative z-10 inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-concentric px-3 text-sm font-medium whitespace-nowrap text-muted-foreground transition-colors duration-(--glass-duration) ease-out glass-focus-inset hover:text-foreground disabled:pointer-events-none disabled:text-glass-label-tertiary data-[state=on]:font-semibold data-[state=on]:text-foreground not-in-data-indicator-ready:data-[state=on]:bg-glass-thumb not-in-data-indicator-ready:data-[state=on]:shadow-glass-knob group-data-[size=lg]/segmented:text-base group-data-[size=sm]/segmented:px-2 group-data-[size=sm]/segmented:text-xs [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}

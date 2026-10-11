@@ -66,8 +66,9 @@ const columns = col.columns([
   col.accessor("date", { header: "Day" }),
   col.accessor("activity", { header: ({ column }) => <DataTableColumnHeader column={column} title="Activity" />, cell: (info) => <span className="font-medium">{info.getValue()}</span> }),
   col.accessor("minutes", {
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Time" className="justify-end" />,
-    cell: (info) => <div className="text-right">{info.getValue()} min</div>,
+    meta: { numeric: true },
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Time" />,
+    cell: (info) => `${info.getValue()} min`,
   }),
 ])
 
@@ -115,7 +116,7 @@ export function Analytics01() {
         </CardHeader>
         <CardContent>
           <DonutChart data={mix} label={(m) => m.name} value={(m) => m.minutes} valueFormat={(m) => `${m} min`} ariaLabel={`Active minutes by kind over the last ${range} days, ${total} in all`}>
-            <span className="type-glass-display numeric-glass text-3xl">{Math.round(total / 60)}h</span>
+            <span className="type-glass-display type-step-3">{Math.round(total / 60)}h</span>
             <span className="text-xs text-muted-foreground">active</span>
           </DonutChart>
         </CardContent>
@@ -127,7 +128,7 @@ export function Analytics01() {
         </CardHeader>
         <CardContent className="flex justify-center">
           <Gauge value={78} target={70} label="Recovery">
-            <span className="type-glass-display text-4xl">78</span>
+            <span className="type-glass-display type-step-4">78</span>
             <span className="text-sm text-muted-foreground">goal 70</span>
           </Gauge>
         </CardContent>

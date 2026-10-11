@@ -133,7 +133,7 @@ export function llmsFullTxt() {
       `Choose a material with a theme item (${themeItems
         .filter((t) => t.name.startsWith("material-"))
         .map((t) => `\`${t.name}\``)
-        .join(", ")}); \`glass-subtle\` / \`glass\` / \`glass-strong\` set intensity by elevation.`,
+        .join(", ")}); \`glass-subtle\` / \`glass\` / \`glass-strong\` are the content material, \`glass-liquid\` / \`glass-liquid-clear\` the control layer.`,
       "",
       "## Components and blocks",
       "",

@@ -72,7 +72,7 @@ function LineChart<Row>({
         tooltip: {
           use: tooltip,
           anchor: "group-center",
-        sort: "color-domain",
+          sort: "color-domain",
           placement: ["top", "right", "left", "bottom"],
           content: seriesTooltip(series, x, { xFormat, valueFormat }),
         },

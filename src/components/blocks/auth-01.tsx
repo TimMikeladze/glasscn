@@ -32,7 +32,7 @@ export function Auth01({ onSubmit }: { onSubmit?: (data: { email: string; passwo
           <div className="grid gap-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="auth-01-password">Password</Label>
-              <a href="#" className="text-xs text-primary hover:underline">
+              <a href="#" className="text-xs text-primary-ink hover:underline">
                 Forgot?
               </a>
             </div>
@@ -53,7 +53,7 @@ export function Auth01({ onSubmit }: { onSubmit?: (data: { email: string; passwo
       </CardContent>
       <CardFooter className="justify-center text-sm text-muted-foreground">
         New here?&nbsp;
-        <a href="#" className="font-medium text-primary hover:underline">
+        <a href="#" className="font-medium text-primary-ink hover:underline">
           Create an account
         </a>
       </CardFooter>

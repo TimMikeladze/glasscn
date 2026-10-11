@@ -7,6 +7,9 @@ import { heatCellTitle, heatmapWeeks, isoDate, monthLabels, weekdayLabels, type 
 
 const LEVEL = ["bg-fill", "bg-primary/25", "bg-primary/50", "bg-primary/75", "bg-primary"]
 
+/** Cell corners follow the shape preset (3px at the default control radius; square stays square). */
+const CELL = "rounded-[calc(var(--glass-radius-control)*0.25)]"
+
 const noop = () => () => {}
 
 /**
@@ -57,25 +60,29 @@ function Heatmap({
   const months = cols ? monthLabels(cols, locale) : []
   const days = weekdayLabels(weekStart, locale)
   return (
-    <div data-slot="heatmap" data-pending={cols ? undefined : ""} className={cn("flex gap-1.5 text-[0.625rem] text-muted-foreground", className)} {...props}>
-      <div className="flex shrink-0 flex-col gap-[3px] pt-4">
+    <div data-slot="heatmap" data-pending={cols ? undefined : ""} className={cn("flex gap-1.5 type-step-n2 text-muted-foreground [--heatmap-gap:calc(0.1875rem*var(--glass-density))]", className)} {...props}>
+      <div className="flex shrink-0 flex-col gap-(--heatmap-gap) pt-4">
         {days.map((d, r) => (
           <div key={r} className="flex flex-1 items-center leading-none">
             {r % 2 === 0 ? d : null}
           </div>
         ))}
       </div>
-      <div className="grid min-w-0 flex-1 justify-start gap-[3px]" style={{ gridTemplateColumns: `repeat(${weeks}, minmax(0, ${cellSize}px))` }}>
+      <div className="grid min-w-0 flex-1 justify-start gap-(--heatmap-gap)" style={{ gridTemplateColumns: `repeat(${weeks}, minmax(0, ${cellSize}px))` }}>
         {cols
           ? cols.map((col, w) => (
-              <div key={col[0].date} className="flex min-w-0 flex-col gap-[3px]">
-                <div className="relative h-3.5">{months[w] ? <span className="absolute left-0 whitespace-nowrap">{months[w]}</span> : null}</div>
+              <div key={col[0].date} className="flex min-w-0 flex-col gap-(--heatmap-gap)">
+                <div className="relative h-3.5">{months[w] ? <span className="absolute start-0 whitespace-nowrap">{months[w]}</span> : null}</div>
                 {col.map((cell) => {
                   const cls = cn(
-                    "relative aspect-square w-full rounded-[3px] focus-visible:outline-hidden",
+                    "relative aspect-square w-full",
+                    CELL,
                     cell.future ? "bg-transparent" : LEVEL[cell.level],
-                    cell.today && "ring-2 ring-primary ring-inset",
-                    onSelect && !cell.future && "cursor-pointer transition-transform hover:scale-125 focus-visible:ring-2 focus-visible:ring-ring"
+                    // the foreground reads on every level, including a full-accent cell
+                    cell.today && "inset-ring-(length:--glass-ring-width) inset-ring-foreground/70",
+                    onSelect &&
+                      !cell.future &&
+                      "glass-focus cursor-pointer transition-transform duration-(--glass-duration) ease-glass hover:scale-125 focus-visible:z-10 motion-reduce:hover:scale-100"
                   )
                   return onSelect && !cell.future ? (
                     <button key={cell.date} type="button" data-slot="heatmap-cell" data-level={cell.level} title={title(cell)} aria-label={title(cell)} onClick={() => onSelect(cell.date)} className={cls} />
@@ -87,10 +94,10 @@ function Heatmap({
             ))
           : // no `today` until hydrated: the same grid, empty, so nothing shifts when it fills in
             Array.from({ length: weeks }, (_, w) => (
-              <div key={w} aria-hidden className="flex min-w-0 flex-col gap-[3px]">
+              <div key={w} aria-hidden className="flex min-w-0 flex-col gap-(--heatmap-gap)">
                 <div className="h-3.5" />
                 {Array.from({ length: 7 }, (_, r) => (
-                  <div key={r} data-slot="heatmap-cell" data-level={0} className={cn("aspect-square w-full rounded-[3px]", LEVEL[0])} />
+                  <div key={r} data-slot="heatmap-cell" data-level={0} className={cn("aspect-square w-full", CELL, LEVEL[0])} />
                 ))}
               </div>
             ))}
@@ -103,11 +110,11 @@ function Heatmap({
 function HeatmapLegend({ className, less = "Less", more = "More", ...props }: React.ComponentProps<"div"> & { less?: string; more?: string }) {
   return (
     <div data-slot="heatmap-legend" className={cn("flex items-center gap-1 text-xs text-muted-foreground", className)} {...props}>
-      <span className="mr-1">{less}</span>
+      <span className="me-1">{less}</span>
       {LEVEL.map((c) => (
-        <span key={c} className={cn("size-2.5 rounded-[3px]", c)} />
+        <span key={c} className={cn("size-2.5", CELL, c)} />
       ))}
-      <span className="ml-1">{more}</span>
+      <span className="ms-1">{more}</span>
     </div>
   )
 }

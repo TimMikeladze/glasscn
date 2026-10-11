@@ -1,7 +1,7 @@
 import { Button } from "@/components/glass/button"
 import { Input } from "@/components/glass/input"
 import { Label } from "@/components/glass/label"
-import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/glass/sheet"
+import { Sheet, SheetBody, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/glass/sheet"
 
 export default function SheetDemo() {
   return (
@@ -14,10 +14,10 @@ export default function SheetDemo() {
           <SheetTitle>New area</SheetTitle>
           <SheetDescription>Something you’re getting better at.</SheetDescription>
         </SheetHeader>
-        <div className="grid gap-2 px-5">
+        <SheetBody className="grid content-start gap-2">
           <Label htmlFor="sheet-area">Name</Label>
           <Input id="sheet-area" placeholder="Jiu-jitsu" />
-        </div>
+        </SheetBody>
         <SheetFooter>
           <Button>Add area</Button>
         </SheetFooter>

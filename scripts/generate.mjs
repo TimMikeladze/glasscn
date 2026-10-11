@@ -4,10 +4,17 @@
  * from registry/items.mjs, registry/stylesheet.mjs and src/lib/glass-theme.ts (the
  * token schema and presets). All three outputs are generated — edit the sources.
  */
-import { writeFileSync } from "node:fs"
+import { existsSync, readFileSync, writeFileSync } from "node:fs"
 import { blocks, components, foundations, nativeItems } from "../registry/items.mjs"
 import { proseStylesheet, stylesheet, themeTokens } from "../registry/stylesheet.mjs"
 import { DENSITIES, FONTS, MATERIALS, MOTIONS, PALETTES, SHAPES, TOKENS, TYPE_PRESETS, createGlassTheme, defaultTheme, fontItemName, themeToCss } from "../src/lib/glass-theme.ts"
+
+// Write only when the content changed: an unchanged file keeps its mtime, so `next dev` doesn't hot-reload on every run.
+const write = (path, content) => {
+  const same = existsSync(path) && readFileSync(path, "utf8") === content
+  if (!same) writeFileSync(path, content)
+  return same ? "unchanged" : "written"
+}
 
 const base = defaultTheme()
 const groupOf = Object.fromEntries(TOKENS.map((t) => [t.name, t.group]))
@@ -48,7 +55,8 @@ const themes = [
   // type presets: the Type group, plus their Google fonts installed as app fonts (registry:font items)
   ...Object.entries(TYPE_PRESETS).map(([k, t]) => {
     const item = presetItem(`type-${k}`, `${t.title} type`, `${t.description} Sets the type scale, leading, weights, case and numerals.`, createGlassTheme({ type: k }), ["Type"])
-    const fonts = Object.entries(t.fonts ?? {}).filter(([role, key]) => FONTS[key]?.google && role !== "display")
+    // a display font that is also the heading font loads once, as the heading font
+    const fonts = Object.entries(t.fonts ?? {}).filter(([role, key]) => FONTS[key]?.google && !(role === "display" && t.fonts?.heading === key))
     if (fonts.length) item.registryDependencies = [...new Set(fonts.map(([role, key]) => `{REGISTRY_URL}/r/${fontItemName(role, key)}.json`))]
     // system stacks need no loading, so a system preset sets them as theme fonts directly
     const system = Object.entries(t.fonts ?? {}).filter(([, key]) => FONTS[key] && !FONTS[key].google)
@@ -61,24 +69,25 @@ const themes = [
 ]
 
 // Font items: shadcn's registry:font — the CLI wires next/font (Next) or fontsource (others).
-// sans → --font-sans, heading → --font-heading, mono → --font-mono.
+// sans → --font-sans, heading → --font-heading, mono → --font-mono, display → --font-display (big figures).
 const fontItems = Object.entries(FONTS).flatMap(([key, f]) => {
   if (!f.google) return []
-  const roles = f.category === "mono" ? ["mono"] : f.category === "serif" || f.category === "display" ? ["heading", "sans"] : ["sans", "heading"]
+  const roles = [...(f.category === "mono" ? ["mono"] : f.category === "serif" || f.category === "display" ? ["heading", "sans"] : ["sans", "heading"]), "display"]
   return roles.map((role) => ({
     name: fontItemName(role, key),
     type: "registry:font",
-    title: `${f.label}${role === "sans" ? "" : role === "heading" ? " (headings)" : " (mono)"}`,
-    description: `${f.label} as your app's ${role === "sans" ? "body" : role === "heading" ? "heading" : "monospace"} font (${f.category}).`,
+    title: `${f.label}${role === "sans" ? "" : role === "heading" ? " (headings)" : role === "display" ? " (display)" : " (mono)"}`,
+    description: `${f.label} as your app's ${role === "sans" ? "body" : role === "heading" ? "heading" : role === "display" ? "display (big figures, stats, rings)" : "monospace"} font (${f.category}).`,
     categories: ["glass", "fonts"],
     font: {
       // fontsource registers variable fonts as "<Family> Variable"; next/font ignores this and uses `import`
       family: `"${f.google.family}${f.google.weights === "variable" ? " Variable" : ""}", ${f.stack.split(", ").slice(1).join(", ")}`,
       provider: "google",
       import: f.google.import,
-      variable: role === "sans" ? "--font-sans" : role === "heading" ? "--font-heading" : "--font-mono",
+      variable: { sans: "--font-sans", heading: "--font-heading", display: "--font-display", mono: "--font-mono" }[role],
       // where the CLI applies it. Without one it puts --font-mono on <html> (shadcn's all-mono look) — ours is a code font.
-      ...(role === "sans" ? {} : { selector: role === "heading" ? "h1, h2, h3, h4, h5, h6" : "code, kbd, samp, pre" }),
+      // display applies only where glasscn sets display type (.font-glass-display / type-glass-display read --font-display)
+      ...(role === "sans" ? {} : { selector: { heading: "h1, h2, h3, h4, h5, h6", display: ".font-glass-display, .type-glass-display", mono: "code, kbd, samp, pre" }[role] }),
       ...(f.google.weights === "variable" ? {} : { weight: f.google.weights }),
       subsets: ["latin"],
       dependency: f.google.dependency,
@@ -92,7 +101,7 @@ const registry = {
   homepage: "{REGISTRY_URL}",
   items: [...foundations, ...themes, ...fontItems, ...components, ...blocks, ...nativeItems],
 }
-writeFileSync("registry.json", JSON.stringify(registry, null, 2) + "\n")
+const registryState = write("registry.json", JSON.stringify(registry, null, 2) + "\n")
 
 // ---- the docs site's CSS: what ships, the full default theme, and palette presets keyed by data-palette ----
 const block = (selector, body, depth = 0) => {
@@ -120,11 +129,10 @@ const css = [
   ...Object.entries({ ...stylesheet, ...proseStylesheet }).map(([k, v]) => block(k, v)),
   "",
 ].join("\n")
-writeFileSync("src/app/glass.generated.css", css)
-console.log(`registry.json: ${registry.items.length} items (${themes.length} themes, ${fontItems.length} fonts) · glass.generated.css written`)
+const cssState = write("src/app/glass.generated.css", css)
+console.log(`registry.json: ${registry.items.length} items (${themes.length} themes, ${fontItems.length} fonts) ${registryState} · glass.generated.css ${cssState}`)
 
 // ---- docs: every shipped file and every demo, highlighted once here (shiki dual themes) ----
-const { readFileSync, existsSync } = await import("node:fs")
 const { createHighlighter } = await import("shiki")
 const highlighter = await createHighlighter({ themes: ["github-light", "github-dark"], langs: ["tsx", "ts", "css", "json", "bash"] })
 const highlight = (code, lang = "tsx") => highlighter.codeToHtml(code, { lang, themes: { light: "github-light", dark: "github-dark" }, defaultColor: false })
@@ -146,8 +154,8 @@ for (const item of [...components, ...blocks]) {
 }
 const cssVarsCode = themeToCss({ light: style.cssVars.light, dark: style.cssVars.dark })
 const snippets = { tokens: { code: cssVarsCode, html: highlight(cssVarsCode, "css") } }
-writeFileSync(
+const sourcesState = write(
   "src/lib/sources.generated.ts",
   `// Generated by scripts/generate.mjs — do not edit.\nexport interface Source { code: string; html: string }\nexport const sources: Record<string, (Source & { path: string })[]> = ${JSON.stringify(sources)}\nexport const demoSources: Record<string, Source> = ${JSON.stringify(demos)}\nexport const snippets: Record<string, Source> = ${JSON.stringify(snippets)}\n`
 )
-console.log(`sources.generated.ts: ${Object.keys(sources).length} items, ${Object.keys(demos).length} demos`)
+console.log(`sources.generated.ts: ${Object.keys(sources).length} items, ${Object.keys(demos).length} demos ${sourcesState}`)

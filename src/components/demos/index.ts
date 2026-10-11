@@ -18,6 +18,7 @@ import Dialog from "./dialog"
 import Dock from "./dock"
 import DropdownMenu from "./dropdown-menu"
 import Glass from "./glass"
+import GlassPreferences from "./glass-preferences"
 import GroupedList from "./grouped-list"
 import BarList from "./bar-list"
 import CategoryBar from "./category-bar"
@@ -74,6 +75,7 @@ export const demos: Record<string, ComponentType> = {
   kbd: Kbd,
   separator: Separator,
   avatar: Avatar,
+  "glass-preferences": GlassPreferences,
   dialog: Dialog,
   "alert-dialog": AlertDialog,
   sheet: Sheet,

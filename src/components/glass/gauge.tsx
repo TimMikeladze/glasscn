@@ -1,7 +1,7 @@
 import * as React from "react"
 import { cn } from "cn"
 
-import { arcPath, fraction, polarPoint } from "@/lib/glass-charts"
+import { arcPath, drawEase, fraction, glassTime, polarPoint } from "@/lib/glass-charts"
 
 const START = -Math.PI * 0.75
 const SWEEP = Math.PI * 1.5
@@ -52,7 +52,7 @@ function Gauge({
       aria-label={label}
       aria-valuemin={min}
       aria-valuemax={max}
-      aria-valuenow={value}
+      aria-valuenow={Math.min(max, Math.max(min, value))}
       className={cn("relative inline-flex shrink-0 justify-center", className)}
       style={{ width: size, height }}
       {...props}
@@ -69,7 +69,7 @@ function Gauge({
             strokeLinecap="round"
             strokeDasharray={`${length} ${length}`}
             data-glass-motion
-            style={{ ["--glass-draw-from" as string]: `${length}`, animation: "glass-draw 1s cubic-bezier(0.16,1,0.3,1) both" }}
+            style={{ ["--glass-draw-from" as string]: `${length}`, animation: `glass-draw ${glassTime(5)} ${drawEase} both` }}
           />
         ) : null}
         {tick === null ? null : (

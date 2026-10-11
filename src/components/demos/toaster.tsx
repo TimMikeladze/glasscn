@@ -8,7 +8,7 @@ export default function ToasterDemo() {
   return (
     <div className="flex gap-3">
       <Button onClick={() => toast.success("Tonight is sealed", { description: "Day 401 · a 3-night chain" })}>Seal tonight</Button>
-      <Button variant="glass" onClick={() => toast("Copied as text")}>
+      <Button variant="glass" onClick={() => toast("Copied as text", { action: { label: "Undo", onClick: () => toast("Copy undone") } })}>
         Copy
       </Button>
     </div>

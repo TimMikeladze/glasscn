@@ -10,7 +10,7 @@
  * Usage: node scripts/verify-install.mjs [--keep]   (needs network for create-next-app / npm)
  */
 import { execFileSync, spawn } from "node:child_process"
-import { mkdirSync, rmSync, writeFileSync } from "node:fs"
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs"
 import { createServer } from "node:net"
 import { join, resolve } from "node:path"
 
@@ -27,6 +27,12 @@ const freePort = () =>
     })
   })
 
+// Pinned to what this repo builds against (the lockfile), so a new upstream release can't turn CI red
+// overnight. Bump deliberately: update next / shadcn in package.json and this follows.
+const versionOf = (pkg) => JSON.parse(readFileSync(join(root, "node_modules", pkg, "package.json"), "utf8")).version
+const createNextApp = `create-next-app@${versionOf("next")}`
+const shadcn = `shadcn@${versionOf("shadcn")}`
+
 const port = await freePort()
 const url = `http://127.0.0.1:${port}`
 console.log(`\n▸ registry for ${url}`)
@@ -42,15 +48,15 @@ await new Promise((r) => setTimeout(r, 500))
 try {
   rmSync(work, { recursive: true, force: true })
   mkdirSync(work, { recursive: true })
-  console.log("\n▸ fresh Next app")
-  run("pnpm", ["dlx", "create-next-app@latest", "app", "--ts", "--tailwind", "--app", "--src-dir", "--eslint", "--use-pnpm", "--import-alias", "@/*", "--yes"], work)
-  run("pnpm", ["dlx", "shadcn@latest", "init", "-d", "--base", "radix"], app)
+  console.log(`\n▸ fresh Next app (${createNextApp}, ${shadcn})`)
+  run("pnpm", ["dlx", createNextApp, "app", "--ts", "--tailwind", "--app", "--src-dir", "--eslint", "--use-pnpm", "--import-alias", "@/*", "--yes"], work)
+  run("pnpm", ["dlx", shadcn, "init", "-d", "--base", "radix"], app)
 
   const registry = (await import(join(root, "registry", "items.mjs")))
   const web = [
     ...registry.foundations.map((i) => i.name),
     "theme-lagoon",
-    "material-liquid",
+    "material-vivid",
     "shape-soft",
     "motion-snappy",
     "density-compact",
@@ -61,7 +67,7 @@ try {
     ...registry.blocks.map((i) => i.name),
   ]
   console.log(`\n▸ shadcn add ${web.length} items`)
-  run("pnpm", ["dlx", "shadcn@latest", "add", ...web.map((n) => `${url}/r/${n}.json`), "-y", "--overwrite"], app)
+  run("pnpm", ["dlx", shadcn, "add", ...web.map((n) => `${url}/r/${n}.json`), "-y", "--overwrite"], app)
 
   // a theme exported from the studio, added from a local file — the "shadcn item" export path
   const { createGlassTheme, themeToRegistryItem } = await import(join(root, "src/lib/glass-theme.ts"))
@@ -69,10 +75,10 @@ try {
     join(app, "my-glass-theme.json"),
     JSON.stringify(themeToRegistryItem(createGlassTheme({ palette: { hue: 140, harmony: "triadic" }, material: "neon", type: "editorial" }), "my-glass-theme", "My glass theme", { fontItemUrl: (n) => `${url}/r/${n}.json` }))
   )
-  run("pnpm", ["dlx", "shadcn@latest", "add", "./my-glass-theme.json", "-y", "--overwrite"], app)
+  run("pnpm", ["dlx", shadcn, "add", "./my-glass-theme.json", "-y", "--overwrite"], app)
   const globals = (await import("node:fs")).readFileSync(join(app, "src/app/globals.css"), "utf8")
   // the exported theme was added last, so its values win over the presets added before it
-  for (const needle of ["--glass-glow: 38%", "@utility glass", "--radius-surface:", "--glass-density: 1;", "--glass-heading-leading: 1.05", "@utility type-glass-heading", "@utility glass-prose"])
+  for (const needle of ["--glass-glow: 38%", "@utility glass", "--radius-surface:", "--glass-density: 1;", "--glass-heading-leading: 1.05", "@utility type-glass-heading", "@utility glass-prose", "@custom-variant dark (&:is(.dark, .dark *)", "@utility glass-liquid"])
     if (!globals.includes(needle)) throw new Error(`globals.css is missing ${needle}`)
   // font items: next/font wired into the layout for each role
   const layout = (await import("node:fs")).readFileSync(join(app, "src/app/layout.tsx"), "utf8")

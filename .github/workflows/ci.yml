@@ -21,6 +21,10 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Generated files are in sync with their sources
+        run: |
+          pnpm generate
+          git diff --exit-code -- registry.json || { echo "::error::registry.json is stale — run pnpm generate and commit it"; exit 1; }
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm test

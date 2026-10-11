@@ -34,7 +34,7 @@ export const foundations = [
     type: "registry:lib",
     title: "Glass style",
     description:
-      "The design tokens (frost, rim, highlight, shadow, blur, saturation, fill, aurora), the glass / glass-strong / glass-subtle utilities, aurora and draw keyframes, a no-backdrop-filter fallback, and glassVariants — the cva every surface shares.",
+      "The design tokens (frost, rim, highlight, shadow, blur, saturation, fill, aurora, liquid, clarity, labels, status), the material utilities (glass / glass-strong / glass-subtle), the liquid control-layer utilities (glass-liquid / glass-liquid-clear), focus, hit-area, concentric corners, Apple text styles, accessibility overrides, aurora and draw keyframes, a no-backdrop-filter fallback, and glassVariants — the cva every surface shares.",
     categories: ["glass", "foundations"],
     // tw-animate-css: overlay enter/exit classes (animate-in, zoom-in-95…). `shadcn init` already imports it.
     dependencies: ["cn", "class-variance-authority", "tw-animate-css"],
@@ -72,7 +72,7 @@ export const foundations = [
 export const components = [
   // surfaces
   ui("aurora", "Aurora", "The living ground: three palette blobs drifting over the base colour. Pure CSS, reduced-motion aware.", { categories: ["surfaces"] }),
-  ui("glass", "Glass", "A frosted pane — the base every surface is made from. Intensity, tint and elevation variants; asChild.", { deps: ["radix-ui"], categories: ["surfaces"] }),
+  ui("glass", "Glass", "A glass pane — material (content) or liquid (control layer, regular or clear). Intensity, tint and elevation variants; asChild.", { deps: ["radix-ui"], categories: ["surfaces"] }),
   ui("card", "Card", "shadcn's Card API on glass: header, title, description, action, content, footer.", { categories: ["surfaces"] }),
   ui("theme-scope", "Theme scope", "Re-theme a subtree at runtime: a different palette, material, shape or scheme for one card, section or preview.", { reg: [at("glass-theme")], categories: ["surfaces"] }),
   // typography
@@ -93,8 +93,13 @@ export const components = [
   ui("kbd", "Kbd", "Keycaps on glass, singly or grouped.", { categories: ["controls"] }),
   ui("separator", "Separator", "A hairline that reads on glass.", { deps: ["radix-ui"], categories: ["controls"] }),
   ui("avatar", "Avatar", "shadcn's Avatar on glass: a round photo with a hairline rim, initials on a soft fill, and overlapping groups.", { deps: ["radix-ui", "class-variance-authority"], categories: ["controls"] }),
+  ui("glass-preferences", "Glass preferences", "The viewer's Liquid Glass setting: a Clarity slider (clear ↔ tinted) and a Reduce transparency switch that write --glass-clarity for the whole page, persisted, with a head script that applies it before paint.", {
+    reg: [at("label"), at("slider"), at("switch")],
+    categories: ["controls"],
+    extraFiles: [{ path: "src/components/glass/glass-preferences-script.tsx", type: "registry:ui", target: "@components/glass/glass-preferences-script.tsx" }],
+  }),
   // overlays
-  ui("dialog", "Dialog", "A strong-glass modal over a dimmed, softened page.", { deps: ["radix-ui", "lucide-react"], reg: [at("button")], categories: ["overlays"] }),
+  ui("dialog", "Dialog", "A liquid-glass modal over a dimmed page.", { deps: ["radix-ui", "lucide-react"], reg: [at("button")], categories: ["overlays"] }),
   ui("alert-dialog", "Alert dialog", "An Apple-style alert on strong glass: a bold title, a short message and capsule actions — for confirming destructive or irreversible choices. Only its buttons close it.", { deps: ["radix-ui"], reg: [at("button")], categories: ["overlays"] }),
   ui("sheet", "Sheet", "A floating glass panel that slides in from any edge, inset like an iPad sheet.", { deps: ["radix-ui", "lucide-react"], reg: [at("button")], categories: ["overlays"] }),
   ui("popover", "Popover", "Floating glass content anchored to a trigger.", { deps: ["radix-ui"], categories: ["overlays"] }),
@@ -108,7 +113,7 @@ export const components = [
   ui("activity-rings", "Activity rings", "Concentric Activity-style rings that sweep in and lap past 100%. Server-component safe.", { reg: [charts], categories: ["data"] }),
   ui("progress-ring", "Progress ring", "One ring that closes around its content — a goal, a countdown, a seal.", { reg: [charts], categories: ["data"] }),
   ui("sparkline", "Sparkline", "A smooth measure over time that draws itself, with a soft area and the latest point lit.", { reg: [charts], categories: ["data"] }),
-  ui("stat", "Stat", "A figure on a glass tile: icon, value, label, trend.", { deps: ["lucide-react"], categories: ["data"] }),
+  ui("stat", "Stat", "A figure on a fill tile (glass when standalone): label, value, trend with sentiment.", { deps: ["lucide-react"], categories: ["data"] }),
   ui("bar-list", "Bar list", "Ranked horizontal bars with the label inside and the value at the end — top habits, sources, pages.", { reg: [charts], categories: ["data"] }),
   ui("gauge", "Gauge", "A three-quarter meter with an optional target tick and the figure in its bowl. Server-component safe.", { reg: [charts], categories: ["data"] }),
   ui("tracker", "Tracker", "A row of status blocks — uptime, or a habit's last 30 days.", { categories: ["data"] }),
@@ -140,7 +145,7 @@ export const blocks = [
   block("dashboard-01", "Dashboard", "Activity rings, stat tiles, a ranged sparkline and a 39-week heatmap.", ["activity-rings", "button", "card", "dropdown-menu", "heatmap", "segmented-control", "sparkline", "stat"]),
   block("analytics-01", "Analytics", "Stacked active minutes over a range, the training mix as a donut, a recovery gauge, top habits and a sortable table of recent sessions.", ["area-chart", "bar-list", "card", "data-table", "donut-chart", "gauge", "segmented-control"]),
   block("settings-01", "Settings", "iOS Settings in glass: grouped rows, icon tiles, a switch, a segmented control and a slider.", ["grouped-list", "segmented-control", "slider", "switch"]),
-  block("auth-01", "Sign in", "A strong-glass sign-in card with email, password and a passkey option.", ["button", "card", "input", "label", "separator"]),
+  block("auth-01", "Sign in", "A glass sign-in card with email, password and a passkey option.", ["button", "card", "input", "label", "separator"]),
   block("chat-01", "Chat", "A conversation on glass: grouped turns with avatars, a read receipt, typing that resolves into a reply, quick replies and a floating composer.", ["avatar", "button", "card", "chat"]),
 ]
 

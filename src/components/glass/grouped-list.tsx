@@ -36,30 +36,35 @@ function GroupedListContent({ className, ...props }: React.ComponentProps<"div">
     <div
       data-slot="grouped-list-content"
       role="list"
-      className={cn(
-        "glass flex flex-col overflow-hidden rounded-surface-sm [&>*+*]:shadow-[inset_0_1px_0_color-mix(in_oklch,var(--foreground)_9%,transparent)]",
-        className
-      )}
+      className={cn("glass flex flex-col overflow-hidden rounded-surface-sm", className)}
       {...props}
     />
   )
 }
 
+// Separators are a hairline above every row but the first, inset to where the text starts
+// (past the icon tile when there is one), as in iOS — drawn with the separator token.
+const separator =
+  "relative not-first:before:pointer-events-none not-first:before:absolute not-first:before:inset-x-0 not-first:before:top-0 not-first:before:ms-4 not-first:before:h-px not-first:before:bg-separator not-first:has-data-[slot=grouped-list-icon]:before:ms-[calc(1rem+1.875rem+0.875rem)]"
+
 const rowClass =
-  "flex min-h-[calc(3.25rem*var(--glass-density))] w-full items-center gap-3.5 px-4 py-2.5 text-start text-sm transition-colors focus-visible:outline-hidden [a&]:hover:bg-fill [button&]:hover:bg-fill focus-visible:bg-fill-strong focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/50 focus-visible:ring-inset aria-selected:bg-fill"
+  "glass-focus-inset flex min-h-[calc(3.25rem*var(--glass-density))] w-full items-center gap-3.5 px-4 py-2.5 text-start text-sm transition-colors duration-(--glass-duration) ease-glass [a&]:hover:bg-fill [button&]:hover:bg-fill focus-visible:bg-fill-strong aria-selected:bg-fill aria-disabled:pointer-events-none aria-disabled:opacity-50 disabled:pointer-events-none disabled:opacity-50 data-disabled:pointer-events-none data-disabled:opacity-50"
 
 /**
  * A row. Use `asChild` with a `<button>` or `<a>` to make it interactive — the list-item
  * role then sits on a wrapper, so the button or link keeps its own role.
+ * `disabled` dims the row and takes it out of the pointer's way (a `<button>` child is
+ * disabled too; a link gets aria-disabled).
  */
-function GroupedListItem({ className, asChild = false, ...props }: React.ComponentProps<"div"> & { asChild?: boolean }) {
+function GroupedListItem({ className, asChild = false, disabled = false, ...props }: React.ComponentProps<"div"> & { asChild?: boolean; disabled?: boolean }) {
+  const state = disabled ? { "data-disabled": "", "aria-disabled": true, disabled: true } : {}
   if (asChild)
     return (
-      <div role="listitem" data-slot="grouped-list-row" className="flex">
-        <Slot.Root data-slot="grouped-list-item" className={cn(rowClass, className)} {...props} />
+      <div role="listitem" data-slot="grouped-list-row" className={cn("flex", separator)}>
+        <Slot.Root data-slot="grouped-list-item" className={cn(rowClass, className)} {...state} {...props} />
       </div>
     )
-  return <div data-slot="grouped-list-item" role="listitem" className={cn(rowClass, className)} {...props} />
+  return <div data-slot="grouped-list-item" role="listitem" data-disabled={disabled ? "" : undefined} className={cn(rowClass, separator, className)} {...props} />
 }
 
 /** A coloured rounded-square glyph tile. Colour it with a `bg-*` class. */
@@ -67,7 +72,7 @@ function GroupedListIcon({ className, ...props }: React.ComponentProps<"span">) 
   return (
     <span
       data-slot="grouped-list-icon"
-      className={cn("inline-flex size-7.5 shrink-0 items-center justify-center rounded-[calc(var(--glass-radius-control)*0.75)] bg-primary text-primary-foreground [&_svg:not([class*='size-'])]:size-4", className)}
+      className={cn("inline-flex size-7.5 shrink-0 items-center justify-center rounded-control-sm bg-primary text-primary-foreground [&_svg:not([class*='size-'])]:size-4", className)}
       {...props}
     />
   )
@@ -86,7 +91,7 @@ function GroupedListValue({ className, ...props }: React.ComponentProps<"span">)
 }
 
 function GroupedListChevron({ className, ...props }: React.ComponentProps<typeof ChevronRightIcon>) {
-  return <ChevronRightIcon data-slot="grouped-list-chevron" aria-hidden className={cn("size-4 shrink-0 text-muted-foreground", className)} {...props} />
+  return <ChevronRightIcon data-slot="grouped-list-chevron" aria-hidden className={cn("size-4 shrink-0 text-muted-foreground rtl:rotate-180", className)} {...props} />
 }
 
 export {

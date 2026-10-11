@@ -75,7 +75,7 @@ export function Dashboard01({ today = "2026-10-08" }: { today?: string }) {
                   <span className="size-2 rounded-full" style={{ background: color }} />
                   {k}
                 </dt>
-                <dd className="font-glass-heading text-xl font-bold tabular-nums">{v}</dd>
+                <dd className="type-glass-display type-step-1">{v}</dd>
               </div>
             ))}
           </dl>
@@ -83,14 +83,14 @@ export function Dashboard01({ today = "2026-10-08" }: { today?: string }) {
       </Card>
 
       <div className="grid grid-cols-3 gap-4">
-        <Stat>
+        <Stat variant="glass">
           <StatIcon className="text-primary">
             <FlameIcon />
           </StatIcon>
           <StatValue className="text-primary">18</StatValue>
           <StatLabel>Chain</StatLabel>
         </Stat>
-        <Stat>
+        <Stat variant="glass">
           <StatIcon>
             <BookOpenIcon />
           </StatIcon>
@@ -98,7 +98,7 @@ export function Dashboard01({ today = "2026-10-08" }: { today?: string }) {
           <StatLabel>Nights</StatLabel>
           <StatTrend>12%</StatTrend>
         </Stat>
-        <Stat>
+        <Stat variant="glass">
           <StatIcon>
             <CheckIcon />
           </StatIcon>
@@ -110,7 +110,7 @@ export function Dashboard01({ today = "2026-10-08" }: { today?: string }) {
           <CardHeader>
             <CardTitle>Sleep</CardTitle>
             <CardDescription>
-              <span className="font-glass-heading text-2xl font-bold text-foreground tabular-nums">{data[data.length - 1]}</span> hours last night
+              <span className="type-glass-display type-step-2 text-foreground">{data[data.length - 1]}</span> hours last night
             </CardDescription>
             <CardAction>
               <SegmentedControl size="sm" value={range} onValueChange={setRange} aria-label="Range">

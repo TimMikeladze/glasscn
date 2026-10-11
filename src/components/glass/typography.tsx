@@ -46,7 +46,8 @@ const textVariants = cva("", {
       large: "type-step-1 font-semibold [line-height:var(--glass-leading)]",
       small: "type-step-n1 leading-snug",
       muted: "type-step-n1 text-muted-foreground",
-      overline: "type-step-n2 font-semibold tracking-[0.12em] text-muted-foreground uppercase",
+      // title case as written (Apple style); add `uppercase` for the all-caps eyebrow
+      overline: "type-step-n2 font-semibold tracking-wide text-muted-foreground",
       caption: "type-step-n2 text-muted-foreground",
     },
   },
@@ -77,7 +78,7 @@ function Blockquote({ className, ...props }: React.ComponentProps<"blockquote">)
   return (
     <blockquote
       data-slot="blockquote"
-      className={cn("border-l-[3px] border-primary pl-4 font-glass-heading type-step-1 [line-height:var(--glass-heading-leading)] text-muted-foreground", className)}
+      className={cn("border-s-[3px] border-primary ps-4 font-glass-heading type-step-1 [line-height:var(--glass-heading-leading)] text-muted-foreground", className)}
       {...props}
     />
   )
@@ -88,16 +89,25 @@ function InlineCode({ className, ...props }: React.ComponentProps<"code">) {
   return (
     <code
       data-slot="inline-code"
-      className={cn("rounded-[calc(var(--glass-radius-control)*0.5)] bg-fill px-[0.4em] py-[0.15em] font-glass-mono text-[0.88em]", className)}
+      className={cn("rounded-control-xs bg-fill px-[0.4em] py-[0.15em] font-glass-mono text-[0.88em]", className)}
       {...props}
     />
   )
 }
 
 /** Bulleted or numbered, markers in the accent. */
-function List({ ordered = false, className, ...props }: Omit<React.ComponentProps<"ul">, "ref"> & { ordered?: boolean }) {
-  const classes = cn("space-y-1.5 pl-[1.4em] marker:text-primary", ordered ? "list-decimal numeric-glass" : "list-disc", className)
-  return ordered ? <ol data-slot="list" className={classes} {...props} /> : <ul data-slot="list" className={classes} {...props} />
+function List({
+  ordered = false,
+  className,
+  ref,
+  ...props
+}: Omit<React.ComponentProps<"ul">, "ref"> & { ordered?: boolean; ref?: React.Ref<HTMLUListElement | HTMLOListElement> }) {
+  const classes = cn("space-y-1.5 ps-[1.4em] marker:text-primary", ordered ? "list-decimal numeric-glass" : "list-disc", className)
+  return ordered ? (
+    <ol ref={ref as React.Ref<HTMLOListElement>} data-slot="list" className={classes} {...props} />
+  ) : (
+    <ul ref={ref as React.Ref<HTMLUListElement>} data-slot="list" className={classes} {...props} />
+  )
 }
 
 /** An inline link: accent, underlined at the theme's offset. */
@@ -107,7 +117,7 @@ function TextLink({ asChild = false, className, ...props }: React.ComponentProps
     <Comp
       data-slot="text-link"
       className={cn(
-        "text-primary-ink underline decoration-primary/40 underline-offset-(--glass-underline-offset) transition-colors duration-(--glass-duration) focus-visible:outline-hidden hover:decoration-primary focus-visible:rounded-sm focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/50",
+        "text-primary-ink underline decoration-primary/40 underline-offset-(--glass-underline-offset) transition-colors duration-(--glass-duration) ease-out glass-focus hover:decoration-primary focus-visible:rounded-control-xs",
         className
       )}
       {...props}

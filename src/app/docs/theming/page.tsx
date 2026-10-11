@@ -28,7 +28,7 @@ import { createGlassTheme } from "@/lib/glass-theme"
 
 const brand = createGlassTheme({
   palette: { hue: 200, harmony: "triadic", chroma: 0.18 },
-  material: "liquid",
+  material: "vivid",
   shape: "soft",
   density: "compact",
   tokens: { "glass-blur": "20px" },
@@ -87,7 +87,7 @@ export default function Theming() {
       <P>
         Each preset is a shadcn theme item that sets only its own group, so you mix them: a palette, a material, a shape, a motion, a density. Adding one replaces the previous choice in its group.
       </P>
-      <InstallCommand args={`add ${itemUrl("theme-lagoon")} ${itemUrl("material-liquid")} ${itemUrl("shape-soft")}`} />
+      <InstallCommand args={`add ${itemUrl("theme-lagoon")} ${itemUrl("material-vivid")} ${itemUrl("shape-soft")}`} />
       <div className="mt-6 grid gap-8">
         <div className="grid gap-3">
           <h3 className="type-glass-heading text-lg">Palettes</h3>

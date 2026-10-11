@@ -64,15 +64,17 @@ const columns = col.columns([
     cell: (info) => <span className="font-medium">{info.getValue()}</span>,
   }),
   col.accessor("minutes", {
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Duration" className="justify-end" />,
-    cell: (info) => <div className="text-right">{info.getValue()} min</div>,
+    meta: { numeric: true },
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Duration" />,
+    cell: (info) => `${info.getValue()} min`,
   }),
   col.accessor("km", {
+    meta: { numeric: true },
     sortUndefined: "last",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Distance" className="justify-end" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Distance" />,
     cell: (info) => {
       const km = info.getValue()
-      return <div className="text-right">{km === undefined ? <span className="text-muted-foreground">—</span> : `${km.toFixed(1)} km`}</div>
+      return km === undefined ? <span className="text-muted-foreground">—</span> : `${km.toFixed(1)} km`
     },
   }),
   col.accessor("effort", {

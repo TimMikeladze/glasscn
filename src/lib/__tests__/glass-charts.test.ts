@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { addDays, arcPath, areaPath, barShares, fraction, heatCellTitle, heatmapWeeks, levelOf, monthLabels, polarPoint, polylineLength, ringArc, ringRadii, sanitizeId, scaleSeries, segmentAt, segments, smoothPath, weekdayLabels } from "../glass-charts"
+import { addDays, arcPath, areaPath, barShares, fraction, heatCellTitle, heatmapWeeks, levelOf, monthLabels, parseDuration, polarPoint, polylineLength, ringArc, ringRadii, sanitizeId, scaleSeries, segmentAt, segments, smoothPath, weekdayLabels } from "../glass-charts"
 
 describe("rings", () => {
   it("fits concentric radii inside the size and drops rings that would collapse", () => {
@@ -144,5 +144,17 @@ describe("category bar", () => {
     expect(segmentAt(segs, 10)).toBe(0)
     expect(segmentAt(segs, 25)).toBe(1)
     expect(segmentAt(segs, 100)).toBe(2)
+  })
+})
+
+describe("motion", () => {
+  it("reads --glass-duration in ms; unreadable values fall back, negatives clamp to 0", () => {
+    expect(parseDuration("200ms")).toBe(200)
+    expect(parseDuration(" 0.25s ")).toBe(250)
+    expect(parseDuration("0ms")).toBe(0)
+    expect(parseDuration("0")).toBe(0)
+    expect(parseDuration("")).toBe(200)
+    expect(parseDuration("var(--x)", 900)).toBe(900)
+    expect(parseDuration("-5ms")).toBe(0)
   })
 })

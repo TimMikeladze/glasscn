@@ -3,12 +3,13 @@
 import * as React from "react"
 import { useTheme } from "next-themes"
 import { cn } from "cn"
-import { DicesIcon, DownloadIcon, MoonIcon, RotateCcwIcon, SunIcon } from "lucide-react"
+import { DicesIcon, DownloadIcon, ImageIcon, MoonIcon, RotateCcwIcon, SparklesIcon, SunIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/glass/badge"
 import { Button } from "@/components/glass/button"
 import { Glass } from "@/components/glass/glass"
+import { useGlassPreferences } from "@/components/glass/glass-preferences"
 import { Label } from "@/components/glass/label"
 import { SegmentedControl, SegmentedControlItem } from "@/components/glass/segmented-control"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/glass/dialog"
@@ -30,6 +31,7 @@ import {
   decodeTheme,
   encodeTheme,
   legibility,
+  legibilityReport,
   randomTheme,
   themeDiff,
   themeToCss,
@@ -40,7 +42,7 @@ import {
   type Tokens,
 } from "@/lib/glass-theme"
 import { ExportPanel } from "./export-panel"
-import { StudioPreview } from "./studio-preview"
+import { StudioPreview, type PreviewGround } from "./studio-preview"
 import { TokenControl } from "./token-control"
 
 interface Recipe {
@@ -60,7 +62,7 @@ const EMPTY = { light: {} as Tokens, dark: {} as Tokens }
 /** Which token groups each preset owns — choosing a preset clears your edits there. */
 const OWNS: Record<string, (t: string) => boolean> = {
   palette: (t) => group(t) === "Colour",
-  material: (t) => ["Material", "Rim", "Depth"].includes(group(t)),
+  material: (t) => ["Material", "Liquid", "Rim", "Depth"].includes(group(t)),
   shape: (t) => group(t) === "Shape",
   motion: (t) => group(t) === "Motion" || t === "aurora-speed",
   density: (t) => group(t) === "Density",
@@ -126,6 +128,8 @@ function Studio({ initialCode, initialApplied }: { initialCode: string; initialA
   const [editing, setEditing] = React.useState<"both" | Scheme>("both")
   const [preview, setPreview] = React.useState<Scheme | null>(null)
   const [applied, setApplied] = React.useState(initialApplied)
+  const [ground, setGround] = React.useState<PreviewGround>("aurora")
+  const viewer = useGlassPreferences()
   const scheme: Scheme = preview ?? (resolvedTheme === "dark" ? "dark" : "light")
 
   const options = toOptions(recipe, overrides)
@@ -173,6 +177,7 @@ function Studio({ initialCode, initialApplied }: { initialCode: string; initialA
 
   const shown: Scheme = editing === "both" ? scheme : editing
   const legible = legibility(theme, scheme)
+  const liquidText = legibilityReport(theme, scheme).text.liquid
   const changedCount = new Set([...Object.keys(overrides.light), ...Object.keys(overrides.dark)]).size
 
   return (
@@ -290,6 +295,15 @@ function Studio({ initialCode, initialApplied }: { initialCode: string; initialA
                 </TabsList>
                 {GROUPS.map((g) => (
                   <TabsContent key={g} value={g} className="grid gap-4 pt-2">
+                    {g === "Material" && viewer.customised ? (
+                      <p className="rounded-control bg-fill p-2.5 text-xs text-muted-foreground">
+                        Your own Glass preference (header) is overriding Clarity everywhere, this preview included.{" "}
+                        <button type="button" onClick={viewer.reset} className="glass-focus rounded-badge font-medium text-foreground underline underline-offset-4">
+                          Reset it
+                        </button>{" "}
+                        to see the theme&rsquo;s value.
+                      </p>
+                    ) : null}
                     {TOKENS.filter((t) => t.group === g).map((t) => (
                       <TokenControl
                         key={`${t.name}-${shown}`}
@@ -318,13 +332,23 @@ function Studio({ initialCode, initialApplied }: { initialCode: string; initialA
               <MoonIcon /> Dark
             </SegmentedControlItem>
           </SegmentedControl>
+          <SegmentedControl size="sm" value={ground} onValueChange={(v) => setGround(v as PreviewGround)} aria-label="Preview ground">
+            <SegmentedControlItem value="aurora" aria-label="Aurora ground">
+              <SparklesIcon /> Aurora
+            </SegmentedControlItem>
+            <SegmentedControlItem value="content" aria-label="Content ground: photos and text">
+              <ImageIcon /> Content
+            </SegmentedControlItem>
+          </SegmentedControl>
           <Tooltip>
             <TooltipTrigger asChild>
               <Badge variant={legible.level === "low" ? "destructive" : "tinted"} className="cursor-help">
                 Text {legible.level} · {legible.ratio}:1
               </Badge>
             </TooltipTrigger>
-            <TooltipContent className="max-w-64">Worst-case contrast of body text on a default pane over the ground and each aurora blob — an estimate, not a WCAG audit.</TooltipContent>
+            <TooltipContent className="max-w-64">
+              Worst-case contrast of body text on a default pane over the ground and each aurora blob — an estimate, not a WCAG audit. On liquid glass: {liquidText}:1.
+            </TooltipContent>
           </Tooltip>
           <label className="ml-auto flex items-center gap-2 text-sm">
             Apply to site
@@ -348,7 +372,7 @@ function Studio({ initialCode, initialApplied }: { initialCode: string; initialA
             </DialogContent>
           </Dialog>
         </Glass>
-        <StudioPreview theme={theme} scheme={scheme} />
+        <StudioPreview theme={theme} scheme={scheme} ground={ground} />
       </section>
     </div>
   )

@@ -11,6 +11,7 @@ import {
   createSortedRowModel,
   filterFn_includesString,
   globalFilteringFeature,
+  metaHelper,
   rowPaginationFeature,
   rowSelectionFeature,
   rowSortingFeature,
@@ -45,9 +46,20 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
  *   ])
  *   <DataTable columns={columns} data={workouts} searchPlaceholder="Search sessions…" />
  *
+ * Align a column with `meta: { align: "end" }` (or `numeric: true` for figures) —
+ * its header and cells line up at the inline end, flipping in RTL.
+ *
  * Keep `columns` and `data` stable (module scope, state or useMemo) — a fresh array each
  * render makes the table recompute every row model.
  */
+/** Per-column options the data table reads from `columnDef.meta`. */
+interface DataTableColumnMeta {
+  /** Inline alignment of the header and cells. */
+  align?: "start" | "center" | "end"
+  /** Figures: aligned to the end. */
+  numeric?: boolean
+}
+
 const dataTableFeatures = tableFeatures({
   rowSortingFeature,
   sortedRowModel: createSortedRowModel(),
@@ -59,6 +71,7 @@ const dataTableFeatures = tableFeatures({
   rowPaginationFeature,
   paginatedRowModel: createPaginatedRowModel(),
   rowSelectionFeature,
+  columnMeta: metaHelper<DataTableColumnMeta>(),
 })
 
 type DataTableFeatures = typeof dataTableFeatures
@@ -118,7 +131,7 @@ function DataTableColumnHeader<TData extends RowData, TValue extends CellData>({
     )
   }
   return (
-    <div data-slot="data-table-column-header" className={cn("flex items-center", className)} {...props}>
+    <div data-slot="data-table-column-header" className={cn("flex items-center in-data-[align=center]:justify-center in-data-[align=end]:justify-end", className)} {...props}>
       <Subscribe source={column.table.store} selector={(state) => state.sorting}>
         {() => {
           const sorted = column.getIsSorted()
@@ -160,10 +173,10 @@ function DataTablePagination<TData extends RowData>({
           Page {page} of {pageCount}
         </span>
         <Button variant="secondary" size="icon-sm" aria-label="Previous page" disabled={!table.getCanPreviousPage()} onClick={() => table.previousPage()}>
-          <ChevronLeftIcon />
+          <ChevronLeftIcon className="rtl:rotate-180" />
         </Button>
         <Button variant="secondary" size="icon-sm" aria-label="Next page" disabled={!table.getCanNextPage()} onClick={() => table.nextPage()}>
-          <ChevronRightIcon />
+          <ChevronRightIcon className="rtl:rotate-180" />
         </Button>
       </div>
     </div>
@@ -219,14 +232,14 @@ function DataTable<TData extends RowData>({
     <div data-slot="data-table" className={cn("flex flex-col gap-3", className)} {...props}>
       {searchPlaceholder !== undefined && (
         <div data-slot="data-table-toolbar" className="relative max-w-xs">
-          <SearchIcon aria-hidden className="pointer-events-none absolute top-1/2 left-[calc(0.75rem*var(--glass-density))] size-4 -translate-y-1/2 text-muted-foreground" />
+          <SearchIcon aria-hidden className="pointer-events-none absolute start-[calc(0.75rem*var(--glass-density))] top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
             aria-label={searchPlaceholder}
             placeholder={searchPlaceholder}
             value={typeof globalFilter === "string" ? globalFilter : ""}
             onChange={(event) => table.setGlobalFilter(event.target.value)}
-            className="h-control-sm pl-[calc(2.25rem*var(--glass-density))]"
+            className="h-control-sm ps-[calc(2.25rem*var(--glass-density))]"
           />
         </div>
       )}
@@ -235,7 +248,13 @@ function DataTable<TData extends RowData>({
           {table.getHeaderGroups().map((group) => (
             <TableRow key={group.id}>
               {group.headers.map((header) => (
-                <TableHead key={header.id} colSpan={header.colSpan} aria-sort={ariaSort(sorting, header.column.id, header.column.getCanSort())}>
+                <TableHead
+                  key={header.id}
+                  colSpan={header.colSpan}
+                  align={header.column.columnDef.meta?.align}
+                  numeric={header.column.columnDef.meta?.numeric}
+                  aria-sort={ariaSort(sorting, header.column.id, header.column.getCanSort())}
+                >
                   {header.isPlaceholder ? null : <table.FlexRender header={header} />}
                 </TableHead>
               ))}
@@ -257,10 +276,10 @@ function DataTable<TData extends RowData>({
                       }
                     : undefined
                 }
-                className={cn(onRowClick && "cursor-pointer focus-visible:outline-hidden focus-visible:bg-fill-strong focus-visible:outline-(length:--glass-ring-width) focus-visible:-outline-offset-2 focus-visible:outline-ring/50")}
+                className={cn(onRowClick && "glass-focus-inset cursor-pointer focus-visible:bg-fill-strong")}
               >
                 {row.getAllCells().map((cell) => (
-                  <TableCell key={cell.id}>
+                  <TableCell key={cell.id} align={cell.column.columnDef.meta?.align} numeric={cell.column.columnDef.meta?.numeric}>
                     <table.FlexRender cell={cell} />
                   </TableCell>
                 ))}
@@ -288,6 +307,7 @@ export {
   createDataTableColumnHelper,
   dataTableFeatures,
   type DataTableFeatures,
+  type DataTableColumnMeta,
   type DataTableColumns,
   type DataTableProps,
 }

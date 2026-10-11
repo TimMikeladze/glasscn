@@ -90,8 +90,8 @@ export function Settings01() {
               <DropletIcon />
             </GroupedListIcon>
             <div className="flex flex-1 flex-col gap-3">
-              <div className="flex justify-between text-[0.95rem]">
-                Frost <span className="text-muted-foreground tabular-nums">{blur[0]}px</span>
+              <div className="flex justify-between type-step-0">
+                Frost <span className="text-muted-foreground numeric-glass">{blur[0]}px</span>
               </div>
               <Slider value={blur} onValueChange={setBlur} min={0} max={48} aria-label="Frost" />
             </div>

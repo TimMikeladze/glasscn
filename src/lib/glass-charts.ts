@@ -310,3 +310,20 @@ export const monotoneCurve = {
     return `${monotoneCurve.line(top)} L${f(start[0])},${f(start[1])}${monotoneSegments(back)} Z`
   },
 }
+
+/**
+ * Motion for the data components, from the theme's `--glass-duration` (200ms by
+ * default; 0 under `motion-still` and reduced motion) so one token stills them all.
+ * `glassTime(6)` is 1.2s at the default. The draw curve is an ease-out with no
+ * overshoot: a dash offset that overshoots would open a gap at the arc's start.
+ */
+export const glassTime = (k: number) => `calc(var(--glass-duration, 200ms) * ${k})`
+export const drawEase = "cubic-bezier(0.16,1,0.3,1)"
+
+/** A CSS time (`200ms`, `0.2s`, `0`) in milliseconds; `fallback` when it can't be read. */
+export function parseDuration(value: string | null | undefined, fallback = 200): number {
+  const m = /^\s*(-?\d*\.?\d+)\s*(ms|s)?\s*$/i.exec(value ?? "")
+  if (!m) return fallback
+  const n = Number(m[1]) * (m[2]?.toLowerCase() === "s" ? 1000 : 1)
+  return Number.isFinite(n) ? Math.max(0, n) : fallback
+}

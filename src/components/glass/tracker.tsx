@@ -31,7 +31,7 @@ function Tracker({
   colors?: Record<string, string>
 }) {
   return (
-    <div data-slot="tracker" role="list" className={cn("flex h-[calc(2rem*var(--glass-density))] w-full gap-[2px]", className)} {...props}>
+    <div data-slot="tracker" role="list" className={cn("flex h-control-sm w-full gap-[calc(0.125rem*var(--glass-density))]", className)} {...props}>
       {data.map((b, i) => (
         <div
           key={b.key ?? i}
@@ -41,7 +41,7 @@ function Tracker({
           title={b.title}
           aria-label={b.title}
           className={cn(
-            "min-w-0 flex-1 transition-transform duration-(--glass-duration) ease-glass first:rounded-l-control-sm last:rounded-r-control-sm hover:scale-y-110",
+            "min-w-0 flex-1 transition-transform duration-(--glass-duration) ease-glass first:rounded-s-control-sm last:rounded-e-control-sm hover:scale-y-110 motion-reduce:hover:scale-y-100",
             (b.status && colors[b.status]) || "bg-fill"
           )}
         />

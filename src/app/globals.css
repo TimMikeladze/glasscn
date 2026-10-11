@@ -4,7 +4,8 @@
 /* glasscn tokens + the palette presets (accent, ring, charts 1–5, aurora): generated from src/lib/glass-theme.ts and registry/stylesheet.mjs */
 @import "./glass.generated.css";
 
-@custom-variant dark (&:is(.dark *));
+/* `dark:` follows the nearest .dark / .light (a forced ThemeScope), not just any .dark ancestor — see docs/theming.md */
+@custom-variant dark (&:is(.dark, .dark *):not(:where(.dark .light, .dark .light *):not(:where(.dark .light .dark, .dark .light .dark *))));
 
 @theme inline {
   --color-background: var(--background);

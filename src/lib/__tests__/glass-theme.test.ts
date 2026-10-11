@@ -15,6 +15,9 @@ import {
   defaultTheme,
   encodeTheme,
   accentFor,
+  inSrgbGamut,
+  spring,
+  statusColours,
   contrastRatio,
   legibility,
   legibilityReport,
@@ -70,9 +73,9 @@ describe("createGlassTheme", () => {
     expect(createGlassTheme()).toEqual({ ...defaultTheme(), light: { ...defaultTheme().light, ...PALETTES.dusk.theme.light }, dark: { ...defaultTheme().dark, ...PALETTES.dusk.theme.dark } })
   })
   it("layers palette, material, shape, motion, density, then overrides — later wins", () => {
-    const t = createGlassTheme({ palette: "ocean", material: "liquid", shape: "square", motion: "still", density: "compact", tokens: { "glass-blur": "3px" }, dark: { "glass-glow": "20%" } })
+    const t = createGlassTheme({ palette: "ocean", material: "vivid", shape: "square", motion: "still", density: "compact", tokens: { "glass-blur": "3px" }, dark: { "glass-glow": "20%" } })
     expect(t.light.primary).toBe(PALETTES.ocean.theme.light.primary)
-    expect(t.light["glass-opacity"]).toBe(MATERIALS.liquid.light!["glass-opacity"])
+    expect(t.light["glass-opacity"]).toBe(MATERIALS.vivid.light!["glass-opacity"])
     expect(t.light["glass-radius-surface"]).toBe("0rem")
     expect(t.dark["glass-duration"]).toBe("0ms")
     expect(t.light["glass-density"]).toBe("0.85")
@@ -155,7 +158,7 @@ describe("colour maths", () => {
         for (const scheme of ["light", "dark"] as const) {
           const r = legibilityReport(createGlassTheme({ palette, material }), scheme)
           const id = `${palette}/${material}/${scheme}`
-          for (const tier of ["subtle", "default", "strong"] as const) {
+          for (const tier of ["subtle", "default", "strong", "liquid"] as const) {
             if (r.text[tier] < 4.5) failures.push(`${id} text on ${tier} ${r.text[tier]}`)
             if (r.secondary[tier] < 4.5) failures.push(`${id} secondary text on ${tier} ${r.secondary[tier]}`)
           }
@@ -179,8 +182,37 @@ describe("colour maths", () => {
     expect(accentFor(dark, "oklch(0.99 0 0)")).toBe(dark)
     const fixed = parseOklch(accentFor("oklch(0.7 0.15 60)", "oklch(0.99 0 0)"))!
     expect(fixed[0]).toBeLessThan(0.7)
-    expect(fixed[1]).toBe(0.15)
+    // chroma may only drop (gamut mapping), hue stays
+    expect(fixed[1]).toBeLessThanOrEqual(0.15)
     expect(fixed[2]).toBe(60)
+  })
+  it("every palette colour is displayable in sRGB (gamut-mapped)", () => {
+    for (const [k, p] of Object.entries(PALETTES))
+      for (const scheme of ["light", "dark"] as const)
+        for (const [name, v] of Object.entries(p.theme[scheme])) {
+          const c = parseOklch(v)
+          if (c) expect(inSrgbGamut(c[0], c[1], c[2]), `${k} ${scheme} ${name} ${v}`).toBe(true)
+        }
+  })
+  it("springs settle at 1 and overshoot only when underdamped", () => {
+    const values = (e: string) => e.slice(7, -1).split(",").map(Number)
+    const bouncy = values(spring({ stiffness: 380, damping: 20 }))
+    expect(bouncy[0]).toBe(0)
+    expect(bouncy.at(-1)).toBe(1)
+    expect(Math.max(...bouncy)).toBeGreaterThan(1)
+    expect(Math.max(...values(spring({ stiffness: 100, damping: 40 })))).toBeLessThanOrEqual(1)
+  })
+  it("status colours keep clear of the accent's hue and carry AA labels", () => {
+    for (let hue = 0; hue < 360; hue += 20)
+      for (const dark of [false, true]) {
+        const st = statusColours(hue, dark)
+        for (const role of ["success", "warning", "info"]) {
+          const c = parseOklch(st[role])!
+          const gap = Math.abs(((c[2] - hue + 540) % 360) - 180)
+          expect(gap, `${role} near accent ${hue}`).toBeGreaterThanOrEqual(25)
+          expect(contrastRatio(relativeLuminance(c), relativeLuminance(parseOklch(st[`${role}-foreground`])!)), `${role} label ${hue}`).toBeGreaterThanOrEqual(4.5)
+        }
+      }
   })
   it("every preset value fits its token (so share links round-trip)", () => {
     for (const t of TOKENS) for (const v of [t.light, t.dark]) if (v) expect(fitsToken(t, v), `${t.name}: ${v}`).toBe(true)
@@ -240,7 +272,7 @@ describe("typography", () => {
     expect([fontItemName("sans", "inter"), fontItemName("heading", "fraunces"), fontItemName("display", "fraunces"), fontItemName("mono", "dm-mono")]).toEqual([
       "font-inter",
       "font-heading-fraunces",
-      "font-heading-fraunces",
+      "font-display-fraunces",
       "font-mono-dm-mono",
     ])
   })
@@ -249,6 +281,11 @@ describe("typography", () => {
     expect(item.registryDependencies).toEqual(["https://r.dev/r/font-inter.json", "https://r.dev/r/font-heading-instrument-serif.json", "https://r.dev/r/font-mono-jetbrains-mono.json"])
     expect(item.cssVars.light["glass-font-heading"]).toBeUndefined()
     expect(item.cssVars.light["glass-font-display"]).toBe(FONTS["instrument-serif"].stack) // display has no app-font slot
+  })
+  it("installs a display font that differs from the heading font as its own font item", () => {
+    const item = themeToRegistryItem(createGlassTheme({ type: "technical" }), "x", "X", { fontItemUrl: (n) => `https://r.dev/r/${n}.json` })
+    expect(item.registryDependencies).toContain("https://r.dev/r/font-display-jetbrains-mono.json")
+    expect(item.cssVars.light["glass-font-display"]).toBeUndefined()
   })
   it("computes the modular scale", () => {
     const s = typeScale(createGlassTheme({ tokens: { "glass-type-ratio": "1.5", "glass-text-scale": "1" } }))

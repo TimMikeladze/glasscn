@@ -25,6 +25,9 @@ export default function ButtonDemo() {
       <Button shape="rounded" variant="glass">
         Rounded
       </Button>
+      <Button variant="glass" disabled>
+        Disabled
+      </Button>
     </div>
   )
 }

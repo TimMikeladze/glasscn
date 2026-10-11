@@ -85,7 +85,7 @@ export function Chat01() {
 
   return (
     <Card className="mx-auto h-[min(600px,80svh)] w-full max-w-md gap-0 py-0">
-      <CardHeader className="flex items-center gap-3 border-b border-glass-border py-3">
+      <CardHeader className="flex items-center gap-3 border-b border-separator py-3">
         <Avatar size="lg">
           <AvatarFallback className="bg-primary/16 text-primary">
             <SproutIcon />

@@ -37,7 +37,8 @@ const STICK_THRESHOLD = 32
 /**
  * The scrolling log. Sticks to the newest message while you're at the bottom (and
  * whenever you send one); scroll up to read back and a "jump to latest" button appears.
- * Set `--chat-thread-inset` to leave room for a composer floating over its bottom edge.
+ * Set `--chat-thread-inset` to leave room for a composer floating over its bottom edge,
+ * and `--chat-bubble-max` (default 36rem) to cap a bubble's width.
  *
  * Screen readers hear new messages through the log's implicit polite live region.
  * A `ChatMessage` marked `streaming` is `aria-busy` (and only additions are relevant),
@@ -100,7 +101,7 @@ function ChatThread({ className, children, ...props }: React.ComponentProps<"div
         aria-relevant="additions"
         tabIndex={0}
         onScroll={onScroll}
-        className="min-h-0 flex-1 overflow-y-auto overscroll-contain focus-visible:outline-hidden [scrollbar-width:thin] focus-visible:ring-(length:--glass-ring-width) focus-visible:ring-ring/40 focus-visible:ring-inset"
+        className="glass-focus-inset min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-width:thin]"
       >
         <div
           ref={contentRef}
@@ -113,21 +114,20 @@ function ChatThread({ className, children, ...props }: React.ComponentProps<"div
       <div data-slot="chat-thread-announcer" role="status" className="sr-only">
         {announcement}
       </div>
-      <Button
+      {/* Liquid glass (the control layer) floating over the log; it materialises — grows in — rather than sliding. */}
+      <button
         type="button"
-        variant="glass"
-        size="icon"
         data-slot="chat-thread-jump"
         aria-label="Jump to latest"
         data-state={atBottom ? "hidden" : "visible"}
         tabIndex={atBottom ? -1 : 0}
         aria-hidden={atBottom || undefined}
         onClick={() => scrollToBottom("smooth")}
-        className="absolute bottom-[calc(var(--chat-thread-inset,0px)+0.75rem)] left-1/2 -translate-x-1/2 [--glass-elevation:initial] [--glass-opacity:var(--glass-opacity-strong)] transition-[opacity,translate,scale] data-[state=hidden]:pointer-events-none data-[state=hidden]:translate-y-2 data-[state=hidden]:opacity-0"
+        className="glass-liquid glass-focus hit-area absolute bottom-[calc(var(--chat-thread-inset,0px)+0.75rem)] left-1/2 inline-flex size-control -translate-x-1/2 items-center justify-center rounded-button text-foreground transition-[opacity,scale] duration-(--glass-duration) ease-glass active:scale-(--glass-press-scale) data-[state=hidden]:pointer-events-none data-[state=hidden]:scale-50 data-[state=hidden]:opacity-0 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4"
         data-glass-motion
       >
         <ArrowDownIcon />
-      </Button>
+      </button>
     </div>
   )
 }
@@ -183,7 +183,7 @@ function ChatMessage({
         <div
           ref={contentRef}
           data-slot="chat-message-content"
-          className="flex max-w-[min(80%,36rem)] min-w-0 flex-col items-start gap-1 group-data-[from=system]/chat-message:max-w-full group-data-[from=system]/chat-message:items-center group-data-[from=user]/chat-message:items-end"
+          className="flex max-w-[min(80%,var(--chat-bubble-max,36rem))] min-w-0 flex-col items-start gap-1 group-data-[from=system]/chat-message:max-w-full group-data-[from=system]/chat-message:items-center group-data-[from=user]/chat-message:items-end"
         >
           {children}
         </div>
@@ -197,8 +197,8 @@ const chatBubbleVariants = cva(
   {
     variants: {
       variant: {
-        user: "bg-primary px-[calc(0.875rem*var(--glass-density))] py-[calc(0.5rem*var(--glass-density))] text-primary-foreground selection:bg-primary-foreground/30",
-        assistant: "bg-fill px-[calc(0.875rem*var(--glass-density))] py-[calc(0.5rem*var(--glass-density))] text-foreground",
+        user: "bg-primary px-pad-sm py-[calc(0.5rem*var(--glass-density))] text-primary-foreground selection:bg-primary-foreground/30",
+        assistant: "bg-fill px-pad-sm py-[calc(0.5rem*var(--glass-density))] text-foreground",
         system: "text-center text-xs text-muted-foreground",
       },
     },
@@ -214,7 +214,7 @@ function ChatBubble({ className, variant, ...props }: React.ComponentProps<"div"
 
 /** A timestamp or receipt ("Delivered", "Read 9:41") under a bubble. */
 function ChatMeta({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="chat-meta" className={cn("px-1 text-[0.7rem] text-muted-foreground numeric-glass", className)} {...props} />
+  return <div data-slot="chat-meta" className={cn("type-caption-2 px-1 text-muted-foreground numeric-glass", className)} {...props} />
 }
 
 /** A day separator ("Today") between hairlines. */
@@ -223,7 +223,7 @@ function ChatDivider({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="chat-divider"
       className={cn(
-        "my-4 flex items-center gap-3 text-[0.7rem] font-medium text-muted-foreground first:mt-0 before:h-px before:flex-1 before:bg-glass-border after:h-px after:flex-1 after:bg-glass-border",
+        "type-caption-2 my-4 flex items-center gap-3 font-medium text-muted-foreground first:mt-0 before:h-px before:flex-1 before:bg-separator after:h-px after:flex-1 after:bg-separator",
         className
       )}
       {...props}
@@ -298,12 +298,14 @@ function ChatSuggestion({ className, value, children, onClick, ...props }: React
 }
 
 const chatComposerVariants = cva(
-  "flex w-full items-end gap-1.5 rounded-surface-sm p-1.5 transition-shadow duration-(--glass-duration) ease-glass has-[textarea:focus-visible]:ring-(length:--glass-ring-width) has-[textarea:focus-visible]:ring-ring/40 has-[textarea:disabled]:opacity-60",
+  // focus: the same outline as glass-focus, drawn on the field's container while the textarea has keyboard focus
+  "flex w-full items-end gap-1.5 rounded-surface-sm p-1.5 has-[textarea:disabled]:opacity-60 has-[textarea:focus-visible]:outline-(length:--glass-ring-width) has-[textarea:focus-visible]:outline-offset-2 has-[textarea:focus-visible]:outline-ring has-[textarea:focus-visible]:outline-solid",
   {
     variants: {
       variant: {
         inset: "bg-fill",
-        floating: "glass-strong",
+        // liquid glass: the control layer floating over the thread (inside it, fills only)
+        floating: "glass-liquid",
       },
     },
     defaultVariants: { variant: "inset" },
@@ -327,7 +329,7 @@ type ChatComposerProps = Omit<React.ComponentProps<"form">, "onSubmit"> &
 /**
  * The message field: grows with its text, Enter sends, Shift+Enter breaks a line,
  * and IME composition (Japanese, Chinese…) never sends early. `floating` makes it
- * a strong-glass capsule to sit over the bottom of a thread.
+ * a liquid-glass capsule (the control layer) to sit over the bottom of a thread.
  */
 function ChatComposer({
   className,
@@ -401,7 +403,7 @@ function ChatComposer({
           }
         }}
         className={cn(
-          "max-h-40 min-h-control-sm flex-1 resize-none bg-transparent px-2 py-[calc((2rem*var(--glass-density)-1.25rem)/2)] text-base leading-5 text-foreground caret-primary placeholder:text-muted-foreground/80 selection:bg-primary/25 focus-visible:outline-hidden disabled:cursor-not-allowed md:text-sm md:leading-5",
+          "max-h-40 min-h-control-sm flex-1 resize-none bg-transparent px-2 py-[calc((2rem*var(--glass-density)-1.25rem)/2)] text-base leading-5 text-foreground caret-primary placeholder:text-glass-label-tertiary selection:bg-primary/25 focus-visible:outline-hidden disabled:cursor-not-allowed md:text-sm md:leading-5",
           textareaProps?.className
         )}
       />

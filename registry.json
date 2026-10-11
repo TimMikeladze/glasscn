@@ -7,7 +7,7 @@
       "name": "glass-style",
       "type": "registry:lib",
       "title": "Glass style",
-      "description": "The design tokens (frost, rim, highlight, shadow, blur, saturation, fill, aurora), the glass / glass-strong / glass-subtle utilities, aurora and draw keyframes, a no-backdrop-filter fallback, and glassVariants — the cva every surface shares.",
+      "description": "The design tokens (frost, rim, highlight, shadow, blur, saturation, fill, aurora, liquid, clarity, labels, status), the material utilities (glass / glass-strong / glass-subtle), the liquid control-layer utilities (glass-liquid / glass-liquid-clear), focus, hit-area, concentric corners, Apple text styles, accessibility overrides, aurora and draw keyframes, a no-backdrop-filter fallback, and glassVariants — the cva every surface shares.",
       "categories": [
         "glass",
         "foundations"
@@ -27,9 +27,9 @@
       ],
       "cssVars": {
         "theme": {
-          "color-glass": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) var(--glass-opacity), transparent)",
-          "color-glass-strong": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) var(--glass-opacity-strong), transparent)",
-          "color-glass-subtle": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) var(--glass-opacity-subtle), transparent)",
+          "color-glass": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity) * min(1, var(--glass-clarity) * 2) + (100% - var(--glass-opacity)) * max(0, var(--glass-clarity) * 2 - 1)), transparent)",
+          "color-glass-strong": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity-strong) * min(1, var(--glass-clarity) * 2) + (100% - var(--glass-opacity-strong)) * max(0, var(--glass-clarity) * 2 - 1)), transparent)",
+          "color-glass-subtle": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity-subtle) * min(1, var(--glass-clarity) * 2) + (100% - var(--glass-opacity-subtle)) * max(0, var(--glass-clarity) * 2 - 1)), transparent)",
           "color-glass-border": "color-mix(in oklch, var(--glass-border-color) var(--glass-border-opacity), transparent)",
           "color-glass-highlight": "color-mix(in oklch, oklch(1 0 0) var(--glass-highlight-opacity), transparent)",
           "color-glass-shadow": "color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)",
@@ -37,6 +37,22 @@
           "color-fill-strong": "color-mix(in oklch, var(--glass-fill-tint) var(--glass-fill-opacity-strong), transparent)",
           "color-glass-thumb": "var(--glass-thumb)",
           "color-glass-knob": "var(--glass-knob)",
+          "color-glass-label": "var(--glass-label)",
+          "color-glass-label-secondary": "var(--glass-label-secondary)",
+          "color-glass-label-tertiary": "var(--glass-label-tertiary)",
+          "color-glass-label-quaternary": "var(--glass-label-quaternary)",
+          "color-separator": "color-mix(in oklch, var(--glass-label) var(--glass-separator-opacity), transparent)",
+          "color-fill-subtle": "color-mix(in oklch, var(--glass-fill-tint) calc(var(--glass-fill-opacity) * 0.66), transparent)",
+          "color-fill-faint": "color-mix(in oklch, var(--glass-fill-tint) calc(var(--glass-fill-opacity) * 0.4), transparent)",
+          "color-success": "var(--success)",
+          "color-success-foreground": "var(--success-foreground)",
+          "color-success-ink": "color-mix(in oklch, var(--success) 68%, var(--glass-label))",
+          "color-warning": "var(--warning)",
+          "color-warning-foreground": "var(--warning-foreground)",
+          "color-warning-ink": "color-mix(in oklch, var(--warning) 55%, var(--glass-label))",
+          "color-info": "var(--info)",
+          "color-info-foreground": "var(--info-foreground)",
+          "color-info-ink": "color-mix(in oklch, var(--info) 68%, var(--glass-label))",
           "color-primary-ink": "color-mix(in oklch, var(--primary) 68%, var(--glass-label))",
           "color-destructive-ink": "color-mix(in oklch, var(--destructive) 68%, var(--glass-label))",
           "color-glass-dim": "color-mix(in oklch, oklch(0 0 0) var(--glass-dim), transparent)",
@@ -50,8 +66,11 @@
           "radius-surface-sm": "calc(var(--glass-radius-surface) * 0.75)",
           "radius-control": "var(--glass-radius-control)",
           "radius-control-sm": "calc(var(--glass-radius-control) * 0.7)",
+          "radius-control-xs": "calc(var(--glass-radius-control) * 0.5)",
           "radius-button": "var(--glass-radius-button)",
           "radius-badge": "var(--glass-radius-badge)",
+          "spacing-control-2xs": "calc(1.5rem * var(--glass-density))",
+          "spacing-knob": "calc(1.5rem * var(--glass-density))",
           "spacing-control-xs": "calc(1.75rem * var(--glass-density))",
           "spacing-control-sm": "calc(2rem * var(--glass-density))",
           "spacing-control": "calc(2.5rem * var(--glass-density))",
@@ -63,6 +82,10 @@
           "spacing-card": "calc(1.25rem * var(--glass-density))",
           "spacing-card-sm": "calc(1rem * var(--glass-density))",
           "ease-glass": "var(--glass-ease)",
+          "shadow-glass-1": "0 calc(var(--glass-shadow-y) * 0.3) calc(var(--glass-shadow-blur) * 0.3) color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)",
+          "shadow-glass-2": "0 calc(var(--glass-shadow-y) * 0.6) calc(var(--glass-shadow-blur) * 0.6) color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)",
+          "shadow-glass-3": "0 calc(var(--glass-shadow-y) * 1) calc(var(--glass-shadow-blur) * 1) color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)",
+          "shadow-glass-4": "0 calc(var(--glass-shadow-y) * 1.6) calc(var(--glass-shadow-blur) * 1.6) color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)",
           "font-weight-title": "var(--glass-heading-weight)",
           "tracking-title": "var(--glass-heading-tracking)"
         },
@@ -70,6 +93,12 @@
           "aurora-1": "oklch(0.829 0.098 37.8)",
           "aurora-2": "oklch(0.809 0.109 296.4)",
           "aurora-3": "oklch(0.907 0.07 70.2)",
+          "success": "oklch(0.52 0.14 150)",
+          "success-foreground": "oklch(0.99 0 0)",
+          "warning": "oklch(0.78 0.16 80)",
+          "warning-foreground": "oklch(0.22 0.04 80)",
+          "info": "oklch(0.52 0.14 240)",
+          "info-foreground": "oklch(0.99 0 0)",
           "aurora-base": "oklch(0.955 0.007 268.5)",
           "glass-tint": "oklch(1 0 0)",
           "glass-opacity": "52%",
@@ -86,8 +115,17 @@
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
           "glass-label": "oklch(0.145 0 0)",
+          "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.44 0.01 285)",
+          "glass-label-tertiary": "oklch(0.6 0.01 285)",
+          "glass-label-quaternary": "oklch(0.76 0.005 285)",
+          "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
+          "glass-liquid-opacity": "46%",
+          "glass-liquid-clear-opacity": "10%",
+          "glass-liquid-clear-dim": "30%",
+          "glass-liquid-blur": "12px",
+          "glass-liquid-saturate": "200%",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "85%",
           "glass-border-width": "1px",
@@ -102,9 +140,10 @@
           "glass-radius-control": "0.75rem",
           "glass-radius-button": "9999px",
           "glass-radius-badge": "9999px",
+          "glass-hit-min": "44px",
           "glass-density": "1",
           "glass-duration": "200ms",
-          "glass-ease": "cubic-bezier(0.2, 0.9, 0.3, 1.12)",
+          "glass-ease": "linear(0, 0.028, 0.098, 0.194, 0.302, 0.415, 0.523, 0.624, 0.713, 0.79, 0.855, 0.908, 0.949, 0.98, 1.003, 1.019, 1.029, 1.034, 1.036, 1.036, 1.034, 1.03, 1.026, 1.022, 1.018, 1.015, 1.011, 1.008, 1.006, 1.004, 1.002, 1.001, 1, 0.999, 0.999, 0.999, 0.999, 0.999, 0.999, 0.999, 1)",
           "glass-press-scale": "0.97",
           "aurora-opacity": "100%",
           "aurora-scale": "1",
@@ -132,6 +171,12 @@
           "aurora-1": "oklch(0.48 0.132 31.7)",
           "aurora-2": "oklch(0.401 0.159 289.2)",
           "aurora-3": "oklch(0.456 0.088 60.9)",
+          "success": "oklch(0.74 0.16 150)",
+          "success-foreground": "oklch(0.18 0.03 150)",
+          "warning": "oklch(0.8 0.15 80)",
+          "warning-foreground": "oklch(0.22 0.04 80)",
+          "info": "oklch(0.74 0.13 240)",
+          "info-foreground": "oklch(0.18 0.03 240)",
           "aurora-base": "oklch(0.116 0.006 285.4)",
           "glass-tint": "oklch(0.24 0.012 285)",
           "glass-opacity": "45%",
@@ -148,8 +193,17 @@
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
           "glass-label": "oklch(0.985 0 0)",
-          "glass-label-secondary": "oklch(0.84 0.01 285)",
+          "glass-clarity": "0.5",
+          "glass-label-secondary": "oklch(0.88 0.01 285)",
+          "glass-label-tertiary": "oklch(0.62 0.01 285)",
+          "glass-label-quaternary": "oklch(0.45 0.01 285)",
+          "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
+          "glass-liquid-opacity": "40%",
+          "glass-liquid-clear-opacity": "8%",
+          "glass-liquid-clear-dim": "20%",
+          "glass-liquid-blur": "12px",
+          "glass-liquid-saturate": "200%",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "12%",
           "glass-border-width": "1px",
@@ -164,9 +218,10 @@
           "glass-radius-control": "0.75rem",
           "glass-radius-button": "9999px",
           "glass-radius-badge": "9999px",
+          "glass-hit-min": "44px",
           "glass-density": "1",
           "glass-duration": "200ms",
-          "glass-ease": "cubic-bezier(0.2, 0.9, 0.3, 1.12)",
+          "glass-ease": "linear(0, 0.028, 0.098, 0.194, 0.302, 0.415, 0.523, 0.624, 0.713, 0.79, 0.855, 0.908, 0.949, 0.98, 1.003, 1.019, 1.029, 1.034, 1.036, 1.036, 1.034, 1.03, 1.026, 1.022, 1.018, 1.015, 1.011, 1.008, 1.006, 1.004, 1.002, 1.001, 1, 0.999, 0.999, 0.999, 0.999, 0.999, 0.999, 0.999, 1)",
           "glass-press-scale": "0.97",
           "aurora-opacity": "100%",
           "aurora-scale": "1",
@@ -192,6 +247,7 @@
         }
       },
       "css": {
+        "@custom-variant dark (&:is(.dark, .dark *):not(:where(.dark .light, .dark .light *):not(:where(.dark .light .dark, .dark .light .dark *))))": {},
         "@custom-variant data-open (&:where([data-state=\"open\"]), &:where([data-open]:not([data-open=\"false\"])))": {},
         "@custom-variant data-closed (&:where([data-state=\"closed\"]), &:where([data-closed]:not([data-closed=\"false\"])))": {},
         "@custom-variant data-checked (&:where([data-state=\"checked\"]), &:where([data-checked]:not([data-checked=\"false\"])))": {},
@@ -207,7 +263,7 @@
           "--card-foreground": "var(--glass-label)",
           "--popover-foreground": "var(--glass-label)",
           "--muted-foreground": "var(--glass-label-secondary)",
-          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) var(--glass-opacity), transparent))",
+          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity) * min(1, var(--glass-clarity) * 2) + (100% - var(--glass-opacity)) * max(0, var(--glass-clarity) * 2 - 1)), transparent))",
           "background-image": "linear-gradient(var(--glass-sheen-angle), color-mix(in oklch, oklch(1 0 0) var(--glass-sheen), transparent), transparent 55%), var(--glass-texture)",
           "border-width": "var(--glass-border-width)",
           "border-style": "solid",
@@ -222,7 +278,7 @@
           "--card-foreground": "var(--glass-label)",
           "--popover-foreground": "var(--glass-label)",
           "--muted-foreground": "var(--glass-label-secondary)",
-          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) var(--glass-opacity-strong), transparent))",
+          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity-strong) * min(1, var(--glass-clarity) * 2) + (100% - var(--glass-opacity-strong)) * max(0, var(--glass-clarity) * 2 - 1)), transparent))",
           "background-image": "linear-gradient(var(--glass-sheen-angle), color-mix(in oklch, oklch(1 0 0) var(--glass-sheen), transparent), transparent 55%), var(--glass-texture)",
           "border-width": "var(--glass-border-width)",
           "border-style": "solid",
@@ -237,7 +293,7 @@
           "--card-foreground": "var(--glass-label)",
           "--popover-foreground": "var(--glass-label)",
           "--muted-foreground": "var(--glass-label-secondary)",
-          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) var(--glass-opacity-subtle), transparent))",
+          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity-subtle) * min(1, var(--glass-clarity) * 2) + (100% - var(--glass-opacity-subtle)) * max(0, var(--glass-clarity) * 2 - 1)), transparent))",
           "background-image": "linear-gradient(var(--glass-sheen-angle), color-mix(in oklch, oklch(1 0 0) var(--glass-sheen), transparent), transparent 55%), var(--glass-texture)",
           "border-width": "var(--glass-border-width)",
           "border-style": "solid",
@@ -246,6 +302,135 @@
           "backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness))",
           "box-shadow": "var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)), inset 0 1px 0 color-mix(in oklch, oklch(1 0 0) var(--glass-highlight-opacity), transparent), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) color-mix(in oklch, var(--primary) var(--glass-glow), transparent)"
         },
+        "@utility glass-liquid": {
+          "color": "var(--glass-label)",
+          "--foreground": "var(--glass-label)",
+          "--card-foreground": "var(--glass-label)",
+          "--popover-foreground": "var(--glass-label)",
+          "--muted-foreground": "var(--glass-label-secondary)",
+          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-liquid-opacity) * min(1, var(--glass-clarity) * 2) + (100% - var(--glass-liquid-opacity)) * max(0, var(--glass-clarity) * 2 - 1)), transparent))",
+          "background-image": "linear-gradient(var(--glass-sheen-angle), color-mix(in oklch, oklch(1 0 0) var(--glass-sheen), transparent), transparent 55%), var(--glass-texture)",
+          "border-width": "var(--glass-border-width)",
+          "border-style": "solid",
+          "border-color": "color-mix(in oklch, var(--glass-border-color) var(--glass-border-opacity), transparent)",
+          "-webkit-backdrop-filter": "blur(var(--glass-liquid-blur)) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness))",
+          "backdrop-filter": "blur(var(--glass-liquid-blur)) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness))",
+          "box-shadow": "var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)), inset 0 1px 0 color-mix(in oklch, oklch(1 0 0) var(--glass-highlight-opacity), transparent), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) color-mix(in oklch, var(--primary) var(--glass-glow), transparent)"
+        },
+        "@utility glass-liquid-clear": {
+          "color": "oklch(0.985 0 0)",
+          "--foreground": "oklch(0.985 0 0)",
+          "--card-foreground": "oklch(0.985 0 0)",
+          "--popover-foreground": "oklch(0.985 0 0)",
+          "--muted-foreground": "oklch(0.9 0 0)",
+          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-liquid-clear-opacity) * min(1, var(--glass-clarity) * 2) + (100% - var(--glass-liquid-clear-opacity)) * max(0, var(--glass-clarity) * 2 - 1)), transparent))",
+          "background-image": "linear-gradient(color-mix(in oklch, oklch(0 0 0) var(--glass-liquid-clear-dim), transparent), color-mix(in oklch, oklch(0 0 0) var(--glass-liquid-clear-dim), transparent)), linear-gradient(var(--glass-sheen-angle), color-mix(in oklch, oklch(1 0 0) var(--glass-sheen), transparent), transparent 55%), var(--glass-texture)",
+          "border-width": "var(--glass-border-width)",
+          "border-style": "solid",
+          "border-color": "color-mix(in oklch, var(--glass-border-color) var(--glass-border-opacity), transparent)",
+          "-webkit-backdrop-filter": "blur(var(--glass-liquid-blur)) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness))",
+          "backdrop-filter": "blur(var(--glass-liquid-blur)) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness))",
+          "box-shadow": "var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)), inset 0 1px 0 color-mix(in oklch, oklch(1 0 0) var(--glass-highlight-opacity), transparent), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) color-mix(in oklch, var(--primary) var(--glass-glow), transparent)"
+        },
+        "@utility glass-focus": {
+          "&:focus-visible": {
+            "outline": "var(--glass-ring-width) solid var(--ring)",
+            "outline-offset": "2px"
+          }
+        },
+        "@utility glass-focus-inset": {
+          "&:focus-visible": {
+            "outline": "var(--glass-ring-width) solid var(--ring)",
+            "outline-offset": "calc(var(--glass-ring-width) * -1)"
+          }
+        },
+        "@utility hit-area": {
+          "position": "relative",
+          "&::after": {
+            "content": "\"\"",
+            "position": "absolute",
+            "top": "50%",
+            "left": "50%",
+            "width": "max(100%, 24px)",
+            "height": "max(100%, 24px)",
+            "translate": "-50% -50%"
+          }
+        },
+        "@media (pointer: coarse)": {
+          ".hit-area::after": {
+            "width": "max(100%, var(--glass-hit-min))",
+            "height": "max(100%, var(--glass-hit-min))"
+          }
+        },
+        "@utility rounded-concentric": {
+          "border-radius": "max(min(var(--glass-concentric-min, 0.25rem), var(--glass-container-radius, var(--glass-radius-control))), calc(var(--glass-container-radius, var(--glass-radius-control)) - var(--glass-container-pad, 0.25rem)))"
+        },
+        "@utility type-large-title": {
+          "font-family": "var(--glass-font-heading, --theme(--font-heading, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif)))",
+          "font-size": "calc(2.125rem * var(--glass-text-scale))",
+          "line-height": "1.206",
+          "font-weight": "400"
+        },
+        "@utility type-title-1": {
+          "font-family": "var(--glass-font-heading, --theme(--font-heading, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif)))",
+          "font-size": "calc(1.75rem * var(--glass-text-scale))",
+          "line-height": "1.214",
+          "font-weight": "400"
+        },
+        "@utility type-title-2": {
+          "font-family": "var(--glass-font-heading, --theme(--font-heading, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif)))",
+          "font-size": "calc(1.375rem * var(--glass-text-scale))",
+          "line-height": "1.273",
+          "font-weight": "400"
+        },
+        "@utility type-title-3": {
+          "font-family": "var(--glass-font-heading, --theme(--font-heading, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif)))",
+          "font-size": "calc(1.25rem * var(--glass-text-scale))",
+          "line-height": "1.25",
+          "font-weight": "400"
+        },
+        "@utility type-headline": {
+          "font-family": "var(--glass-font-sans, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif))",
+          "font-size": "calc(1.0625rem * var(--glass-text-scale))",
+          "line-height": "1.294",
+          "font-weight": "600"
+        },
+        "@utility type-body": {
+          "font-family": "var(--glass-font-sans, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif))",
+          "font-size": "calc(1.0625rem * var(--glass-text-scale))",
+          "line-height": "1.294",
+          "font-weight": "400"
+        },
+        "@utility type-callout": {
+          "font-family": "var(--glass-font-sans, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif))",
+          "font-size": "calc(1rem * var(--glass-text-scale))",
+          "line-height": "1.313",
+          "font-weight": "400"
+        },
+        "@utility type-subheadline": {
+          "font-family": "var(--glass-font-sans, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif))",
+          "font-size": "calc(0.9375rem * var(--glass-text-scale))",
+          "line-height": "1.333",
+          "font-weight": "400"
+        },
+        "@utility type-footnote": {
+          "font-family": "var(--glass-font-sans, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif))",
+          "font-size": "calc(0.8125rem * var(--glass-text-scale))",
+          "line-height": "1.385",
+          "font-weight": "400"
+        },
+        "@utility type-caption-1": {
+          "font-family": "var(--glass-font-sans, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif))",
+          "font-size": "calc(0.75rem * var(--glass-text-scale))",
+          "line-height": "1.333",
+          "font-weight": "400"
+        },
+        "@utility type-caption-2": {
+          "font-family": "var(--glass-font-sans, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif))",
+          "font-size": "calc(0.6875rem * var(--glass-text-scale))",
+          "line-height": "1.182",
+          "font-weight": "400"
+        },
         "@utility font-glass-sans": {
           "font-family": "var(--glass-font-sans, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif))"
         },
@@ -253,7 +438,7 @@
           "font-family": "var(--glass-font-heading, --theme(--font-heading, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif)))"
         },
         "@utility font-glass-display": {
-          "font-family": "var(--glass-font-display, var(--glass-font-heading, --theme(--font-heading, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif))))"
+          "font-family": "var(--glass-font-display, --theme(--font-display, var(--glass-font-heading, --theme(--font-heading, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif)))))"
         },
         "@utility font-glass-mono": {
           "font-family": "var(--glass-font-mono, --theme(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace))"
@@ -275,7 +460,7 @@
           "font-feature-settings": "var(--glass-font-features)"
         },
         "@utility type-glass-display": {
-          "font-family": "var(--glass-font-display, var(--glass-font-heading, --theme(--font-heading, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif))))",
+          "font-family": "var(--glass-font-display, --theme(--font-display, var(--glass-font-heading, --theme(--font-heading, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif)))))",
           "font-weight": "var(--glass-display-weight)",
           "letter-spacing": "var(--glass-display-tracking)",
           "font-variant-numeric": "var(--glass-numeric)",
@@ -371,7 +556,7 @@
           }
         },
         "@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))": {
-          ".glass, .glass-strong, .glass-subtle": {
+          ".glass, .glass-strong, .glass-subtle, .glass-liquid, .glass-liquid-clear": {
             "--glass-bg": "color-mix(in oklch, var(--glass-tint) 92%, transparent)"
           }
         },
@@ -379,6 +564,58 @@
           "[data-slot=aurora-blob], [data-glass-motion]": {
             "animation": "none !important",
             "transition": "none !important"
+          },
+          ":root, [data-glass-scope]": {
+            "--glass-duration": "0ms !important",
+            "--glass-press-scale": "1 !important",
+            "--glass-ease": "linear !important"
+          }
+        },
+        "@media (prefers-reduced-transparency: reduce)": {
+          ":root, [data-glass-scope]": {
+            "--glass-opacity": "90% !important",
+            "--glass-opacity-strong": "96% !important",
+            "--glass-opacity-subtle": "84% !important",
+            "--glass-liquid-opacity": "90% !important",
+            "--glass-liquid-clear-opacity": "70% !important",
+            "--glass-clarity": "0.5 !important",
+            "--glass-blur": "40px !important",
+            "--glass-liquid-blur": "30px !important",
+            "--glass-sheen": "0% !important",
+            "--glass-texture": "none !important"
+          }
+        },
+        "@media (prefers-contrast: more)": {
+          ":root, [data-glass-scope]": {
+            "--glass-opacity": "94% !important",
+            "--glass-opacity-strong": "97% !important",
+            "--glass-opacity-subtle": "90% !important",
+            "--glass-liquid-opacity": "94% !important",
+            "--glass-liquid-clear-opacity": "80% !important",
+            "--glass-clarity": "0.5 !important",
+            "--glass-border-width": "1.5px !important",
+            "--glass-border-opacity": "100% !important",
+            "--glass-border-color": "oklch(0.25 0 0) !important",
+            "--glass-highlight-opacity": "0% !important",
+            "--glass-sheen": "0% !important",
+            "--glass-glow": "0% !important",
+            "--glass-texture": "none !important",
+            "--glass-label-secondary": "oklch(0.36 0.01 285) !important"
+          },
+          ":is(:root, [data-glass-scope]):is(.dark, .dark *):not(:where(.dark .light, .dark .light *):not(:where(.dark .light .dark, .dark .light .dark *)))": {
+            "--glass-border-color": "oklch(1 0 0) !important",
+            "--glass-label-secondary": "oklch(0.93 0.01 285) !important"
+          }
+        },
+        "@media (forced-colors: active)": {
+          ".glass, .glass-strong, .glass-subtle, .glass-liquid, .glass-liquid-clear": {
+            "-webkit-backdrop-filter": "none",
+            "backdrop-filter": "none",
+            "background-color": "Canvas",
+            "background-image": "none",
+            "color": "CanvasText",
+            "border-color": "CanvasText",
+            "box-shadow": "none"
           }
         }
       }
@@ -451,11 +688,17 @@
           "chart-1": "oklch(0.557 0.19 34.8)",
           "chart-2": "oklch(0.685 0.189 296.4)",
           "chart-3": "oklch(0.803 0.159 69.8)",
-          "chart-4": "oklch(0.55 0.128 95)",
+          "chart-4": "oklch(0.55 0.113 95)",
           "chart-5": "oklch(0.85 0.096 335)",
-          "aurora-1": "oklch(0.829 0.098 37.8)",
-          "aurora-2": "oklch(0.809 0.109 296.4)",
+          "aurora-1": "oklch(0.829 0.097 37.8)",
+          "aurora-2": "oklch(0.809 0.108 296.4)",
           "aurora-3": "oklch(0.907 0.07 70.2)",
+          "success": "oklch(0.52 0.143 150)",
+          "success-foreground": "oklch(0.99 0 0)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.52 0.119 240)",
+          "info-foreground": "oklch(0.99 0 0)",
           "aurora-base": "oklch(0.955 0.007 268.5)"
         },
         "dark": {
@@ -470,6 +713,12 @@
           "aurora-1": "oklch(0.48 0.132 31.7)",
           "aurora-2": "oklch(0.401 0.159 289.2)",
           "aurora-3": "oklch(0.456 0.088 60.9)",
+          "success": "oklch(0.74 0.15 150)",
+          "success-foreground": "oklch(0.2 0.04 150)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.74 0.14 240)",
+          "info-foreground": "oklch(0.2 0.04 240)",
           "aurora-base": "oklch(0.116 0.006 285.4)"
         }
       }
@@ -493,16 +742,22 @@
           "chart-3": "oklch(0.665 0.187 286.4)",
           "chart-4": "oklch(0.55 0.128 319)",
           "chart-5": "oklch(0.85 0.096 199)",
-          "aurora-1": "oklch(0.817 0.093 256.2)",
+          "aurora-1": "oklch(0.817 0.092 256.2)",
           "aurora-2": "oklch(0.899 0.073 185.2)",
-          "aurora-3": "oklch(0.828 0.094 291.7)",
+          "aurora-3": "oklch(0.828 0.093 291.7)",
+          "success": "oklch(0.52 0.143 150)",
+          "success-foreground": "oklch(0.99 0 0)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.52 0.089 205)",
+          "info-foreground": "oklch(0.99 0 0)",
           "aurora-base": "oklch(0.955 0.007 268.5)"
         },
         "dark": {
-          "primary": "oklch(0.705 0.159 252.4)",
+          "primary": "oklch(0.705 0.158 252.4)",
           "primary-foreground": "oklch(0.18 0.02 259)",
-          "ring": "oklch(0.705 0.159 252.4)",
-          "chart-1": "oklch(0.705 0.159 252.4)",
+          "ring": "oklch(0.705 0.158 252.4)",
+          "chart-1": "oklch(0.705 0.158 252.4)",
           "chart-2": "oklch(0.773 0.127 186.5)",
           "chart-3": "oklch(0.665 0.187 286.4)",
           "chart-4": "oklch(0.66 0.128 319)",
@@ -510,6 +765,12 @@
           "aurora-1": "oklch(0.389 0.133 260.3)",
           "aurora-2": "oklch(0.442 0.071 205.5)",
           "aurora-3": "oklch(0.36 0.154 280)",
+          "success": "oklch(0.74 0.15 150)",
+          "success-foreground": "oklch(0.2 0.04 150)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.74 0.126 205)",
+          "info-foreground": "oklch(0.2 0.036 205)",
           "aurora-base": "oklch(0.116 0.006 285.4)"
         }
       }
@@ -530,12 +791,18 @@
           "ring": "oklch(0.558 0.194 9.9)",
           "chart-1": "oklch(0.558 0.194 9.9)",
           "chart-2": "oklch(0.698 0.191 302)",
-          "chart-3": "oklch(0.771 0.143 43.5)",
-          "chart-4": "oklch(0.55 0.128 70)",
+          "chart-3": "oklch(0.771 0.142 43.5)",
+          "chart-4": "oklch(0.55 0.119 70)",
           "chart-5": "oklch(0.85 0.096 310)",
           "aurora-1": "oklch(0.844 0.092 1.1)",
           "aurora-2": "oklch(0.843 0.106 311.1)",
           "aurora-3": "oklch(0.907 0.051 1.4)",
+          "success": "oklch(0.52 0.143 150)",
+          "success-foreground": "oklch(0.99 0 0)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.52 0.119 240)",
+          "info-foreground": "oklch(0.99 0 0)",
           "aurora-base": "oklch(0.955 0.007 268.5)"
         },
         "dark": {
@@ -544,12 +811,18 @@
           "ring": "oklch(0.719 0.182 8.2)",
           "chart-1": "oklch(0.719 0.182 8.2)",
           "chart-2": "oklch(0.698 0.191 302)",
-          "chart-3": "oklch(0.771 0.143 43.5)",
+          "chart-3": "oklch(0.771 0.142 43.5)",
           "chart-4": "oklch(0.66 0.128 70)",
-          "chart-5": "oklch(0.86 0.096 310)",
+          "chart-5": "oklch(0.86 0.092 310)",
           "aurora-1": "oklch(0.431 0.14 4.8)",
           "aurora-2": "oklch(0.407 0.146 306.5)",
           "aurora-3": "oklch(0.339 0.122 309.2)",
+          "success": "oklch(0.74 0.15 150)",
+          "success-foreground": "oklch(0.2 0.04 150)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.74 0.14 240)",
+          "info-foreground": "oklch(0.2 0.04 240)",
           "aurora-base": "oklch(0.116 0.006 285.4)"
         }
       }
@@ -565,17 +838,23 @@
       ],
       "cssVars": {
         "light": {
-          "primary": "oklch(0.519 0.126 157.8)",
+          "primary": "oklch(0.519 0.122 157.8)",
           "primary-foreground": "oklch(0.99 0 0)",
-          "ring": "oklch(0.519 0.126 157.8)",
-          "chart-1": "oklch(0.519 0.126 157.8)",
+          "ring": "oklch(0.519 0.122 157.8)",
+          "chart-1": "oklch(0.519 0.122 157.8)",
           "chart-2": "oklch(0.779 0.178 129)",
           "chart-3": "oklch(0.711 0.118 221.5)",
-          "chart-4": "oklch(0.55 0.128 218)",
+          "chart-4": "oklch(0.55 0.099 218)",
           "chart-5": "oklch(0.85 0.096 98)",
           "aurora-1": "oklch(0.89 0.071 160.3)",
           "aurora-2": "oklch(0.927 0.098 121.8)",
           "aurora-3": "oklch(0.87 0.057 211.5)",
+          "success": "oklch(0.52 0.118 115)",
+          "success-foreground": "oklch(0.99 0 0)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.52 0.119 240)",
+          "info-foreground": "oklch(0.99 0 0)",
           "aurora-base": "oklch(0.955 0.007 268.5)"
         },
         "dark": {
@@ -585,11 +864,17 @@
           "chart-1": "oklch(0.769 0.149 158.2)",
           "chart-2": "oklch(0.779 0.178 129)",
           "chart-3": "oklch(0.711 0.118 221.5)",
-          "chart-4": "oklch(0.66 0.128 218)",
+          "chart-4": "oklch(0.66 0.118 218)",
           "chart-5": "oklch(0.86 0.096 98)",
           "aurora-1": "oklch(0.456 0.091 159.1)",
           "aurora-2": "oklch(0.47 0.105 130.5)",
           "aurora-3": "oklch(0.432 0.068 211.9)",
+          "success": "oklch(0.74 0.15 115)",
+          "success-foreground": "oklch(0.2 0.04 115)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.74 0.14 240)",
+          "info-foreground": "oklch(0.2 0.04 240)",
           "aurora-base": "oklch(0.116 0.006 285.4)"
         }
       }
@@ -605,17 +890,23 @@
       ],
       "cssVars": {
         "light": {
-          "primary": "oklch(0.54 0.144 65.8)",
+          "primary": "oklch(0.54 0.12 65.8)",
           "primary-foreground": "oklch(0.99 0 0)",
-          "ring": "oklch(0.54 0.144 65.8)",
-          "chart-1": "oklch(0.54 0.144 65.8)",
+          "ring": "oklch(0.54 0.12 65.8)",
+          "chart-1": "oklch(0.54 0.12 65.8)",
           "chart-2": "oklch(0.712 0.183 34)",
           "chart-3": "oklch(0.823 0.164 94.1)",
           "chart-4": "oklch(0.55 0.128 126)",
-          "chart-5": "oklch(0.85 0.096 6)",
-          "aurora-1": "oklch(0.901 0.092 79.5)",
-          "aurora-2": "oklch(0.849 0.086 40.3)",
-          "aurora-3": "oklch(0.953 0.079 95.9)",
+          "chart-5": "oklch(0.85 0.085 6)",
+          "aurora-1": "oklch(0.901 0.091 79.5)",
+          "aurora-2": "oklch(0.849 0.085 40.3)",
+          "aurora-3": "oklch(0.953 0.078 95.9)",
+          "success": "oklch(0.52 0.143 150)",
+          "success-foreground": "oklch(0.99 0 0)",
+          "warning": "oklch(0.8 0.16 115)",
+          "warning-foreground": "oklch(0.2 0.04 115)",
+          "info": "oklch(0.52 0.119 240)",
+          "info-foreground": "oklch(0.99 0 0)",
           "aurora-base": "oklch(0.955 0.007 268.5)"
         },
         "dark": {
@@ -626,10 +917,16 @@
           "chart-2": "oklch(0.712 0.183 34)",
           "chart-3": "oklch(0.823 0.164 94.1)",
           "chart-4": "oklch(0.66 0.128 126)",
-          "chart-5": "oklch(0.86 0.096 6)",
+          "chart-5": "oklch(0.86 0.078 6)",
           "aurora-1": "oklch(0.471 0.094 74)",
           "aurora-2": "oklch(0.414 0.106 35.8)",
           "aurora-3": "oklch(0.448 0.085 102.3)",
+          "success": "oklch(0.74 0.15 150)",
+          "success-foreground": "oklch(0.2 0.04 150)",
+          "warning": "oklch(0.8 0.16 115)",
+          "warning-foreground": "oklch(0.2 0.04 115)",
+          "info": "oklch(0.74 0.14 240)",
+          "info-foreground": "oklch(0.2 0.04 240)",
           "aurora-base": "oklch(0.116 0.006 285.4)"
         }
       }
@@ -656,6 +953,12 @@
           "aurora-1": "oklch(0.881 0.015 264.5)",
           "aurora-2": "oklch(0.911 0.025 301.1)",
           "aurora-3": "oklch(0.892 0.024 227.8)",
+          "success": "oklch(0.52 0.143 150)",
+          "success-foreground": "oklch(0.99 0 0)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.52 0.119 240)",
+          "info-foreground": "oklch(0.99 0 0)",
           "aurora-base": "oklch(0.955 0.007 268.5)"
         },
         "dark": {
@@ -670,6 +973,12 @@
           "aurora-1": "oklch(0.326 0.02 269.5)",
           "aurora-2": "oklch(0.339 0.032 300)",
           "aurora-3": "oklch(0.315 0.028 236.2)",
+          "success": "oklch(0.74 0.15 150)",
+          "success-foreground": "oklch(0.2 0.04 150)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.74 0.14 240)",
+          "info-foreground": "oklch(0.2 0.04 240)",
           "aurora-base": "oklch(0.116 0.006 285.4)"
         }
       }
@@ -690,12 +999,18 @@
           "ring": "oklch(0.55 0.15 300)",
           "chart-1": "oklch(0.55 0.15 300)",
           "chart-2": "oklch(0.66 0.15 338)",
-          "chart-3": "oklch(0.78 0.128 266)",
+          "chart-3": "oklch(0.78 0.111 266)",
           "chart-4": "oklch(0.55 0.12 0)",
-          "chart-5": "oklch(0.85 0.09 240)",
+          "chart-5": "oklch(0.85 0.083 240)",
           "aurora-1": "oklch(0.84 0.083 300)",
           "aurora-2": "oklch(0.83 0.09 338)",
-          "aurora-3": "oklch(0.9 0.063 266)",
+          "aurora-3": "oklch(0.9 0.048 266)",
+          "success": "oklch(0.52 0.143 150)",
+          "success-foreground": "oklch(0.99 0 0)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.52 0.119 240)",
+          "info-foreground": "oklch(0.99 0 0)",
           "aurora-base": "oklch(0.955 0.012 300)"
         },
         "dark": {
@@ -704,12 +1019,18 @@
           "ring": "oklch(0.74 0.138 300)",
           "chart-1": "oklch(0.74 0.138 300)",
           "chart-2": "oklch(0.72 0.15 338)",
-          "chart-3": "oklch(0.82 0.128 266)",
+          "chart-3": "oklch(0.82 0.089 266)",
           "chart-4": "oklch(0.66 0.12 0)",
-          "chart-5": "oklch(0.86 0.09 240)",
+          "chart-5": "oklch(0.86 0.077 240)",
           "aurora-1": "oklch(0.44 0.117 300)",
           "aurora-2": "oklch(0.38 0.135 338)",
           "aurora-3": "oklch(0.42 0.09 266)",
+          "success": "oklch(0.74 0.15 150)",
+          "success-foreground": "oklch(0.2 0.04 150)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.74 0.14 240)",
+          "info-foreground": "oklch(0.2 0.04 240)",
           "aurora-base": "oklch(0.12 0.012 300)"
         }
       }
@@ -725,17 +1046,23 @@
       ],
       "cssVars": {
         "light": {
-          "primary": "oklch(0.51 0.13 165)",
+          "primary": "oklch(0.515 0.108 165)",
           "primary-foreground": "oklch(0.99 0 0)",
-          "ring": "oklch(0.51 0.13 165)",
-          "chart-1": "oklch(0.51 0.13 165)",
+          "ring": "oklch(0.515 0.108 165)",
+          "chart-1": "oklch(0.515 0.108 165)",
           "chart-2": "oklch(0.66 0.13 315)",
           "chart-3": "oklch(0.78 0.111 15)",
           "chart-4": "oklch(0.55 0.104 225)",
           "chart-5": "oklch(0.85 0.078 105)",
           "aurora-1": "oklch(0.84 0.072 165)",
           "aurora-2": "oklch(0.83 0.078 315)",
-          "aurora-3": "oklch(0.9 0.055 15)",
+          "aurora-3": "oklch(0.9 0.052 15)",
+          "success": "oklch(0.52 0.118 115)",
+          "success-foreground": "oklch(0.99 0 0)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.52 0.119 240)",
+          "info-foreground": "oklch(0.99 0 0)",
           "aurora-base": "oklch(0.955 0.012 165)"
         },
         "dark": {
@@ -744,12 +1071,18 @@
           "ring": "oklch(0.74 0.12 165)",
           "chart-1": "oklch(0.74 0.12 165)",
           "chart-2": "oklch(0.72 0.13 315)",
-          "chart-3": "oklch(0.82 0.111 15)",
+          "chart-3": "oklch(0.82 0.102 15)",
           "chart-4": "oklch(0.66 0.104 225)",
           "chart-5": "oklch(0.86 0.078 105)",
-          "aurora-1": "oklch(0.44 0.101 165)",
+          "aurora-1": "oklch(0.44 0.093 165)",
           "aurora-2": "oklch(0.38 0.117 315)",
           "aurora-3": "oklch(0.42 0.078 15)",
+          "success": "oklch(0.74 0.15 115)",
+          "success-foreground": "oklch(0.2 0.04 115)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.74 0.14 240)",
+          "info-foreground": "oklch(0.2 0.04 240)",
           "aurora-base": "oklch(0.12 0.012 165)"
         }
       }
@@ -769,27 +1102,39 @@
           "primary-foreground": "oklch(0.99 0 0)",
           "ring": "oklch(0.56 0.2 22)",
           "chart-1": "oklch(0.56 0.2 22)",
-          "chart-2": "oklch(0.66 0.2 202)",
-          "chart-3": "oklch(0.78 0.17 46)",
-          "chart-4": "oklch(0.55 0.16 82)",
+          "chart-2": "oklch(0.66 0.112 202)",
+          "chart-3": "oklch(0.78 0.138 46)",
+          "chart-4": "oklch(0.55 0.113 82)",
           "chart-5": "oklch(0.85 0.12 322)",
-          "aurora-1": "oklch(0.84 0.11 22)",
+          "aurora-1": "oklch(0.84 0.087 22)",
           "aurora-2": "oklch(0.83 0.12 202)",
-          "aurora-3": "oklch(0.9 0.084 46)",
+          "aurora-3": "oklch(0.9 0.056 46)",
+          "success": "oklch(0.52 0.143 150)",
+          "success-foreground": "oklch(0.99 0 0)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.52 0.119 240)",
+          "info-foreground": "oklch(0.99 0 0)",
           "aurora-base": "oklch(0.955 0.012 22)"
         },
         "dark": {
-          "primary": "oklch(0.74 0.184 22)",
+          "primary": "oklch(0.74 0.158 22)",
           "primary-foreground": "oklch(0.18 0.03 22)",
-          "ring": "oklch(0.74 0.184 22)",
-          "chart-1": "oklch(0.74 0.184 22)",
-          "chart-2": "oklch(0.72 0.2 202)",
-          "chart-3": "oklch(0.82 0.17 46)",
-          "chart-4": "oklch(0.66 0.16 82)",
-          "chart-5": "oklch(0.86 0.12 322)",
+          "ring": "oklch(0.74 0.158 22)",
+          "chart-1": "oklch(0.74 0.158 22)",
+          "chart-2": "oklch(0.72 0.122 202)",
+          "chart-3": "oklch(0.82 0.108 46)",
+          "chart-4": "oklch(0.66 0.136 82)",
+          "chart-5": "oklch(0.86 0.117 322)",
           "aurora-1": "oklch(0.44 0.156 22)",
-          "aurora-2": "oklch(0.38 0.18 202)",
-          "aurora-3": "oklch(0.42 0.12 46)",
+          "aurora-2": "oklch(0.38 0.065 202)",
+          "aurora-3": "oklch(0.42 0.119 46)",
+          "success": "oklch(0.74 0.15 150)",
+          "success-foreground": "oklch(0.2 0.04 150)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.74 0.14 240)",
+          "info-foreground": "oklch(0.2 0.04 240)",
           "aurora-base": "oklch(0.12 0.012 22)"
         }
       }
@@ -805,10 +1150,10 @@
       ],
       "cssVars": {
         "light": {
-          "primary": "oklch(0.5 0.14 200)",
+          "primary": "oklch(0.515 0.087 200)",
           "primary-foreground": "oklch(0.99 0 0)",
-          "ring": "oklch(0.5 0.14 200)",
-          "chart-1": "oklch(0.5 0.14 200)",
+          "ring": "oklch(0.515 0.087 200)",
+          "chart-1": "oklch(0.515 0.087 200)",
           "chart-2": "oklch(0.66 0.14 238)",
           "chart-3": "oklch(0.78 0.119 166)",
           "chart-4": "oklch(0.55 0.112 260)",
@@ -816,20 +1161,32 @@
           "aurora-1": "oklch(0.84 0.077 200)",
           "aurora-2": "oklch(0.83 0.084 238)",
           "aurora-3": "oklch(0.9 0.059 166)",
+          "success": "oklch(0.52 0.143 150)",
+          "success-foreground": "oklch(0.99 0 0)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.52 0.119 240)",
+          "info-foreground": "oklch(0.99 0 0)",
           "aurora-base": "oklch(0.955 0.012 200)"
         },
         "dark": {
-          "primary": "oklch(0.74 0.129 200)",
+          "primary": "oklch(0.74 0.125 200)",
           "primary-foreground": "oklch(0.18 0.03 200)",
-          "ring": "oklch(0.74 0.129 200)",
-          "chart-1": "oklch(0.74 0.129 200)",
+          "ring": "oklch(0.74 0.125 200)",
+          "chart-1": "oklch(0.74 0.125 200)",
           "chart-2": "oklch(0.72 0.14 238)",
           "chart-3": "oklch(0.82 0.119 166)",
           "chart-4": "oklch(0.66 0.112 260)",
           "chart-5": "oklch(0.86 0.084 140)",
-          "aurora-1": "oklch(0.44 0.109 200)",
-          "aurora-2": "oklch(0.38 0.126 238)",
+          "aurora-1": "oklch(0.44 0.075 200)",
+          "aurora-2": "oklch(0.38 0.085 238)",
           "aurora-3": "oklch(0.42 0.084 166)",
+          "success": "oklch(0.74 0.15 150)",
+          "success-foreground": "oklch(0.2 0.04 150)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.74 0.14 240)",
+          "info-foreground": "oklch(0.2 0.04 240)",
           "aurora-base": "oklch(0.12 0.012 200)"
         }
       }
@@ -856,6 +1213,12 @@
           "aurora-1": "oklch(0.8 0.039 70)",
           "aurora-2": "oklch(0.88 0.042 78)",
           "aurora-3": "oklch(0.92 0.029 62)",
+          "success": "oklch(0.52 0.143 150)",
+          "success-foreground": "oklch(0.99 0 0)",
+          "warning": "oklch(0.8 0.16 115)",
+          "warning-foreground": "oklch(0.2 0.04 115)",
+          "info": "oklch(0.52 0.119 240)",
+          "info-foreground": "oklch(0.99 0 0)",
           "aurora-base": "oklch(0.955 0.012 70)"
         },
         "dark": {
@@ -870,6 +1233,12 @@
           "aurora-1": "oklch(0.44 0.055 70)",
           "aurora-2": "oklch(0.38 0.063 78)",
           "aurora-3": "oklch(0.42 0.042 62)",
+          "success": "oklch(0.74 0.15 150)",
+          "success-foreground": "oklch(0.2 0.04 150)",
+          "warning": "oklch(0.8 0.16 115)",
+          "warning-foreground": "oklch(0.2 0.04 115)",
+          "info": "oklch(0.74 0.14 240)",
+          "info-foreground": "oklch(0.2 0.04 240)",
           "aurora-base": "oklch(0.12 0.012 70)"
         }
       }
@@ -893,23 +1262,35 @@
           "chart-3": "oklch(0.78 0.162 155)",
           "chart-4": "oklch(0.55 0.152 335)",
           "chart-5": "oklch(0.85 0.114 215)",
-          "aurora-1": "oklch(0.84 0.105 275)",
-          "aurora-2": "oklch(0.83 0.114 35)",
+          "aurora-1": "oklch(0.84 0.079 275)",
+          "aurora-2": "oklch(0.83 0.096 35)",
           "aurora-3": "oklch(0.9 0.08 155)",
+          "success": "oklch(0.52 0.143 150)",
+          "success-foreground": "oklch(0.99 0 0)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.52 0.119 240)",
+          "info-foreground": "oklch(0.99 0 0)",
           "aurora-base": "oklch(0.955 0.012 275)"
         },
         "dark": {
-          "primary": "oklch(0.74 0.175 275)",
+          "primary": "oklch(0.74 0.134 275)",
           "primary-foreground": "oklch(0.18 0.03 275)",
-          "ring": "oklch(0.74 0.175 275)",
-          "chart-1": "oklch(0.74 0.175 275)",
-          "chart-2": "oklch(0.72 0.19 35)",
+          "ring": "oklch(0.74 0.134 275)",
+          "chart-1": "oklch(0.74 0.134 275)",
+          "chart-2": "oklch(0.72 0.176 35)",
           "chart-3": "oklch(0.82 0.162 155)",
           "chart-4": "oklch(0.66 0.152 335)",
-          "chart-5": "oklch(0.86 0.114 215)",
+          "chart-5": "oklch(0.86 0.112 215)",
           "aurora-1": "oklch(0.44 0.148 275)",
-          "aurora-2": "oklch(0.38 0.171 35)",
-          "aurora-3": "oklch(0.42 0.114 155)",
+          "aurora-2": "oklch(0.38 0.135 35)",
+          "aurora-3": "oklch(0.42 0.104 155)",
+          "success": "oklch(0.74 0.15 150)",
+          "success-foreground": "oklch(0.2 0.04 150)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.74 0.14 240)",
+          "info-foreground": "oklch(0.2 0.04 240)",
           "aurora-base": "oklch(0.12 0.012 275)"
         }
       }
@@ -940,7 +1321,11 @@
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
           "glass-label": "oklch(0.145 0 0)",
+          "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.44 0.01 285)",
+          "glass-label-tertiary": "oklch(0.6 0.01 285)",
+          "glass-label-quaternary": "oklch(0.76 0.005 285)",
+          "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "85%",
@@ -969,7 +1354,11 @@
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
           "glass-label": "oklch(0.985 0 0)",
-          "glass-label-secondary": "oklch(0.84 0.01 285)",
+          "glass-clarity": "0.5",
+          "glass-label-secondary": "oklch(0.88 0.01 285)",
+          "glass-label-tertiary": "oklch(0.62 0.01 285)",
+          "glass-label-quaternary": "oklch(0.45 0.01 285)",
+          "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "12%",
@@ -985,9 +1374,9 @@
       }
     },
     {
-      "name": "material-liquid",
+      "name": "material-vivid",
       "type": "registry:theme",
-      "title": "Liquid material",
+      "title": "Vivid material",
       "description": "Clear and vivid: little frost, strong saturation, a bright sheen. Sets frost, blur, saturation, sheen, grain, rim and depth.",
       "categories": [
         "glass",
@@ -1010,7 +1399,11 @@
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
           "glass-label": "oklch(0.145 0 0)",
+          "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.44 0.01 285)",
+          "glass-label-tertiary": "oklch(0.6 0.01 285)",
+          "glass-label-quaternary": "oklch(0.76 0.005 285)",
+          "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "85%",
@@ -1031,7 +1424,7 @@
           "glass-blur": "16px",
           "glass-saturate": "240%",
           "glass-brightness": "100%",
-          "glass-sheen": "10%",
+          "glass-sheen": "5%",
           "glass-sheen-angle": "135deg",
           "glass-texture": "none",
           "glass-fill-tint": "oklch(0.6 0.01 285)",
@@ -1039,7 +1432,11 @@
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
           "glass-label": "oklch(0.985 0 0)",
-          "glass-label-secondary": "oklch(0.84 0.01 285)",
+          "glass-clarity": "0.5",
+          "glass-label-secondary": "oklch(0.88 0.01 285)",
+          "glass-label-tertiary": "oklch(0.62 0.01 285)",
+          "glass-label-quaternary": "oklch(0.45 0.01 285)",
+          "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "12%",
@@ -1080,7 +1477,11 @@
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
           "glass-label": "oklch(0.145 0 0)",
+          "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.44 0.01 285)",
+          "glass-label-tertiary": "oklch(0.6 0.01 285)",
+          "glass-label-quaternary": "oklch(0.76 0.005 285)",
+          "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "100%",
@@ -1101,7 +1502,7 @@
           "glass-blur": "10px",
           "glass-saturate": "150%",
           "glass-brightness": "100%",
-          "glass-sheen": "16%",
+          "glass-sheen": "6%",
           "glass-sheen-angle": "120deg",
           "glass-texture": "none",
           "glass-fill-tint": "oklch(0.6 0.01 285)",
@@ -1109,7 +1510,11 @@
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
           "glass-label": "oklch(0.985 0 0)",
-          "glass-label-secondary": "oklch(0.84 0.01 285)",
+          "glass-clarity": "0.5",
+          "glass-label-secondary": "oklch(0.88 0.01 285)",
+          "glass-label-tertiary": "oklch(0.62 0.01 285)",
+          "glass-label-quaternary": "oklch(0.45 0.01 285)",
+          "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "28%",
@@ -1138,7 +1543,7 @@
           "glass-tint": "oklch(0.2 0.01 270)",
           "glass-opacity": "72%",
           "glass-opacity-strong": "86%",
-          "glass-opacity-subtle": "62%",
+          "glass-opacity-subtle": "68%",
           "glass-blur": "30px",
           "glass-saturate": "140%",
           "glass-brightness": "85%",
@@ -1150,7 +1555,11 @@
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
           "glass-label": "oklch(0.985 0 0)",
+          "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.88 0.01 270)",
+          "glass-label-tertiary": "oklch(0.6 0.01 285)",
+          "glass-label-quaternary": "oklch(0.76 0.005 285)",
+          "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "16%",
@@ -1179,7 +1588,11 @@
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
           "glass-label": "oklch(0.985 0 0)",
-          "glass-label-secondary": "oklch(0.84 0.01 285)",
+          "glass-clarity": "0.5",
+          "glass-label-secondary": "oklch(0.88 0.01 285)",
+          "glass-label-tertiary": "oklch(0.62 0.01 285)",
+          "glass-label-quaternary": "oklch(0.45 0.01 285)",
+          "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "12%",
@@ -1220,7 +1633,11 @@
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
           "glass-label": "oklch(0.145 0 0)",
+          "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.44 0.01 285)",
+          "glass-label-tertiary": "oklch(0.6 0.01 285)",
+          "glass-label-quaternary": "oklch(0.76 0.005 285)",
+          "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "85%",
@@ -1249,7 +1666,11 @@
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
           "glass-label": "oklch(0.985 0 0)",
-          "glass-label-secondary": "oklch(0.84 0.01 285)",
+          "glass-clarity": "0.5",
+          "glass-label-secondary": "oklch(0.88 0.01 285)",
+          "glass-label-tertiary": "oklch(0.62 0.01 285)",
+          "glass-label-quaternary": "oklch(0.45 0.01 285)",
+          "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "12%",
@@ -1290,7 +1711,11 @@
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
           "glass-label": "oklch(0.145 0 0)",
+          "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.44 0.01 285)",
+          "glass-label-tertiary": "oklch(0.6 0.01 285)",
+          "glass-label-quaternary": "oklch(0.76 0.005 285)",
+          "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "35%",
@@ -1319,7 +1744,11 @@
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
           "glass-label": "oklch(0.985 0 0)",
-          "glass-label-secondary": "oklch(0.84 0.01 285)",
+          "glass-clarity": "0.5",
+          "glass-label-secondary": "oklch(0.88 0.01 285)",
+          "glass-label-tertiary": "oklch(0.62 0.01 285)",
+          "glass-label-quaternary": "oklch(0.45 0.01 285)",
+          "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "6%",
@@ -1360,7 +1789,11 @@
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
           "glass-label": "oklch(0.145 0 0)",
+          "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.44 0.01 285)",
+          "glass-label-tertiary": "oklch(0.6 0.01 285)",
+          "glass-label-quaternary": "oklch(0.76 0.005 285)",
+          "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "70%",
@@ -1389,7 +1822,11 @@
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
           "glass-label": "oklch(0.985 0 0)",
-          "glass-label-secondary": "oklch(0.84 0.01 285)",
+          "glass-clarity": "0.5",
+          "glass-label-secondary": "oklch(0.88 0.01 285)",
+          "glass-label-tertiary": "oklch(0.62 0.01 285)",
+          "glass-label-quaternary": "oklch(0.45 0.01 285)",
+          "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "22%",
@@ -1520,13 +1957,13 @@
       "cssVars": {
         "light": {
           "glass-duration": "200ms",
-          "glass-ease": "cubic-bezier(0.2, 0.9, 0.3, 1.12)",
+          "glass-ease": "linear(0, 0.028, 0.098, 0.194, 0.302, 0.415, 0.523, 0.624, 0.713, 0.79, 0.855, 0.908, 0.949, 0.98, 1.003, 1.019, 1.029, 1.034, 1.036, 1.036, 1.034, 1.03, 1.026, 1.022, 1.018, 1.015, 1.011, 1.008, 1.006, 1.004, 1.002, 1.001, 1, 0.999, 0.999, 0.999, 0.999, 0.999, 0.999, 0.999, 1)",
           "glass-press-scale": "0.97",
           "aurora-speed": "1"
         },
         "dark": {
           "glass-duration": "200ms",
-          "glass-ease": "cubic-bezier(0.2, 0.9, 0.3, 1.12)",
+          "glass-ease": "linear(0, 0.028, 0.098, 0.194, 0.302, 0.415, 0.523, 0.624, 0.713, 0.79, 0.855, 0.908, 0.949, 0.98, 1.003, 1.019, 1.029, 1.034, 1.036, 1.036, 1.034, 1.03, 1.026, 1.022, 1.018, 1.015, 1.011, 1.008, 1.006, 1.004, 1.002, 1.001, 1, 0.999, 0.999, 0.999, 0.999, 0.999, 0.999, 0.999, 1)",
           "glass-press-scale": "0.97",
           "aurora-speed": "1"
         }
@@ -1568,13 +2005,13 @@
       "cssVars": {
         "light": {
           "glass-duration": "160ms",
-          "glass-ease": "cubic-bezier(0.3, 1.4, 0.5, 1)",
+          "glass-ease": "linear(0, 0.045, 0.159, 0.313, 0.483, 0.65, 0.8, 0.926, 1.023, 1.091, 1.132, 1.151, 1.151, 1.139, 1.118, 1.093, 1.067, 1.042, 1.021, 1.004, 0.991, 0.983, 0.978, 0.977, 0.978, 0.98, 0.984, 0.988, 0.992, 0.995, 0.998, 1, 1.002, 1.003, 1.004, 1.004, 1.003, 1.003, 1.002, 1.002, 1)",
           "glass-press-scale": "0.94",
           "aurora-speed": "1"
         },
         "dark": {
           "glass-duration": "160ms",
-          "glass-ease": "cubic-bezier(0.3, 1.4, 0.5, 1)",
+          "glass-ease": "linear(0, 0.045, 0.159, 0.313, 0.483, 0.65, 0.8, 0.926, 1.023, 1.091, 1.132, 1.151, 1.151, 1.139, 1.118, 1.093, 1.067, 1.042, 1.021, 1.004, 0.991, 0.983, 0.978, 0.977, 0.978, 0.98, 0.984, 0.988, 0.992, 0.995, 0.998, 1, 1.002, 1.003, 1.004, 1.004, 1.003, 1.003, 1.002, 1.002, 1)",
           "glass-press-scale": "0.94",
           "aurora-speed": "1"
         }
@@ -1592,13 +2029,13 @@
       "cssVars": {
         "light": {
           "glass-duration": "0ms",
-          "glass-ease": "cubic-bezier(0.2, 0.9, 0.3, 1.12)",
+          "glass-ease": "linear(0, 0.028, 0.098, 0.194, 0.302, 0.415, 0.523, 0.624, 0.713, 0.79, 0.855, 0.908, 0.949, 0.98, 1.003, 1.019, 1.029, 1.034, 1.036, 1.036, 1.034, 1.03, 1.026, 1.022, 1.018, 1.015, 1.011, 1.008, 1.006, 1.004, 1.002, 1.001, 1, 0.999, 0.999, 0.999, 0.999, 0.999, 0.999, 0.999, 1)",
           "glass-press-scale": "1",
           "aurora-speed": "0.0001"
         },
         "dark": {
           "glass-duration": "0ms",
-          "glass-ease": "cubic-bezier(0.2, 0.9, 0.3, 1.12)",
+          "glass-ease": "linear(0, 0.028, 0.098, 0.194, 0.302, 0.415, 0.523, 0.624, 0.713, 0.79, 0.855, 0.908, 0.949, 0.98, 1.003, 1.019, 1.029, 1.034, 1.036, 1.036, 1.034, 1.03, 1.026, 1.022, 1.018, 1.015, 1.011, 1.008, 1.006, 1.004, 1.002, 1.001, 1, 0.999, 0.999, 0.999, 0.999, 0.999, 0.999, 0.999, 1)",
           "glass-press-scale": "1",
           "aurora-speed": "0.0001"
         }
@@ -1916,6 +2353,7 @@
       "registryDependencies": [
         "{REGISTRY_URL}/r/font-ibm-plex-sans.json",
         "{REGISTRY_URL}/r/font-heading-space-grotesk.json",
+        "{REGISTRY_URL}/r/font-display-jetbrains-mono.json",
         "{REGISTRY_URL}/r/font-mono-jetbrains-mono.json"
       ]
     },
@@ -2036,9 +2474,11 @@
       ],
       "cssVars": {
         "light": {
+          "glass-hit-min": "44px",
           "glass-density": "0.85"
         },
         "dark": {
+          "glass-hit-min": "44px",
           "glass-density": "0.85"
         }
       }
@@ -2054,9 +2494,11 @@
       ],
       "cssVars": {
         "light": {
+          "glass-hit-min": "44px",
           "glass-density": "1"
         },
         "dark": {
+          "glass-hit-min": "44px",
           "glass-density": "1"
         }
       }
@@ -2072,9 +2514,11 @@
       ],
       "cssVars": {
         "light": {
+          "glass-hit-min": "44px",
           "glass-density": "1.15"
         },
         "dark": {
+          "glass-hit-min": "44px",
           "glass-density": "1.15"
         }
       }
@@ -2114,6 +2558,27 @@
         "import": "Geist",
         "variable": "--font-heading",
         "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/geist"
+      }
+    },
+    {
+      "name": "font-display-geist",
+      "type": "registry:font",
+      "title": "Geist (display)",
+      "description": "Geist as your app's display (big figures, stats, rings) font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Geist Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Geist",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
         "subsets": [
           "latin"
         ],
@@ -2162,6 +2627,27 @@
       }
     },
     {
+      "name": "font-display-inter",
+      "type": "registry:font",
+      "title": "Inter (display)",
+      "description": "Inter as your app's display (big figures, stats, rings) font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Inter Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Inter",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/inter"
+      }
+    },
+    {
       "name": "font-figtree",
       "type": "registry:font",
       "title": "Figtree",
@@ -2196,6 +2682,27 @@
         "import": "Figtree",
         "variable": "--font-heading",
         "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/figtree"
+      }
+    },
+    {
+      "name": "font-display-figtree",
+      "type": "registry:font",
+      "title": "Figtree (display)",
+      "description": "Figtree as your app's display (big figures, stats, rings) font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Figtree Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Figtree",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
         "subsets": [
           "latin"
         ],
@@ -2244,6 +2751,27 @@
       }
     },
     {
+      "name": "font-display-manrope",
+      "type": "registry:font",
+      "title": "Manrope (display)",
+      "description": "Manrope as your app's display (big figures, stats, rings) font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Manrope Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Manrope",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/manrope"
+      }
+    },
+    {
       "name": "font-dm-sans",
       "type": "registry:font",
       "title": "DM Sans",
@@ -2278,6 +2806,27 @@
         "import": "DM_Sans",
         "variable": "--font-heading",
         "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/dm-sans"
+      }
+    },
+    {
+      "name": "font-display-dm-sans",
+      "type": "registry:font",
+      "title": "DM Sans (display)",
+      "description": "DM Sans as your app's display (big figures, stats, rings) font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"DM Sans Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "DM_Sans",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
         "subsets": [
           "latin"
         ],
@@ -2326,6 +2875,27 @@
       }
     },
     {
+      "name": "font-display-plus-jakarta-sans",
+      "type": "registry:font",
+      "title": "Plus Jakarta Sans (display)",
+      "description": "Plus Jakarta Sans as your app's display (big figures, stats, rings) font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Plus Jakarta Sans Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Plus_Jakarta_Sans",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/plus-jakarta-sans"
+      }
+    },
+    {
       "name": "font-outfit",
       "type": "registry:font",
       "title": "Outfit",
@@ -2360,6 +2930,27 @@
         "import": "Outfit",
         "variable": "--font-heading",
         "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/outfit"
+      }
+    },
+    {
+      "name": "font-display-outfit",
+      "type": "registry:font",
+      "title": "Outfit (display)",
+      "description": "Outfit as your app's display (big figures, stats, rings) font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Outfit Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Outfit",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
         "subsets": [
           "latin"
         ],
@@ -2408,6 +2999,27 @@
       }
     },
     {
+      "name": "font-display-sora",
+      "type": "registry:font",
+      "title": "Sora (display)",
+      "description": "Sora as your app's display (big figures, stats, rings) font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Sora Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Sora",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/sora"
+      }
+    },
+    {
       "name": "font-onest",
       "type": "registry:font",
       "title": "Onest",
@@ -2442,6 +3054,27 @@
         "import": "Onest",
         "variable": "--font-heading",
         "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/onest"
+      }
+    },
+    {
+      "name": "font-display-onest",
+      "type": "registry:font",
+      "title": "Onest (display)",
+      "description": "Onest as your app's display (big figures, stats, rings) font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Onest Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Onest",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
         "subsets": [
           "latin"
         ],
@@ -2490,6 +3123,27 @@
       }
     },
     {
+      "name": "font-display-ibm-plex-sans",
+      "type": "registry:font",
+      "title": "IBM Plex Sans (display)",
+      "description": "IBM Plex Sans as your app's display (big figures, stats, rings) font (sans).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"IBM Plex Sans Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "IBM_Plex_Sans",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/ibm-plex-sans"
+      }
+    },
+    {
       "name": "font-nunito",
       "type": "registry:font",
       "title": "Nunito",
@@ -2524,6 +3178,27 @@
         "import": "Nunito",
         "variable": "--font-heading",
         "selector": "h1, h2, h3, h4, h5, h6",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/nunito"
+      }
+    },
+    {
+      "name": "font-display-nunito",
+      "type": "registry:font",
+      "title": "Nunito (display)",
+      "description": "Nunito as your app's display (big figures, stats, rings) font (rounded).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Nunito Variable\", ui-rounded, ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Nunito",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
         "subsets": [
           "latin"
         ],
@@ -2572,6 +3247,27 @@
       }
     },
     {
+      "name": "font-display-space-grotesk",
+      "type": "registry:font",
+      "title": "Space Grotesk (display)",
+      "description": "Space Grotesk as your app's display (big figures, stats, rings) font (display).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Space Grotesk Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Space_Grotesk",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/space-grotesk"
+      }
+    },
+    {
       "name": "font-heading-bricolage-grotesque",
       "type": "registry:font",
       "title": "Bricolage Grotesque (headings)",
@@ -2613,6 +3309,27 @@
       }
     },
     {
+      "name": "font-display-bricolage-grotesque",
+      "type": "registry:font",
+      "title": "Bricolage Grotesque (display)",
+      "description": "Bricolage Grotesque as your app's display (big figures, stats, rings) font (display).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Bricolage Grotesque Variable\", ui-sans-serif, system-ui, sans-serif",
+        "provider": "google",
+        "import": "Bricolage_Grotesque",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/bricolage-grotesque"
+      }
+    },
+    {
       "name": "font-heading-fraunces",
       "type": "registry:font",
       "title": "Fraunces (headings)",
@@ -2647,6 +3364,27 @@
         "provider": "google",
         "import": "Fraunces",
         "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/fraunces"
+      }
+    },
+    {
+      "name": "font-display-fraunces",
+      "type": "registry:font",
+      "title": "Fraunces (display)",
+      "description": "Fraunces as your app's display (big figures, stats, rings) font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Fraunces Variable\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "Fraunces",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
         "subsets": [
           "latin"
         ],
@@ -2701,6 +3439,30 @@
       }
     },
     {
+      "name": "font-display-instrument-serif",
+      "type": "registry:font",
+      "title": "Instrument Serif (display)",
+      "description": "Instrument Serif as your app's display (big figures, stats, rings) font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Instrument Serif\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "Instrument_Serif",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
+        "weight": [
+          "400"
+        ],
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource/instrument-serif"
+      }
+    },
+    {
       "name": "font-heading-newsreader",
       "type": "registry:font",
       "title": "Newsreader (headings)",
@@ -2735,6 +3497,27 @@
         "provider": "google",
         "import": "Newsreader",
         "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/newsreader"
+      }
+    },
+    {
+      "name": "font-display-newsreader",
+      "type": "registry:font",
+      "title": "Newsreader (display)",
+      "description": "Newsreader as your app's display (big figures, stats, rings) font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Newsreader Variable\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "Newsreader",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
         "subsets": [
           "latin"
         ],
@@ -2783,6 +3566,27 @@
       }
     },
     {
+      "name": "font-display-playfair-display",
+      "type": "registry:font",
+      "title": "Playfair Display (display)",
+      "description": "Playfair Display as your app's display (big figures, stats, rings) font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Playfair Display Variable\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "Playfair_Display",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/playfair-display"
+      }
+    },
+    {
       "name": "font-heading-lora",
       "type": "registry:font",
       "title": "Lora (headings)",
@@ -2824,6 +3628,27 @@
       }
     },
     {
+      "name": "font-display-lora",
+      "type": "registry:font",
+      "title": "Lora (display)",
+      "description": "Lora as your app's display (big figures, stats, rings) font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Lora Variable\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "Lora",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/lora"
+      }
+    },
+    {
       "name": "font-heading-source-serif-4",
       "type": "registry:font",
       "title": "Source Serif 4 (headings)",
@@ -2858,6 +3683,27 @@
         "provider": "google",
         "import": "Source_Serif_4",
         "variable": "--font-sans",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/source-serif-4"
+      }
+    },
+    {
+      "name": "font-display-source-serif-4",
+      "type": "registry:font",
+      "title": "Source Serif 4 (display)",
+      "description": "Source Serif 4 as your app's display (big figures, stats, rings) font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Source Serif 4 Variable\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "Source_Serif_4",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
         "subsets": [
           "latin"
         ],
@@ -2918,6 +3764,33 @@
       }
     },
     {
+      "name": "font-display-ibm-plex-serif",
+      "type": "registry:font",
+      "title": "IBM Plex Serif (display)",
+      "description": "IBM Plex Serif as your app's display (big figures, stats, rings) font (serif).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"IBM Plex Serif\", ui-serif, Georgia, serif",
+        "provider": "google",
+        "import": "IBM_Plex_Serif",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
+        "weight": [
+          "400",
+          "500",
+          "600",
+          "700"
+        ],
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource/ibm-plex-serif"
+      }
+    },
+    {
       "name": "font-mono-geist-mono",
       "type": "registry:font",
       "title": "Geist Mono (mono)",
@@ -2932,6 +3805,27 @@
         "import": "Geist_Mono",
         "variable": "--font-mono",
         "selector": "code, kbd, samp, pre",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/geist-mono"
+      }
+    },
+    {
+      "name": "font-display-geist-mono",
+      "type": "registry:font",
+      "title": "Geist Mono (display)",
+      "description": "Geist Mono as your app's display (big figures, stats, rings) font (mono).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Geist Mono Variable\", ui-monospace, SFMono-Regular, Menlo, monospace",
+        "provider": "google",
+        "import": "Geist_Mono",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
         "subsets": [
           "latin"
         ],
@@ -2960,6 +3854,27 @@
       }
     },
     {
+      "name": "font-display-jetbrains-mono",
+      "type": "registry:font",
+      "title": "JetBrains Mono (display)",
+      "description": "JetBrains Mono as your app's display (big figures, stats, rings) font (mono).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"JetBrains Mono Variable\", ui-monospace, SFMono-Regular, Menlo, monospace",
+        "provider": "google",
+        "import": "JetBrains_Mono",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource-variable/jetbrains-mono"
+      }
+    },
+    {
       "name": "font-mono-ibm-plex-mono",
       "type": "registry:font",
       "title": "IBM Plex Mono (mono)",
@@ -2974,6 +3889,32 @@
         "import": "IBM_Plex_Mono",
         "variable": "--font-mono",
         "selector": "code, kbd, samp, pre",
+        "weight": [
+          "400",
+          "500",
+          "600"
+        ],
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource/ibm-plex-mono"
+      }
+    },
+    {
+      "name": "font-display-ibm-plex-mono",
+      "type": "registry:font",
+      "title": "IBM Plex Mono (display)",
+      "description": "IBM Plex Mono as your app's display (big figures, stats, rings) font (mono).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"IBM Plex Mono\", ui-monospace, SFMono-Regular, Menlo, monospace",
+        "provider": "google",
+        "import": "IBM_Plex_Mono",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
         "weight": [
           "400",
           "500",
@@ -3011,6 +3952,31 @@
       }
     },
     {
+      "name": "font-display-dm-mono",
+      "type": "registry:font",
+      "title": "DM Mono (display)",
+      "description": "DM Mono as your app's display (big figures, stats, rings) font (mono).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"DM Mono\", ui-monospace, SFMono-Regular, Menlo, monospace",
+        "provider": "google",
+        "import": "DM_Mono",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
+        "weight": [
+          "400",
+          "500"
+        ],
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource/dm-mono"
+      }
+    },
+    {
       "name": "font-mono-space-mono",
       "type": "registry:font",
       "title": "Space Mono (mono)",
@@ -3025,6 +3991,31 @@
         "import": "Space_Mono",
         "variable": "--font-mono",
         "selector": "code, kbd, samp, pre",
+        "weight": [
+          "400",
+          "700"
+        ],
+        "subsets": [
+          "latin"
+        ],
+        "dependency": "@fontsource/space-mono"
+      }
+    },
+    {
+      "name": "font-display-space-mono",
+      "type": "registry:font",
+      "title": "Space Mono (display)",
+      "description": "Space Mono as your app's display (big figures, stats, rings) font (mono).",
+      "categories": [
+        "glass",
+        "fonts"
+      ],
+      "font": {
+        "family": "\"Space Mono\", ui-monospace, SFMono-Regular, Menlo, monospace",
+        "provider": "google",
+        "import": "Space_Mono",
+        "variable": "--font-display",
+        "selector": ".font-glass-display, .type-glass-display",
         "weight": [
           "400",
           "700"
@@ -3062,7 +4053,7 @@
       "name": "glass",
       "type": "registry:ui",
       "title": "Glass",
-      "description": "A frosted pane — the base every surface is made from. Intensity, tint and elevation variants; asChild.",
+      "description": "A glass pane — material (content) or liquid (control layer, regular or clear). Intensity, tint and elevation variants; asChild.",
       "categories": [
         "glass",
         "surfaces"
@@ -3232,11 +4223,11 @@
           },
           "& :where(ul)": {
             "list-style-type": "disc",
-            "padding-left": "1.4em"
+            "padding-inline-start": "1.4em"
           },
           "& :where(ol)": {
             "list-style-type": "decimal",
-            "padding-left": "1.4em",
+            "padding-inline-start": "1.4em",
             "font-variant-numeric": "var(--glass-numeric)"
           },
           "& :where(li)": {
@@ -3246,8 +4237,8 @@
             "color": "var(--primary)"
           },
           "& :where(blockquote)": {
-            "border-left": "3px solid var(--primary)",
-            "padding-left": "1em",
+            "border-inline-start": "3px solid var(--primary)",
+            "padding-inline-start": "1em",
             "font-family": "var(--glass-font-heading, --theme(--font-heading, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif)))",
             "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), 1))",
             "line-height": "var(--glass-heading-leading)",
@@ -3264,7 +4255,7 @@
             "font-family": "var(--glass-font-mono, --theme(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace))",
             "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), -1))",
             "line-height": "1.6",
-            "background-color": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) var(--glass-opacity-subtle), transparent)",
+            "background-color": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity-subtle) * min(1, var(--glass-clarity) * 2) + (100% - var(--glass-opacity-subtle)) * max(0, var(--glass-clarity) * 2 - 1)), transparent)",
             "border": "var(--glass-border-width) solid color-mix(in oklch, var(--glass-border-color) var(--glass-border-opacity), transparent)",
             "border-radius": "var(--glass-radius-control)",
             "padding": "1em 1.2em",
@@ -3289,7 +4280,7 @@
           "& :where(th, td)": {
             "padding": "0.55em 0.75em",
             "border-bottom": "1px solid color-mix(in oklch, var(--foreground) 10%, transparent)",
-            "text-align": "left"
+            "text-align": "start"
           },
           "& :where(th)": {
             "font-weight": "600"
@@ -3652,10 +4643,41 @@
       ]
     },
     {
+      "name": "glass-preferences",
+      "type": "registry:ui",
+      "title": "Glass preferences",
+      "description": "The viewer's Liquid Glass setting: a Clarity slider (clear ↔ tinted) and a Reduce transparency switch that write --glass-clarity for the whole page, persisted, with a head script that applies it before paint.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/label.json",
+        "{REGISTRY_URL}/r/slider.json",
+        "{REGISTRY_URL}/r/switch.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/glass-preferences.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/glass-preferences.tsx"
+        },
+        {
+          "path": "src/components/glass/glass-preferences-script.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/glass-preferences-script.tsx"
+        }
+      ]
+    },
+    {
       "name": "dialog",
       "type": "registry:ui",
       "title": "Dialog",
-      "description": "A strong-glass modal over a dimmed, softened page.",
+      "description": "A liquid-glass modal over a dimmed page.",
       "categories": [
         "glass",
         "overlays"
@@ -3952,7 +4974,7 @@
       "name": "stat",
       "type": "registry:ui",
       "title": "Stat",
-      "description": "A figure on a glass tile: icon, value, label, trend.",
+      "description": "A figure on a fill tile (glass when standalone): label, value, trend with sentiment.",
       "categories": [
         "glass",
         "data"
@@ -4386,7 +5408,7 @@
       "name": "auth-01",
       "type": "registry:block",
       "title": "Sign in",
-      "description": "A strong-glass sign-in card with email, password and a passkey option.",
+      "description": "A glass sign-in card with email, password and a passkey option.",
       "categories": [
         "glass",
         "blocks"
@@ -5015,7 +6037,7 @@
       "name": "native-dialog",
       "type": "registry:ui",
       "title": "Dialog (native)",
-      "description": "A strong-glass modal over a dimmed, softened page. React Native: iOS, Android and web.",
+      "description": "A liquid-glass modal over a dimmed page. React Native: iOS, Android and web.",
       "categories": [
         "glass",
         "native"
@@ -5264,7 +6286,7 @@
       "name": "native-stat",
       "type": "registry:ui",
       "title": "Stat (native)",
-      "description": "A figure on a glass tile: icon, value, label, trend. React Native: iOS, Android and web.",
+      "description": "A figure on a fill tile (glass when standalone): label, value, trend with sentiment. React Native: iOS, Android and web.",
       "categories": [
         "glass",
         "native"
@@ -5690,7 +6712,7 @@
       "name": "native-auth-01",
       "type": "registry:ui",
       "title": "Sign in (native)",
-      "description": "A strong-glass sign-in card with email, password and a passkey option. React Native: iOS, Android and web.",
+      "description": "A glass sign-in card with email, password and a passkey option. React Native: iOS, Android and web.",
       "categories": [
         "glass",
         "native"

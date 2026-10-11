@@ -13,7 +13,7 @@ export interface GlassTheme {
   dark: Tokens
 }
 
-export type TokenGroup = "Colour" | "Material" | "Rim" | "Depth" | "Shape" | "Density" | "Motion" | "Aurora" | "Fonts" | "Type"
+export type TokenGroup = "Colour" | "Material" | "Liquid" | "Rim" | "Depth" | "Shape" | "Density" | "Motion" | "Aurora" | "Fonts" | "Type"
 
 export type TokenControl =
   | { type: "colour" }
@@ -56,10 +56,33 @@ export const TEXTURES: Record<string, string> = {
   heavy: grain(0.7, 0.45),
 }
 
+/**
+ * A damped spring as a CSS `linear()` easing: the position of a unit mass pulled from 0 to 1,
+ * sampled until it settles and normalised to the transition's duration. Browsers without
+ * `linear()` (Safari < 17.2) drop the declaration and ease normally.
+ */
+export function spring({ stiffness = 170, damping = 26, mass = 1, points = 40 }: { stiffness?: number; damping?: number; mass?: number; points?: number } = {}): string {
+  const w0 = Math.sqrt(stiffness / mass)
+  const zeta = damping / (2 * Math.sqrt(stiffness * mass))
+  const at = (t: number) => {
+    if (zeta < 1) {
+      const wd = w0 * Math.sqrt(1 - zeta * zeta)
+      return 1 - Math.exp(-zeta * w0 * t) * (Math.cos(wd * t) + ((zeta * w0) / wd) * Math.sin(wd * t))
+    }
+    return 1 - Math.exp(-w0 * t) * (1 + w0 * t)
+  }
+  // settle: the last moment the curve is more than 0.1% away from rest
+  let end = 0
+  for (let t = 0; t < 10; t += 0.001) if (Math.abs(at(t) - 1) > 0.001) end = t
+  end = Math.max(end, 0.05)
+  const values = Array.from({ length: points + 1 }, (_, i) => (i === points ? 1 : Math.round(at((i / points) * end) * 1000) / 1000))
+  return `linear(${values.join(", ")})`
+}
+
 export const EASINGS: Record<string, string> = {
-  spring: "cubic-bezier(0.2, 0.9, 0.3, 1.12)",
+  spring: spring({ stiffness: 230, damping: 22 }),
   smooth: "cubic-bezier(0.4, 0, 0.2, 1)",
-  snappy: "cubic-bezier(0.3, 1.4, 0.5, 1)",
+  snappy: spring({ stiffness: 380, damping: 20 }),
   linear: "linear",
 }
 
@@ -174,6 +197,12 @@ export const TOKENS: TokenDef[] = [
   { name: "aurora-1", group: "Colour", label: "Aurora 1", description: "Top-left blob.", light: "oklch(0.829 0.098 37.8)", dark: "oklch(0.48 0.132 31.7)", control: colour },
   { name: "aurora-2", group: "Colour", label: "Aurora 2", description: "Right blob.", light: "oklch(0.809 0.109 296.4)", dark: "oklch(0.401 0.159 289.2)", control: colour },
   { name: "aurora-3", group: "Colour", label: "Aurora 3", description: "Bottom blob.", light: "oklch(0.907 0.07 70.2)", dark: "oklch(0.456 0.088 60.9)", control: colour },
+  { name: "success", group: "Colour", label: "Success", description: "Done, kept, connected.", light: "oklch(0.52 0.14 150)", dark: "oklch(0.74 0.16 150)", control: colour },
+  { name: "success-foreground", group: "Colour", label: "On success", description: "Text on a success fill.", light: "oklch(0.99 0 0)", dark: "oklch(0.18 0.03 150)", control: colour },
+  { name: "warning", group: "Colour", label: "Warning", description: "Needs attention.", light: "oklch(0.78 0.16 80)", dark: "oklch(0.8 0.15 80)", control: colour },
+  { name: "warning-foreground", group: "Colour", label: "On warning", description: "Text on a warning fill.", light: "oklch(0.22 0.04 80)", dark: "oklch(0.22 0.04 80)", control: colour },
+  { name: "info", group: "Colour", label: "Info", description: "Neutral news.", light: "oklch(0.52 0.14 240)", dark: "oklch(0.74 0.13 240)", control: colour },
+  { name: "info-foreground", group: "Colour", label: "On info", description: "Text on an info fill.", light: "oklch(0.99 0 0)", dark: "oklch(0.18 0.03 240)", control: colour },
   { name: "aurora-base", group: "Colour", label: "Ground", description: "The page colour under the aurora.", light: "oklch(0.955 0.007 268.5)", dark: "oklch(0.116 0.006 285.4)", control: colour },
 
   // Material
@@ -200,8 +229,19 @@ export const TOKENS: TokenDef[] = [
   { name: "glass-fill-opacity-strong", group: "Material", label: "Fill (strong)", description: "Hovered and pressed fills, tracks.", light: "20%", dark: "36%", control: range(0, 80, 1, "%") },
   { name: "glass-thumb", group: "Material", label: "Thumb", description: "The raised thumb of segmented controls.", light: "oklch(1 0 0)", dark: "oklch(1 0 0 / 20%)", control: colour },
   { name: "glass-label", group: "Material", label: "Text on glass", description: "Text inside panes (remaps --foreground there).", light: "oklch(0.145 0 0)", dark: "oklch(0.985 0 0)", control: colour },
-  { name: "glass-label-secondary", group: "Material", label: "Secondary text", description: "Muted text inside panes (remaps --muted-foreground there).", light: "oklch(0.44 0.01 285)", dark: "oklch(0.84 0.01 285)", control: colour },
+  { name: "glass-clarity", group: "Material", label: "Clarity", description: "0 ultra clear → 1 fully tinted, like iOS 27's Liquid Glass slider. Scales every frost.", light: "0.5", dark: "0.5", control: range(0, 1, 0.01, "") },
+  { name: "glass-label-secondary", group: "Material", label: "Secondary text", description: "Muted text inside panes (remaps --muted-foreground there).", light: "oklch(0.44 0.01 285)", dark: "oklch(0.88 0.01 285)", control: colour },
+  { name: "glass-label-tertiary", group: "Material", label: "Tertiary text", description: "Placeholders and unavailable items inside panes.", light: "oklch(0.6 0.01 285)", dark: "oklch(0.62 0.01 285)", control: colour },
+  { name: "glass-label-quaternary", group: "Material", label: "Quaternary text", description: "Watermarks inside panes.", light: "oklch(0.76 0.005 285)", dark: "oklch(0.45 0.01 285)", control: colour },
+  { name: "glass-separator-opacity", group: "Material", label: "Separator", description: "Hairlines between rows, inside panes.", light: "12%", dark: "16%", control: range(0, 60, 1, "%") },
   { name: "glass-knob", group: "Material", label: "Knob", description: "Switch and slider knobs.", light: "oklch(1 0 0)", dark: "oklch(1 0 0)", control: colour },
+
+  // Liquid — the control layer (toolbars, the dock, floating buttons, menus, sheets)
+  { name: "glass-liquid-opacity", group: "Liquid", label: "Liquid frost", description: "How opaque liquid (regular) glass is — the control layer.", light: "46%", dark: "40%", control: range(0, 100, 1, "%") },
+  { name: "glass-liquid-clear-opacity", group: "Liquid", label: "Clear frost", description: "Clear glass, only over media and with a dim.", light: "10%", dark: "8%", control: range(0, 60, 1, "%") },
+  { name: "glass-liquid-clear-dim", group: "Liquid", label: "Clear dim", description: "The dimming layer under clear glass, so bold white content stays legible over bright media (Apple: 35%).", light: "30%", dark: "20%", control: range(0, 60, 1, "%") },
+  { name: "glass-liquid-blur", group: "Liquid", label: "Liquid blur", description: "Less blur than the material: the backdrop stays readable through the lens.", light: "12px", dark: "12px", control: range(0, 60, 1, "px") },
+  { name: "glass-liquid-saturate", group: "Liquid", label: "Liquid saturation", description: "Colour carried through liquid glass.", light: "200%", dark: "200%", control: range(0, 300, 5, "%") },
 
   // Rim
   { name: "glass-border-color", group: "Rim", label: "Rim colour", description: "The edge around every pane.", light: "oklch(1 0 0)", dark: "oklch(1 0 0)", control: colour },
@@ -224,6 +264,7 @@ export const TOKENS: TokenDef[] = [
   { name: "glass-radius-badge", group: "Shape", label: "Badge corners", description: "Badges and tags.", light: "9999px", dark: "9999px", control: { type: "select", options: [{ label: "capsule", value: "9999px" }, { label: "0.5rem", value: "0.5rem" }, { label: "0.25rem", value: "0.25rem" }, { label: "square", value: "0rem" }] } },
 
   // Density
+  { name: "glass-hit-min", group: "Density", label: "Touch target", description: "The smallest tap area on touch screens (Apple: 44pt).", light: "44px", dark: "44px", control: range(24, 64, 1, "px") },
   { name: "glass-density", group: "Density", label: "Density", description: "Scales control heights, paddings and card spacing.", light: "1", dark: "1", control: range(0.75, 1.3, 0.01, "") },
 
   // Motion
@@ -237,7 +278,7 @@ export const TOKENS: TokenDef[] = [
   { name: "aurora-speed", group: "Aurora", label: "Aurora speed", description: "Drift speed multiplier.", light: "1", dark: "1", control: range(0.1, 4, 0.1, "") },
   { name: "aurora-blur", group: "Aurora", label: "Aurora softness", description: "Extra blur on the blobs.", light: "0px", dark: "0px", control: range(0, 120, 2, "px") },
 
-  { name: "glass-ring-width", group: "Shape", label: "Focus ring", description: "Keyboard focus ring thickness.", light: "3px", dark: "3px", control: range(0, 6, 0.5, "px") },
+  { name: "glass-ring-width", group: "Shape", label: "Focus ring", description: "Keyboard focus outline thickness (never below 2px).", light: "3px", dark: "3px", control: range(2, 6, 0.5, "px") },
 
   // Fonts — optional: unset means your app's --font-sans / --font-heading / --font-mono
   { name: "glass-font-sans", group: "Fonts", label: "Body font", description: "Text on glass. Unset: your app's --font-sans.", light: "", dark: "", optional: true, control: { type: "select", options: fontOptions(["sans", "rounded", "serif", "display"]) } },
@@ -266,7 +307,7 @@ export const TOKENS: TokenDef[] = [
 
 export const TOKEN_NAMES = TOKENS.map((t) => t.name)
 const TOKEN_BY_NAME: Record<string, TokenDef> = Object.fromEntries(TOKENS.map((t) => [t.name, t]))
-export const GROUPS: TokenGroup[] = ["Colour", "Material", "Rim", "Depth", "Shape", "Density", "Motion", "Aurora", "Fonts", "Type"]
+export const GROUPS: TokenGroup[] = ["Colour", "Material", "Liquid", "Rim", "Depth", "Shape", "Density", "Motion", "Aurora", "Fonts", "Type"]
 
 export const defaultTheme = (): GlassTheme => ({
   light: Object.fromEntries(TOKENS.map((t) => [t.name, t.light])),
@@ -288,8 +329,14 @@ export interface HueSpec {
   tintedGround?: boolean
 }
 
-const oklch = (l: number, c: number, h: number, a?: number) =>
-  `oklch(${round(l, 3)} ${round(c, 3)} ${round(((h % 360) + 360) % 360, 1)}${a === undefined ? "" : ` / ${round(a * 100, 1)}%`})`
+/** An OKLCH colour, chroma-reduced into sRGB (CSS Color 4 gamut mapping keeps L and H). */
+const oklch = (l: number, c: number, h: number, a?: number) => {
+  const [L, C0, H] = gamutMap(l, c, ((h % 360) + 360) % 360).map((v, i) => round(v, i === 2 ? 1 : 3))
+  // rounding can nudge a colour on the gamut edge back out: step chroma down until it fits
+  let C = C0
+  while (C > 0 && !inSrgbGamut(L, C, H)) C = round(C - 0.001, 3)
+  return `oklch(${L} ${C} ${H}${a === undefined ? "" : ` / ${a}%`})`
+}
 const round = (n: number, d: number) => Math.round(n * 10 ** d) / 10 ** d
 
 const HARMONY: Record<Harmony, number[]> = {
@@ -315,6 +362,32 @@ export function accentFor(primary: string, label: string, min = 5): string {
   return l === p[0] ? primary : oklch(Math.max(0, Math.min(1, l)), p[1], p[2])
 }
 
+/** Hue distance on the colour wheel. */
+const hueGap = (a: number, b: number) => Math.abs(((a - b + 540) % 360) - 180)
+
+/**
+ * Success, warning and info for a palette: fixed hues (green, amber, blue) nudged away from
+ * the accent so a status never reads as the brand colour, each with a label at AA.
+ */
+export function statusColours(accentHue: number, dark: boolean): Tokens {
+  const out: Tokens = {}
+  const roles: [string, number, number, number, boolean][] = [
+    // name, hue, light L, chroma, dark label in light mode?
+    ["success", 150, 0.52, 0.15, false],
+    ["warning", 80, 0.8, 0.16, true],
+    ["info", 240, 0.52, 0.14, false],
+  ]
+  for (const [name, base, l, c, darkLabelInLight] of roles) {
+    let h = base
+    if (hueGap(h, accentHue) < 30) h = base + (((base - accentHue + 540) % 360) - 180 >= 0 ? 35 : -35)
+    const darkLabel = dark || darkLabelInLight
+    const label = darkLabel ? oklch(0.2, 0.04, h) : oklch(0.99, 0, 0)
+    out[name] = accentFor(dark ? oklch(Math.max(l, 0.74), c, h) : oklch(l, c, h), label)
+    out[`${name}-foreground`] = label
+  }
+  return out
+}
+
 /** A whole palette — accent, ring, five chart colours, three aurora blobs and a ground — from one hue. */
 export function paletteFromHue({ hue, harmony = "analogous", chroma = 0.17, tintedGround = true }: HueSpec): GlassTheme {
   const [a, b, c] = HARMONY[harmony].map((d) => hue + d)
@@ -323,6 +396,7 @@ export function paletteFromHue({ hue, harmony = "analogous", chroma = 0.17, tint
     const label = dark ? oklch(0.18, 0.03, hue) : oklch(0.99, 0, 0)
     const primary = accentFor(dark ? oklch(0.74, chroma * 0.92, hue) : oklch(0.6, chroma, hue), label)
     return {
+      ...statusColours(hue, dark),
       primary,
       "primary-foreground": label,
       ring: primary,
@@ -351,8 +425,9 @@ function tuned(hue: number, light: { primary: string; aurora: string[]; rings: s
   const gen = paletteFromHue({ hue, chroma: mono ? 0.02 : 0.16, tintedGround: false })
   const scheme = (s: typeof light, isDark: boolean, base: Tokens): Tokens => {
     const label = isDark ? (mono ? "oklch(0.15 0 0)" : oklch(0.18, 0.02, hue)) : "oklch(0.99 0 0)"
-    const primary = accentFor(s.primary, label)
-    return schemeTokens(s, isDark, base, primary, label)
+    const primary = accentFor(mapColour(s.primary), label)
+    const mapped = { primary: s.primary, aurora: s.aurora.map(mapColour), rings: s.rings.map(mapColour) }
+    return schemeTokens(mapped, isDark, base, primary, label)
   }
   const schemeTokens = (s: typeof light, isDark: boolean, base: Tokens, primary: string, label: string): Tokens => ({
     ...base,
@@ -449,19 +524,19 @@ export interface PresetDef {
 
 export const MATERIALS: Record<string, PresetDef> = {
   frosted: { title: "Frosted", description: "Soft frost, a light rim — the default." },
-  liquid: {
-    title: "Liquid",
+  vivid: {
+    title: "Vivid",
     description: "Clear and vivid: little frost, strong saturation, a bright sheen.",
     tokens: { "glass-blur": "16px", "glass-saturate": "240%", "glass-sheen": "22%", "glass-sheen-angle": "135deg" },
     light: { "glass-opacity": "28%", "glass-opacity-strong": "55%", "glass-opacity-subtle": "14%" },
-    dark: { "glass-opacity": "26%", "glass-opacity-strong": "55%", "glass-opacity-subtle": "12%", "glass-sheen": "10%" },
+    dark: { "glass-opacity": "26%", "glass-opacity-strong": "55%", "glass-opacity-subtle": "12%", "glass-sheen": "5%" },
   },
   crystal: {
     title: "Crystal",
     description: "Little blur, a crisp double-strength rim and a hard highlight.",
     tokens: { "glass-blur": "10px", "glass-saturate": "150%", "glass-border-width": "1.5px", "glass-sheen": "16%", "glass-sheen-angle": "120deg" },
     light: { "glass-opacity": "38%", "glass-border-opacity": "100%", "glass-highlight-opacity": "100%" },
-    dark: { "glass-opacity": "34%", "glass-border-opacity": "28%", "glass-highlight-opacity": "30%" },
+    dark: { "glass-opacity": "34%", "glass-border-opacity": "28%", "glass-highlight-opacity": "30%", "glass-sheen": "6%" },
   },
   smoked: {
     title: "Smoked",
@@ -469,8 +544,8 @@ export const MATERIALS: Record<string, PresetDef> = {
     tokens: { "glass-tint": "oklch(0.2 0.01 270)", "glass-blur": "30px", "glass-saturate": "140%", "glass-brightness": "85%", "glass-border-color": "oklch(1 0 0)", "glass-sheen": "6%" },
     // dark panes in the light scheme too: text, fills and thumbs inside them follow the dark scheme
     light: {
-      "glass-opacity": "72%", "glass-opacity-strong": "86%", "glass-opacity-subtle": "62%", "glass-border-opacity": "16%", "glass-highlight-opacity": "18%", "glass-shadow-opacity": "30%",
-      "glass-label": "oklch(0.985 0 0)", "glass-label-secondary": "oklch(0.88 0.01 270)",
+      "glass-opacity": "72%", "glass-opacity-strong": "86%", "glass-opacity-subtle": "68%", "glass-border-opacity": "16%", "glass-highlight-opacity": "18%", "glass-shadow-opacity": "30%",
+      "glass-label": "oklch(0.985 0 0)", "glass-label-secondary": "oklch(0.88 0.01 270)", "glass-liquid-opacity": "72%",
       "glass-fill-tint": "oklch(0.6 0.01 285)", "glass-fill-opacity": "24%", "glass-fill-opacity-strong": "36%", "glass-thumb": "oklch(1 0 0 / 20%)",
     },
     dark: { "glass-opacity": "60%", "glass-opacity-strong": "84%" },
@@ -601,7 +676,19 @@ const applyFonts = (t: GlassTheme, fonts?: Partial<Record<FontRole, string>>) =>
 }
 
 /** Defaults, then palette, material, shape, motion, density, type, fonts, then your overrides — later wins. */
+const warnUnknown = (kind: string, key: string | undefined, known: Record<string, unknown>) => {
+  if (key === undefined || key in known) return
+  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env
+  if (env?.NODE_ENV !== "production") console.warn(`glasscn: unknown ${kind} "${key}" — ignored. Known: ${Object.keys(known).join(", ")}`)
+}
+
 export function createGlassTheme(options: CreateThemeOptions = {}): GlassTheme {
+  if (typeof options.palette !== "object") warnUnknown("palette", options.palette, PALETTES)
+  warnUnknown("material", options.material, MATERIALS)
+  warnUnknown("shape", options.shape, SHAPES)
+  warnUnknown("motion", options.motion, MOTIONS)
+  warnUnknown("type preset", options.type, TYPE_PRESETS)
+  if (typeof options.density === "string") warnUnknown("density", options.density, DENSITIES)
   const theme = defaultTheme()
   const palette = typeof options.palette === "object" ? paletteFromHue(options.palette) : PALETTES[options.palette ?? "dusk"]?.theme
   if (palette) {
@@ -735,7 +822,7 @@ export function fontStylesheetUrl(theme: GlassTheme): string | null {
 }
 
 /** The registry font item a role + font maps to: `font-inter`, `font-heading-fraunces`, `font-mono-jetbrains-mono`. */
-export const fontItemName = (role: FontRole, key: string) => (role === "sans" ? `font-${key}` : role === "mono" ? `font-mono-${key}` : `font-heading-${key}`)
+export const fontItemName = (role: FontRole, key: string) => (role === "sans" ? `font-${key}` : role === "mono" ? `font-mono-${key}` : role === "display" ? `font-display-${key}` : `font-heading-${key}`)
 
 /** Font sizes per step of the theme's scale, in px — for docs, previews and tests. */
 export function typeScale(theme: GlassTheme, scheme: Scheme = "light"): Record<number, number> {
@@ -757,7 +844,9 @@ export function themeToRegistryItem(theme: GlassTheme, name = "glass-custom-them
   const registryDependencies: string[] = []
   if (fontItemUrl) {
     for (const { role, key, font } of fontDependencies(theme)) {
-      if (!font.google || role === "display") continue
+      if (!font.google) continue
+      // a display font that is the heading font loads once, as the heading font (the display chain falls back to it)
+      if (role === "display" && fontDependencies(theme).some((d) => d.role === "heading" && d.key === key)) continue
       registryDependencies.push(fontItemUrl(fontItemName(role, key)))
       delete light[ROLE_TOKEN[role]]
       delete dark[ROLE_TOKEN[role]]
@@ -823,6 +912,49 @@ export function parseOklch(value: string): [number, number, number, number] | nu
   return [l, Number(m[3]), Number(m[4]), a]
 }
 
+/** OKLCH → linear sRGB, unclamped (out-of-gamut colours fall outside 0–1). */
+function oklchToLinearRaw(l: number, c: number, h: number): [number, number, number] {
+  const a = c * Math.cos((h * Math.PI) / 180)
+  const b = c * Math.sin((h * Math.PI) / 180)
+  const l_ = (l + 0.3963377774 * a + 0.2158037573 * b) ** 3
+  const m_ = (l - 0.1055613458 * a - 0.0638541728 * b) ** 3
+  const s_ = (l - 0.0894841775 * a - 1.291485548 * b) ** 3
+  return [
+    4.0767416621 * l_ - 3.3077115913 * m_ + 0.2309699292 * s_,
+    -1.2684380046 * l_ + 2.6097574011 * m_ - 0.3413193965 * s_,
+    -0.0041960863 * l_ - 0.7034186147 * m_ + 1.707614701 * s_,
+  ]
+}
+
+/** Is this OKLCH colour displayable in sRGB? */
+export function inSrgbGamut(l: number, c: number, h: number): boolean {
+  return oklchToLinearRaw(l, c, h).every((x) => x >= -0.0005 && x <= 1.0005)
+}
+
+/** Reduce chroma (keeping lightness and hue) until the colour fits sRGB. */
+export function gamutMap(l: number, c: number, h: number): [number, number, number] {
+  if (inSrgbGamut(l, c, h)) return [l, c, h]
+  let lo = 0
+  let hi = c
+  for (let i = 0; i < 24; i++) {
+    const mid = (lo + hi) / 2
+    if (inSrgbGamut(l, mid, h)) lo = mid
+    else hi = mid
+  }
+  return [l, lo, h]
+}
+
+/** Gamut-map an `oklch(...)` string; anything else is returned as is. */
+export function mapColour(value: string): string {
+  const p = parseOklch(value)
+  if (!p) return value
+  if (inSrgbGamut(p[0], p[1], p[2])) return value
+  const [L, , H] = gamutMap(p[0], p[1], p[2])
+  let C = round(gamutMap(p[0], p[1], p[2])[1], 3)
+  while (C > 0 && !inSrgbGamut(round(L, 3), C, round(H, 1))) C = round(C - 0.001, 3)
+  return `oklch(${round(L, 3)} ${C} ${round(H, 1)}${p[3] === 1 ? "" : ` / ${round(p[3] * 100, 1)}%`})`
+}
+
 /** OKLCH → linear sRGB, clamped. */
 export function oklchToLinearRgb([l, c, h]: [number, number, number, number]): [number, number, number] {
   const a = c * Math.cos((h * Math.PI) / 180)
@@ -867,8 +999,13 @@ const over = (top: RGB, bottom: RGB, alpha: number): RGB => [0, 1, 2].map((i) =>
 /** shadcn's default foregrounds — text outside panes. */
 const FOREGROUND: Record<Scheme, string> = { light: "oklch(0.145 0 0)", dark: "oklch(0.985 0 0)" }
 
-export type Tier = "subtle" | "default" | "strong"
-const TIER_OPACITY: Record<Tier, string> = { subtle: "glass-opacity-subtle", default: "glass-opacity", strong: "glass-opacity-strong" }
+export type Tier = "subtle" | "default" | "strong" | "liquid"
+const TIER_OPACITY: Record<Tier, string> = { subtle: "glass-opacity-subtle", default: "glass-opacity", strong: "glass-opacity-strong", liquid: "glass-liquid-opacity" }
+
+/** The frost opacity a clarity setting produces (mirrors the stylesheet): 0.5 keeps it, 0 halves… to clear, 1 → opaque. */
+export function clarityOpacity(opacity: number, clarity: number): number {
+  return opacity * Math.min(1, clarity * 2) + (1 - opacity) * Math.max(0, clarity * 2 - 1)
+}
 
 export interface LegibilityReport {
   /** Worst text contrast inside panes of each tier, over the ground and every aurora blob. */
@@ -887,7 +1024,7 @@ export interface LegibilityReport {
  * blob, with the theme's own text-on-glass colours. A guide, not WCAG proof — blur
  * averages the backdrop, and sheen/grain are ignored.
  */
-export function legibilityReport(theme: GlassTheme, scheme: Scheme): LegibilityReport {
+export function legibilityReport(theme: GlassTheme, scheme: Scheme, { clarity }: { clarity?: number } = {}): LegibilityReport {
   const t = theme[scheme]
   const d = defaultTheme()[scheme]
   const get = (k: string) => t[k] || d[k]
@@ -896,9 +1033,16 @@ export function legibilityReport(theme: GlassTheme, scheme: Scheme): LegibilityR
   const tintRgb = gammaRgb(tint)
   const brightness = parseFloat(get("glass-brightness") ?? "100") / 100
   const grounds = ["aurora-base", "aurora-1", "aurora-2", "aurora-3"].map((k) => col(get(k))).filter(Boolean) as [number, number, number, number][]
+  const c = clarity ?? parseFloat(get("glass-clarity") ?? "0.5")
+  const sheen = parseFloat(get("glass-sheen") ?? "0") / 100
+  const white: RGB = [1, 1, 1]
   const panes = (tier: Tier) => {
-    const alpha = (parseFloat(get(TIER_OPACITY[tier]) ?? "50") / 100) * tint[3]
-    return grounds.map((g) => luminanceOfGamma(over(tintRgb, gammaRgb(g).map((x) => Math.min(1, x * brightness)) as RGB, alpha)))
+    const alpha = clarityOpacity(parseFloat(get(TIER_OPACITY[tier]) ?? "50") / 100, c) * tint[3]
+    return grounds.flatMap((g) => {
+      const frosted = over(tintRgb, gammaRgb(g).map((x) => Math.min(1, x * brightness)) as RGB, alpha)
+      // the sheen lightens the top of a pane: check the text against both
+      return [luminanceOfGamma(frosted), luminanceOfGamma(over(white, frosted, sheen))]
+    })
   }
   const worst = (fg: string | undefined, tier: Tier) => {
     const c = col(fg)
@@ -906,7 +1050,7 @@ export function legibilityReport(theme: GlassTheme, scheme: Scheme): LegibilityR
     const l = relativeLuminance(c)
     return round(Math.min(...panes(tier).map((p) => contrastRatio(l, p))), 2)
   }
-  const tiers: Tier[] = ["subtle", "default", "strong"]
+  const tiers: Tier[] = ["subtle", "default", "strong", "liquid"]
   const label = get("glass-label") ?? FOREGROUND[scheme]
   const secondary = get("glass-label-secondary")
   const primary = col(get("primary"))

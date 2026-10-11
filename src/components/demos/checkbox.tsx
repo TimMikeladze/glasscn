@@ -26,7 +26,7 @@ export default function CheckboxDemo() {
         />
         <Label htmlFor="habit-all">Today’s habits</Label>
       </div>
-      <div className="grid gap-3 pl-7">
+      <div className="grid gap-3 ps-7">
         {habits.map((h) => (
           <div key={h.id} className="flex items-center gap-3">
             <Checkbox id={`habit-${h.id}`} checked={!!done[h.id]} onCheckedChange={(value) => setDone((d) => ({ ...d, [h.id]: value === true }))} />

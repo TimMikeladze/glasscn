@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 
 import { Aurora } from "@/components/glass/aurora"
+import { GlassPreferencesScript } from "@/components/glass/glass-preferences-script"
 import { Providers, paletteScript } from "@/components/site/providers"
 import { SiteHeader } from "@/components/site/site-header"
 import { docsNav } from "@/components/site/docs-nav-data"
@@ -22,6 +23,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: paletteScript }} />
+        <GlassPreferencesScript />
       </head>
       <body className="type-glass min-h-dvh">
         <Providers palettes={Object.keys(PALETTES)}>

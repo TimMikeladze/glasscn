@@ -3,7 +3,7 @@
 import * as React from "react"
 import { cn } from "cn"
 
-import { areaPath, polylineLength, sanitizeId, scaleSeries, smoothPath } from "@/lib/glass-charts"
+import { areaPath, drawEase, glassTime, polylineLength, sanitizeId, scaleSeries, smoothPath } from "@/lib/glass-charts"
 
 /** The drawing's width in viewBox units; the svg stretches it to the container. */
 const W = 300
@@ -70,7 +70,7 @@ function Sparkline({
             <stop offset="1" stopColor={color} stopOpacity={0} />
           </linearGradient>
         </defs>
-        {area ? <path d={areaPath(points, height - 2)} fill={`url(#spark-${id})`} data-glass-motion style={{ animation: "glass-fade 0.7s ease-out 0.3s both" }} /> : null}
+        {area ? <path d={areaPath(points, height - 2)} fill={`url(#spark-${id})`} data-glass-motion style={{ animation: `glass-fade ${glassTime(3.5)} ease-out ${glassTime(1.5)} both` }} /> : null}
         <path
           d={line}
           fill="none"
@@ -82,7 +82,7 @@ function Sparkline({
           strokeDasharray={`${length} ${length}`}
           strokeDashoffset={0}
           data-glass-motion
-          style={{ ["--glass-draw-from" as string]: `${length}`, animation: "glass-draw 1.1s cubic-bezier(0.16,1,0.3,1) both" }}
+          style={{ ["--glass-draw-from" as string]: `${length}`, animation: `glass-draw ${glassTime(5.5)} ${drawEase} both` }}
         />
       </svg>
       {dot ? (

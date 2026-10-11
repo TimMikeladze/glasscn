@@ -1,7 +1,7 @@
 import * as React from "react"
 import { cn } from "cn"
 
-import { ringArc, ringRadii } from "@/lib/glass-charts"
+import { drawEase, glassTime, ringArc, ringRadii } from "@/lib/glass-charts"
 
 export interface ActivityRing {
   /** Progress, 0–1. Above 1 draws a second lap, like Apple's rings. */
@@ -14,6 +14,8 @@ export interface ActivityRing {
 /**
  * Concentric Activity-style rings. Each arc sweeps in from twelve o'clock on
  * mount (CSS only — works in Server Components) and eases to new values.
+ * Timing follows `--glass-duration` (×6 to draw, ×4 to ease), so `motion-still`
+ * and reduced motion still them.
  */
 function ActivityRings({
   rings,
@@ -54,8 +56,8 @@ function ActivityRings({
             data-glass-motion
             style={{
               ["--glass-draw-from" as string]: `${circumference}`,
-              animation: "glass-draw 1.2s cubic-bezier(0.16,1,0.3,1) both",
-              transition: "stroke-dashoffset 0.8s cubic-bezier(0.16,1,0.3,1)",
+              animation: `glass-draw ${glassTime(6)} ${drawEase} both`,
+              transition: `stroke-dashoffset ${glassTime(4)} ${drawEase}`,
               ...extra,
             }}
           />
@@ -64,7 +66,7 @@ function ActivityRings({
           <g key={i} data-slot="activity-ring">
             <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeOpacity={0.2} strokeWidth={stroke} />
             {ring.value > 0.001 ? arc(offset) : null}
-            {lapOffset !== null ? arc(lapOffset, { opacity: 0.85, animationDelay: "0.9s" }) : null}
+            {lapOffset !== null ? arc(lapOffset, { opacity: 0.85, animationDelay: glassTime(4.5) }) : null}
           </g>
         )
       })}

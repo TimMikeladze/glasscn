@@ -1,21 +1,22 @@
 # Theming — design (v2)
 
-Everything visual in glasscn is a **primitive CSS variable**, grouped into ten dimensions. Themes are just values for those primitives; nothing else changes.
+Everything visual in glasscn is a **primitive CSS variable**, grouped into eleven dimensions. Themes are just values for those primitives; nothing else changes.
 
 ## The one rule that makes scoping work
 
 Primitives live on `:root` / `.dark` (or any element). **Derived values never do.** Colours like the frost, rim and shadow are computed *inside* the utilities and `@theme inline` tokens from the primitives — so they are evaluated on the element that uses them, and overriding a primitive on any subtree re-themes that subtree. (A `--glass: color-mix(…var(--glass-opacity)…)` declared on `:root` would freeze at `:root` and ignore child overrides.)
 
-## Dimensions (72 primitives)
+## Dimensions (88 primitives)
 
 | Group | Primitives |
 |---|---|
-| Colour | `primary` `primary-foreground` `ring` `chart-1..5` `aurora-1..3` `aurora-base` |
-| Material | `glass-tint` `glass-opacity` `-strong` `-subtle` `glass-blur` `glass-saturate` `glass-brightness` `glass-sheen` `glass-sheen-angle` `glass-texture` `glass-fill-tint` `glass-fill-opacity` `-strong` `glass-thumb` `glass-knob` `glass-label` `glass-label-secondary` |
+| Colour | `primary` `primary-foreground` `ring` `chart-1..5` `success` `warning` `info` (+ `-foreground`) `aurora-1..3` `aurora-base` |
+| Material | `glass-tint` `glass-opacity` `-strong` `-subtle` `glass-blur` `glass-saturate` `glass-brightness` `glass-sheen` `glass-sheen-angle` `glass-texture` `glass-fill-tint` `glass-fill-opacity` `-strong` `glass-thumb` `glass-knob` `glass-clarity` `glass-label` `glass-label-secondary` `-tertiary` `-quaternary` `glass-separator-opacity` |
+| Liquid | `glass-liquid-opacity` `glass-liquid-clear-opacity` `glass-liquid-clear-dim` `glass-liquid-blur` `glass-liquid-saturate` |
 | Rim | `glass-border-color` `glass-border-opacity` `glass-border-width` `glass-highlight-opacity` |
 | Depth | `glass-shadow-color` `glass-shadow-opacity` `glass-shadow-y` `glass-shadow-blur` `glass-glow` `glass-dim` |
 | Shape | `glass-radius-surface` `glass-radius-control` `glass-radius-button` `glass-radius-badge` `glass-ring-width` |
-| Density | `glass-density` (a multiplier on control heights, paddings, card spacing) |
+| Density | `glass-density` (a multiplier on control heights, paddings, card spacing) `glass-hit-min` (touch target) |
 | Motion | `glass-duration` `glass-ease` `glass-press-scale` |
 | Aurora | `aurora-opacity` `aurora-scale` `aurora-speed` `aurora-blur` |
 | Fonts | `glass-font-sans` `-heading` `-display` `-mono` — optional; unset means your app's `--font-*` |
@@ -24,6 +25,18 @@ Primitives live on `:root` / `.dark` (or any element). **Derived values never do
 Fonts and type in depth: [`typography.md`](typography.md).
 
 Tailwind gets named tokens over them: `bg-glass`, `border-glass-border`, `bg-fill`, `rounded-surface`, `rounded-control`, `rounded-button`, `rounded-badge`, `h-control`, `px-pad`, `ease-glass`, and for type `type-glass`, `type-glass-heading`, `type-glass-display`, `font-glass-heading`, `type-step-n2…6`…
+
+### Material and liquid
+
+Two kinds of glass, as in Apple's design: **material** (`glass`, `glass-strong`, `glass-subtle`) for content — cards, panes, anything in flow; **liquid** (`glass-liquid`, `glass-liquid-clear`) for the control layer floating over content — the dock, toolbars, floating buttons, menus, popovers, sheets. Liquid uses less blur and more saturation; clear liquid is only for media and dims what's behind it. `--glass-clarity` (0 ultra clear → 1 fully tinted, default 0.5) scales every frost at once, like iOS 27's Liquid Glass slider. Let viewers set it themselves with the `glass-preferences` item (a Clarity slider and a Reduce transparency switch, persisted, applied before paint by `<GlassPreferencesScript />`); their choice beats every theme and `ThemeScope`, and the OS settings below beat it.
+
+### Accessibility settings
+
+`prefers-reduced-transparency` makes every pane frostier, `prefers-contrast: more` makes panes nearly opaque with a contrasting rim, `forced-colors` turns them into system colours, `prefers-reduced-motion` zeroes durations and press squash. They override primitives with `!important`, so they win over themes, scopes and per-element overrides.
+
+### Utilities
+
+`glass-focus` / `glass-focus-inset` (focus outline in `--ring`), `hit-area` (≥ 24px, `--glass-hit-min` on touch), `rounded-concentric` (container radius − padding; containers set `--glass-container-radius` / `--glass-container-pad`), Apple text styles `type-large-title`, `type-title-1..3`, `type-headline`, `type-body`, `type-callout`, `type-subheadline`, `type-footnote`, `type-caption-1..2`, tokens `text-glass-label-*`, `border-separator`, `bg-fill-subtle` / `-faint`, `bg-success` / `-warning` / `-info` and their `-ink` text, `shadow-glass-1..4`, `h-control-2xs`, `size-knob`, `rounded-control-xs`.
 
 ### Text on glass
 
@@ -36,9 +49,9 @@ Every shipped palette × material, in both schemes, is tested to WCAG AA by `leg
 ## Presets (each a shadcn `registry:theme` item; they compose)
 
 - **Palettes (12)** — Dusk, Ocean, Rose, Sage, Amber, Graphite (hand-tuned) + Lavender, Mint, Cherry, Lagoon, Sand, Midnight (generated from a hue).
-- **Materials (7)** — frosted (default), liquid, crystal, smoked, matte, vapor, neon.
+- **Materials (7)** — frosted (default), vivid, crystal, smoked, matte, vapor, neon.
 - **Shapes (4)** — round (default), soft, sharp, square.
-- **Motion (4)** — spring (default), smooth, snappy, still.
+- **Motion (4)** — spring (default), smooth, snappy, still. Spring and snappy are real springs: `spring({ stiffness, damping, mass })` emits a CSS `linear()` curve.
 - **Density** — compact, default, comfortable.
 - **Type (8)** — default, system, modern, editorial, friendly, technical, classic, grotesk (each depends on its `registry:font` items).
 
@@ -55,6 +68,17 @@ Every shipped palette × material, in both schemes, is tested to WCAG AA by `leg
 ## Runtime scoping — `ThemeScope` (registry item `theme-scope`)
 
 `<ThemeScope theme={…} scheme="dark">` (or `type="editorial" loadFonts`) themes a subtree — including its body type: it writes a scoped `<style>` with light/dark rules for its own `data-glass-scope` id, so a card, a section or a preview can wear a different theme from the page.
+
+- **Preset props write only their groups.** `palette` → Colour; `material` → Material, Liquid, Rim, Depth; `shape` → Shape; `motion` → Motion + aurora speed; `density`, `type`, `fonts` → their own (plus anything else the preset sets). `<ThemeScope shape="sharp">` keeps the page's palette and material. A `theme` prop writes every token.
+- **Small output.** One light rule, then a dark rule with only the values that differ by scheme (`themeScopeCss(selector, props)` returns it, for tests and SSR inspection).
+- **Forced `scheme`.** One rule: the scope's values, shadcn's full neutral set (`background`, `foreground`, `card`, `popover`, `muted`, `secondary`, `accent`, `border`, `input`, `destructive` + foregrounds), `color-scheme` and `color`. Tokens it doesn't name follow the scheme too: a dark scope matches your `.dark` rules by its class; a light one takes the default light values (your accent and charts stay).
+- **`dark:` inside a forced scope.** shadcn's `@custom-variant dark (&:is(.dark *))` matches any `.dark` ancestor, so a light scope in a dark page would still get every `dark:` utility. glasscn's variant follows the *nearest* `.dark` / `.light` (exact three levels deep — page, scope, scope — and correct when next-themes puts `light` on `<html>`):
+
+  ```css
+  @custom-variant dark (&:is(.dark, .dark *):not(:where(.dark .light, .dark .light *):not(:where(.dark .light .dark, .dark .light .dark *))));
+  ```
+
+  It keeps shadcn's specificity. Tailwind uses the last definition, so it must come after shadcn's line in `globals.css` (glass-style's CSS is appended after it). `@scope (.dark) to (.light)` would be exact at any depth, but Tailwind nests a variant's `@scope` inside the utility rule, where it no longer matches.
 
 ## Site
 

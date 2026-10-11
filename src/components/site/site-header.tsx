@@ -5,10 +5,12 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
 import { cn } from "cn"
-import { MenuIcon, MoonIcon, PaletteIcon, StarIcon, SunIcon } from "lucide-react"
+import { MenuIcon, MoonIcon, PaletteIcon, SlidersHorizontalIcon, StarIcon, SunIcon } from "lucide-react"
 
 import { Button } from "@/components/glass/button"
+import { GlassPreferences } from "@/components/glass/glass-preferences"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/components/glass/dropdown-menu"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/glass/popover"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/glass/sheet"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/glass/tooltip"
 import { site } from "@/lib/site"
@@ -105,6 +107,25 @@ export function SiteHeader({ stars, nav }: { stars: number | null; nav: NavSecti
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
+          <Popover>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon-sm" aria-label="Glass preferences">
+                    <SlidersHorizontalIcon />
+                  </Button>
+                </PopoverTrigger>
+              </TooltipTrigger>
+              <TooltipContent>Glass</TooltipContent>
+            </Tooltip>
+            <PopoverContent align="end" className="w-72 gap-4">
+              <div className="grid gap-1">
+                <p className="type-glass-heading text-sm">Glass</p>
+                <p className="text-xs text-muted-foreground">How much the page shows through, for you — like iOS 27&rsquo;s Liquid Glass setting.</p>
+              </div>
+              <GlassPreferences />
+            </PopoverContent>
+          </Popover>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="ghost" size="icon-sm" aria-label="Toggle dark mode" onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>

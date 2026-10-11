@@ -34,9 +34,10 @@ describe("llms-full.txt", () => {
 
   it("includes the design rules and the material guidance", () => {
     expect(full).toContain("## Design rules")
-    expect(full).toContain("**Glass needs something to frost.**")
+    expect(full).toContain("**Glass needs content beneath it.**")
+    expect(full).toContain("**Never liquid on liquid.**")
     expect(full).toContain("## Material vs Liquid Glass")
-    expect(full).toContain("material-liquid")
+    expect(full).toContain("material-vivid")
   })
 })
 

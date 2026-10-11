@@ -2,6 +2,23 @@
 
 Registry items are copied into your app, so re-run `npx shadcn add @glasscn-app/<item>` to pick up a change. IDs refer to [`docs/roadmap.md`](docs/roadmap.md).
 
+## Unreleased — M1 foundations (2026-10-11)
+
+### Breaking
+- Material preset `liquid` is renamed **`vivid`** (`material-vivid`); "liquid" now names the control-layer surface.
+- Control-layer parts (Dock, DockAction, Tooltip, Popover, DropdownMenu, Sheet, Dialog, AlertDialog, toasts, floating chat composer, `Button variant="glass"`) use **`glass-liquid`**.
+- `Stat` defaults to a fill tile (glass when standalone or with `intensity`/`variant="glass"`); `StatTrend` "up" is success-green by default (`sentiment` prop).
+- Focus is an outline (`glass-focus`), not a box-shadow ring.
+
+### Added
+- `glass-liquid`, `glass-liquid-clear`; `Glass variant="material|liquid|liquid-clear"`; `--glass-clarity` (iOS 27-style clear↔tinted) and the `glass-preferences` item (also in the site header).
+- Accessibility: `prefers-reduced-transparency`, `prefers-contrast: more`, `forced-colors`, reduced-motion primitive overrides.
+- Tokens: `glass-label-tertiary/-quaternary`, `success`/`warning`/`info` (+ `-ink`), `separator`, `fill-subtle/-faint`, `shadow-glass-1..4`, `control-2xs`, `knob`, `rounded-control-xs`, `glass-hit-min`; utilities `hit-area`, `rounded-concentric`, Apple text styles `type-large-title … type-caption-2`.
+- Real spring easings (`spring()` → CSS `linear()`); gamut-mapped palettes; display fonts as `font-display-*` items.
+- `ThemeScope`: forced schemes isolate `dark:`; partial props emit only their groups; much smaller CSS. `glass-style` ships the scope-aware `dark` variant.
+- RTL via logical properties across components; `SheetBody`, `DialogBody`, sheet `side="start|end"`, `--dock-inset`, `GroupedListItem disabled`, `TableHead/Cell align|numeric`.
+- Tests: component (jsdom), structural "never glass on glass", ThemeScope/sanitizer/decode fixtures, generated CSS parses, CI checks generated files.
+
 ## Unreleased — M0 "stop the bleeding" (2026-10-11)
 
 ### Breaking

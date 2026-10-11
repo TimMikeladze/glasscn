@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from "react"
 import { cn } from "cn"
 
@@ -8,8 +10,13 @@ import { cn } from "cn"
  * `--aurora-opacity`, `--aurora-scale`, `--aurora-speed` and `--aurora-blur`;
  * the props below override those for one instance. Fixed behind the page by
  * default (`fixed inset-0 -z-10`); pass `className="absolute"` to fill a container.
+ *
+ * Cheap when idle: the blobs are GPU layers only while they move, the drift
+ * pauses while the aurora is off screen, and `speed={0}` (or `animate={false}`)
+ * holds it still.
  */
 function Aurora({
+  ref,
   className,
   style,
   speed,
@@ -29,8 +36,30 @@ function Aurora({
   blur?: number
   animate?: boolean
 }) {
+  const local = React.useRef<HTMLDivElement | null>(null)
+  const setRef = React.useCallback(
+    (node: HTMLDivElement | null) => {
+      local.current = node
+      if (typeof ref === "function") ref(node)
+      else if (ref) ref.current = node
+    },
+    [ref]
+  )
+  const moving = animate && !(speed !== undefined && speed <= 0)
+  // pause the drift while off screen (an aurora per preview adds up)
+  React.useEffect(() => {
+    const el = local.current
+    if (!el || !moving || typeof IntersectionObserver === "undefined") return
+    const observer = new IntersectionObserver((entries) => el.toggleAttribute("data-paused", !entries[entries.length - 1].isIntersecting))
+    observer.observe(el)
+    return () => {
+      observer.disconnect()
+      el.removeAttribute("data-paused")
+    }
+  }, [moving])
+
   const overrides: Record<string, string> = {}
-  if (speed !== undefined) overrides["--aurora-speed"] = String(speed)
+  if (speed !== undefined && speed > 0) overrides["--aurora-speed"] = String(speed)
   if (intensity !== undefined) overrides["--aurora-opacity"] = `${intensity * 100}%`
   if (scale !== undefined) overrides["--aurora-scale"] = String(scale)
   if (blur !== undefined) overrides["--aurora-blur"] = `${blur}px`
@@ -39,22 +68,35 @@ function Aurora({
     <div
       data-slot="aurora-blob"
       aria-hidden
-      className={cn("absolute aspect-square rounded-full will-change-transform", position)}
+      className={cn(
+        "absolute aspect-square rounded-full",
+        moving && "will-change-transform group-data-paused/aurora:will-change-auto group-data-paused/aurora:[animation-play-state:paused] motion-reduce:will-change-auto",
+        position
+      )}
       style={{
         width: `calc(${size}% * var(--aurora-scale, 1))`,
         minWidth: `calc(${minPx}px * var(--aurora-scale, 1))`,
         background: `radial-gradient(closest-side, var(--aurora-${i}), color-mix(in oklch, var(--aurora-${i}) 55%, transparent) 45%, transparent)`,
         opacity: "var(--aurora-opacity, 100%)",
         filter: "blur(var(--aurora-blur, 0px))",
-        animation: animate ? `glass-aurora-${i} calc(${seconds}s / var(--aurora-speed, 1)) ease-in-out infinite` : undefined,
+        // longhands, so the paused class can set animation-play-state; max() guards a zero speed
+        ...(moving
+          ? {
+              animationName: `glass-aurora-${i}`,
+              animationDuration: `calc(${seconds}s / max(var(--aurora-speed, 1), 0.0001))`,
+              animationTimingFunction: "ease-in-out",
+              animationIterationCount: "infinite",
+            }
+          : null),
       }}
     />
   )
   return (
     <div
+      ref={setRef}
       data-slot="aurora"
       aria-hidden
-      className={cn("pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-aurora-base", className)}
+      className={cn("group/aurora pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-aurora-base", className)}
       style={{ ...overrides, ...style }}
       {...props}
     >

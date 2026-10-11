@@ -25,6 +25,7 @@ import { ThemeScope } from "@/components/glass/theme-scope"
 import { Blockquote, Display, Heading, InlineCode, Text, TextLink } from "@/components/glass/typography"
 import { demos } from "@/components/demos"
 import { GROUPS, docs } from "@/lib/docs"
+import { ContentGround } from "./content-ground"
 import { typeScale } from "@/lib/glass-theme"
 import type { GlassTheme } from "@/lib/glass-theme"
 
@@ -43,8 +44,14 @@ const CATALOGUE = GROUPS.map((group) => ({
   items: docs.filter((d) => d.group === group && demos[d.slug]).map((d) => ({ slug: d.slug, title: d.title, Demo: React.memo(demos[d.slug]) })),
 })).filter((g) => g.items.length > 0)
 
-/** Everything wearing the studio's theme — scoped, with its own aurora and scheme, independent of the page. */
-export function StudioPreview({ theme, scheme }: { theme: GlassTheme; scheme: "light" | "dark" }) {
+export type PreviewGround = "aurora" | "content"
+
+/**
+ * Everything wearing the studio's theme — scoped, with its own aurora and scheme, independent of the page.
+ * `ground="content"` swaps the aurora behind the showcase for a page of photos and text: what liquid
+ * glass is meant to float over (the catalogue below keeps the aurora).
+ */
+export function StudioPreview({ theme, scheme, ground = "aurora" }: { theme: GlassTheme; scheme: "light" | "dark"; ground?: PreviewGround }) {
   const [tab, setTab] = React.useState("today")
   const scale = Object.entries(typeScale(theme, scheme))
     .filter(([n]) => Number(n) >= 0)
@@ -53,6 +60,7 @@ export function StudioPreview({ theme, scheme }: { theme: GlassTheme; scheme: "l
     <ThemeScope theme={theme} scheme={scheme} loadFonts className="relative isolate overflow-hidden rounded-[calc(var(--glass-radius-surface)*1.25)] text-foreground">
       <Aurora className="absolute" />
       <div className="relative grid gap-4 p-4 sm:p-6 xl:grid-cols-[1.15fr_1fr]">
+        {ground === "content" ? <ContentGround /> : null}
           <Card className="xl:col-span-2">
             <CardContent className="grid gap-4">
               <Text variant="overline">Type specimen · scale {scale.join(" · ")}px</Text>

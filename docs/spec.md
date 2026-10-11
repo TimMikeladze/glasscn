@@ -19,7 +19,7 @@ shadcn's standard is Tailwind v4 + CSS variables + Radix + `cn`, copied into the
 
 ## Theming
 
-See [`theming.md`](theming.md): 72 primitives in ten groups, composable presets (12 palettes, 7 materials, 4 shapes, 4 motions, 3 densities, 8 type presets), 45 `registry:font` items ([`typography.md`](typography.md)), the theme engine (`glass-theme`), `ThemeScope`, and the Theme Studio at `/themes`. Agents: [`architecture.md`](architecture.md), [`rules/`](rules/README.md), `skills/`.
+See [`theming.md`](theming.md): 88 primitives in eleven groups, composable presets (12 palettes, 7 materials, 4 shapes, 4 motions, 3 densities, 8 type presets), 45 `registry:font` items ([`typography.md`](typography.md)), the theme engine (`glass-theme`), `ThemeScope`, and the Theme Studio at `/themes`. Agents: [`architecture.md`](architecture.md), [`rules/`](rules/README.md), `skills/`.
 
 ## Foundations (v1 notes)
 
@@ -33,7 +33,7 @@ See [`theming.md`](theming.md): 72 primitives in ten groups, composable presets 
 |---|---|
 | Surfaces | `aurora`, `glass` (`Glass`), `card`, `theme-scope` |
 | Typography | `typography` (`Heading`, `Text`, `Display`, `Blockquote`, `InlineCode`, `List`, `TextLink`), `prose` |
-| Controls | `button`, `badge`, `input`, `textarea`, `label`, `checkbox`, `switch`, `segmented-control`, `tabs`, `slider`, `progress`, `kbd`, `separator`, `avatar` |
+| Controls | `button`, `badge`, `input`, `textarea`, `label`, `checkbox`, `switch`, `segmented-control`, `tabs`, `slider`, `progress`, `kbd`, `separator`, `avatar`, `glass-preferences` |
 | Overlays | `dialog`, `sheet`, `popover`, `tooltip`, `dropdown-menu`, `toaster` (sonner) |
 | Navigation | `dock` (floating capsule bar, sliding pill, action button), `grouped-list` (Settings-style rows, icon tiles) |
 | Data | `activity-rings`, `progress-ring`, `sparkline`, `stat`, `heatmap`, `bar-list`, `gauge`, `tracker`, `category-bar` |

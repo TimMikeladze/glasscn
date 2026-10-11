@@ -21,11 +21,39 @@ import { scaleLinear } from "@tanstack/charts/scales/linear"
 import { scalePoint } from "@tanstack/charts/scales/point"
 import { scaleUtc } from "d3-scale"
 
-import { axisKind } from "@/lib/glass-charts"
+import { axisKind, parseDuration, sanitizeId } from "@/lib/glass-charts"
 
-/** Draws in once (bars grow, lines and areas rise, arcs sweep); snaps under reduced motion. */
-const drawIn = motion({ initial: "always", transition: { type: "tween", duration: 900 } })
 const still = motion({ initial: false })
+
+/**
+ * Draws in once (bars grow, lines and areas rise, arcs sweep) over 4.5 × the
+ * theme's `--glass-duration` (900ms at the default 200ms), read from the host when
+ * the chart mounts — so `motion-still`, a `ThemeScope` with its own motion, and
+ * reduced motion (which zeroes the duration) all snap. The library reads its
+ * options when it mounts, after the host is in the DOM; the getters defer the read
+ * until then. The host is found by id: the chart mounts in a layout effect, before
+ * React attaches the host's ref.
+ */
+function useDrawIn(hostId: string) {
+  const [renderer] = React.useState(() => {
+    const ms = () => {
+      const host = typeof document === "undefined" ? null : document.getElementById(hostId)
+      return host ? parseDuration(getComputedStyle(host).getPropertyValue("--glass-duration")) * 4.5 : 900
+    }
+    return motion({
+      get initial() {
+        return ms() > 0 ? ("always" as const) : false
+      },
+      transition: {
+        type: "tween",
+        get duration() {
+          return ms()
+        },
+      },
+    })
+  })
+  return renderer
+}
 
 /** The nth series colour, cycling through `--chart-1..5`. */
 function chartColor(i: number) {
@@ -115,8 +143,8 @@ const hostClass = cn(
   "[--ts-chart-tooltip-border-radius:var(--glass-radius-control)] [--ts-chart-tooltip-padding:0.5rem_0.75rem] [--ts-chart-tooltip-font:inherit]",
   "[--ts-chart-tooltip-shadow:0_6px_18px_color-mix(in_oklch,var(--glass-shadow-color)_var(--glass-shadow-opacity),transparent)]",
   "[&_.ts-chart-tooltip]:numeric-glass [&_.ts-chart-tooltip]:[-webkit-backdrop-filter:blur(var(--glass-blur))_saturate(var(--glass-saturate))] [&_.ts-chart-tooltip]:[backdrop-filter:blur(var(--glass-blur))_saturate(var(--glass-saturate))]",
-  // the focus ring sits on the plot, not around the whole svg
-  "[&_svg]:outline-none [&:has(svg:focus-visible)]:rounded-control-sm [&:has(svg:focus-visible)]:ring-(length:--glass-ring-width) [&:has(svg:focus-visible)]:ring-ring/50"
+  // the focus outline (glass-focus) sits on the host, not around the bare svg
+  "[&_svg:focus-visible]:outline-hidden [&:has(svg:focus-visible)]:rounded-control-sm [&:has(svg:focus-visible)]:outline-(length:--glass-ring-width) [&:has(svg:focus-visible)]:outline-offset-2 [&:has(svg:focus-visible)]:outline-ring [&:has(svg:focus-visible)]:outline-solid"
 )
 
 type ChartContainerProps<TDatum, TXValue extends ChartValue, TYValue extends ChartValue> = Omit<
@@ -127,7 +155,7 @@ type ChartContainerProps<TDatum, TXValue extends ChartValue, TYValue extends Cha
   style?: React.CSSProperties
   /** Overlaid on the chart (e.g. a donut's centre figure). */
   children?: React.ReactNode
-  /** Draw in on mount (later data changes still glide). Reduced motion always snaps. */
+  /** Draw in on mount (later data changes still glide). Timed by --glass-duration; reduced motion and motion-still snap. */
   animate?: boolean
 }
 
@@ -142,8 +170,10 @@ function ChartContainer<TDatum, TXValue extends ChartValue = ChartValue, TYValue
   animate = true,
   ...props
 }: ChartContainerProps<TDatum, TXValue, TYValue>) {
+  const id = `glass-chart-${sanitizeId(React.useId())}`
+  const drawIn = useDrawIn(id)
   return (
-    <div data-slot="chart" className={cn(hostClass, className)} style={style}>
+    <div id={id} data-slot="chart" className={cn(hostClass, className)} style={style}>
       <Chart renderer={animate ? drawIn : still} {...props} />
       {children}
     </div>
