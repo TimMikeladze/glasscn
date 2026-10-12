@@ -1,24 +1,25 @@
 # Promo video
 
-A ~40 s, 1920×1080, 30 fps MP4 for X/Twitter that runs through the registry on the real site, then frames it in device mock-ups across themes. Lives in `video/` (own `package.json`, Playwright only — not part of the app build).
+A ~40 s, 1920×1080, 30 fps MP4 for X/Twitter. It runs through the registry on the real site, then frames it in device mock-ups across themes. It lives in `video/`, which has its own `package.json`, depends only on Playwright, and isn't part of the app build.
 
 ## Approach
 
-Two deterministic passes, no screen recording (Playwright's recorder is low-bitrate VP8):
+Two deterministic passes and no screen recording, because Playwright's recorder is low-bitrate VP8:
 
-1. **Capture** (`video/capture.mjs`) — drives the running dev site and saves crisp PNGs to `video/shots/`:
+1. **Capture** (`video/capture.mjs`) drives the running dev site and saves crisp PNGs to `video/shots/`:
    - every `registry:ui` component's docs preview (`/docs/<name>`), cycling palettes and schemes;
    - the landing page, full height, desktop (1440 wide);
    - `dashboard-01` / `analytics-01` previews under several palette × material × shape themes;
    - mobile (390×844 @3x) full pages of the landing, a docs page and `/themes`, one per theme.
-   Themes are applied the way the site does it: `glasscn-palette` in localStorage, scheme via next-themes' `theme` key, and material/shape presets as `glasscn-custom-css` built from the `registry:theme` items' `cssVars` in `registry.json`.
-2. **Render** (`video/render.mjs`) — loads `video/stage.html` (one timeline, all motion a pure function of `t`), seeks to each frame via `window.seek(t)`, screenshots, and pipes to `ffmpeg` (H.264, yuv420p, CRF 18, `+faststart`) → `video/out/glasscn.mp4`.
+
+   Themes are applied the same way the site does it: `glasscn-palette` in localStorage, the scheme via next-themes' `theme` key, and material/shape presets as `glasscn-custom-css` built from the `registry:theme` items' `cssVars` in `registry.json`.
+2. **Render** (`video/render.mjs`) loads `video/stage.html` (one timeline, all motion a pure function of `t`), seeks to each frame via `window.seek(t)`, screenshots it, and pipes the frames to `ffmpeg` (H.264, yuv420p, CRF 18, `+faststart`), which writes `video/out/glasscn.mp4`.
 
 ## Timeline
 
 | s | Scene |
 |---|---|
-| 0–3 | Title on aurora: "glasscn — Glass, for shadcn." |
+| 0–3 | Title on aurora: "glasscn" with the "Glass, for shadcn." pill |
 | 3–13 | Component wall: every component tile flies in, camera drifts, count ticker |
 | 13–20 | Browser window: landing page scrolls |
 | 20–28 | Laptop: dashboard re-themes (palette · material · shape label) |

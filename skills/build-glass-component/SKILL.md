@@ -1,6 +1,6 @@
 ---
 name: build-glass-component
-description: Add a new component or block to the glasscn registry end to end — the component file, its registry entry, a live demo, docs props, tests and the install check. Use when asked to add, port or rebuild a UI component in glasscn (src/components/glass), or to turn an existing shadcn component into a glass one.
+description: Add a new component or block to the glasscn registry end to end: the component file, its registry entry, a live demo, docs props, tests and the install check. Use when asked to add, port or rebuild a UI component in glasscn (src/components/glass), or to turn an existing shadcn component into a glass one.
 ---
 
 # Build a glass component
@@ -12,16 +12,16 @@ Read `docs/rules/components.md` and `docs/rules/design.md` once before starting.
 ## The loop
 
 1. **Find the shadcn original, if there is one.** `pnpm dlx shadcn@latest view <name>` (or add it to a scratch project) and keep its parts, prop names and `data-slot`s. glasscn adds; it does not rename.
-2. **Write `src/components/glass/<name>.tsx`.** Start from the closest exemplar below. Tokens only — see `references/tokens-cheatsheet.md`.
+2. **Write `src/components/glass/<name>.tsx`.** Start from the closest exemplar below. Use tokens only; `references/tokens-cheatsheet.md` maps each need to its token.
 3. **Register it in `registry/items.mjs`** with `ui(name, title, description, { deps, reg, categories })`. `deps` = every npm package you import (`cn` is implied); `reg` = every other glasscn item you import (`at("button")`, `hook`, `charts`, `at("glass-theme")`).
-4. **Demo:** `src/components/demos/<name>.tsx` (default export, realistic content — a journaling-app feel is the house style) and add it to `src/components/demos/index.ts`.
+4. **Demo:** `src/components/demos/<name>.tsx` (default export, realistic content; the house style reads like a journaling app) and add it to `src/components/demos/index.ts`.
 5. **Docs:** props and notes in `PROPS` in `src/lib/docs.ts` for anything not obvious from shadcn.
 6. **Pure logic?** Put it in `src/lib/glass-charts.ts` (or a new lib item) with tests in `src/lib/__tests__/`. Components render; libraries compute.
 7. **Check:** `pnpm typecheck && pnpm lint && pnpm test`. The registry test tells you about undeclared imports, missing files and colliding file names.
-8. **Install it for real:** `pnpm verify:install` (about 3 minutes) — a fresh Next app adds every item and builds.
+8. **Install it for real:** `pnpm verify:install` (about 3 minutes). It creates a fresh Next app, adds every item and builds it.
 9. **Look at it.** `pnpm dev`, open `/docs/<name>`, switch palette (header), light/dark, and try it in `/themes` with a sharp shape, compact density and the `matte` and `neon` materials. If it ignores any of those, a value is hard-coded.
 
-## Exemplars — read one, not all
+## Exemplars (read one, not all)
 
 | You're building | Read |
 |---|---|
@@ -37,7 +37,7 @@ Read `docs/rules/components.md` and `docs/rules/design.md` once before starting.
 ## Done means
 
 - [ ] Every part has `data-slot`; `className` merges last through `cn`.
-- [ ] No hex, no `bg-white/…`, no fixed radius/height on themed parts — `rounded-surface|control|button|badge`, `h-control*`, `px-pad*`, `ease-glass`, `ring-(length:--glass-ring-width)`.
+- [ ] No hex, no `bg-white/…`, no fixed radius/height on themed parts. Use `rounded-surface|control|button|badge`, `h-control*`, `px-pad*`, `ease-glass`, `ring-(length:--glass-ring-width)`.
 - [ ] Reads correctly in all 12 palettes, both schemes, `shape-square` and `density-compact`.
 - [ ] Keyboard: focus ring visible, Radix handles roles.
 - [ ] Demo + docs entry + registry entry + `pnpm verify:install` green.

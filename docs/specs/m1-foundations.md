@@ -1,4 +1,4 @@
-# M1 — foundations for Liquid Glass
+# M1: foundations for Liquid Glass
 
 Roadmap milestone M1 ([`../roadmap.md`](../roadmap.md)). Everything later (the liquid layer, new components, native parity) consumes these tokens and utilities, so they land first. Design background: [`../liquid-glass.md`](../liquid-glass.md) Part 3.
 
@@ -7,17 +7,17 @@ Roadmap milestone M1 ([`../roadmap.md`](../roadmap.md)). Everything later (the l
 | Area | Primitives (light / dark) | Derived (Tailwind) |
 |---|---|---|
 | Liquid surface | `glass-liquid-opacity` 46% / 40%, `glass-liquid-blur` 12px, `glass-liquid-saturate` 200%, `glass-liquid-clear-opacity` 10% / 8% | `glass-liquid`, `glass-liquid-clear` utilities |
-| Clarity (iOS 27 slider) | `glass-clarity` 0.5 (0 = ultra clear, 1 = fully tinted) | every frost opacity: `o·min(1, 2c) + (100% − o)·max(0, 2c − 1)` — 0.5 reproduces today |
+| Clarity (iOS 27 slider) | `glass-clarity` 0.5 (0 = ultra clear, 1 = fully tinted) | every frost opacity: `o·min(1, 2c) + (100% − o)·max(0, 2c − 1)`; 0.5 reproduces the pre-M1 frost |
 | Labels | `glass-label-tertiary` (disabled, placeholder), `glass-label-quaternary` (watermark) | `text-glass-label-*`; panes remap `--muted-foreground` already |
 | Status | `success`, `warning`, `info` + `-foreground`, per palette, hue-avoiding the accent | `*-ink` text tokens like `primary-ink` |
 | Fills / separator | `glass-separator-opacity` 12% / 16% | `bg-fill-subtle` (×0.66), `bg-fill-faint` (×0.4), `border-separator`, `bg-separator` |
-| Elevation | — | `shadow-glass-1..4` from the shadow primitives |
+| Elevation | none | `shadow-glass-1..4` from the shadow primitives |
 | Focus | `glass-ring-width` min 2px | `glass-focus` / `glass-focus-inset`: an **outline** in `--ring` (survives forced colours, follows radius, no box-shadow clash with panes) |
 | Hit targets | `glass-hit-min` 44px | `hit-area`: a transparent `::after` ≥ 24px (fine pointer) / `--glass-hit-min` (coarse) |
-| Sizes | — | `control-2xs` (1.5rem×density), `knob` (1.5rem×density), `radius-control-xs` |
+| Sizes | none | `control-2xs` (1.5rem×density), `knob` (1.5rem×density), `radius-control-xs` |
 | Concentric | containers set `--glass-container-radius` / `--glass-container-pad` | `rounded-concentric` = `max(--glass-concentric-min, radius − pad)` |
-| Type | — | Apple text styles `type-large-title … type-caption-2` (size, leading, weight × `--glass-text-scale`) |
-| Motion | `glass-ease` presets become `linear()` springs from `spring({stiffness, damping, mass})` | — |
+| Type | none | Apple text styles `type-large-title … type-caption-2` (size, leading, weight × `--glass-text-scale`) |
+| Motion | `glass-ease` presets become `linear()` springs from `spring({stiffness, damping, mass})` | none |
 
 Rename the material preset `liquid` → **`vivid`** (ENG-34) so "liquid" means the surface.
 

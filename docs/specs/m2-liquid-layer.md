@@ -1,4 +1,4 @@
-# M2 — the liquid layer
+# M2: the liquid layer
 
 Roadmap milestone M2 ([`../roadmap.md`](../roadmap.md)). Design: [`../liquid-glass.md`](../liquid-glass.md) §3.1–3.5. Builds on M1 ([`m1-foundations.md`](m1-foundations.md)): `glass-liquid`, `--glass-clarity`, springs, `glass-focus`, `hit-area`, `rounded-concentric`.
 
@@ -22,15 +22,15 @@ Accessibility blocks zero `specular`, `illumination`, `press-stretch` and set `p
 
 ## Utilities (`stylesheet.mjs`, derived, no `@media` inside `@utility`)
 
-- `glass-light` — two-sided rim: `::before` conic gradient from `--glass-light-angle` (specular → transparent → edge-shade → transparent) masked to the border (`mask-composite: exclude`). `glass-liquid` / `glass-liquid-clear` include it and drop the single inset highlight (LG-04).
-- `glass-illuminate` — `::after` radial glow at `--glass-press-x/y`, `plus-lighter`, opacity on `:active` / `[data-pressed]` (LG-05). Hook `use-glass-pointer` writes the coordinates in rAF; optional `followLight` rotates `--glass-light-angle` on hover devices, off under reduced motion.
-- `glass-shadow-adaptive` — shadow × `--glass-shadow-over-content` when `[data-over-content]` (LG-06).
-- `glass-prominent` — tinted liquid: `--primary` mixed into liquid frost, `primary-foreground` label, rim + illumination (LG-07). Button `variant="prominent"`; `default` stays solid.
-- `glass-knob-lens` — at rest solid `bg-glass-knob`; under `group-active` / `[data-dragging]` liquid, scaled `--glass-knob-lens-scale`, stretched toward travel via `--glass-knob-stretch-x` (LG-09).
-- `glass-materialize` — registered `@property --glass-materialize` (0→1) scales blur, frost and scale(0.96→1) for overlay `data-[state=open|closed]`; reduced motion = fade (LG-10).
-- `glass-morph-origin` — popover / dropdown / tooltip grow from trigger size and radius: `@starting-style` `clip-path: inset(… round …)` sized from `--radix-*-trigger-width/height`, `transform-origin` from Radix (LG-11). Sheets / dialogs: same-document View Transition from the trigger where supported; blur re-enabled after.
-- `glass-press` / `glass-press-liquid` — elastic: solid squashes `scale(1+s, 1−s)·press-scale`, liquid grows `press-grow`; spring ease; none under reduced motion (LG-13, BTN-02).
-- `scroll-edge-soft` / `scroll-edge-hard` — progressive blur band (stacked masked backdrop layers) / near-opaque material strip (NAV-02).
+- `glass-light`: two-sided rim: `::before` conic gradient from `--glass-light-angle` (specular → transparent → edge-shade → transparent) masked to the border (`mask-composite: exclude`). `glass-liquid` / `glass-liquid-clear` include it and drop the single inset highlight (LG-04).
+- `glass-illuminate`: `::after` radial glow at `--glass-press-x/y`, `plus-lighter`, opacity on `:active` / `[data-pressed]` (LG-05). Hook `use-glass-pointer` writes the coordinates in rAF; optional `followLight` rotates `--glass-light-angle` on hover devices, off under reduced motion.
+- `glass-shadow-adaptive`: shadow × `--glass-shadow-over-content` when `[data-over-content]` (LG-06).
+- `glass-prominent`: tinted liquid: `--primary` mixed into liquid frost, `primary-foreground` label, rim + illumination (LG-07). Button `variant="prominent"`; `default` stays solid.
+- `glass-knob-lens`: at rest solid `bg-glass-knob`; under `group-active` / `[data-dragging]` liquid, scaled `--glass-knob-lens-scale`, stretched toward travel via `--glass-knob-stretch-x` (LG-09).
+- `glass-materialize`: registered `@property --glass-materialize` (0→1) scales blur, frost and scale(0.96→1) for overlay `data-[state=open|closed]`; reduced motion = fade (LG-10).
+- `glass-morph-origin`: popover / dropdown / tooltip grow from trigger size and radius: `@starting-style` `clip-path: inset(… round …)` sized from `--radix-*-trigger-width/height`, `transform-origin` from Radix (LG-11). Sheets / dialogs: same-document View Transition from the trigger where supported; blur re-enabled after.
+- `glass-press` / `glass-press-liquid`: elastic. solid squashes `scale(1+s, 1−s)·press-scale`, liquid grows `press-grow`; spring ease; none under reduced motion (LG-13, BTN-02).
+- `scroll-edge-soft` / `scroll-edge-hard`: progressive blur band (stacked masked backdrop layers) / near-opaque material strip (NAV-02).
 - `glass-focus` becomes two-tone: 2px `--ring` outline + 2px offset with a contrasting halo, following radius (UX-02).
 
 ## Components
@@ -57,7 +57,7 @@ Every new or changed web item gets a native twin in `registry/native/` (best eff
 
 ## Site / perf / QA
 
-- UX-06: preview frames are aurora ground, not panes; blocks use material/fills — no glass in glass in glass.
+- UX-06: preview frames are aurora ground, not panes; blocks use material/fills, so there's no glass in glass in glass.
 - UX-04: `content-visibility: auto` on off-screen doc sections, aurora pauses off-screen / while scrolling, blur budget (≤ 12 `backdrop-filter` in initial viewport) checked in e2e.
 - QA-02/03/09: Playwright (`e2e/`, `pnpm test:e2e`, not part of `pnpm test`): axe on `/docs/*`, `/themes`, blocks (light/dark × 2 materials); `toHaveScreenshot` on docs previews × 3 palettes × 2 schemes × {square, compact}; Chromium/WebKit/Firefox projects for liquid surfaces.
 

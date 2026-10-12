@@ -4,11 +4,11 @@ An Expo app in `sandbox/native/` that renders every `native-*` item, so the nati
 
 ## Decisions
 
-- **Live source, not a copy.** The sandbox imports `@/components/glass/native/*`. For the type-checker, `tsconfig.json` points it at `../../registry/native/*` (plus a catch-all `*` so registry files resolve `react-native` from the sandbox). Metro ignores tsconfig paths (`experiments.tsconfigPaths: false` — it would apply the catch-all too) and maps the `@/` aliases in `metro.config.js`, which also watches `registry/native`. Edit a registry file, the sandbox hot-reloads.
-- **Standalone package, npm.** Its own `package.json` + `package-lock.json`, not a pnpm workspace member — the site's install stays untouched, and Expo's tooling (`npx expo install`) is happiest with npm. Excluded from the root tsconfig, eslint and vitest.
+- **Live source, not a copy.** The sandbox imports `@/components/glass/native/*`. For the type-checker, `tsconfig.json` points it at `../../registry/native/*` (plus a catch-all `*` so registry files resolve `react-native` from the sandbox). Metro ignores tsconfig paths (`experiments.tsconfigPaths: false`, since it would apply the catch-all too) and maps the `@/` aliases in `metro.config.js`, which also watches `registry/native`. Edit a registry file, the sandbox hot-reloads.
+- **Standalone package, npm.** Its own `package.json` + `package-lock.json`, not a pnpm workspace member, so the site's install stays untouched, and Expo's tooling (`npx expo install`) works best with npm. Excluded from the root tsconfig, eslint and vitest.
 - **Expo Router, one screen per check.** `index` lists items; each screen exercises one item across palettes and schemes. A global header picks palette + scheme through `GlassThemeProvider`.
 - **Runs on Expo Go, the iOS simulator and web.** Every dependency is in the Expo Go SDK (`expo-blur`, `expo-glass-effect`, `expo-haptics`, `react-native-svg`). Web uses react-native-web, so the browser agent can screenshot it.
-- **The install check uses the sandbox.** `node scripts/verify-native.mjs` defaults to `sandbox/native`: it copies the app, drops the alias to `registry/native`, `shadcn add`s every native item from a local registry, and type-checks — proving the shipped files work, not just the live ones.
+- **The install check uses the sandbox.** `node scripts/verify-native.mjs` defaults to `sandbox/native`: it copies the app, drops the alias to `registry/native`, `shadcn add`s every native item from a local registry, and type-checks. That proves the shipped files work, not just the live ones.
 
 ## Screens
 
@@ -35,7 +35,7 @@ pnpm verify:native # from the repo root: install-from-registry check
 
 The theme picker lists all 12 generated palettes. A deep link's `?palette=ocean&scheme=dark` query sets them on launch (Maestro's screenshot flow uses it).
 
-Don't start Metro with `CI=1` — it turns off the file watcher and serves stale bundles.
+Don't start Metro with `CI=1`. It turns off the file watcher and serves stale bundles.
 
 Overlays that present system UI (the `@expo/ui` bottom sheet, system menus, `FullWindowOverlay` toasts, NativeTabs) only show their native form on the iOS simulator or Android; the web renders the React Native fallback (glass sheet and menu).
 

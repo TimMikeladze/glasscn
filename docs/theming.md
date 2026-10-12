@@ -1,10 +1,10 @@
-# Theming — design (v2)
+# Theming design (v2)
 
-Everything visual in glasscn is a **primitive CSS variable**, grouped into eleven dimensions. Themes are just values for those primitives; nothing else changes.
+Everything visual in glasscn is a primitive CSS variable, grouped into eleven dimensions. A theme is a set of values for those primitives and nothing else.
 
-## The one rule that makes scoping work
+## Why derived values never sit on `:root`
 
-Primitives live on `:root` / `.dark` (or any element). **Derived values never do.** Colours like the frost, rim and shadow are computed *inside* the utilities and `@theme inline` tokens from the primitives — so they are evaluated on the element that uses them, and overriding a primitive on any subtree re-themes that subtree. (A `--glass: color-mix(…var(--glass-opacity)…)` declared on `:root` would freeze at `:root` and ignore child overrides.)
+Primitives live on `:root` / `.dark` (or any element). **Derived values never do.** Colours like the frost, rim and shadow are computed from the primitives inside the utilities and `@theme inline` tokens, so they're evaluated on the element that uses them. That's what lets you override a primitive on any subtree and re-theme just that subtree. A `--glass: color-mix(…var(--glass-opacity)…)` declared on `:root` would be computed once at `:root` and ignore overrides on children.
 
 ## Dimensions (101 primitives)
 
@@ -19,7 +19,7 @@ Primitives live on `:root` / `.dark` (or any element). **Derived values never do
 | Density | `glass-density` (a multiplier on control heights, paddings, card spacing) `glass-hit-min` (touch target) |
 | Motion | `glass-duration` `glass-ease` `glass-press-scale` `glass-press-stretch` `glass-press-grow` `glass-knob-lens-scale` |
 | Aurora | `aurora-opacity` `aurora-scale` `aurora-speed` `aurora-blur` |
-| Fonts | `glass-font-sans` `-heading` `-display` `-mono` — optional; unset means your app's `--font-*` |
+| Fonts | `glass-font-sans` `-heading` `-display` `-mono`, optional; unset means your app's `--font-*` |
 | Type | `glass-text-scale` `glass-type-ratio` `glass-leading` `glass-tracking` `glass-body-weight` `glass-heading-weight` `-tracking` `-leading` `-case` `-wrap` `glass-hyphens` `glass-display-weight` `-tracking` `glass-numeric` `glass-font-features` `glass-measure` `glass-underline-offset` |
 
 Fonts and type in depth: [`typography.md`](typography.md).
@@ -28,15 +28,26 @@ Tailwind gets named tokens over them: `bg-glass`, `border-glass-border`, `bg-fil
 
 ### Material and liquid
 
-Two kinds of glass, as in Apple's design: **material** (`glass`, `glass-strong`, `glass-subtle`) for content — cards, panes, anything in flow; **liquid** (`glass-liquid`, `glass-liquid-clear`) for the control layer floating over content — the dock, toolbars, floating buttons, menus, popovers, sheets. Liquid uses less blur and more saturation; clear liquid is only for media and dims what's behind it. `--glass-clarity` (0 ultra clear → 1 fully tinted, default 0.5) scales every frost at once, like iOS 27's Liquid Glass slider. Let viewers set it themselves with the `glass-preferences` item (a Clarity slider and a Reduce transparency switch, persisted, applied before paint by `<GlassPreferencesScript />`); their choice beats every theme and `ThemeScope`, and the OS settings below beat it.
+There are two kinds of glass, following Apple's design. Material glass (`glass`, `glass-strong`, `glass-subtle`) is for content: cards, panes, anything in flow. Liquid glass (`glass-liquid`, `glass-liquid-clear`) is for the control layer floating over content: the dock, toolbars, floating buttons, menus, popovers and sheets. Liquid uses less blur and more saturation. Clear liquid is only for media, and it dims what's behind it. `--glass-clarity` (0 ultra clear → 1 fully tinted, default 0.5) scales every frost at once, like iOS 27's Liquid Glass slider. The `glass-preferences` item lets viewers set it themselves: a Clarity slider and a Reduce transparency switch, persisted and applied before paint by `<GlassPreferencesScript />`. A viewer's choice beats every theme and `ThemeScope`. The OS settings below beat the viewer's choice.
 
 ### Accessibility settings
 
-`prefers-reduced-transparency` makes every pane frostier, `prefers-contrast: more` makes panes nearly opaque with a contrasting rim, `forced-colors` turns them into system colours, `prefers-reduced-motion` zeroes durations, press squash / stretch / grow and the knob lens, and cross-fades overlays. Reduce transparency and increase contrast also zero `--glass-specular` and `--glass-illumination`. They override primitives with `!important`, so they win over themes, scopes and per-element overrides.
+| Setting | Effect |
+|---|---|
+| `prefers-reduced-transparency` | Every pane gets frostier |
+| `prefers-contrast: more` | Panes go nearly opaque with a contrasting rim |
+| `forced-colors` | Panes use system colours |
+| `prefers-reduced-motion` | Zeroes durations, press squash / stretch / grow and the knob lens; overlays cross-fade |
+
+Reduce transparency and increase contrast also zero `--glass-specular` and `--glass-illumination`. They override primitives with `!important`, so they win over themes, scopes and per-element overrides.
 
 ### Utilities
 
-`glass-focus` / `glass-focus-inset` (two-tone focus: a `--ring` outline with a halo in the pane colour), `hit-area` (≥ 24px, `--glass-hit-min` on touch), `rounded-concentric` (container radius − padding; containers set `--glass-container-radius` / `--glass-container-pad`), Apple text styles `type-large-title`, `type-title-1..3`, `type-headline`, `type-body`, `type-callout`, `type-subheadline`, `type-footnote`, `type-caption-1..2`, tokens `text-glass-label-*`, `border-separator`, `bg-fill-subtle` / `-faint`, `bg-success` / `-warning` / `-info` and their `-ink` text, `shadow-glass-1..4`, `h-control-2xs`, `size-knob`, `rounded-control-xs`.
+- `glass-focus` / `glass-focus-inset`: two-tone focus, a `--ring` outline with a halo in the pane colour
+- `hit-area`: ≥ 24px, `--glass-hit-min` on touch
+- `rounded-concentric`: container radius − padding; containers set `--glass-container-radius` / `--glass-container-pad`
+- Apple text styles: `type-large-title`, `type-title-1..3`, `type-headline`, `type-body`, `type-callout`, `type-subheadline`, `type-footnote`, `type-caption-1..2`
+- Tokens: `text-glass-label-*`, `border-separator`, `bg-fill-subtle` / `-faint`, `bg-success` / `-warning` / `-info` and their `-ink` text, `shadow-glass-1..4`, `h-control-2xs`, `size-knob`, `rounded-control-xs`.
 
 The liquid layer (M2):
 
@@ -54,39 +65,45 @@ The liquid layer (M2):
 
 ### Text on glass
 
-Panes remap shadcn's `--foreground`, `--card-foreground`, `--popover-foreground` and `--muted-foreground` to `--glass-label` / `--glass-label-secondary` for everything inside them, so a material can carry its own text colours (a smoked pane in a light theme gets light text) and muted text stays legible on frost. If your app customises `--foreground`, set `--glass-label` to match.
+Panes remap shadcn's `--foreground`, `--card-foreground`, `--popover-foreground` and `--muted-foreground` to `--glass-label` / `--glass-label-secondary` for everything inside them. A material can then carry its own text colours (a smoked pane in a light theme gets light text), and muted text stays legible on frost. If your app customises `--foreground`, set `--glass-label` to match.
 
 ### Legibility
 
-Every shipped palette × material, in both schemes, is tested to WCAG AA by `legibilityReport()`: text and secondary text on subtle, default and strong panes ≥ 4.5:1, the accent's label ≥ 4.5:1, the accent against the ground ≥ 3:1. Palettes move their accent's lightness (`accentFor`) until its label passes.
+Every shipped palette × material, in both schemes, is tested to WCAG AA with `legibilityReport()`. Text and secondary text on subtle, default and strong panes must reach 4.5:1, the accent's label 4.5:1, and the accent against the ground 3:1. Palettes move their accent's lightness (`accentFor`) until its label passes.
 
-## Presets (each a shadcn `registry:theme` item; they compose)
+## Presets
 
-- **Palettes (12)** — Dusk, Ocean, Rose, Sage, Amber, Graphite (hand-tuned) + Lavender, Mint, Cherry, Lagoon, Sand, Midnight (generated from a hue).
-- **Materials (7)** — frosted (default), vivid, crystal, smoked, matte, vapor, neon.
-- **Shapes (4)** — round (default), soft, sharp, square.
-- **Motion (4)** — spring (default), smooth, snappy, still. Spring and snappy are real springs: `spring({ stiffness, damping, mass })` emits a CSS `linear()` curve.
-- **Density** — compact, default, comfortable.
-- **Type (8)** — default, system, modern, editorial, friendly, technical, classic, grotesk (each depends on its `registry:font` items).
+Each preset is a shadcn `registry:theme` item, and they compose.
 
-## The engine — `lib/glass-theme.ts` (registry item `glass-theme`, tested)
+- Palettes (12): Dusk, Ocean, Rose, Sage, Amber, Graphite (hand-tuned) + Lavender, Mint, Cherry, Lagoon, Sand, Midnight (generated from a hue).
+- Materials (7): frosted (default), vivid, crystal, smoked, matte, vapor, neon.
+- Shapes (4): round (default), soft, sharp, square.
+- Motion (4): spring (default), smooth, snappy, still. Spring and snappy are real springs: `spring({ stiffness, damping, mass })` emits a CSS `linear()` curve.
+- Density: compact, default, comfortable.
+- Type (8): default, system, modern, editorial, friendly, technical, classic, grotesk (each depends on its `registry:font` items).
 
-- `TOKENS` — the schema: name, group, label, description, light/dark default, control (range / colour / select).
+## The engine
+
+`lib/glass-theme.ts`, shipped as the registry item `glass-theme`, with tests.
+
+- `TOKENS`: the schema, with name, group, label, description, light/dark default, control (range / colour / select).
 - `createGlassTheme({ palette, material, shape, motion, density, type, fonts, tokens, light, dark })` → `{ light, dark }`.
-- `paletteFromHue({ hue, harmony, chroma })` — analogous, complementary, triadic, split, monochrome.
+- `paletteFromHue({ hue, harmony, chroma })`: analogous, complementary, triadic, split, monochrome.
 - `themeToCss`, `themeToRegistryItem` (a ready `registry:theme` JSON you can host or `shadcn add ./file.json`), `themeVars` (inline style), `encodeTheme` / `decodeTheme` (shareable URLs).
 - Fonts: `FONTS`, `TYPE_PRESETS`, `fontStylesheetUrl`, `fontDependencies`, `typeScale`; `themeToCss(theme, { fontImport: true })` prepends the Google Fonts `@import`.
-- `legibility(theme, scheme)` — estimated text contrast on a default pane over the aurora (AA / AAA / low); `legibilityReport(theme, scheme)` — the full matrix (text and secondary text per tier, accent label, accent vs ground), composited in gamma sRGB as browsers do; `accentFor(primary, label)` — moves an accent's lightness until its label reads at AA.
-- `sanitizeValue` / `sanitizeTokens` / `fitsToken` — values are checked before they become CSS (no `;`, braces, comments, `var()` or fetches), and each must fit its token: a number in the right unit, a colour, a select value.
+- `legibility(theme, scheme)`: estimated text contrast on a default pane over the aurora (AA / AAA / low). `legibilityReport(theme, scheme)`: the full matrix (text and secondary text per tier, accent label, accent vs ground), composited in gamma sRGB as browsers do. `accentFor(primary, label)`: moves an accent's lightness until its label reads at AA.
+- `sanitizeValue` / `sanitizeTokens` / `fitsToken`: values are checked before they become CSS (no `;`, braces, comments, `var()` or fetches), and each must fit its token, as a number in the right unit, a colour, a select value.
 
-## Runtime scoping — `ThemeScope` (registry item `theme-scope`)
+## Runtime scoping with `ThemeScope`
 
-`<ThemeScope theme={…} scheme="dark">` (or `type="editorial" loadFonts`) themes a subtree — including its body type: it writes a scoped `<style>` with light/dark rules for its own `data-glass-scope` id, so a card, a section or a preview can wear a different theme from the page.
+Shipped as the registry item `theme-scope`.
 
-- **Preset props write only their groups.** `palette` → Colour; `material` → Material, Liquid, Rim, Depth; `shape` → Shape; `motion` → Motion + aurora speed; `density`, `type`, `fonts` → their own (plus anything else the preset sets). `<ThemeScope shape="sharp">` keeps the page's palette and material. A `theme` prop writes every token.
-- **Small output.** One light rule, then a dark rule with only the values that differ by scheme (`themeScopeCss(selector, props)` returns it, for tests and SSR inspection).
-- **Forced `scheme`.** One rule: the scope's values, shadcn's full neutral set (`background`, `foreground`, `card`, `popover`, `muted`, `secondary`, `accent`, `border`, `input`, `destructive` + foregrounds), `color-scheme` and `color`. Tokens it doesn't name follow the scheme too: a dark scope matches your `.dark` rules by its class; a light one takes the default light values (your accent and charts stay).
-- **`dark:` inside a forced scope.** shadcn's `@custom-variant dark (&:is(.dark *))` matches any `.dark` ancestor, so a light scope in a dark page would still get every `dark:` utility. glasscn's variant follows the *nearest* `.dark` / `.light` (exact three levels deep — page, scope, scope — and correct when next-themes puts `light` on `<html>`):
+`<ThemeScope theme={…} scheme="dark">` (or `type="editorial" loadFonts`) themes a subtree, including its body type. It writes a scoped `<style>` with light/dark rules for its own `data-glass-scope` id, so a card, a section or a preview can wear a different theme from the page.
+
+- Preset props write only their groups. `palette` → Colour; `material` → Material, Liquid, Rim, Depth; `shape` → Shape; `motion` → Motion + aurora speed; `density`, `type`, `fonts` → their own (plus anything else the preset sets). `<ThemeScope shape="sharp">` keeps the page's palette and material. A `theme` prop writes every token.
+- The output is small: one light rule, then a dark rule with only the values that differ by scheme (`themeScopeCss(selector, props)` returns it, for tests and SSR inspection).
+- A forced `scheme` writes one rule: the scope's values, shadcn's full neutral set (`background`, `foreground`, `card`, `popover`, `muted`, `secondary`, `accent`, `border`, `input`, `destructive` + foregrounds), `color-scheme` and `color`. Tokens it doesn't name follow the scheme too: a dark scope matches your `.dark` rules by its class; a light one takes the default light values (your accent and charts stay).
+- `dark:` inside a forced scope: shadcn's `@custom-variant dark (&:is(.dark *))` matches any `.dark` ancestor, so a light scope in a dark page would still get every `dark:` utility. glasscn's variant follows the nearest `.dark` / `.light`. It's exact three levels deep (page, scope, scope) and correct when next-themes puts `light` on `<html>`:
 
   ```css
   @custom-variant dark (&:is(.dark, .dark *):not(:where(.dark .light, .dark .light *):not(:where(.dark .light .dark, .dark .light .dark *))));
@@ -96,4 +113,4 @@ Every shipped palette × material, in both schemes, is tested to WCAG AA by `leg
 
 ## Site
 
-`/themes` — the Theme Studio: every primitive as a control, presets, hue harmony generator, randomise, a scoped live preview (with its own scheme) that continues into a catalogue of every registry item — components and blocks, each with its docs demo, straight from the registry ([`studio-catalogue.md`](studio-catalogue.md)) — legibility badge, export as CSS / registry item / TypeScript / share link, and "apply to the whole site".
+`/themes` is the Theme Studio. It has every primitive as a control, presets, a hue harmony generator, randomise, a legibility badge, export as CSS / registry item / TypeScript / share link, and "apply to the whole site". The scoped live preview has its own scheme and continues into a catalogue of every registry item, components and blocks, each with its docs demo, read straight from the registry ([`studio-catalogue.md`](studio-catalogue.md)).

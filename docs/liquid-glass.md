@@ -1,6 +1,6 @@
-# Liquid Glass — study and alignment plan
+# Liquid Glass study and alignment plan
 
-A study of Apple's Liquid Glass (iOS/iPadOS/macOS 26, refined in 27) — paradigm, material physics, colour, shape, components, motion, accessibility, APIs — and a gap analysis of glasscn against it, ending in a prioritised plan.
+A study of Apple's Liquid Glass (iOS/iPadOS/macOS 26, refined in 27): paradigm, material physics, colour, shape, components, motion, accessibility and APIs. Then a gap analysis of glasscn against it, ending in a prioritised plan.
 
 Sources: Apple's [Liquid Glass technology overview](https://developer.apple.com/documentation/technologyoverviews/liquid-glass), [Adopting Liquid Glass](https://developer.apple.com/documentation/technologyoverviews/adopting-liquid-glass), [Applying Liquid Glass to custom views](https://developer.apple.com/documentation/swiftui/applying-liquid-glass-to-custom-views), the HIG ([Materials](https://developer.apple.com/design/human-interface-guidelines/materials), [Color](https://developer.apple.com/design/human-interface-guidelines/color), [Layout](https://developer.apple.com/design/human-interface-guidelines/layout), [Toolbars](https://developer.apple.com/design/human-interface-guidelines/toolbars), [Tab bars](https://developer.apple.com/design/human-interface-guidelines/tab-bars), [Scroll views](https://developer.apple.com/design/human-interface-guidelines/scroll-views), [Motion](https://developer.apple.com/design/human-interface-guidelines/motion)), WWDC25 sessions [219](https://developer.apple.com/videos/play/wwdc2025/219) (Meet Liquid Glass), [356](https://developer.apple.com/videos/play/wwdc2025/356) (new design system), [323](https://developer.apple.com/videos/play/wwdc2025/323) (SwiftUI), [284](https://developer.apple.com/videos/play/wwdc2025/284) (UIKit), [310](https://developer.apple.com/videos/play/wwdc2025/310) (AppKit), WWDC26 sessions [101](https://developer.apple.com/videos/play/wwdc2026/101), [102](https://developer.apple.com/videos/play/wwdc2026/102), [289](https://developer.apple.com/videos/play/wwdc2026/289), [8120](https://developer.apple.com/videos/play/wwdc2026/8120); web techniques from [kube.io](https://kube.io/blog/liquid-glass-css-svg/) and [Aave](https://aave.com/design/building-glass-for-the-web); critique from [NN/g](https://www.nngroup.com/articles/liquid-glass/). Studied 2026-10-11.
 
@@ -8,21 +8,21 @@ Sources: Apple's [Liquid Glass technology overview](https://developer.apple.com/
 
 ## TL;DR
 
-glasscn is a very good **frosted-material** library (Apple's *standard materials* — ultraThin…thick — plus vibrancy-style fills). Liquid Glass is a different thing: a **lens** that lives only on a **floating control/navigation layer**, with **dynamic light**, **morphing**, and **accessibility-driven adaptivity**. We match its shapes (capsules), one-accent colour discipline and a lot of iOS control anatomy; we miss its paradigm and most of its physics.
+glasscn is a **frosted-material** library: Apple's *standard materials* (ultraThin…thick) plus vibrancy-style fills. Liquid Glass is a different thing: a **lens** that lives only on a **floating control/navigation layer**, with **dynamic light**, **morphing**, and **accessibility-driven adaptivity**. We match its shapes (capsules), one-accent colour discipline and a lot of iOS control anatomy; we miss its paradigm and most of its physics.
 
 The five changes that would move us furthest:
 
-1. **Split the two layers.** Keep today's `glass*` as the *content material*; add a **`liquid`** surface (regular + clear) for the control layer — dock, toolbars, floating buttons, menus, popovers, sheets, knobs — and rewrite the design rules around it.
+1. **Split the two layers.** Keep today's `glass*` as the *content material*; add a **`liquid`** surface (regular + clear) for the control layer (dock, toolbars, floating buttons, menus, popovers, sheets, knobs), and rewrite the design rules around it.
 2. **Accessibility adaptivity** (cheap, overdue): `prefers-reduced-transparency`, `prefers-contrast`, `forced-colors`, plus a **clarity** primitive that mirrors iOS 27's "clear ↔ tinted" slider.
 3. **Light, not a static sheen:** a two-sided specular rim with a light angle, the iOS 27 darkened edge, pointer-driven illumination on press, adaptive shadow.
 4. **Concentric shapes** (`inner = outer − padding`, with a minimum) and continuous corners where the browser has them.
 5. **The missing navigation layer:** floating `Toolbar`, scroll-edge effect, dock minimise-on-scroll + bottom accessory + search tab, sheet detents, morph-from-source menus, glass knobs on switch/slider/segmented control.
 
-Refraction (true lensing) is the headline effect but the least portable on the web — ship it as a Chromium-only progressive layer on small control-layer elements, never as the base.
+Refraction (true lensing) is the headline effect but the least portable on the web. Ship it as a Chromium-only progressive layer on small control-layer elements, never as the base.
 
 ---
 
-## Part 1 — What Liquid Glass is
+## Part 1: What Liquid Glass is
 
 ### 1.1 Paradigm
 
@@ -31,7 +31,7 @@ Refraction (true lensing) is the headline effect but the least portable on the w
 - **One floating plane.** Controls live on a single glass plane that morphs between contexts rather than separate panels appearing and disappearing. (219)
 - **Hierarchy by layout and grouping, not decoration.** Remove custom bar backgrounds, borders and `presentationBackground`. (356)
 - **Hardware harmony.** Corner radii derive from the device/window: nested shapes are concentric with their container. (Adopting)
-- **Edge to edge.** Content runs under bars and sidebars; a *scroll edge effect* — not an opaque bar — keeps controls legible. (HIG Layout)
+- **Edge to edge.** Content runs under bars and sidebars; a *scroll edge effect*, not an opaque bar, keeps controls legible. (HIG Layout)
 - **Never glass on glass.** Things on glass use fills, transparency and vibrancy. Glass cannot sample other glass, so related glass shapes share one container. (219, 323)
 
 ### 1.2 Material anatomy
@@ -43,7 +43,7 @@ Apple publishes no blur radii or refraction indices; it publishes behaviours.
 | **Lensing** | "Bends, shapes and concentrates light" rather than scattering it. Refraction at the **edges** defines the silhouette; the centre stays readable. |
 | **Specular highlights** | Virtual lights produce highlights that **respond to geometry** and move on interaction (and, sometimes, device motion). iOS 27: **brighter speculars plus a darkened edge.** |
 | **Adaptive shadow** | Shadow opacity **rises over text**, falls over light flat backgrounds. |
-| **Illumination** | On touch the material "illuminates from within" — a glow starting under the finger that spreads through the element and onto nearby glass. |
+| **Illumination** | On touch the material "illuminates from within": a glow starting under the finger that spreads through the element and onto nearby glass. |
 | **Tint / dynamic range** | Tint and range shift continuously to keep glyphs legible. |
 | **Thickness by size** | Larger glass (a menu grown from a button) reads thicker: deeper shadow, stronger lensing, softer scatter. Sidebars are more opaque than buttons. |
 | **Light/dark flip** | *Small* elements (bars, buttons) flip light↔dark with the content beneath; glyphs follow monochromatically. *Large* elements adapt but don't flip. |
@@ -53,9 +53,9 @@ Apple publishes no blur radii or refraction indices; it publishes behaviours.
 
 ### 1.3 Variants, tint and colour
 
-- **`regular`** — default; blurs and adjusts luminosity; fully adaptive; for anything, any size, text on top.
-- **`clear`** — highly translucent, **no adaptive behaviour**; only over media, only if a dimming layer is acceptable, only with bold bright content on top. Bright media: add a **35% dark dimming layer**. **Never mix regular and clear.**
-- **`identity`** — no effect (for toggling).
+- **`regular`**: default; blurs and adjusts luminosity; fully adaptive; for anything, any size, text on top.
+- **`clear`**: highly translucent, **no adaptive behaviour**; only over media, only if a dimming layer is acceptable, only with bold bright content on top. Bright media: add a **35% dark dimming layer**. **Never mix regular and clear.**
+- **`identity`**: no effect (for toggling).
 - **Tint** maps a colour to a *range of tones* by the brightness underneath, like real coloured glass. Use for meaning (primary action, status), not decoration. **Colour the background of a prominent button, not its label.** Never a solid opaque fill on a glass button.
 - **Colour discipline:** glass has no colour of its own. One prominent (tinted) action per toolbar; monochrome toolbars/tab bars in colourful apps; monochrome icons in bars; avoid similar hues in content and controls; every custom colour needs light, dark and increased-contrast variants.
 
@@ -81,7 +81,7 @@ Apple publishes no blur radii or refraction indices; it publishes behaviours.
 | **Menu / popover** | **The button morphs into the menu.** Leading icons on items. |
 | **Action sheet / confirmation** | Originates from the source element, not the screen bottom. |
 | **Buttons** | `glass`, `glassProminent` (tinted), `clear`; capsule default; one or two prominent per view; always a press state. |
-| **Switch / slider / segmented** | **Knob turns into glass while dragging** — a lens over the value; momentum and stretch. Slider: tick marks, neutral value (fill origin), thumbless progress style. |
+| **Switch / slider / segmented** | **Knob turns into glass while dragging**: a lens over the value; momentum and stretch. Slider: tick marks, neutral value (fill origin), thumbless progress style. |
 | **Search** | iPhone: bottom toolbar field that can minimise to a button, or a search tab. iPad/Mac: top trailing. |
 | **Alerts** | Bolder, left-aligned text. |
 | **App icons / widgets** | Layered, with system speculars/refraction; clear and tinted appearances. |
@@ -89,19 +89,19 @@ Apple publishes no blur radii or refraction indices; it publishes behaviours.
 ### 1.6 Motion and interaction
 
 - `.interactive()`: on touch the glass **scales, bounces and shimmers**; gel-like flex. Touch reads stronger than pointer.
-- **Morphing** — `GlassEffectContainer(spacing:)` blends shapes nearer than `spacing`; `glassEffectID` + namespace morphs between states; transitions `matchedGeometry` (near), `materialize` (far), `identity`; `glassEffectUnion` merges at rest.
-- **Source-anchored presentations** — menus, popovers, sheets, alerts flow out of their control.
+- **Morphing**: `GlassEffectContainer(spacing:)` blends shapes nearer than `spacing`; `glassEffectID` + namespace morphs between states; transitions `matchedGeometry` (near), `materialize` (far), `identity`; `glassEffectUnion` merges at rest.
+- **Source-anchored presentations**: menus, popovers, sheets, alerts flow out of their control.
 - **Materialise, don't fade.**
 
 ### 1.7 Accessibility and user control
 
 - **Reduce Transparency** → frostier, obscures more. **Increase Contrast** → predominantly black/white with a contrasting border. **Reduce Motion** → weaker effects, **no elasticity**.
-- **User clarity setting** — iOS 26.1 added *Clear / Tinted*; **iOS 27 replaced it with a continuous slider "ultra clear → fully tinted"**, applied to all glass apps without recompiling. Apple's answer to legibility critique (NN/g: low contrast over busy content, text over text, floating controls hiding content).
+- **User clarity setting**: iOS 26.1 added *Clear / Tinted*; **iOS 27 replaced it with a continuous slider "ultra clear → fully tinted"**, applied to all glass apps without recompiling. Apple's answer to legibility critique (NN/g: low contrast over busy content, text over text, floating controls hiding content).
 - Icon-only buttons need labels.
 
 ### 1.8 What changed in 27 (June 2026)
 
-Material retuned (diffuses complex content better, darkened edge, brighter speculars, more uniform refraction, better contrast); clarity slider; uniform toolbar under floating bars; edge-to-edge sidebars with accent icons on Mac/iPad; uniform window radius on Mac; AppKit glass bounces on click; `TabRole.prominent`, toolbar minimisation APIs; the `UIDesignRequiresCompatibility` opt-out is gone — every app recompiled with Xcode 27 gets Liquid Glass. No new `Glass` variants.
+Material retuned (diffuses complex content better, darkened edge, brighter speculars, more uniform refraction, better contrast); clarity slider; uniform toolbar under floating bars; edge-to-edge sidebars with accent icons on Mac/iPad; uniform window radius on Mac; AppKit glass bounces on click; `TabRole.prominent`, toolbar minimisation APIs; the `UIDesignRequiresCompatibility` opt-out is gone, so every app recompiled with Xcode 27 gets Liquid Glass. No new `Glass` variants.
 
 ### 1.9 Platform APIs (for the native track and naming)
 
@@ -112,22 +112,22 @@ Material retuned (diffuses complex content better, darkened edge, brighter specu
 | Group / morph | `GlassEffectContainer(spacing:)`, `glassEffectID`, `glassEffectUnion`, `glassEffectTransition` | `UIGlassContainerEffect` | `NSGlassEffectContainerView` | `GlassContainer spacing`; `@expo/ui` `glassEffectId` + `Namespace` |
 | Buttons | `.glass`, `.glassProminent` | `.glass()`, `.prominentGlass()`, `.clearGlass()` | `BezelStyle.glass`, `tintProminence` | `@expo/ui` `buttonStyle('glass'│'glassProminent')` |
 | Scroll edge | `scrollEdgeEffectStyle(.soft/.hard)` | `UIScrollEdgeEffect` | `NSScrollEdgeEffectStyle` | system bars (`headerTransparent`, `NativeTabs`) |
-| Corners | `ConcentricRectangle`, `.concentric(minimum:)` | `UICornerConfiguration`, `.containerConcentric` | `NSViewCornerConfiguration` (27) | — |
-| Tab bar | `tabBarMinimizeBehavior`, `tabViewBottomAccessory`, `Tab(role: .search)` | `UITabAccessory`, `UISearchTab` | — | `NativeTabs minimizeBehavior`, `BottomAccessory`, `role="search"` |
+| Corners | `ConcentricRectangle`, `.concentric(minimum:)` | `UICornerConfiguration`, `.containerConcentric` | `NSViewCornerConfiguration` (27) | none |
+| Tab bar | `tabBarMinimizeBehavior`, `tabViewBottomAccessory`, `Tab(role: .search)` | `UITabAccessory`, `UISearchTab` | none | `NativeTabs minimizeBehavior`, `BottomAccessory`, `role="search"` |
 
 ---
 
-## Part 2 — Where glasscn stands
+## Part 2: Where glasscn stands
 
 ### 2.1 Scorecard
 
 | Area | Apple | glasscn today | Fit |
 |---|---|---|---|
-| Layer model | Glass only on control/navigation layer; content uses standard materials | Glass everywhere — cards, stats, panes, controls — with a "two levels max" rule | ❌ paradigm gap |
+| Layer model | Glass only on control/navigation layer; content uses standard materials | Glass everywhere (cards, stats, panes, controls) with a "two levels max" rule | ❌ paradigm gap |
 | Material | Lens: refraction at edges, dynamic speculars, adaptive shadow, illumination | Frost: blur + saturate + brightness, static linear sheen, 1px top highlight, one drop shadow, optional grain | ⚠️ good *material*, not *liquid* |
 | Variants | `regular` / `clear` (+35% dim) / `identity`; never mixed | `subtle` / default / `strong` intensities; tint none/primary/destructive; 7 material presets | ⚠️ intensity ≠ variant; no `clear` |
 | Light | Speculars follow geometry and interaction; 27 darkened edge | Fixed-angle sheen | ❌ |
-| Adaptivity | Small glass flips light/dark with content; shadow tracks content | Scheme from `.dark` only | ❌ (web can't sample the backdrop — see 3.6) |
+| Adaptivity | Small glass flips light/dark with content; shadow tracks content | Scheme from `.dark` only | ❌ (web can't sample the backdrop; see 3.6) |
 | Tint | Tone range; colour the prominent button's glass | `tinted` button = 16% primary fill; default button = **solid** primary; `DockAction` solid accent | ⚠️ |
 | Shape | Capsule / fixed / concentric with minimum | Capsule buttons ✅, radius tokens ✅, fixed `×0.75` inner radii, native `radius − 6` hacks | ⚠️ no concentric system |
 | Continuous corners | Squircle everywhere | Native `borderCurve: continuous` ✅; web none | ⚠️ |
@@ -151,12 +151,12 @@ Material retuned (diffuses complex content better, darkened edge, brighter specu
 | Colour discipline | One accent, monochrome bars | One `--primary`, OKLCH, `--chart-*` ✅ | ✅ |
 | Native iOS 26 | Real glass | `GlassView` regular + tint + interactive ✅; no `clear`, no `GlassContainer`, no reduce-transparency check | ⚠️ |
 | Native Android | (no system glass; tonal surfaces) | Plain 88–90% fill | ⚠️ acceptable, blur now possible |
-| Native web (RN-web) | — | Hard-coded `blur(28px) saturate(180%)`, ignores tokens | ⚠️ |
+| Native web (RN-web) | n/a | Hard-coded `blur(28px) saturate(180%)`, ignores tokens | ⚠️ |
 
 ### 2.2 Paradigm misalignments (the important part)
 
-1. **Glass is our content.** `Card`, `Stat`, `GroupedList`, chart hosts and blocks are all frosted panes over an aurora — the 2021 *glassmorphism* paradigm. Apple's is the inverse: content is opaque or standard-material, and glass is reserved for the thin layer of controls floating over it. Our rules 3 and 4 ("two levels of glass", "intensity follows elevation") are a reasonable glassmorphism system but say nothing about *what kind* of element may be glass.
-2. **Glass needs an aurora (rule 1).** Apple's glass needs *content scrolling underneath*, not a decorative gradient. Every demo we ship shows panes on an aurora; none shows a floating control over real scrolling content (photos, text, a list) — the canonical Liquid Glass scene.
+1. **Glass is our content.** `Card`, `Stat`, `GroupedList`, chart hosts and blocks are all frosted panes over an aurora, the 2021 *glassmorphism* paradigm. Apple's is the inverse: content is opaque or standard-material, and glass is reserved for the thin layer of controls floating over it. Our rules 3 and 4 ("two levels of glass", "intensity follows elevation") are a reasonable glassmorphism system but say nothing about *what kind* of element may be glass.
+2. **Glass needs an aurora (rule 1).** Apple's glass needs *content scrolling underneath*, not a decorative gradient. Every demo we ship shows panes on an aurora; none shows a floating control over real scrolling content (photos, text, a list), which is the canonical Liquid Glass scene.
 3. **"Strong" is opacity, not thickness.** Apple's large glass is thicker (deeper shadow, stronger lensing, more opaque) and small glass flips tone. Ours scales only opacity.
 4. **Fading.** Our overlays fade + zoom. Liquid Glass materialises (lens/blur modulation + scale). Native already learned this the hard way (`canFade()`).
 5. **Solid accent buttons.** The default `Button` and `DockAction` are solid `--primary` fills; Apple's prominent action is *tinted glass*. Solid opaque fills "break the visual character".
@@ -165,7 +165,7 @@ What we already get right and should keep: the primitives-vs-derived engine (it 
 
 ---
 
-## Part 3 — How to align
+## Part 3: How to align
 
 Every proposal respects the five AGENTS.md rules: new tokens are **primitives** in `src/lib/glass-theme.ts`; derived values are computed in `registry/stylesheet.mjs` utilities; components use tokens only.
 
@@ -173,15 +173,15 @@ Every proposal respects the five AGENTS.md rules: new tokens are **primitives** 
 
 - Keep `glass` / `glass-subtle` / `glass-strong` exactly as they are and **document them as the content material** (Apple's standard materials). No breaking change.
 - Add a **`liquid`** surface family for the control layer:
-  - `@utility glass-liquid` — `regular`: lower base opacity than `glass`, tighter blur, two-sided specular rim (3.2), darkened edge, adaptive-ready shadow, `isolation: isolate`.
-  - `@utility glass-liquid-clear` — `clear`: very low opacity, small blur, no tone adaptivity, paired with an optional dim (`--glass-dim`, default 35% when used over media).
+  - `@utility glass-liquid`: `regular`: lower base opacity than `glass`, tighter blur, two-sided specular rim (3.2), darkened edge, adaptive-ready shadow, `isolation: isolate`.
+  - `@utility glass-liquid-clear`: `clear`: very low opacity, small blur, no tone adaptivity, paired with an optional dim (`--glass-dim`, default 35% when used over media).
   - `Glass` gets `variant: "material" | "liquid" | "liquid-clear"` (cva in `glass-variants.ts`), keeping `intensity` for material.
 - Move control-layer parts to `liquid`: `Dock`, `DockAction`, `Toolbar` (new), floating `chat` composer and jump button, `Tooltip`, `Popover`, `DropdownMenu`, `Sheet`, `Dialog`, switch/slider/segmented knobs *while active*, `Button variant="glass"`.
 - **Rules rewrite** (`docs/rules/design.md`):
   - Glass (liquid) is for controls and navigation floating over content; content uses the material or opaque fills.
   - Never liquid on liquid; group neighbouring liquid elements in one group (3.5).
   - `regular` by default; `clear` only over media with a dim; never mix in one view.
-  - Rule 1 becomes "glass needs content beneath it" — aurora *or* real content.
+  - Rule 1 becomes "glass needs content beneath it": aurora *or* real content.
 - Add an "over content" demo scene: a photo grid / long article scrolling under a `Toolbar` and `Dock`.
 
 ### 3.2 Light: speculars, edge, illumination, shadow
@@ -199,11 +199,11 @@ New primitives (Material/Rim/Depth groups):
 Rendering (all in utilities, all evaluated per element):
 
 - **Two-sided rim** via a `::before` gradient stroke: `conic-gradient(from var(--glass-light-angle), specular, transparent 25%, edge-shade 50%, transparent 75%, specular)` masked to the border with `mask-composite: exclude`. Replaces the single `inset 0 1px 0` highlight on liquid surfaces; material surfaces keep theirs.
-- **Interactive illumination**: a `::after` `radial-gradient(circle at var(--glass-press-x) var(--glass-press-y), illumination, transparent 60%)` with `mix-blend-mode: plus-lighter`, faded in on `:active` / `data-pressed`. A tiny hook (`use-glass-pointer`, registry:hook) writes `--glass-press-x/y` on `pointerdown/move` in rAF — no React state.
+- **Interactive illumination**: a `::after` `radial-gradient(circle at var(--glass-press-x) var(--glass-press-y), illumination, transparent 60%)` with `mix-blend-mode: plus-lighter`, faded in on `:active` / `data-pressed`. A tiny hook (`use-glass-pointer`, registry:hook) writes `--glass-press-x/y` on `pointerdown/move` in rAF, with no React state.
 - **Optional pointer/tilt light**: the same hook can rotate `--glass-light-angle` toward the pointer for hover devices (off by default, off under reduced motion).
 - **Adaptive shadow**: bars read `data-over-content` (set by the scroll-edge observer, 3.4) and multiply shadow opacity.
 
-### 3.3 Accessibility and the clarity slider (do first — cheap, high value)
+### 3.3 Accessibility and the clarity slider (do first: cheap, high value)
 
 In `registry/stylesheet.mjs`, override **primitives** (so it composes with every theme and `ThemeScope`):
 
@@ -222,10 +222,10 @@ In `registry/stylesheet.mjs`, override **primitives** (so it composes with every
 }
 ```
 
-Once 3.2 and 3.6 land, the same blocks zero `--glass-specular`, `--glass-illumination` and `--glass-refraction`. Increase-contrast also needs a dark-scheme border colour that contrasts (`--glass-border-color` → `CanvasText`-like black/white per scheme). Safari doesn't support `prefers-reduced-transparency` — hence the clarity control:
+Once 3.2 and 3.6 land, the same blocks zero `--glass-specular`, `--glass-illumination` and `--glass-refraction`. Increase-contrast also needs a dark-scheme border colour that contrasts (`--glass-border-color` → `CanvasText`-like black/white per scheme). Safari doesn't support `prefers-reduced-transparency`, hence the clarity control:
 
 - **`glass-clarity`** primitive, 0 (ultra clear) → 1 (fully tinted), default ≈ 0.35. Derived opacity in utilities becomes `calc(var(--glass-opacity) + (100% - var(--glass-opacity)) * var(--glass-clarity))`, blur and dim scale with it. One number, matching iOS 27's slider.
-- A `GlassPreferences` component (registry:ui) — a slider + "reduce transparency" switch writing `--glass-clarity` on `:root` and persisting to `localStorage` — and expose it on the docs site.
+- A `GlassPreferences` component (registry:ui): a slider + "reduce transparency" switch writing `--glass-clarity` on `:root` and persisting to `localStorage`. Expose it on the docs site.
 - `legibility()` gains a `clarity` input and reports the worst case at the theme's default clarity.
 
 Native: read `AccessibilityInfo.isReduceTransparencyEnabled()` and `isBoldTextEnabled()` (iOS); under reduce transparency skip `GlassView`/`BlurView` and render `glassSolid`. iOS honours the system clarity slider by itself.
@@ -284,9 +284,9 @@ Native: read `AccessibilityInfo.isReduceTransparencyEnabled()` and `isBoldTextEn
 
 ---
 
-## Part 4 — Plan
+## Part 4: Plan
 
-The full, ID'd backlog — this study's items plus the October 2026 audit of every component, the engine, native, the site and the market — lives in [`roadmap.md`](roadmap.md), sequenced into milestones M0–M7. Mapping from this study:
+The full, ID'd backlog (this study's items plus the October 2026 audit of every component, the engine, native, the site and the market) lives in [`roadmap.md`](roadmap.md), sequenced into milestones M0–M7. Mapping from this study:
 
 | Study section | Roadmap items |
 |---|---|
@@ -305,7 +305,7 @@ Component-level Apple specs (metrics, button order, menus, sheets, charts, type 
 ## Open questions
 
 - Should `default` `Button` stay solid (shadcn parity) or become `prominent` glass? Recommendation: stay solid, add `prominent`.
-- Should cards move off glass by default (Apple-strict) or stay frosted material (current look)? Recommendation: stay frosted — it *is* Apple's standard material — but stop calling it Liquid Glass and stop putting liquid surfaces on it.
-- Unverified: Firefox's current behaviour with `backdrop-filter: url()` (an open bug says broken, a 2026 svgwg comment says it works — test before relying on it).
-- Answered: `ControlSize.extraLarge` "resolves to `.large` on platforms other than visionOS" — an `xl` size is our choice, not Apple parity.
+- Should cards move off glass by default (Apple-strict) or stay frosted material (current look)? Recommendation: stay frosted, because it *is* Apple's standard material, but stop calling it Liquid Glass and stop putting liquid surfaces on it.
+- Unverified: Firefox's current behaviour with `backdrop-filter: url()` (an open bug says broken, a 2026 svgwg comment says it works; test before relying on it).
+- Answered: `ControlSize.extraLarge` "resolves to `.large` on platforms other than visionOS", so an `xl` size is our choice, not Apple parity.
 - The material preset named `liquid` must be renamed before the `glass-liquid` surface ships (ENG-34).

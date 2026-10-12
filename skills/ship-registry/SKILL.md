@@ -1,6 +1,6 @@
 ---
 name: ship-registry
-description: Release glasscn — regenerate, run every check including the real install into a fresh Next app and the native check, build the docs site and registry with the right URL, and deploy. Use before merging registry changes, cutting a release, or deploying glasscn.
+description: Release glasscn. Regenerate, run every check including the real install into a fresh Next app and the native check, build the docs site and registry with the right URL, and deploy. Use before merging registry changes, cutting a release, or deploying glasscn.
 ---
 
 # Ship the registry
@@ -19,8 +19,8 @@ pnpm verify:native                 # native items from the registry into a copy 
 NEXT_PUBLIC_REGISTRY_URL=https://glasscn.app pnpm build
 ```
 
-- `verify:install` takes ~3 minutes and needs the network (create-next-app, npm). Run it whenever items, files, dependencies or the stylesheet change. It caught: colliding file names, a deadlocked static server, and wrong preset ordering assumptions.
-- `pnpm build` stamps `{REGISTRY_URL}`: `NEXT_PUBLIC_REGISTRY_URL`, else `https://glasscn.app` when `VERCEL` is set, else localhost. A local build without it ships localhost URLs in `public/r/*.json` — check one file before deploying.
+- `verify:install` takes about 3 minutes and needs the network (create-next-app, npm). Run it whenever items, files, dependencies or the stylesheet change. It caught: colliding file names, a deadlocked static server, and wrong preset ordering assumptions.
+- `pnpm build` stamps `{REGISTRY_URL}`: `NEXT_PUBLIC_REGISTRY_URL`, else `https://glasscn.app` when `VERCEL` is set, else localhost. A local build without it ships localhost URLs in `public/r/*.json`, so check one file before deploying.
 - Look at the site: `/`, `/themes` (presets, a slider, export, share link), one component page, light and dark, phone width.
 
 ## Deploy

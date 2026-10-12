@@ -1,6 +1,6 @@
 # glasscn native sandbox
 
-An Expo app that renders every `native-*` registry item live from `../../registry/native` — for checking the native track on the iOS simulator, Expo Go, Android and the web.
+An Expo app that renders every `native-*` registry item live from `../../registry/native`. Use it to check the native track on the iOS simulator, Expo Go, Android and the web.
 
 ```bash
 npm install

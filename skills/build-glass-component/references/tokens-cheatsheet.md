@@ -6,7 +6,7 @@
 | A control fill on glass | `bg-fill`, hover `bg-fill-strong` | `bg-muted`, `bg-black/5` |
 | An edge on glass | `border-glass-border` | `border-border` |
 | Accent | `bg-primary text-primary-foreground`, washes `bg-primary/16 text-primary` | any palette colour class |
-| Data colours | `var(--chart-1..5)` / `bg-chart-2` | hard-coded colours |
+| Data colours | `var(--chart-1..8)` / `bg-chart-2` | hard-coded colours |
 | Surface corners | `rounded-surface`, smaller `rounded-surface-sm` | `rounded-3xl` |
 | Control corners | `rounded-control`, inner `rounded-control-sm` | `rounded-xl` |
 | Button / pill corners | `rounded-button` | `rounded-full` (only for truly circular things: dots, knobs) |
