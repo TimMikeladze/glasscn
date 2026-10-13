@@ -14,7 +14,6 @@ import { HomeExamples } from "@/components/site/home-examples"
 import { ThemeStrip } from "@/components/site/theme-strip"
 import { InstallCommand } from "@/components/site/install-command"
 import { ControlsSampler } from "@/components/site/controls-sampler"
-import { PaletteDock } from "@/components/site/palette-dock"
 import AreaChartDemo from "@/components/demos/area-chart"
 import BarListDemo from "@/components/demos/bar-list"
 import CategoryBarDemo from "@/components/demos/category-bar"
@@ -231,7 +230,6 @@ export default function Home() {
           </CardContent>
         </Card>
       </section>
-      <PaletteDock />
     </main>
   )
 }

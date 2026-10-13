@@ -24,7 +24,7 @@ component appears on it live, plus composed examples that only exist on the home
     tabs (Surfaces, Typography, Controls, Overlays, Navigation, Data, Chat), each a grid of tiles
     that render the item's own docs demo from `demos` and link to `/docs/<slug>`. It's driven by the
     registry, so new items show up without editing the page. Blocks are excluded, since they're shown in full above.
-11. **CTA** + `PaletteDock`.
+11. **CTA**.
 
 ## Decisions
 
