@@ -5,7 +5,7 @@ import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTi
 
 export default function EmptyDemo() {
   return (
-    <div className="grid w-full gap-4 sm:grid-cols-2">
+    <div className="grid w-full gap-4 @lg:grid-cols-2">
       <Empty className="bg-fill">
         <EmptyHeader>
           <EmptyMedia variant="icon">

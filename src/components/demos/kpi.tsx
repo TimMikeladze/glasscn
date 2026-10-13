@@ -14,7 +14,7 @@ export default function KpiDemo() {
       <CardHeader>
         <CardTitle>This week</CardTitle>
       </CardHeader>
-      <CardContent className="grid gap-3 sm:grid-cols-3">
+      <CardContent className="grid gap-3 @lg:grid-cols-3">
         <Kpi label="Steps" icon={<FootprintsIcon />} value={54140} trend={{ value: 0.12 }} description="vs last week" chart={<Sparkline data={steps} height={36} dot={false} />} />
         {/* resting heart rate going down is the good direction */}
         <Kpi label="Resting HR" icon={<HeartPulseIcon />} value={58} format={(v) => `${v} bpm`} trend={{ value: -3, good: "down", format: (v) => `${v} bpm` }} description="7-day average" />

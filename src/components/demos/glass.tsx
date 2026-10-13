@@ -34,7 +34,7 @@ export default function GlassDemo() {
       </div>
 
       {/* Liquid: the control layer, floating over real content */}
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 @lg:grid-cols-2">
         <figure className="grid gap-2">
           <div className={frame}>
             {/* edge to edge: the content runs under the bars */}

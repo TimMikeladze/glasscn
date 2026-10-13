@@ -23,7 +23,7 @@ export function ComponentPreview({ children, html, code, wide = false }: { child
         <div
           className={cn(
             // an aurora ground, not a glass pane: the demo's glass is the only glass (UX-06)
-            "relative isolate flex min-h-72 items-center justify-center overflow-hidden rounded-3xl border border-glass-border",
+            "@container relative isolate flex min-h-72 items-center justify-center overflow-hidden rounded-3xl border border-glass-border",
             wide ? "p-4 sm:p-8" : "p-6 sm:p-12"
           )}
         >

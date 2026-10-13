@@ -37,7 +37,7 @@ export function ComponentGallery({ items }: { items: GalleryItem[] }) {
                 const Demo = demos[item.slug]
                 return (
                   <article key={item.slug} className="glass flex min-w-0 flex-col overflow-hidden rounded-surface">
-                    <div className="relative flex min-h-64 flex-1 items-center justify-center overflow-hidden p-6">{Demo ? <Demo /> : null}</div>
+                    <div className="@container relative flex min-h-64 flex-1 items-center justify-center overflow-hidden p-6">{Demo ? <Demo /> : null}</div>
                     <Link href={`/docs/${item.slug}`} className="group flex items-start gap-3 border-t border-glass-border px-5 py-4 transition-colors hover:bg-fill">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 font-semibold">

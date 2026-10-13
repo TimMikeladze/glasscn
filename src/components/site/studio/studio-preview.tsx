@@ -260,7 +260,7 @@ export function StudioPreview({ theme, scheme, ground = "aurora" }: { theme: Gla
               {items.map(({ slug, title, Demo }) => (
                 <figure key={slug} className={cn("grid gap-4 rounded-surface border border-glass-border p-4 sm:p-5", group === "Blocks" && "md:col-span-2")}>
                   <figcaption className="type-glass-heading text-sm">{title}</figcaption>
-                  <div className="flex min-h-32 items-center justify-center overflow-x-auto">
+                  <div className="@container flex min-h-32 items-center justify-center overflow-x-auto">
                     <Demo />
                   </div>
                 </figure>

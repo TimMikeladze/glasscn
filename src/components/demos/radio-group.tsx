@@ -5,7 +5,7 @@ import { RadioGroup, RadioGroupCard, RadioGroupItem } from "@/components/glass/r
 
 export default function RadioGroupDemo() {
   return (
-    <div className="grid w-full max-w-md gap-8 sm:grid-cols-2">
+    <div className="grid w-full max-w-md gap-8 @lg:grid-cols-2">
       <RadioGroup defaultValue="evening" aria-label="Reminder time">
         {[
           ["morning", "Morning"],
