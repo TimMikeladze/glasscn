@@ -1,0 +1,5 @@
+{"AXLabel": "System glass action", "type": "Button", "role": "AXButton", "role_description": "button", "enabled": true, "traits": ["Button", "Scrollable"], "custom_actions": [], "subrole": null}
+{"AXLabel": "Disabled", "type": "Button", "role": "AXButton", "role_description": "button", "enabled": false, "traits": ["NotEnabled", "Button", "Scrollable"], "custom_actions": [], "subrole": null}
+{"AXLabel": "Toggle extra", "type": "Button", "role": "AXButton", "role_description": "button", "enabled": true, "traits": ["Button", "Scrollable"], "custom_actions": [], "subrole": null}
+{"AXLabel": "Reject large:, true", "type": "Button", "role": "AXButton", "role_description": "button", "enabled": true, "traits": ["Button", "Scrollable"], "custom_actions": [], "subrole": null}
+{"AXLabel": "Open system inspector", "type": "Button", "role": "AXButton", "role_description": "button", "enabled": true, "traits": ["Button", "Scrollable"], "custom_actions": [], "subrole": null}

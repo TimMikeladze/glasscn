@@ -1,0 +1,185 @@
+[
+{
+"AXLabel": null,
+"AXValue": "1",
+"type": "CheckBox",
+"role_description": "switch",
+"traits": [
+"Toggle",
+"Button",
+"Scrollable"
+],
+"enabled": true,
+"frame": {
+"x": 24,
+"y": 340.3333377838135,
+"width": 61,
+"height": 28
+}
+},
+{
+"AXLabel": "Reminders small",
+"AXValue": "1",
+"type": "CheckBox",
+"role_description": "switch",
+"traits": [
+"Toggle",
+"Button",
+"Scrollable"
+],
+"enabled": true,
+"frame": {
+"x": 97,
+"y": 344.3333377838135,
+"width": 44,
+"height": 20
+}
+},
+{
+"AXLabel": "Reminders glass",
+"AXValue": "1",
+"type": "CheckBox",
+"role_description": "switch",
+"traits": [
+"Toggle",
+"Button",
+"Scrollable"
+],
+"enabled": true,
+"frame": {
+"y": 431.6666660308838,
+"width": 63,
+"height": 28,
+"x": 16
+}
+},
+{
+"AXLabel": null,
+"AXValue": "1",
+"type": "CheckBox",
+"role_description": "switch",
+"traits": [
+"Toggle",
+"Button",
+"Scrollable"
+],
+"enabled": true,
+"frame": {
+"width": 63,
+"y": 431.6666660308838,
+"height": 28,
+"x": 91
+}
+},
+{
+"AXLabel": null,
+"AXValue": "0",
+"type": "CheckBox",
+"role_description": "switch",
+"traits": [
+"Toggle",
+"Button",
+"Scrollable"
+],
+"enabled": true,
+"frame": {
+"x": 166,
+"y": 431.6666660308838,
+"width": 63,
+"height": 28
+}
+},
+{
+"AXLabel": null,
+"AXValue": "1",
+"type": "CheckBox",
+"role_description": "switch",
+"traits": [
+"Toggle",
+"Button",
+"Scrollable"
+],
+"enabled": true,
+"frame": {
+"x": 24,
+"y": 523.0000095367432,
+"width": 61,
+"height": 28
+}
+},
+{
+"AXLabel": null,
+"AXValue": "0",
+"type": "CheckBox",
+"role_description": "switch",
+"traits": [
+"Toggle",
+"Button",
+"Scrollable"
+],
+"enabled": true,
+"frame": {
+"y": 523.0000095367432,
+"x": 105,
+"width": 61,
+"height": 28
+}
+},
+{
+"AXLabel": null,
+"AXValue": "1",
+"type": "CheckBox",
+"role_description": "switch",
+"traits": [
+"NotEnabled",
+"Toggle",
+"Scrollable",
+"Button"
+],
+"enabled": false,
+"frame": {
+"y": 590.6666660308838,
+"width": 61,
+"x": 24,
+"height": 28
+}
+},
+{
+"AXLabel": null,
+"AXValue": "0",
+"type": "CheckBox",
+"role_description": "switch",
+"traits": [
+"NotEnabled",
+"Toggle",
+"Scrollable",
+"Button"
+],
+"enabled": false,
+"frame": {
+"x": 97,
+"y": 594.6666660308838,
+"width": 44,
+"height": 20
+}
+},
+{
+"AXLabel": null,
+"AXValue": "1",
+"type": "CheckBox",
+"role_description": "switch",
+"traits": [
+"NotEnabled",
+"Toggle",
+"Scrollable",
+"Button"
+],
+"enabled": false,
+"frame": {
+"height": 28,
+"x": 153,
+"y": 590.6666660308838,
+"width": 63
+}
+}
+]

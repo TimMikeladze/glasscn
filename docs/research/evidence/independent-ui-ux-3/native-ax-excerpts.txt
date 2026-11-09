@@ -1,0 +1,36 @@
+# idb ui describe-all excerpts (type|role|label|value|x,y,w,h in pt), iPhone 18 Pro iOS 27.0, Expo Go 57.0.9
+
+## materials (scheme=light): no "Playback progress" element (N-1)
+StaticText|text|Balance · 0||38,351,326,23
+Slider|slider|Neutral balance|0|189,400,24,24
+StaticText|text|Progress · 35%||38,450,326,23
+StaticText|text|Control inset · 12||38,557,326,23
+Slider|slider|Control inset|0.4000000059604645|38,582,326,31
+
+## action-sheet-contracts open (N-20): one action, disabled Delete omitted
+StaticText|text|Night 311||179,111,180,20
+StaticText|text|Choose what to do with this entry.||179,139,180,38
+Button|button|Archive entry||165,198,208,48
+## after passive dismiss / after reopen + Archive
+StaticText|text|Actions: 0 · source presses: 1 / Open changes: true, false
+StaticText|text|Actions: 1 · source presses: 2 / Open changes: true, false, true, false
+
+## search predictions (N-13): suggestion above, field pushed from y=237 to y=301
+Button|button|Alpine lake||44,237,314,43
+TextField|search text field|Search all collections|Al|78,301,187,36
+
+## search AX5 (N-15)
+Button|button|Search destination||38,276,143,48
+Button|button|Search now||189,276,211,48   (screen width 402)
+
+## music AX5 (N-3)
+GenericElement||Home||36,337,330,97
+GenericElement||Library||36,439,330,97
+GenericElement||Radio||36,540,330,97
+GenericElement||Search music||171,654,60,60
+
+## maps segmented (N-16): unnamed system control
+TabGroup|tab group|||42,461,318,31
+
+## native-contracts controlled detent rejection
+StaticText|text|Accepted detent: 0 · requests: 1,1||16,539,370,18
