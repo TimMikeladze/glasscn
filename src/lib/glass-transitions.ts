@@ -29,6 +29,39 @@ export function useGlassMorphRef<T extends HTMLElement>(part: "trigger" | "conte
   }, [set])
 }
 
+type Radius = [string, string, string, string]
+const corners = ["borderTopLeftRadius", "borderTopRightRadius", "borderBottomRightRadius", "borderBottomLeftRadius"] as const
+
+/** Each corner in px, capped at half the short side (a 9999px capsule would otherwise stay round until the last frame). */
+function radius(element: HTMLElement | null | undefined): Radius | null {
+  if (!element?.isConnected) return null
+  const style = getComputedStyle(element)
+  const { width, height } = element.getBoundingClientRect()
+  const cap = Math.min(width, height) / 2
+  return corners.map((corner) => `${Math.min(parseFloat(style[corner]) || 0, cap)}px`) as Radius
+}
+
+/**
+ * Chrome copies the element's backdrop-filter onto ::view-transition-group, which has no
+ * border-radius, so the glass blur paints as a square until the transition ends. Animate the
+ * group's corners from the source's to the destination's with the group's own timing; the
+ * image pair inherits them (stylesheet) and clips the snapshots to the same shape.
+ */
+function roundGroup(transition: ViewTransition & { ready?: Promise<void> }, name: string, from: Radius | null, to: () => Radius | null) {
+  void transition.ready?.then(() => {
+    const end = to() ?? from
+    const start = from ?? end
+    if (!start || !end) return
+    const pseudoElement = `::view-transition-group(${name})`
+    const root = document.documentElement
+    const timing = root.getAnimations({ subtree: true }).find((animation) => (animation.effect as KeyframeEffect | null)?.pseudoElement === pseudoElement)?.effect?.getTiming()
+    const frame = (r: Radius) => ({ borderTopLeftRadius: r[0], borderTopRightRadius: r[1], borderBottomRightRadius: r[2], borderBottomLeftRadius: r[3] })
+    const shape = root.animate([frame(start), frame(end)], { pseudoElement, duration: timing?.duration ?? 0, easing: timing?.easing ?? "ease", delay: timing?.delay ?? 0, fill: "both" })
+    // the pseudo-element is gone after the transition, but a filling animation would outlive it
+    void transition.finished.finally(() => shape.cancel())
+  }).catch(() => {})
+}
+
 /** One source identity follows a presentation from its trigger to its content and back. */
 export function useGlassPresentation({ open: controlled, defaultOpen = false, onOpenChange }: OpenOptions): GlassMorph {
   const [inner, setInner] = React.useState(defaultOpen)
@@ -38,7 +71,9 @@ export function useGlassPresentation({ open: controlled, defaultOpen = false, on
   const content = React.useRef<HTMLElement | null>(null)
   const active = React.useRef<{ transition: ViewTransition; restore: () => void; next: boolean } | null>(null)
   const id = React.useId()
-  const name = `glass-presentation-${id.replace(/[^a-zA-Z0-9_-]/g, "")}`
+  // lowercase only: Chrome lowercases the name in animate({ pseudoElement }), so a mixed-case
+  // name (React's `_R_…` ids) never matches its group; uppercase is escaped to stay unique
+  const name = `glass-presentation-${id.replace(/[^a-zA-Z0-9_-]/g, "").replace(/[A-Z]/g, (c) => `u${c.toLowerCase()}`)}`
   const setTrigger = React.useCallback((element: HTMLElement | null) => { trigger.current = element }, [])
   const setContent = React.useCallback((element: HTMLElement | null) => { content.current = element }, [])
 
@@ -86,6 +121,7 @@ export function useGlassPresentation({ open: controlled, defaultOpen = false, on
       return
     }
     active.current = { transition, restore, next }
+    roundGroup(transition, name, radius(from), () => radius(destination()))
     void transition.finished.catch(() => {}).finally(() => {
       if (active.current?.transition !== transition) return
       restore()
