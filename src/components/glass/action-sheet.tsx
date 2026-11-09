@@ -13,6 +13,9 @@ import { GlassMorphContext, useGlassMorphRef, useGlassPresentation } from "@/lib
  * piece of liquid glass; Cancel is its own capsule below. Tapping outside cancels.
  * Built on Dialog for focus trapping, Escape and implicit outside dismissal.
  *
+ * `placement="source"` is the iOS 27 sheet with a source: it opens beside its trigger, drops
+ * Cancel (tapping outside cancels) and leaves the rest of the page usable.
+ *
  *   <ActionSheet>
  *     <ActionSheetTrigger asChild><Button>…</Button></ActionSheetTrigger>
  *     <ActionSheetContent>
@@ -24,28 +27,73 @@ import { GlassMorphContext, useGlassMorphRef, useGlassPresentation } from "@/lib
  *   </ActionSheet>
  */
 
-const ActionSheetContext = React.createContext<(open: boolean) => void>(() => {})
+type Placement = "sheet" | "source"
+const ActionSheetContext = React.createContext<{ setOpen: (open: boolean) => void; placement: Placement; triggerRef: React.RefObject<HTMLElement | null> }>({ setOpen: () => {}, placement: "sheet", triggerRef: { current: null } })
 
-function ActionSheet({ open, defaultOpen, onOpenChange, ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
+function ActionSheet({ open, defaultOpen, onOpenChange, placement = "sheet", ...props }: React.ComponentProps<typeof DialogPrimitive.Root> & { placement?: Placement }) {
   const presentation = useGlassPresentation({ open, defaultOpen, onOpenChange })
   const { setOpen } = presentation
+  const triggerRef = React.useRef<HTMLElement | null>(null)
+  const ctx = React.useMemo(() => ({ setOpen, placement, triggerRef }), [setOpen, placement])
   return (
     <GlassMorphContext.Provider value={presentation}>
-      <ActionSheetContext.Provider value={setOpen}>
-        <DialogPrimitive.Root data-slot="action-sheet" open={presentation.open} onOpenChange={setOpen} {...props} />
+      <ActionSheetContext.Provider value={ctx}>
+        <DialogPrimitive.Root data-slot="action-sheet" modal={placement === "sheet"} open={presentation.open} onOpenChange={setOpen} {...props} />
       </ActionSheetContext.Provider>
     </GlassMorphContext.Provider>
   )
 }
 
 function ActionSheetTrigger({ ref, ...props }: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
+  const { triggerRef } = React.useContext(ActionSheetContext)
   const source = useGlassMorphRef<HTMLButtonElement>("trigger", ref)
-  return <DialogPrimitive.Trigger ref={source} data-slot="action-sheet-trigger" {...props} />
+  const attach = React.useCallback((node: HTMLButtonElement | null) => { triggerRef.current = node; source(node) }, [triggerRef, source])
+  return <DialogPrimitive.Trigger ref={attach} data-slot="action-sheet-trigger" {...props} />
+}
+
+/** Beside the trigger, opening toward the side with more room; kept inside the viewport. */
+function useSourcePosition(triggerRef: React.RefObject<HTMLElement | null>, active: boolean) {
+  const [style, setStyle] = React.useState<React.CSSProperties>({ visibility: "hidden" })
+  React.useLayoutEffect(() => {
+    if (!active) return
+    const place = () => {
+      const r = triggerRef.current?.getBoundingClientRect()
+      if (!r) return
+      const width = Math.min(288, window.innerWidth - 24)
+      const left = Math.max(12, Math.min(r.right - width, window.innerWidth - width - 12))
+      const below = window.innerHeight - r.bottom > r.top
+      setStyle(below ? { left, width, top: r.bottom + 8 } : { left, width, bottom: window.innerHeight - r.top + 8 })
+    }
+    place()
+    window.addEventListener("resize", place)
+    window.addEventListener("scroll", place, true)
+    return () => { window.removeEventListener("resize", place); window.removeEventListener("scroll", place, true) }
+  }, [triggerRef, active])
+  return style
 }
 
 function ActionSheetContent({ className, children, ...props }: React.ComponentProps<typeof DialogPrimitive.Content>) {
-  const setOpen = React.useContext(ActionSheetContext)
+  const { setOpen, placement, triggerRef } = React.useContext(ActionSheetContext)
   const morph = React.useContext(GlassMorphContext)
+  const source = placement === "source"
+  const position = useSourcePosition(triggerRef, source)
+  if (source) {
+    // no Cancel and no scrim: a tap outside cancels (Radix's non-modal outside dismissal)
+    return (
+      <DialogPortal>
+        <DialogPrimitive.Content
+          data-slot="action-sheet-content"
+          data-placement="source"
+          data-glass-motion=""
+          style={position}
+          className={cn("fixed z-50 outline-hidden duration-(--glass-duration) ease-glass data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 motion-reduce:[--tw-enter-scale:1]! motion-reduce:[--tw-exit-scale:1]!", className)}
+          {...props}
+        >
+          <ActionSheetGroupFrame>{React.Children.toArray(children).filter((c) => !isCancel(c))}</ActionSheetGroupFrame>
+        </DialogPrimitive.Content>
+      </DialogPortal>
+    )
+  }
   // the content fills the screen so a tap beside the sheet lands here: that tap cancels
   return (
     <DialogPortal>

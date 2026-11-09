@@ -32,7 +32,8 @@ function Presets() {
         <View key={group} style={{ gap: 6 }}>
           <Text style={{ color: t.mutedForeground, fontSize: 12, fontWeight: "600" }}>{group}</Text>
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
-            <Chip label="default" active={!presets[group]} onPress={() => setPreset(group, undefined)} />
+            {/* "unset" leaves the group to the provider; density and type also have presets named "default" */}
+            <Chip label="unset" active={!presets[group]} onPress={() => setPreset(group, undefined)} />
             {PRESET_NAMES[group].map((name) => (
               <Chip key={name} label={name} active={presets[group] === name} onPress={() => setPreset(group, name as never)} />
             ))}

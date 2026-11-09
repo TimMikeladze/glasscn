@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { ThemeProvider } from "next-themes"
+import { Direction } from "radix-ui"
 
 import { TooltipProvider } from "@/components/glass/tooltip"
 import { Toaster } from "@/components/glass/toaster"
@@ -19,6 +20,15 @@ function readPalette(palettes: Palette[]): Palette {
     return "system"
   }
 }
+
+// Radix reads direction from context, not the DOM: follow <html dir> so a right-to-left
+// document mirrors tabs, sliders and menus as well as the CSS
+const subscribeDir = (cb: () => void) => {
+  const observer = new MutationObserver(cb)
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["dir"] })
+  return () => observer.disconnect()
+}
+const readDir = () => (document.documentElement.dir === "rtl" ? "rtl" : "ltr")
 
 const subscribe = (cb: () => void) => {
   window.addEventListener("storage", cb)
@@ -48,13 +58,16 @@ export function Providers({ palettes, children }: { palettes: Palette[]; childre
     window.dispatchEvent(new Event("glasscn-palette"))
   }, [])
   const value = React.useMemo(() => ({ palette, setPalette, palettes }), [palette, setPalette, palettes])
+  const dir = React.useSyncExternalStore(subscribeDir, readDir, () => "ltr" as const)
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <PaletteContext.Provider value={value}>
-        <TooltipProvider>
-          {children}
-          <ToasterThemed />
-        </TooltipProvider>
+        <Direction.Provider dir={dir}>
+          <TooltipProvider>
+            {children}
+            <ToasterThemed />
+          </TooltipProvider>
+        </Direction.Provider>
       </PaletteContext.Provider>
     </ThemeProvider>
   )

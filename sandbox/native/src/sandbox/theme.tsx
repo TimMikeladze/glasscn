@@ -48,6 +48,9 @@ export function SandboxThemeProvider({ children }: { children: React.ReactNode }
   const [scheme, setScheme] = React.useState<Scheme>(system === "dark" ? "dark" : "light")
   const [presets, setPresets] = React.useState<Presets>({})
   const [a11y, setA11yState] = React.useState<Partial<Record<A11ySetting, boolean>>>({})
+  // settings a deep link forced: the next link that doesn't ask for one releases it, so a
+  // `still=1` screenshot run doesn't silently still the motion checks that follow
+  const fromUrl = React.useRef<A11ySetting[]>([])
 
   React.useEffect(() => {
     if (!url) return
@@ -59,8 +62,15 @@ export function SandboxThemeProvider({ children }: { children: React.ReactNode }
     const forced = [...(q.still === "1" ? ["reduceMotion"] : []), ...(typeof q.force === "string" ? q.force.split(",") : [])].filter((k): k is A11ySetting =>
       ["reduceMotion", "reduceTransparency", "highContrast", "boldText"].includes(k)
     )
+    const released = fromUrl.current.filter((k) => !forced.includes(k))
+    for (const k of released) forceA11y(k, null)
     for (const k of forced) forceA11y(k, true)
-    if (forced.length) setA11yState((s) => ({ ...s, ...Object.fromEntries(forced.map((k) => [k, true])) }))
+    fromUrl.current = forced
+    if (forced.length || released.length) setA11yState((s) => {
+      const next: Partial<Record<A11ySetting, boolean>> = { ...s, ...Object.fromEntries(forced.map((k) => [k, true])) }
+      for (const k of released) delete next[k]
+      return next
+    })
   }, [url])
 
   const value = React.useMemo<SandboxTheme>(

@@ -38,6 +38,6 @@ Read `docs/rules/components.md` and `docs/rules/design.md` once before starting.
 
 - [ ] Every part has `data-slot`; `className` merges last through `cn`.
 - [ ] No hex, no `bg-white/…`, no fixed radius/height on themed parts. Use `rounded-surface|control|button|badge`, `h-control*`, `px-pad*`, `ease-glass`, `ring-(length:--glass-ring-width)`.
-- [ ] Reads correctly in all 12 palettes, both schemes, `shape-square` and `density-compact`.
+- [ ] Reads correctly in all 13 palettes, both schemes, `shape-square` and `density-compact`.
 - [ ] Keyboard: focus ring visible, Radix handles roles.
 - [ ] Demo + docs entry + registry entry + `pnpm verify:install` green.

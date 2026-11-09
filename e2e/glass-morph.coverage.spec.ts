@@ -2,7 +2,8 @@ import { expect, test } from "@playwright/test"
 
 test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" })
-  await page.goto("/docs/glass-morph")
+  // networkidle: under a loaded machine a click on `load` can land before React hydrates the demo
+  await page.goto("/docs/glass-morph", { waitUntil: "networkidle" })
   await page.locator('[data-slot="glass-morph"]').first().scrollIntoViewIfNeeded()
 })
 

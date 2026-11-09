@@ -33,7 +33,9 @@ npm test           # jest-expo component tests (docs/testing.md#native)
 pnpm verify:native # from the repo root: install-from-registry check
 ```
 
-The theme picker lists all 12 generated palettes. A deep link's `?palette=ocean&scheme=dark` query sets them on launch (Maestro's screenshot flow uses it).
+The theme picker lists all 13 generated palettes, System first. A deep link's `?palette=ocean&scheme=dark` query sets them on launch (Maestro's screenshot flow uses it). `still=1` forces Reduce Motion and `force=reduceTransparency,highContrast` forces those settings on; the next deep link that leaves one out releases it, so a screenshot run doesn't still the motion checks that follow. Settings turned on from the `/tokens` chips stay until you turn them off there.
+
+Expo Go draws a floating tools button over the top-right corner of the app. It sits on top of the Close and toolbar buttons of large-detent sheets, and a tap there opens the developer menu instead. Drag it to another edge before testing those buttons.
 
 Don't start Metro with `CI=1`. It turns off the file watcher and serves stale bundles.
 

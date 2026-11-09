@@ -140,8 +140,8 @@ describe("registry.json", () => {
     for (const f of ["README.md", "docs/theming.md", "docs/spec.md"]) expect(readFileSync(f, "utf8"), f).toContain(`${TOKENS.length} primitives`)
   })
   it("references only primitives that exist", () => {
-    // primitives, the two layer hooks, and shadcn's own colour tokens
-    const known = new Set([...TOKENS.map((t) => t.name), "glass-surface-depth", "glass-window-active", "glass-optical-filter", "glass-bg", "glass-elevation", "glass-tinted", "glass-draw-from", "glass-container-radius", "glass-container-pad", "glass-concentric-min", "glass-press-x", "glass-press-y", "glass-knob-stretch-x", "glass-morph-w", "glass-morph-h", "glass-morph-origin", "glass-scroll-edge-to", "glass-scroll-edge-rule", "primary", "primary-foreground", "destructive", "destructive-foreground", "foreground", "muted-foreground"])
+    // primitives, the layer and state hooks the stylesheet sets itself, and shadcn's own colour tokens
+    const known = new Set([...TOKENS.map((t) => t.name), "glass-surface-depth", "glass-window-active", "glass-ink-active", "glass-optical-filter", "glass-bg", "glass-elevation", "glass-tinted", "glass-draw-from", "glass-container-radius", "glass-container-pad", "glass-concentric-min", "glass-press-x", "glass-press-y", "glass-knob-stretch-x", "glass-morph-w", "glass-morph-h", "glass-morph-origin", "glass-scroll-edge-to", "glass-scroll-edge-rule", "primary", "primary-foreground", "destructive", "destructive-foreground", "foreground", "muted-foreground"])
     const css = JSON.stringify([themeTokens, ...registry.items.filter((i) => i.css).map((i) => i.css)])
     // Radix's measured sizes (the accordion / collapsible keyframes) come from the element
     for (const [, name] of css.matchAll(/var\(--([\w-]+)/g)) expect(known.has(name) || name.startsWith("radix-"), name).toBe(true)
@@ -203,7 +203,7 @@ describe("primitives stay plain, and every variable a component uses exists (REG
     const declared = new Set()
     for (const src of Object.values(sources)) for (const [, name] of src.matchAll(/(?:\[|["'`])--([\w-]+)(?::|["'`])/g)) declared.add(name)
     const primitives = new Set(TOKENS.map((t) => t.name))
-    const hooks = new Set(["glass-surface-depth", "glass-window-active", "glass-optical-filter", "glass-bg", "glass-elevation", "glass-tinted", "glass-draw-from", "glass-container-radius", "glass-container-pad", "glass-concentric-min", "glass-press-x", "glass-press-y", "glass-knob-stretch-x", "glass-morph-w", "glass-morph-h", "glass-morph-origin", "glass-scroll-edge-to", "glass-scroll-edge-rule", "glass-materialize"])
+    const hooks = new Set(["glass-surface-depth", "glass-window-active", "glass-ink-active", "glass-optical-filter", "glass-bg", "glass-elevation", "glass-tinted", "glass-draw-from", "glass-container-radius", "glass-container-pad", "glass-concentric-min", "glass-press-x", "glass-press-y", "glass-knob-stretch-x", "glass-morph-w", "glass-morph-h", "glass-morph-origin", "glass-scroll-edge-to", "glass-scroll-edge-rule", "glass-materialize"])
     const shadcn = new Set(["background", "foreground", "card", "card-foreground", "popover", "popover-foreground", "primary", "primary-foreground", "secondary", "secondary-foreground", "muted", "muted-foreground", "accent", "accent-foreground", "destructive", "border", "input", "ring", "radius"])
     const theme = new Set(Object.keys(themeTokens))
     // radix's measured vars, the sliding indicator, TanStack Charts' tooltip/series, tw-animate-css

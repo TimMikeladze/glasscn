@@ -66,7 +66,9 @@ export const themeTokens = {
   // accent-coloured text on a tint of itself (tinted badges and buttons, links): the label colour
   // carrying 30% of the accent (INK_ACCENT in glass-theme.ts), so it stays AA on its own 16–22% fill
   // on every palette × material (legibilityReport.tintedLabel / destructiveLabel)
-  "color-primary-ink": "color-mix(in oklch, var(--primary) 30%, var(--glass-label))",
+  // --glass-ink-active is only set on glass, so accent text there greys out in an inactive window
+  // while page text keeps its colour; outside glass the fallback holds it at full ink
+  "color-primary-ink": "color-mix(in oklch, color-mix(in oklch, var(--primary) 30%, var(--glass-label)) calc(var(--glass-ink-active, 1) * 100%), var(--glass-label-secondary))",
   // shadcn v4 has no destructive-foreground: white unless the app sets one
   "color-destructive-foreground": "var(--destructive-foreground, oklch(0.985 0 0))",
   "color-destructive-ink": "color-mix(in oklch, var(--destructive) 30%, var(--glass-label))",
@@ -459,7 +461,7 @@ export const stylesheet = {
   "@property --glass-window-active": { syntax: '"<number>"', inherits: "true", "initial-value": "1" },
   ":where([data-glass-window-active=false])": { "--glass-window-active": "0" },
   ":where([data-glass-window-active=true])": { "--glass-window-active": "1" },
-  ":where(.glass-liquid, .glass-prominent) :where(.text-primary-ink)": { color: "color-mix(in oklch, color-mix(in oklch, var(--primary) 30%, var(--glass-label)) calc(var(--glass-window-active, 1) * 100%), var(--glass-label-secondary))" },
+  ":where(.glass-liquid, .glass-prominent)": { "--glass-ink-active": "var(--glass-window-active, 1)" },
   ":where([data-glass-show-borders]) :is(.glass-liquid, .glass-liquid-clear, .glass-prominent, .glass-knob-lens)": { "border-color": "var(--glass-label-secondary)", "border-width": "max(1px, var(--glass-border-width))" },
   "@keyframes glass-materialize": {
     from: {

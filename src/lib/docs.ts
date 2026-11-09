@@ -323,13 +323,14 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
   },
   "action-sheet": {
     props: [
+      { name: "placement", type: `"sheet" | "source"`, default: `"sheet"`, description: "source opens the choices beside the trigger without a scrim or Cancel, like an iOS 27 sheet with a source; a tap outside or Escape cancels and the page stays usable." },
       { name: "variant (ActionSheetAction)", type: `"default" | "destructive" | "preferred"`, default: `"default"`, description: "destructive for the risky choice; preferred sets it in bold." },
       { name: "native (native ActionSheet)", type: "boolean", default: "true", description: "Supported plain, uncontrolled iOS choices use the real source-attached ConfirmationDialog. false selects the custom sheet." },
       { name: "onAction (native ActionSheetAction)", type: "() => void", description: "Eventless system selection. RN onPress selects the custom path and receives its event. A Cancel callback selects custom to distinguish explicit cancellation from passive dismissal." },
     ],
     notes: [
       "Web choices share one liquid group; ActionSheetCancel (write it last) sits in its own capsule below. Outside taps and Escape dismiss without calling Cancel's callback. Dialog semantics preserve focus trapping and return to the source.",
-      "The web/custom sheet is bottom-anchored on phones and centered on wider layouts. The iOS system owns anchored presentation and which Cancel/disabled choices are visible; controlled state, rich actions, preferred/custom styling and RN action events select the custom implementation.",
+      "The web/custom sheet is bottom-anchored on phones and centered on wider layouts; placement=\"source\" anchors it to the trigger instead and leaves ActionSheetCancel out. The iOS system owns anchored presentation and which Cancel/disabled choices are visible; controlled state, rich actions, preferred/custom styling and RN action events select the custom implementation.",
     ],
   },
   checkbox: {

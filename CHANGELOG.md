@@ -25,9 +25,13 @@ Registry items are copied into your app, so re-run `npx shadcn add @glasscn-app/
 - Separate clear-blur, refraction and bezel primitives; Reduce bright effects preference; direct-surface transparency/contrast overrides that remain effective inside scoped themes.
 - `liquid-glass-02` / `native-liquid-glass-02`: Landmarks, Notes, Search and Materials extend the showcase to ten scenes. Both tracks gain `GlassMorph`, image-only `BackgroundExtension`, prioritized/pinned `ToolbarCommands`, removable SearchField tokens and four named standard material tiers. The [55-case parity matrix](docs/research/apple-liquid-glass-parity-matrix.md) separates system delegation, custom compositions, browser approximations and unavailable APIs.
 - Locally derived regular-glass depth, inactive-window web treatment and Show control borders. New theme primitives bring the engine to 108 tokens.
+- `ActionSheet placement="source"` (web): the choices open beside their trigger with no scrim and no Cancel, and the rest of the page stays usable. A tap outside or Escape cancels. This is the iOS 27 sheet with a source; the default `"sheet"` placement keeps Cancel and the scrim.
 
 ### Fixed
 
+- Destructive action-sheet rows rendered in the accent ink on liquid glass: the inactive-window rule for `text-primary-ink` was unlayered CSS and beat every utility. The dimming now lives in `--color-primary-ink` (through `--glass-ink-active`, set only on glass), so `text-destructive-ink` and other overrides apply again.
+- Radix parts on the docs site (tabs, sliders, menus) follow `<html dir>`; Music's tabs mirror in right-to-left.
+- Native sandbox: a deep link's forced Reduce Motion or Reduce Transparency no longer survives later links that omit it; the preset rows' reset chip is "unset", so density and type no longer show two "default" chips.
 - `/themes` opened 7,500–14,000 px down the page: cmdk scrolled its selected row into view with the window. Command rows now scroll only their list.
 - Hydration mismatch on `/`: `GlassEffects` waits for React to hydrate a node before enhancing it.
 - Showcase sheets presented over the docs page; `SheetContent container` presents them inside their scene.

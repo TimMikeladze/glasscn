@@ -308,10 +308,10 @@ Applied in the same session after this review was written. Measurements use this
 | UX2-W07 | Fixed | Secondary label is Apple's `#3C3C43` held opaque; thin material tiles use the primary label | Regular-large secondary 4.97:1, ultraThin 6.59 (were 3.69, 2.44) |
 | UX2-W08 | Fixed | Selected Music tab uses the accent, semibold | |
 | UX2-W09 | Fixed | Shorter hero at regular width | |
-| UX2-W10 | Open | Badge reorder motion | |
-| UX2-W11 | Partly fixed | Directional chevrons mirror in RTL; Music's Radix tabs still need a `DirectionProvider` from the app | |
-| UX2-W12 | Open | Anchored web ActionSheet without Cancel | |
+| UX2-W10 | Open, partly by design | No change. Labels crossing mid-swap match the native system morph, which this review also saw overlap. The contour trailing the badges comes from the union mask: it is a data-URL SVG that the browser decodes a frame or more late. Fixing that means drawing the union inline instead of as a `mask-image` | |
+| UX2-W11 | Fixed | Directional chevrons mirror in RTL; the site's providers give Radix the direction of `<html dir>` | With `dir="rtl"`, Music's tabs run Home, New, Library from the right (x 904, 738, 571; were left to right) |
+| UX2-W12 | Fixed | `ActionSheet placement="source"` opens beside its trigger with no scrim, no Cancel and no `inert`; the docs demo shows both placements. Its destructive row now takes `destructive-ink`: an unlayered `text-primary-ink` rule had overridden it on every liquid surface | `e2e/action-sheet.behavior.spec.ts`: edge within 16 px of the trigger, outside tap and Escape cancel, focus returns on Escape |
 | UX2-W13 | Fixed | Back-to-top uses an up arrow; Landmarks sidebar rows select a section; Notes date is US format | Typing undo still records each keystroke |
 | UX2-N08 | Partly fixed | No disabled Delete in the system dialog; active tool glyph uses the accent; Mail's bottom bar always sits on its edge; Search Clear is a text button | Maps pin under the panel remains |
 | UX2-H01 | Fixed | Social links use `glass-focus`; the Studio example is a group, not a dialog; quote and alert rails removed; the install guide uses `theme-system` and no Aurora | |
-| UX2-H02 | Partly fixed | The flaky Reduce Motion morph test gets a 5 s poll | Sandbox forced settings and duplicate chips remain |
+| UX2-H02 | Fixed | The flaky Reduce Motion morph test gets a 5 s poll. A deep link's forced settings are released by the next link that leaves them out, while chip settings stay; the reset chip is "unset"; `docs/sandbox.md` notes Expo Go's floating tools button | `sandbox/native/__tests__/sandbox-theme.test.tsx` (fails on the old provider) |

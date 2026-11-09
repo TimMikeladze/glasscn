@@ -71,7 +71,7 @@
           "color-info": "var(--info)",
           "color-info-foreground": "var(--info-foreground)",
           "color-info-ink": "color-mix(in oklch, var(--info) 68%, var(--glass-label))",
-          "color-primary-ink": "color-mix(in oklch, var(--primary) 30%, var(--glass-label))",
+          "color-primary-ink": "color-mix(in oklch, color-mix(in oklch, var(--primary) 30%, var(--glass-label)) calc(var(--glass-ink-active, 1) * 100%), var(--glass-label-secondary))",
           "color-destructive-foreground": "var(--destructive-foreground, oklch(0.985 0 0))",
           "color-destructive-ink": "color-mix(in oklch, var(--destructive) 30%, var(--glass-label))",
           "color-glass-dim": "color-mix(in oklch, oklch(0 0 0) var(--glass-dim), transparent)",
@@ -817,8 +817,8 @@
         ":where([data-glass-window-active=true])": {
           "--glass-window-active": "1"
         },
-        ":where(.glass-liquid, .glass-prominent) :where(.text-primary-ink)": {
-          "color": "color-mix(in oklch, color-mix(in oklch, var(--primary) 30%, var(--glass-label)) calc(var(--glass-window-active, 1) * 100%), var(--glass-label-secondary))"
+        ":where(.glass-liquid, .glass-prominent)": {
+          "--glass-ink-active": "var(--glass-window-active, 1)"
         },
         ":where([data-glass-show-borders]) :is(.glass-liquid, .glass-liquid-clear, .glass-prominent, .glass-knob-lens)": {
           "border-color": "var(--glass-label-secondary)",

@@ -5,9 +5,18 @@ import { Button } from "@/components/glass/button"
 
 export default function ActionSheetDemo() {
   return (
-    <ActionSheet>
+    <div className="flex flex-wrap items-center justify-center gap-3">
+      <EntrySheet />
+      <EntrySheet placement="source" />
+    </div>
+  )
+}
+
+function EntrySheet({ placement = "sheet" }: { placement?: "sheet" | "source" }) {
+  return (
+    <ActionSheet placement={placement}>
       <ActionSheetTrigger asChild>
-        <Button variant="glass">Entry options</Button>
+        <Button variant="glass">{placement === "source" ? "From the button" : "Entry options"}</Button>
       </ActionSheetTrigger>
       <ActionSheetContent>
         <ActionSheetHeader>

@@ -22,3 +22,23 @@ for (const reducedMotion of ["reduce", "no-preference"] as const) {
     })
   })
 }
+
+test("source placement opens beside its trigger without Cancel and keeps the page usable", async ({ page }) => {
+  await open(page, "/docs/action-sheet")
+  const trigger = page.getByRole("tabpanel").getByRole("button", { name: "From the button", exact: true })
+  await trigger.click()
+  const dialog = page.getByRole("dialog", { name: "Day 401" })
+  await expect(dialog).toBeVisible()
+  await expect(dialog.getByRole("button", { name: "Cancel" })).toHaveCount(0)
+  const t = (await trigger.boundingBox())!
+  const d = (await dialog.boundingBox())!
+  // anchored: the sheet's edge sits within 16px of the trigger, above or below it
+  expect(Math.min(Math.abs(d.y - (t.y + t.height)), Math.abs(d.y + d.height - t.y))).toBeLessThan(16)
+  await page.mouse.click(4, 4)
+  await expect(dialog).toHaveCount(0)
+  await trigger.click()
+  await expect(dialog).toBeVisible()
+  await page.keyboard.press("Escape")
+  await expect(dialog).toHaveCount(0)
+  await expect(trigger).toBeFocused()
+})
