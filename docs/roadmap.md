@@ -631,6 +631,7 @@ Ocean-liquid light settings screen is close to Apple-grade (grouped rows, shadow
 - [ ] **SITE-28** P2 docs: `bar-list`, `heatmap` take `onSelect` without `"use client"` → document "interactive use needs a client parent" or split server visual + client wrapper.
 - [ ] **SITE-29** P2 improve: Sidebar group labels uppercase → title case (matches LG study §1.4).
 - [ ] **SITE-30** P2 gap: RSC-safe and bundle-size badges per item (DX-07).
+- [x] **SITE-31** P1 fix: Reset saved site palette, custom CSS, scheme and glass preferences once before paint after the Liquid Glass rebuild; preserve later choices. Versioned in `src/lib/site-settings.ts` with landing-page browser coverage.
 
 ## 10. Distribution and developer experience
 

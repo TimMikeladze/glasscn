@@ -61,4 +61,6 @@ It reuses a dev server on `E2E_BASE_URL` (default `http://localhost:3011`) and s
 
 Themes are applied the way the site persists them: `glasscn-palette`, `theme` and `glasscn-custom-css` (preset items' `cssVars`) in localStorage before first paint (`e2e/theme.ts`). Screenshots run with reduced motion, so the aurora is still.
 
+Theme fixtures also set the current site-settings version to represent choices saved after the one-time reset. `site-settings.spec.ts` loads the landing page with old settings, checks that all four settings are cleared, then reloads with new choices and checks they persist.
+
 The pure `glass-optics` tests cover rounded-lens geometry, neutral interior and bounded displacement. Component regressions cover configured token-class merging, cluster ref composition and interrupted source transitions. These tests establish glasscn's browser model; Apple does not publish the shader constants needed to claim identical optical output. See the [27 work record](plans/apple-liquid-glass-27.md) for the verified totals and install/build results.

@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test"
 import sharp from "sharp"
 import AxeBuilder from "@axe-core/playwright"
+import { applyTheme } from "./theme"
 
 test("Photos controls keep their state while the content changes", async ({ page }) => {
   await page.goto("/showcase")
@@ -139,8 +140,8 @@ test("reduced transparency keeps clear controls readable and removes optical enh
 })
 
 for (const scheme of ["light", "dark"] as const) {
-  test(`every showcase scene has accessible controls in ${scheme}`, async ({ page }) => {
-    await page.addInitScript((value) => localStorage.setItem("theme", value), scheme)
+  test(`every showcase scene has accessible controls in ${scheme}`, async ({ context, page }) => {
+    await applyTheme(context, { scheme })
     await page.goto("/showcase")
     for (const name of ["Photos", "Music", "Maps", "Safari", "Mail", "Controls", "Landmarks", "Notes", "Search", "Materials"]) {
       await page.getByRole("tab", { name, exact: true }).click()

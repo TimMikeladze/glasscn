@@ -59,6 +59,7 @@ Native uses `expo-glass-effect` and supported Expo system controls instead of th
 
 - `/` landing, `/showcase` (ten Apple-inspired scenes and optical/merge labs), `/docs/*` per item (live demo from `src/components/demos`, install, props from `src/lib/docs.ts`, source from `sources.generated.ts`), `/docs/theming`, `/docs/fonts`, `/docs/native`, `/themes` (Theme Studio).
 - The site's palette switcher sets `data-palette` on `<html>`; "apply to site" in the studio writes sanitised CSS under `:root[data-glass-custom]`; both are applied before paint.
+- `src/lib/site-settings.ts` versions the site's saved settings. A version change clears the palette, custom CSS, color scheme and glass preferences before those scripts run, once per browser. New choices survive subsequent loads. Bump `SITE_SETTINGS_VERSION` for another reset; installed registry components are unaffected.
 
 ## Verification
 

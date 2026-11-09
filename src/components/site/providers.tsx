@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes"
 
 import { TooltipProvider } from "@/components/glass/tooltip"
 import { Toaster } from "@/components/glass/toaster"
+import { siteSettingsResetScript } from "@/lib/site-settings"
 export type Palette = string
 const KEY = "glasscn-palette"
 
@@ -99,4 +100,4 @@ export const hasSiteTheme = () => {
 }
 
 /** Runs before paint: no flash of the wrong palette or custom theme. */
-export const paletteScript = `try{var d=document.documentElement,p=localStorage.getItem("${KEY}");if(p)d.dataset.palette=p;var c=localStorage.getItem("${CUSTOM}");if(c){var s=document.createElement("style");s.id="glasscn-custom";s.textContent=c;document.head.appendChild(s);d.setAttribute("data-glass-custom","")}}catch(e){}`
+export const paletteScript = `${siteSettingsResetScript}try{var d=document.documentElement,p=localStorage.getItem("${KEY}");if(p)d.dataset.palette=p;var c=localStorage.getItem("${CUSTOM}");if(c){var s=document.createElement("style");s.id="glasscn-custom";s.textContent=c;document.head.appendChild(s);d.setAttribute("data-glass-custom","")}}catch(e){}`

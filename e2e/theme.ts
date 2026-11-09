@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs"
 import type { BrowserContext, Page } from "@playwright/test"
+import { SITE_SETTINGS_VERSION, SITE_SETTINGS_VERSION_KEY } from "../src/lib/site-settings"
 
 const registry = JSON.parse(readFileSync(new URL("../registry.json", import.meta.url), "utf8")) as {
   items: { name: string; type: string; cssVars?: Record<string, Record<string, string>> }[]
@@ -29,13 +30,14 @@ function presetCss(presets: string[]) {
 export async function applyTheme(ctx: BrowserContext, theme: Theme) {
   const css = theme.presets?.length ? presetCss(theme.presets) : ""
   await ctx.addInitScript(
-    ({ palette, scheme, css }) => {
+    ({ palette, scheme, css, settingsVersion, settingsVersionKey }) => {
+      localStorage.setItem(settingsVersionKey, settingsVersion)
       if (palette) localStorage.setItem("glasscn-palette", palette)
       localStorage.setItem("theme", scheme)
       if (css) localStorage.setItem("glasscn-custom-css", css)
       else localStorage.removeItem("glasscn-custom-css")
     },
-    { palette: theme.palette, scheme: theme.scheme, css }
+    { palette: theme.palette, scheme: theme.scheme, css, settingsVersion: SITE_SETTINGS_VERSION, settingsVersionKey: SITE_SETTINGS_VERSION_KEY }
   )
 }
 
