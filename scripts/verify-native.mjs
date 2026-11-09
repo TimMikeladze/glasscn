@@ -60,6 +60,7 @@ try {
     "jest.setup.js",
     "jest.resolver.js",
     "jest.expo-ui.js",
+    "jest.expo-ui-modifiers.js",
     "__tests__",
   ])
     if (existsSync(join(source, f)))

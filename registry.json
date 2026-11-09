@@ -4,6 +4,19 @@
   "homepage": "{REGISTRY_URL}",
   "items": [
     {
+      "name": "glass-toolbar-layout",
+      "type": "registry:lib",
+      "title": "Toolbar command layout",
+      "description": "Pure width allocation for prioritized, pinned and overflow-only toolbar commands, shared with native.",
+      "files": [
+        {
+          "path": "src/lib/glass-toolbar-layout.ts",
+          "type": "registry:lib",
+          "target": "@lib/glass-toolbar-layout.ts"
+        }
+      ]
+    },
+    {
       "name": "glass-style",
       "type": "registry:lib",
       "title": "Glass style",
@@ -17,19 +30,24 @@
         "class-variance-authority",
         "tw-animate-css"
       ],
-      "docs": "glasscn is installed. Put <Aurora /> (shadcn add @glasscn-app/aurora) behind your app, and make sure your global CSS has @import \"tw-animate-css\"; (shadcn init adds it) so overlays animate.",
+      "docs": "glasscn is installed. Place floating controls over your content. For web refraction, add @glasscn-app/glass-effects and mount <GlassEffects /> once in the app root. Keep @import \"tw-animate-css\"; in your global CSS (shadcn init adds it) so overlays animate.",
       "files": [
         {
           "path": "src/lib/glass-variants.ts",
           "type": "registry:lib",
           "target": "@lib/glass-variants.ts"
+        },
+        {
+          "path": "src/lib/glass-cn.ts",
+          "type": "registry:lib",
+          "target": "@lib/glass-cn.ts"
         }
       ],
       "cssVars": {
         "theme": {
-          "color-glass": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity) * min(1, var(--glass-clarity) * 2) + (100% - var(--glass-opacity)) * max(0, var(--glass-clarity) * 2 - 1)), transparent)",
-          "color-glass-strong": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity-strong) * min(1, var(--glass-clarity) * 2) + (100% - var(--glass-opacity-strong)) * max(0, var(--glass-clarity) * 2 - 1)), transparent)",
-          "color-glass-subtle": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity-subtle) * min(1, var(--glass-clarity) * 2) + (100% - var(--glass-opacity-subtle)) * max(0, var(--glass-clarity) * 2 - 1)), transparent)",
+          "color-glass": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity) * (0.5 + 0.5 * min(1, var(--glass-clarity) * 2)) + (100% - var(--glass-opacity)) * max(0, var(--glass-clarity) * 2 - 1)), transparent)",
+          "color-glass-strong": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity-strong) * (0.5 + 0.5 * min(1, var(--glass-clarity) * 2)) + (100% - var(--glass-opacity-strong)) * max(0, var(--glass-clarity) * 2 - 1)), transparent)",
+          "color-glass-subtle": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity-subtle) * (0.5 + 0.5 * min(1, var(--glass-clarity) * 2)) + (100% - var(--glass-opacity-subtle)) * max(0, var(--glass-clarity) * 2 - 1)), transparent)",
           "color-glass-border": "color-mix(in oklch, var(--glass-border-color) var(--glass-border-opacity), transparent)",
           "color-glass-highlight": "color-mix(in oklch, var(--glass-highlight-color) var(--glass-highlight-opacity), transparent)",
           "color-glass-shadow": "color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)",
@@ -57,8 +75,10 @@
           "color-destructive-foreground": "var(--destructive-foreground, oklch(0.985 0 0))",
           "color-destructive-ink": "color-mix(in oklch, var(--destructive) 30%, var(--glass-label))",
           "color-glass-dim": "color-mix(in oklch, oklch(0 0 0) var(--glass-dim), transparent)",
+          "color-glass-media-dim": "color-mix(in oklch, oklch(0 0 0) var(--glass-liquid-clear-dim), transparent)",
+          "color-glass-media-foreground": "var(--glass-highlight-color)",
           "shadow-glass-knob": "0 3px 8px color-mix(in oklch, var(--glass-shadow-color) calc(var(--glass-shadow-opacity) + 8%), transparent), 0 1px 2px color-mix(in oklch, var(--glass-shadow-color) calc(var(--glass-shadow-opacity) + 4%), transparent)",
-          "shadow-glass-accent": "0 8px 22px color-mix(in oklch, var(--primary) 32%, transparent), inset 0 1px 0 color-mix(in oklch, oklch(1 0 0) 30%, transparent)",
+          "shadow-glass-accent": "0 1px 3px color-mix(in oklch, var(--glass-shadow-color) calc(var(--glass-shadow-opacity) * 0.6), transparent), inset 0 1px 0 color-mix(in oklch, oklch(1 0 0) 30%, transparent)",
           "color-aurora-base": "var(--aurora-base)",
           "color-aurora-1": "var(--aurora-1)",
           "color-aurora-2": "var(--aurora-2)",
@@ -91,52 +111,59 @@
           "tracking-title": "var(--glass-heading-tracking)"
         },
         "light": {
-          "aurora-1": "oklch(0.829 0.098 37.8)",
-          "aurora-2": "oklch(0.809 0.109 296.4)",
-          "aurora-3": "oklch(0.907 0.07 70.2)",
-          "success": "oklch(0.52 0.14 150)",
+          "aurora-1": "oklch(0.963 0.007 286.3)",
+          "aurora-2": "oklch(0.963 0.007 286.3)",
+          "aurora-3": "oklch(0.963 0.007 286.3)",
+          "success": "oklch(0.52 0.143 150)",
           "success-foreground": "oklch(0.99 0 0)",
-          "warning": "oklch(0.78 0.16 80)",
-          "warning-foreground": "oklch(0.22 0.04 80)",
-          "info": "oklch(0.52 0.14 240)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.52 0.089 205)",
           "info-foreground": "oklch(0.99 0 0)",
-          "aurora-base": "oklch(0.955 0.007 268.5)",
+          "aurora-base": "oklch(0.963 0.007 286.3)",
           "glass-tint": "oklch(1 0 0)",
           "glass-opacity": "52%",
           "glass-opacity-strong": "74%",
           "glass-opacity-subtle": "28%",
+          "glass-opacity-thick": "86%",
           "glass-blur": "28px",
           "glass-saturate": "180%",
           "glass-brightness": "100%",
-          "glass-sheen": "10%",
+          "glass-sheen": "0%",
           "glass-sheen-angle": "160deg",
           "glass-texture": "none",
-          "glass-fill-tint": "oklch(0.55 0.01 285)",
+          "glass-fill-tint": "oklch(0.575 0.012 286)",
           "glass-fill-opacity": "12%",
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
-          "glass-label": "oklch(0.145 0 0)",
+          "glass-label": "oklch(0 0 none)",
           "glass-clarity": "0.5",
-          "glass-label-secondary": "oklch(0.44 0.01 285)",
-          "glass-label-tertiary": "oklch(0.6 0.01 285)",
+          "glass-label-secondary": "oklch(0.37 0.012 286)",
+          "glass-label-tertiary": "oklch(0.52 0.01 286)",
           "glass-label-quaternary": "oklch(0.76 0.005 285)",
           "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
-          "glass-liquid-opacity": "46%",
+          "glass-liquid-opacity": "58%",
           "glass-liquid-clear-opacity": "10%",
-          "glass-liquid-clear-dim": "30%",
-          "glass-liquid-blur": "12px",
-          "glass-liquid-saturate": "200%",
+          "glass-liquid-clear-dim": "35%",
+          "glass-liquid-blur": "18px",
+          "glass-liquid-clear-blur": "4px",
+          "glass-liquid-saturate": "160%",
+          "glass-refraction": "14px",
+          "glass-bezel": "12px",
+          "glass-depth-opacity": "12%",
+          "glass-depth-blur": "6px",
+          "glass-inactive-strength": "0.4",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "85%",
           "glass-border-width": "1px",
           "glass-highlight-opacity": "92%",
           "glass-highlight-color": "oklch(1 0 0)",
           "glass-light-angle": "-45deg",
-          "glass-specular": "70%",
-          "glass-edge-shade": "0%",
+          "glass-specular": "88%",
+          "glass-edge-shade": "22%",
           "glass-illumination": "22%",
-          "glass-shadow-color": "oklch(0.3 0.05 270)",
+          "glass-shadow-color": "oklch(0 0 0)",
           "glass-shadow-opacity": "12%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
@@ -179,50 +206,57 @@
           "glass-underline-offset": "0.22em"
         },
         "dark": {
-          "aurora-1": "oklch(0.48 0.132 31.7)",
-          "aurora-2": "oklch(0.401 0.159 289.2)",
-          "aurora-3": "oklch(0.456 0.088 60.9)",
-          "success": "oklch(0.74 0.16 150)",
-          "success-foreground": "oklch(0.18 0.03 150)",
-          "warning": "oklch(0.8 0.15 80)",
-          "warning-foreground": "oklch(0.22 0.04 80)",
-          "info": "oklch(0.74 0.13 240)",
-          "info-foreground": "oklch(0.18 0.03 240)",
-          "aurora-base": "oklch(0.116 0.006 285.4)",
-          "glass-tint": "oklch(0.24 0.012 285)",
+          "aurora-1": "oklch(0 0 none)",
+          "aurora-2": "oklch(0 0 none)",
+          "aurora-3": "oklch(0 0 none)",
+          "success": "oklch(0.74 0.15 150)",
+          "success-foreground": "oklch(0.2 0.04 150)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.74 0.126 205)",
+          "info-foreground": "oklch(0.2 0.036 205)",
+          "aurora-base": "oklch(0 0 none)",
+          "glass-tint": "oklch(0.227 0.004 286.1)",
           "glass-opacity": "45%",
           "glass-opacity-strong": "72%",
           "glass-opacity-subtle": "24%",
+          "glass-opacity-thick": "84%",
           "glass-blur": "28px",
           "glass-saturate": "180%",
           "glass-brightness": "100%",
-          "glass-sheen": "5%",
+          "glass-sheen": "0%",
           "glass-sheen-angle": "160deg",
           "glass-texture": "none",
-          "glass-fill-tint": "oklch(0.6 0.01 285)",
+          "glass-fill-tint": "oklch(0.575 0.012 286)",
           "glass-fill-opacity": "24%",
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
-          "glass-label": "oklch(0.985 0 0)",
+          "glass-label": "oklch(1 0 none)",
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.88 0.01 285)",
-          "glass-label-tertiary": "oklch(0.62 0.01 285)",
+          "glass-label-tertiary": "oklch(0.66 0.01 285)",
           "glass-label-quaternary": "oklch(0.45 0.01 285)",
           "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
-          "glass-liquid-opacity": "40%",
+          "glass-liquid-opacity": "48%",
           "glass-liquid-clear-opacity": "8%",
-          "glass-liquid-clear-dim": "20%",
-          "glass-liquid-blur": "12px",
-          "glass-liquid-saturate": "200%",
+          "glass-liquid-clear-dim": "35%",
+          "glass-liquid-blur": "18px",
+          "glass-liquid-clear-blur": "4px",
+          "glass-liquid-saturate": "160%",
+          "glass-refraction": "14px",
+          "glass-bezel": "12px",
+          "glass-depth-opacity": "12%",
+          "glass-depth-blur": "6px",
+          "glass-inactive-strength": "0.4",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "12%",
           "glass-border-width": "1px",
           "glass-highlight-opacity": "14%",
           "glass-highlight-color": "oklch(1 0 0)",
           "glass-light-angle": "-45deg",
-          "glass-specular": "30%",
-          "glass-edge-shade": "18%",
+          "glass-specular": "65%",
+          "glass-edge-shade": "32%",
           "glass-illumination": "22%",
           "glass-shadow-color": "oklch(0 0 0)",
           "glass-shadow-opacity": "45%",
@@ -284,7 +318,7 @@
           "--card-foreground": "var(--glass-label)",
           "--popover-foreground": "var(--glass-label)",
           "--muted-foreground": "var(--glass-label-secondary)",
-          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity) * min(1, var(--glass-clarity) * 2) + (100% - var(--glass-opacity)) * max(0, var(--glass-clarity) * 2 - 1)), transparent))",
+          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity) * (0.5 + 0.5 * min(1, var(--glass-clarity) * 2)) + (100% - var(--glass-opacity)) * max(0, var(--glass-clarity) * 2 - 1)), transparent))",
           "background-image": "linear-gradient(var(--glass-sheen-angle), color-mix(in oklch, oklch(1 0 0) var(--glass-sheen), transparent), transparent 55%), var(--glass-texture)",
           "border-width": "var(--glass-border-width)",
           "border-style": "solid",
@@ -299,7 +333,7 @@
           "--card-foreground": "var(--glass-label)",
           "--popover-foreground": "var(--glass-label)",
           "--muted-foreground": "var(--glass-label-secondary)",
-          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity-strong) * min(1, var(--glass-clarity) * 2) + (100% - var(--glass-opacity-strong)) * max(0, var(--glass-clarity) * 2 - 1)), transparent))",
+          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity-strong) * (0.5 + 0.5 * min(1, var(--glass-clarity) * 2)) + (100% - var(--glass-opacity-strong)) * max(0, var(--glass-clarity) * 2 - 1)), transparent))",
           "background-image": "linear-gradient(var(--glass-sheen-angle), color-mix(in oklch, oklch(1 0 0) var(--glass-sheen), transparent), transparent 55%), var(--glass-texture)",
           "border-width": "var(--glass-border-width)",
           "border-style": "solid",
@@ -314,7 +348,7 @@
           "--card-foreground": "var(--glass-label)",
           "--popover-foreground": "var(--glass-label)",
           "--muted-foreground": "var(--glass-label-secondary)",
-          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity-subtle) * min(1, var(--glass-clarity) * 2) + (100% - var(--glass-opacity-subtle)) * max(0, var(--glass-clarity) * 2 - 1)), transparent))",
+          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity-subtle) * (0.5 + 0.5 * min(1, var(--glass-clarity) * 2)) + (100% - var(--glass-opacity-subtle)) * max(0, var(--glass-clarity) * 2 - 1)), transparent))",
           "background-image": "linear-gradient(var(--glass-sheen-angle), color-mix(in oklch, oklch(1 0 0) var(--glass-sheen), transparent), transparent 55%), var(--glass-texture)",
           "border-width": "var(--glass-border-width)",
           "border-style": "solid",
@@ -323,20 +357,35 @@
           "backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness))",
           "box-shadow": "var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)), inset 0 1px 0 color-mix(in oklch, var(--glass-highlight-color) var(--glass-highlight-opacity), transparent), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) color-mix(in oklch, var(--primary) var(--glass-glow), transparent)"
         },
+        "@utility glass-thick": {
+          "color": "var(--glass-label)",
+          "--foreground": "var(--glass-label)",
+          "--card-foreground": "var(--glass-label)",
+          "--popover-foreground": "var(--glass-label)",
+          "--muted-foreground": "var(--glass-label-secondary)",
+          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity-thick) * (0.5 + 0.5 * min(1, var(--glass-clarity) * 2)) + (100% - var(--glass-opacity-thick)) * max(0, var(--glass-clarity) * 2 - 1)), transparent))",
+          "background-image": "linear-gradient(var(--glass-sheen-angle), color-mix(in oklch, oklch(1 0 0) var(--glass-sheen), transparent), transparent 55%), var(--glass-texture)",
+          "border-width": "var(--glass-border-width)",
+          "border-style": "solid",
+          "border-color": "color-mix(in oklch, var(--glass-border-color) var(--glass-border-opacity), transparent)",
+          "-webkit-backdrop-filter": "blur(calc(var(--glass-blur) * 1.5)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness))",
+          "backdrop-filter": "blur(calc(var(--glass-blur) * 1.5)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness))",
+          "box-shadow": "var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)), inset 0 1px 0 color-mix(in oklch, var(--glass-highlight-color) var(--glass-highlight-opacity), transparent), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) color-mix(in oklch, var(--primary) var(--glass-glow), transparent)"
+        },
         "@utility glass-liquid": {
           "color": "var(--glass-label)",
           "--foreground": "var(--glass-label)",
           "--card-foreground": "var(--glass-label)",
           "--popover-foreground": "var(--glass-label)",
           "--muted-foreground": "var(--glass-label-secondary)",
-          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-liquid-opacity) * min(1, var(--glass-clarity) * 2) + (100% - var(--glass-liquid-opacity)) * max(0, var(--glass-clarity) * 2 - 1)), transparent))",
+          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) min(100%, calc(calc(var(--glass-liquid-opacity) * (0.5 + 0.5 * min(1, var(--glass-clarity) * 2)) + (100% - var(--glass-liquid-opacity)) * max(0, var(--glass-clarity) * 2 - 1)) + var(--glass-surface-depth, 0) * var(--glass-depth-opacity))), transparent))",
           "background-image": "linear-gradient(var(--glass-sheen-angle), color-mix(in oklch, oklch(1 0 0) var(--glass-sheen), transparent), transparent 55%), var(--glass-texture)",
           "border-width": "var(--glass-border-width)",
           "border-style": "solid",
-          "border-color": "color-mix(in oklch, var(--glass-border-color) var(--glass-border-opacity), transparent)",
-          "-webkit-backdrop-filter": "blur(var(--glass-liquid-blur)) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness))",
-          "backdrop-filter": "blur(var(--glass-liquid-blur)) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness))",
-          "box-shadow": "var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) color-mix(in oklch, var(--primary) var(--glass-glow), transparent)",
+          "border-color": "transparent",
+          "-webkit-backdrop-filter": "blur(calc(var(--glass-liquid-blur) + var(--glass-surface-depth, 0) * var(--glass-depth-blur))) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness)) var(--glass-optical-filter, blur(0px))",
+          "backdrop-filter": "blur(calc(var(--glass-liquid-blur) + var(--glass-surface-depth, 0) * var(--glass-depth-blur))) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness)) var(--glass-optical-filter, blur(0px))",
+          "box-shadow": "var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) color-mix(in oklch, var(--glass-shadow-color) calc(var(--glass-shadow-opacity) * calc(var(--glass-inactive-strength) + (1 - var(--glass-inactive-strength)) * var(--glass-window-active, 1))), transparent)), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) color-mix(in oklch, var(--primary) var(--glass-glow), transparent)",
           "isolation": "isolate",
           "&::before": {
             "content": "\"\"",
@@ -345,26 +394,26 @@
             "padding": "max(1px, var(--glass-border-width))",
             "border-radius": "inherit",
             "pointer-events": "none",
-            "background": "conic-gradient(from var(--glass-light-angle), color-mix(in oklch, var(--glass-highlight-color) var(--glass-specular), transparent), transparent 25%, color-mix(in oklch, oklch(0 0 0) var(--glass-edge-shade), transparent) 50%, transparent 75%, color-mix(in oklch, var(--glass-highlight-color) var(--glass-specular), transparent))",
+            "background": "conic-gradient(from var(--glass-light-angle), color-mix(in oklch, var(--glass-highlight-color) calc(var(--glass-specular) * calc(var(--glass-inactive-strength) + (1 - var(--glass-inactive-strength)) * var(--glass-window-active, 1))), transparent), transparent 25%, color-mix(in oklch, oklch(0 0 0) calc(var(--glass-edge-shade) * calc(var(--glass-inactive-strength) + (1 - var(--glass-inactive-strength)) * var(--glass-window-active, 1))), transparent) 50%, transparent 75%, color-mix(in oklch, var(--glass-highlight-color) calc(var(--glass-specular) * calc(var(--glass-inactive-strength) + (1 - var(--glass-inactive-strength)) * var(--glass-window-active, 1))), transparent))",
             "-webkit-mask": "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
             "-webkit-mask-composite": "xor",
             "mask": "linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0)"
           }
         },
         "@utility glass-liquid-clear": {
-          "color": "oklch(0.985 0 0)",
-          "--foreground": "oklch(0.985 0 0)",
-          "--card-foreground": "oklch(0.985 0 0)",
-          "--popover-foreground": "oklch(0.985 0 0)",
-          "--muted-foreground": "oklch(0.9 0 0)",
-          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-liquid-clear-opacity) * min(1, var(--glass-clarity) * 2) + (100% - var(--glass-liquid-clear-opacity)) * max(0, var(--glass-clarity) * 2 - 1)), transparent))",
-          "background-image": "linear-gradient(color-mix(in oklch, oklch(0 0 0) var(--glass-liquid-clear-dim), transparent), color-mix(in oklch, oklch(0 0 0) var(--glass-liquid-clear-dim), transparent)), linear-gradient(var(--glass-sheen-angle), color-mix(in oklch, oklch(1 0 0) var(--glass-sheen), transparent), transparent 55%), var(--glass-texture)",
+          "color": "color-mix(in oklch, var(--glass-label) calc(round(down, clamp(0, calc(var(--glass-clarity) + 0.35), 1), 1) * 100%), oklch(0.985 0 0))",
+          "--foreground": "color-mix(in oklch, var(--glass-label) calc(round(down, clamp(0, calc(var(--glass-clarity) + 0.35), 1), 1) * 100%), oklch(0.985 0 0))",
+          "--card-foreground": "color-mix(in oklch, var(--glass-label) calc(round(down, clamp(0, calc(var(--glass-clarity) + 0.35), 1), 1) * 100%), oklch(0.985 0 0))",
+          "--popover-foreground": "color-mix(in oklch, var(--glass-label) calc(round(down, clamp(0, calc(var(--glass-clarity) + 0.35), 1), 1) * 100%), oklch(0.985 0 0))",
+          "--muted-foreground": "color-mix(in oklch, var(--glass-label) calc(round(down, clamp(0, calc(var(--glass-clarity) + 0.35), 1), 1) * 100%), oklch(0.9 0 0))",
+          "background-color": "var(--glass-bg, color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) max(calc(var(--glass-liquid-clear-opacity) * (0.5 + 0.5 * min(1, var(--glass-clarity) * 2)) + (100% - var(--glass-liquid-clear-opacity)) * max(0, var(--glass-clarity) * 2 - 1)), calc(round(down, clamp(0, calc(var(--glass-clarity) + 0.35), 1), 1) * 70%)), transparent))",
+          "background-image": "linear-gradient(var(--glass-sheen-angle), color-mix(in oklch, oklch(1 0 0) var(--glass-sheen), transparent), transparent 55%), var(--glass-texture)",
           "border-width": "var(--glass-border-width)",
           "border-style": "solid",
-          "border-color": "color-mix(in oklch, var(--glass-border-color) var(--glass-border-opacity), transparent)",
-          "-webkit-backdrop-filter": "blur(var(--glass-liquid-blur)) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness))",
-          "backdrop-filter": "blur(var(--glass-liquid-blur)) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness))",
-          "box-shadow": "var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) color-mix(in oklch, var(--primary) var(--glass-glow), transparent)",
+          "border-color": "transparent",
+          "-webkit-backdrop-filter": "blur(var(--glass-liquid-clear-blur)) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness)) var(--glass-optical-filter, blur(0px))",
+          "backdrop-filter": "blur(var(--glass-liquid-clear-blur)) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness)) var(--glass-optical-filter, blur(0px))",
+          "box-shadow": "var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) color-mix(in oklch, var(--glass-shadow-color) calc(var(--glass-shadow-opacity) * calc(var(--glass-inactive-strength) + (1 - var(--glass-inactive-strength)) * var(--glass-window-active, 1))), transparent)), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) color-mix(in oklch, var(--primary) var(--glass-glow), transparent)",
           "isolation": "isolate",
           "&::before": {
             "content": "\"\"",
@@ -373,11 +422,18 @@
             "padding": "max(1px, var(--glass-border-width))",
             "border-radius": "inherit",
             "pointer-events": "none",
-            "background": "conic-gradient(from var(--glass-light-angle), color-mix(in oklch, var(--glass-highlight-color) var(--glass-specular), transparent), transparent 25%, color-mix(in oklch, oklch(0 0 0) var(--glass-edge-shade), transparent) 50%, transparent 75%, color-mix(in oklch, var(--glass-highlight-color) var(--glass-specular), transparent))",
+            "background": "conic-gradient(from var(--glass-light-angle), color-mix(in oklch, var(--glass-highlight-color) calc(var(--glass-specular) * calc(var(--glass-inactive-strength) + (1 - var(--glass-inactive-strength)) * var(--glass-window-active, 1))), transparent), transparent 25%, color-mix(in oklch, oklch(0 0 0) calc(var(--glass-edge-shade) * calc(var(--glass-inactive-strength) + (1 - var(--glass-inactive-strength)) * var(--glass-window-active, 1))), transparent) 50%, transparent 75%, color-mix(in oklch, var(--glass-highlight-color) calc(var(--glass-specular) * calc(var(--glass-inactive-strength) + (1 - var(--glass-inactive-strength)) * var(--glass-window-active, 1))), transparent))",
             "-webkit-mask": "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
             "-webkit-mask-composite": "xor",
             "mask": "linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0)"
           }
+        },
+        "@utility glass-clear-label": {
+          "color": "color-mix(in oklch, var(--glass-label) calc(round(down, clamp(0, calc(var(--glass-clarity) + 0.35), 1), 1) * 100%), oklch(0.985 0 0))",
+          "--foreground": "color-mix(in oklch, var(--glass-label) calc(round(down, clamp(0, calc(var(--glass-clarity) + 0.35), 1), 1) * 100%), oklch(0.985 0 0))",
+          "--card-foreground": "color-mix(in oklch, var(--glass-label) calc(round(down, clamp(0, calc(var(--glass-clarity) + 0.35), 1), 1) * 100%), oklch(0.985 0 0))",
+          "--popover-foreground": "color-mix(in oklch, var(--glass-label) calc(round(down, clamp(0, calc(var(--glass-clarity) + 0.35), 1), 1) * 100%), oklch(0.985 0 0))",
+          "--muted-foreground": "color-mix(in oklch, var(--glass-label) calc(round(down, clamp(0, calc(var(--glass-clarity) + 0.35), 1), 1) * 100%), oklch(0.9 0 0))"
         },
         "@utility glass-light": {
           "&::before": {
@@ -387,7 +443,7 @@
             "padding": "max(1px, var(--glass-border-width))",
             "border-radius": "inherit",
             "pointer-events": "none",
-            "background": "conic-gradient(from var(--glass-light-angle), color-mix(in oklch, var(--glass-highlight-color) var(--glass-specular), transparent), transparent 25%, color-mix(in oklch, oklch(0 0 0) var(--glass-edge-shade), transparent) 50%, transparent 75%, color-mix(in oklch, var(--glass-highlight-color) var(--glass-specular), transparent))",
+            "background": "conic-gradient(from var(--glass-light-angle), color-mix(in oklch, var(--glass-highlight-color) calc(var(--glass-specular) * calc(var(--glass-inactive-strength) + (1 - var(--glass-inactive-strength)) * var(--glass-window-active, 1))), transparent), transparent 25%, color-mix(in oklch, oklch(0 0 0) calc(var(--glass-edge-shade) * calc(var(--glass-inactive-strength) + (1 - var(--glass-inactive-strength)) * var(--glass-window-active, 1))), transparent) 50%, transparent 75%, color-mix(in oklch, var(--glass-highlight-color) calc(var(--glass-specular) * calc(var(--glass-inactive-strength) + (1 - var(--glass-inactive-strength)) * var(--glass-window-active, 1))), transparent))",
             "-webkit-mask": "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
             "-webkit-mask-composite": "xor",
             "mask": "linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0)"
@@ -400,6 +456,7 @@
             "inset": "0",
             "border-radius": "inherit",
             "background": "radial-gradient(circle at var(--glass-press-x, 50%) var(--glass-press-y, 50%), color-mix(in oklch, var(--glass-highlight-color) var(--glass-illumination), transparent), transparent 60%)",
+            "pointer-events": "none",
             "mix-blend-mode": "plus-lighter",
             "opacity": "0",
             "transition": "opacity calc(var(--glass-duration) * 2) ease-out"
@@ -411,7 +468,7 @@
         },
         "@utility glass-shadow-adaptive": {
           "transition": "box-shadow var(--glass-duration) ease-out",
-          "&[data-over-content]:not([data-over-content=false])": {
+          "&[data-over-content]:not([data-over-content=false]), [data-over-content]:not([data-over-content=false]) &": {
             "--glass-elevation": "0 calc(var(--glass-shadow-y) * var(--glass-shadow-over-content)) calc(var(--glass-shadow-blur) * var(--glass-shadow-over-content)) color-mix(in oklch, var(--glass-shadow-color) min(100%, calc(var(--glass-shadow-opacity) * var(--glass-shadow-over-content))), transparent)"
           }
         },
@@ -425,10 +482,10 @@
           "background-image": "linear-gradient(var(--glass-sheen-angle), color-mix(in oklch, oklch(1 0 0) var(--glass-sheen), transparent), transparent 55%), var(--glass-texture)",
           "border-width": "var(--glass-border-width)",
           "border-style": "solid",
-          "border-color": "color-mix(in oklch, var(--glass-border-color) var(--glass-border-opacity), transparent)",
-          "-webkit-backdrop-filter": "blur(var(--glass-liquid-blur)) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness))",
-          "backdrop-filter": "blur(var(--glass-liquid-blur)) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness))",
-          "box-shadow": "var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent)), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) color-mix(in oklch, var(--primary) var(--glass-glow), transparent)",
+          "border-color": "transparent",
+          "-webkit-backdrop-filter": "blur(calc(var(--glass-liquid-blur) + var(--glass-surface-depth, 0) * var(--glass-depth-blur))) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness)) var(--glass-optical-filter, blur(0px))",
+          "backdrop-filter": "blur(calc(var(--glass-liquid-blur) + var(--glass-surface-depth, 0) * var(--glass-depth-blur))) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness)) var(--glass-optical-filter, blur(0px))",
+          "box-shadow": "var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) color-mix(in oklch, var(--glass-shadow-color) calc(var(--glass-shadow-opacity) * calc(var(--glass-inactive-strength) + (1 - var(--glass-inactive-strength)) * var(--glass-window-active, 1))), transparent)), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) color-mix(in oklch, var(--primary) var(--glass-glow), transparent)",
           "isolation": "isolate",
           "&::before": {
             "content": "\"\"",
@@ -437,7 +494,7 @@
             "padding": "max(1px, var(--glass-border-width))",
             "border-radius": "inherit",
             "pointer-events": "none",
-            "background": "conic-gradient(from var(--glass-light-angle), color-mix(in oklch, var(--glass-highlight-color) var(--glass-specular), transparent), transparent 25%, color-mix(in oklch, oklch(0 0 0) var(--glass-edge-shade), transparent) 50%, transparent 75%, color-mix(in oklch, var(--glass-highlight-color) var(--glass-specular), transparent))",
+            "background": "conic-gradient(from var(--glass-light-angle), color-mix(in oklch, var(--glass-highlight-color) calc(var(--glass-specular) * calc(var(--glass-inactive-strength) + (1 - var(--glass-inactive-strength)) * var(--glass-window-active, 1))), transparent), transparent 25%, color-mix(in oklch, oklch(0 0 0) calc(var(--glass-edge-shade) * calc(var(--glass-inactive-strength) + (1 - var(--glass-inactive-strength)) * var(--glass-window-active, 1))), transparent) 50%, transparent 75%, color-mix(in oklch, var(--glass-highlight-color) calc(var(--glass-specular) * calc(var(--glass-inactive-strength) + (1 - var(--glass-inactive-strength)) * var(--glass-window-active, 1))), transparent))",
             "-webkit-mask": "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
             "-webkit-mask-composite": "xor",
             "mask": "linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0)"
@@ -448,6 +505,7 @@
             "inset": "0",
             "border-radius": "inherit",
             "background": "radial-gradient(circle at var(--glass-press-x, 50%) var(--glass-press-y, 50%), color-mix(in oklch, var(--glass-highlight-color) var(--glass-illumination), transparent), transparent 60%)",
+            "pointer-events": "none",
             "mix-blend-mode": "plus-lighter",
             "opacity": "0",
             "transition": "opacity calc(var(--glass-duration) * 2) ease-out"
@@ -470,10 +528,10 @@
         },
         "@utility glass-knob-lens": {
           "background-color": "var(--glass-knob)",
-          "&:is(:where(.group):active > *, [data-dragging]:not([data-dragging=false]), [data-dragging]:not([data-dragging=false]) *)": {
+          "&:is(:where(.group):active > *, [data-dragging]:not([data-dragging=false]), [data-dragging]:not([data-dragging=false]) *), :where([data-slot=switch], [data-slot=slider], [data-slot=segmented-control]):active &": {
             "background-color": "color-mix(in oklch, var(--glass-knob) 22%, transparent)",
-            "-webkit-backdrop-filter": "blur(var(--glass-liquid-blur)) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness))",
-            "backdrop-filter": "blur(var(--glass-liquid-blur)) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness))",
+            "-webkit-backdrop-filter": "blur(calc(var(--glass-liquid-blur) + var(--glass-surface-depth, 0) * var(--glass-depth-blur))) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness)) var(--glass-optical-filter, blur(0px))",
+            "backdrop-filter": "blur(calc(var(--glass-liquid-blur) + var(--glass-surface-depth, 0) * var(--glass-depth-blur))) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness)) var(--glass-optical-filter, blur(0px))",
             "box-shadow": "0 calc(var(--glass-shadow-y) * 0.4) calc(var(--glass-shadow-blur) * 0.5) color-mix(in oklch, var(--glass-shadow-color) var(--glass-shadow-opacity), transparent), inset 0 0 0 1px color-mix(in oklch, var(--glass-highlight-color) var(--glass-specular), transparent), inset 0 -2px 4px color-mix(in oklch, oklch(0 0 0) var(--glass-edge-shade), transparent)",
             "scale": "calc(var(--glass-knob-lens-scale) * (1 + max(var(--glass-knob-stretch-x, 0), var(--glass-knob-stretch-x, 0) * -1) * 0.12)) calc(var(--glass-knob-lens-scale) * (1 - max(var(--glass-knob-stretch-x, 0), var(--glass-knob-stretch-x, 0) * -1) * 0.06))"
           }
@@ -516,10 +574,18 @@
           "&::after": {
             "-webkit-backdrop-filter": "blur(var(--glass-blur))",
             "backdrop-filter": "blur(var(--glass-blur))",
-            "background-color": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity-subtle) * min(1, var(--glass-clarity) * 2) + (100% - var(--glass-opacity-subtle)) * max(0, var(--glass-clarity) * 2 - 1)), transparent)",
+            "background-color": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity-subtle) * (0.5 + 0.5 * min(1, var(--glass-clarity) * 2)) + (100% - var(--glass-opacity-subtle)) * max(0, var(--glass-clarity) * 2 - 1)), transparent)",
             "-webkit-mask-image": "linear-gradient(to var(--glass-scroll-edge-to, bottom), #000, transparent 40%)",
             "mask-image": "linear-gradient(to var(--glass-scroll-edge-to, bottom), #000, transparent 40%)"
           }
+        },
+        "@utility scroll-edge-automatic": {
+          "pointer-events": "none",
+          "background-color": "color-mix(in oklch, var(--glass-tint) max(var(--glass-opacity-strong), 86%), transparent)",
+          "-webkit-backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness))",
+          "backdrop-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness))",
+          "-webkit-mask-image": "linear-gradient(to var(--glass-scroll-edge-to, bottom), #000 65%, transparent)",
+          "mask-image": "linear-gradient(to var(--glass-scroll-edge-to, bottom), #000 65%, transparent)"
         },
         "@utility scroll-edge-hard": {
           "pointer-events": "none",
@@ -551,7 +617,8 @@
             "left": "50%",
             "width": "max(100%, 24px)",
             "height": "max(100%, 24px)",
-            "translate": "-50% -50%"
+            "translate": "-50% -50%",
+            "pointer-events": "auto"
           }
         },
         "@media (pointer: coarse)": {
@@ -729,6 +796,34 @@
           "inherits": "false",
           "initial-value": "1"
         },
+        "@property --glass-optical-filter": {
+          "syntax": "\"*\"",
+          "inherits": "false",
+          "initial-value": "blur(0px)"
+        },
+        "@property --glass-surface-depth": {
+          "syntax": "\"<number>\"",
+          "inherits": "false",
+          "initial-value": "0"
+        },
+        "@property --glass-window-active": {
+          "syntax": "\"<number>\"",
+          "inherits": "true",
+          "initial-value": "1"
+        },
+        ":where([data-glass-window-active=false])": {
+          "--glass-window-active": "0"
+        },
+        ":where([data-glass-window-active=true])": {
+          "--glass-window-active": "1"
+        },
+        ":where(.glass-liquid, .glass-prominent) :where(.text-primary-ink)": {
+          "color": "color-mix(in oklch, color-mix(in oklch, var(--primary) 30%, var(--glass-label)) calc(var(--glass-window-active, 1) * 100%), var(--glass-label-secondary))"
+        },
+        ":where([data-glass-show-borders]) :is(.glass-liquid, .glass-liquid-clear, .glass-prominent, .glass-knob-lens)": {
+          "border-color": "var(--glass-label-secondary)",
+          "border-width": "max(1px, var(--glass-border-width))"
+        },
         "@keyframes glass-materialize": {
           "from": {
             "--glass-materialize": "0",
@@ -804,7 +899,7 @@
           }
         },
         "@layer base": {
-          ":where(.glass-liquid, .glass-liquid-clear, .glass-light, .glass-prominent, .glass-illuminate, .scroll-edge-soft)": {
+          ":where(.glass-liquid, .glass-liquid-clear, .glass-light, .glass-prominent, .glass-illuminate, .scroll-edge-soft, .scroll-edge-automatic)": {
             "position": "relative"
           },
           ":where(.glass-press, .glass-press-liquid)": {
@@ -814,13 +909,21 @@
             "transition": "scale calc(var(--glass-duration) * 1.5) var(--glass-ease), background-color var(--glass-duration) ease-out, box-shadow var(--glass-duration) ease-out"
           }
         },
+        "::view-transition-group(.glass-presentation)": {
+          "animation-duration": "calc(var(--glass-duration) * 2.5)",
+          "animation-timing-function": "var(--glass-ease)"
+        },
+        "::view-transition-image-pair(.glass-presentation)": {
+          "border-radius": "inherit",
+          "overflow": "clip"
+        },
         "@starting-style": {
           ".glass-morph-origin:is([data-state=open], [data-state=delayed-open], [data-state=instant-open])": {
             "clip-path": "inset(calc((100% - var(--glass-morph-h, 100%)) / 2) calc((100% - var(--glass-morph-w, 100%)) / 2) round var(--glass-radius-button))"
           }
         },
         "@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)))": {
-          ".glass, .glass-strong, .glass-subtle, .glass-liquid, .glass-liquid-clear": {
+          ".glass, .glass-strong, .glass-subtle, .glass-thick, .glass-liquid, .glass-liquid-clear": {
             "--glass-bg": "color-mix(in oklch, var(--glass-tint) 92%, transparent)"
           }
         },
@@ -849,6 +952,21 @@
           }
         },
         "@media (prefers-reduced-transparency: reduce)": {
+          ".glass-liquid-clear": {
+            "color": "var(--glass-label)",
+            "--foreground": "var(--glass-label)",
+            "--muted-foreground": "var(--glass-label-secondary)",
+            "--popover-foreground": "var(--glass-label)"
+          },
+          ".glass, .glass-strong, .glass-subtle, .glass-thick, .glass-liquid, .glass-liquid-clear": {
+            "--glass-clarity": "0.5 !important",
+            "--glass-opacity": "90% !important",
+            "--glass-opacity-strong": "96% !important",
+            "--glass-opacity-subtle": "84% !important",
+            "--glass-liquid-opacity": "90% !important",
+            "--glass-liquid-clear-opacity": "90% !important",
+            "--glass-refraction": "0px !important"
+          },
           ":root, [data-glass-scope]": {
             "--glass-opacity": "90% !important",
             "--glass-opacity-strong": "96% !important",
@@ -861,10 +979,26 @@
             "--glass-sheen": "0% !important",
             "--glass-texture": "none !important",
             "--glass-specular": "0% !important",
-            "--glass-illumination": "0% !important"
+            "--glass-illumination": "0% !important",
+            "--glass-refraction": "0px !important"
           }
         },
         "@media (prefers-contrast: more)": {
+          ".glass-liquid-clear": {
+            "color": "var(--glass-label)",
+            "--foreground": "var(--glass-label)",
+            "--muted-foreground": "var(--glass-label-secondary)",
+            "--popover-foreground": "var(--glass-label)"
+          },
+          ".glass, .glass-strong, .glass-subtle, .glass-thick, .glass-liquid, .glass-liquid-clear": {
+            "--glass-clarity": "0.5 !important",
+            "--glass-opacity": "94% !important",
+            "--glass-opacity-strong": "97% !important",
+            "--glass-opacity-subtle": "90% !important",
+            "--glass-liquid-opacity": "94% !important",
+            "--glass-liquid-clear-opacity": "94% !important",
+            "--glass-refraction": "0px !important"
+          },
           ":root, [data-glass-scope]": {
             "--glass-opacity": "94% !important",
             "--glass-opacity-strong": "97% !important",
@@ -884,15 +1018,29 @@
             "--glass-illumination": "0% !important",
             "--glass-press-stretch": "0 !important",
             "--glass-press-grow": "1 !important",
+            "--glass-refraction": "0px !important",
             "--glass-label-secondary": "oklch(0.36 0.01 285) !important"
           },
           ":is(:root, [data-glass-scope]):is(.dark, .dark *):not(:where(.dark .light, .dark .light *):not(:where(.dark .light .dark, .dark .light .dark *)))": {
             "--glass-border-color": "oklch(1 0 0) !important",
             "--glass-label-secondary": "oklch(0.93 0.01 285) !important"
+          },
+          ":is(.glass-liquid, .glass-liquid-clear, .glass-prominent)": {
+            "border-color": "color-mix(in oklch, var(--glass-border-color) var(--glass-border-opacity), transparent)"
           }
         },
+        ":where([data-glass-reduce-transparency]) .glass-liquid-clear": {
+          "color": "var(--glass-label)",
+          "--foreground": "var(--glass-label)",
+          "--muted-foreground": "var(--glass-label-secondary)",
+          "--popover-foreground": "var(--glass-label)"
+        },
+        ":where([data-glass-reduce-highlights]) :is(.glass-liquid, .glass-liquid-clear, .glass-light, .glass-illuminate, .glass-prominent)": {
+          "--glass-specular": "0% !important",
+          "--glass-illumination": "0% !important"
+        },
         "@media (forced-colors: active)": {
-          ".glass, .glass-strong, .glass-subtle, .glass-liquid, .glass-liquid-clear": {
+          ".glass, .glass-strong, .glass-subtle, .glass-thick, .glass-liquid, .glass-liquid-clear": {
             "-webkit-backdrop-filter": "none",
             "backdrop-filter": "none",
             "background-color": "Canvas",
@@ -986,10 +1134,146 @@
       ]
     },
     {
+      "name": "glass-optics",
+      "type": "registry:lib",
+      "title": "Glass optics",
+      "description": "A bounded rounded-lens displacement map for web control surfaces. Geometry only; no backdrop pixels are read.",
+      "categories": [
+        "glass",
+        "foundations"
+      ],
+      "files": [
+        {
+          "path": "src/lib/glass-optics.ts",
+          "type": "registry:lib",
+          "target": "@lib/glass-optics.ts"
+        }
+      ]
+    },
+    {
+      "name": "glass-portal",
+      "type": "registry:lib",
+      "title": "Glass portal",
+      "description": "Carries scoped theme primitives and appearance into body-mounted overlays without clipping them to a preview.",
+      "categories": [
+        "glass",
+        "foundations"
+      ],
+      "dependencies": [
+        "radix-ui"
+      ],
+      "files": [
+        {
+          "path": "src/lib/glass-portal.tsx",
+          "type": "registry:lib",
+          "target": "@lib/glass-portal.tsx"
+        }
+      ]
+    },
+    {
+      "name": "glass-transitions",
+      "type": "registry:lib",
+      "title": "Glass presentation transitions",
+      "description": "Source-to-presentation transitions with per-instance identity, synchronous React snapshots and reduced-motion fallback.",
+      "categories": [
+        "glass",
+        "foundations"
+      ],
+      "dependencies": [
+        "react-dom"
+      ],
+      "files": [
+        {
+          "path": "src/lib/glass-transitions.ts",
+          "type": "registry:lib",
+          "target": "@lib/glass-transitions.ts"
+        }
+      ]
+    },
+    {
+      "name": "glass-effects",
+      "type": "registry:component",
+      "title": "Glass effects",
+      "description": "Install once at the app root to add optical refraction and pointer illumination to floating controls, including portals. CSS material fallback on WebKit and Firefox.",
+      "categories": [
+        "glass",
+        "foundations"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-optics.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/glass-effects.tsx",
+          "type": "registry:component",
+          "target": "@components/glass/glass-effects.tsx"
+        }
+      ]
+    },
+    {
+      "name": "theme-system",
+      "type": "registry:theme",
+      "title": "System palette",
+      "description": "Apple's default appearance: Apple's blue on the system greys, the system colours for charts, no aurora. The default. Sets the accent, ring, eight chart colours, the aurora and the ground for light and dark.",
+      "categories": [
+        "glass",
+        "themes"
+      ],
+      "cssVars": {
+        "light": {
+          "primary": "oklch(0.543 0.187 256.2)",
+          "primary-foreground": "oklch(1 0 none)",
+          "ring": "oklch(0.543 0.187 256.2)",
+          "chart-1": "oklch(0.543 0.187 256.2)",
+          "chart-2": "oklch(0.73 0.194 147.4)",
+          "chart-3": "oklch(0.753 0.172 55.7)",
+          "chart-4": "oklch(0.622 0.263 322.5)",
+          "chart-5": "oklch(0.65 0.238 17.9)",
+          "chart-6": "oklch(0.559 0.23 279.3)",
+          "chart-7": "oklch(0.745 0.127 203.3)",
+          "chart-8": "oklch(0.648 0.007 286.2)",
+          "aurora-1": "oklch(0.963 0.007 286.3)",
+          "aurora-2": "oklch(0.963 0.007 286.3)",
+          "aurora-3": "oklch(0.963 0.007 286.3)",
+          "success": "oklch(0.52 0.143 150)",
+          "success-foreground": "oklch(0.99 0 0)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.52 0.089 205)",
+          "info-foreground": "oklch(0.99 0 0)",
+          "aurora-base": "oklch(0.963 0.007 286.3)"
+        },
+        "dark": {
+          "primary": "oklch(0.543 0.187 256.2)",
+          "primary-foreground": "oklch(1 0 none)",
+          "ring": "oklch(0.543 0.187 256.2)",
+          "chart-1": "oklch(0.543 0.187 256.2)",
+          "chart-2": "oklch(0.756 0.208 147)",
+          "chart-3": "oklch(0.762 0.167 57.1)",
+          "chart-4": "oklch(0.658 0.279 322.4)",
+          "chart-5": "oklch(0.658 0.231 16)",
+          "chart-6": "oklch(0.641 0.193 274.7)",
+          "chart-7": "oklch(0.787 0.134 203.3)",
+          "chart-8": "oklch(0.681 0.007 286.2)",
+          "aurora-1": "oklch(0 0 none)",
+          "aurora-2": "oklch(0 0 none)",
+          "aurora-3": "oklch(0 0 none)",
+          "success": "oklch(0.74 0.15 150)",
+          "success-foreground": "oklch(0.2 0.04 150)",
+          "warning": "oklch(0.8 0.16 80)",
+          "warning-foreground": "oklch(0.2 0.04 80)",
+          "info": "oklch(0.74 0.126 205)",
+          "info-foreground": "oklch(0.2 0.036 205)",
+          "aurora-base": "oklch(0 0 none)"
+        }
+      }
+    },
+    {
       "name": "theme-dusk",
       "type": "registry:theme",
       "title": "Dusk palette",
-      "description": "Coral over violet and peach — the default. Sets the accent, ring, eight chart colours, the aurora and the ground for light and dark.",
+      "description": "Coral over violet and peach. Sets the accent, ring, eight chart colours, the aurora and the ground for light and dark.",
       "categories": [
         "glass",
         "themes"
@@ -1696,33 +1980,45 @@
           "glass-opacity": "52%",
           "glass-opacity-strong": "74%",
           "glass-opacity-subtle": "28%",
+          "glass-opacity-thick": "86%",
           "glass-blur": "28px",
           "glass-saturate": "180%",
           "glass-brightness": "100%",
-          "glass-sheen": "10%",
+          "glass-sheen": "0%",
           "glass-sheen-angle": "160deg",
           "glass-texture": "none",
-          "glass-fill-tint": "oklch(0.55 0.01 285)",
+          "glass-fill-tint": "oklch(0.575 0.012 286)",
           "glass-fill-opacity": "12%",
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
-          "glass-label": "oklch(0.145 0 0)",
+          "glass-label": "oklch(0 0 none)",
           "glass-clarity": "0.5",
-          "glass-label-secondary": "oklch(0.44 0.01 285)",
-          "glass-label-tertiary": "oklch(0.6 0.01 285)",
+          "glass-label-secondary": "oklch(0.37 0.012 286)",
+          "glass-label-tertiary": "oklch(0.52 0.01 286)",
           "glass-label-quaternary": "oklch(0.76 0.005 285)",
           "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
+          "glass-liquid-opacity": "58%",
+          "glass-liquid-clear-opacity": "10%",
+          "glass-liquid-clear-dim": "35%",
+          "glass-liquid-blur": "18px",
+          "glass-liquid-clear-blur": "4px",
+          "glass-liquid-saturate": "160%",
+          "glass-refraction": "14px",
+          "glass-bezel": "12px",
+          "glass-depth-opacity": "12%",
+          "glass-depth-blur": "6px",
+          "glass-inactive-strength": "0.4",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "85%",
           "glass-border-width": "1px",
           "glass-highlight-opacity": "92%",
           "glass-highlight-color": "oklch(1 0 0)",
           "glass-light-angle": "-45deg",
-          "glass-specular": "70%",
-          "glass-edge-shade": "0%",
+          "glass-specular": "88%",
+          "glass-edge-shade": "22%",
           "glass-illumination": "22%",
-          "glass-shadow-color": "oklch(0.3 0.05 270)",
+          "glass-shadow-color": "oklch(0 0 0)",
           "glass-shadow-opacity": "12%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
@@ -1731,35 +2027,47 @@
           "glass-glow": "0%"
         },
         "dark": {
-          "glass-tint": "oklch(0.24 0.012 285)",
+          "glass-tint": "oklch(0.227 0.004 286.1)",
           "glass-opacity": "45%",
           "glass-opacity-strong": "72%",
           "glass-opacity-subtle": "24%",
+          "glass-opacity-thick": "84%",
           "glass-blur": "28px",
           "glass-saturate": "180%",
           "glass-brightness": "100%",
-          "glass-sheen": "5%",
+          "glass-sheen": "0%",
           "glass-sheen-angle": "160deg",
           "glass-texture": "none",
-          "glass-fill-tint": "oklch(0.6 0.01 285)",
+          "glass-fill-tint": "oklch(0.575 0.012 286)",
           "glass-fill-opacity": "24%",
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
-          "glass-label": "oklch(0.985 0 0)",
+          "glass-label": "oklch(1 0 none)",
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.88 0.01 285)",
-          "glass-label-tertiary": "oklch(0.62 0.01 285)",
+          "glass-label-tertiary": "oklch(0.66 0.01 285)",
           "glass-label-quaternary": "oklch(0.45 0.01 285)",
           "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
+          "glass-liquid-opacity": "48%",
+          "glass-liquid-clear-opacity": "8%",
+          "glass-liquid-clear-dim": "35%",
+          "glass-liquid-blur": "18px",
+          "glass-liquid-clear-blur": "4px",
+          "glass-liquid-saturate": "160%",
+          "glass-refraction": "14px",
+          "glass-bezel": "12px",
+          "glass-depth-opacity": "12%",
+          "glass-depth-blur": "6px",
+          "glass-inactive-strength": "0.4",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "12%",
           "glass-border-width": "1px",
           "glass-highlight-opacity": "14%",
           "glass-highlight-color": "oklch(1 0 0)",
           "glass-light-angle": "-45deg",
-          "glass-specular": "30%",
-          "glass-edge-shade": "18%",
+          "glass-specular": "65%",
+          "glass-edge-shade": "32%",
           "glass-illumination": "22%",
           "glass-shadow-color": "oklch(0 0 0)",
           "glass-shadow-opacity": "45%",
@@ -1786,33 +2094,45 @@
           "glass-opacity": "28%",
           "glass-opacity-strong": "55%",
           "glass-opacity-subtle": "14%",
+          "glass-opacity-thick": "70%",
           "glass-blur": "16px",
           "glass-saturate": "240%",
           "glass-brightness": "100%",
           "glass-sheen": "22%",
           "glass-sheen-angle": "135deg",
           "glass-texture": "none",
-          "glass-fill-tint": "oklch(0.55 0.01 285)",
+          "glass-fill-tint": "oklch(0.575 0.012 286)",
           "glass-fill-opacity": "12%",
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
-          "glass-label": "oklch(0.145 0 0)",
+          "glass-label": "oklch(0 0 none)",
           "glass-clarity": "0.5",
-          "glass-label-secondary": "oklch(0.44 0.01 285)",
-          "glass-label-tertiary": "oklch(0.6 0.01 285)",
+          "glass-label-secondary": "oklch(0.37 0.012 286)",
+          "glass-label-tertiary": "oklch(0.52 0.01 286)",
           "glass-label-quaternary": "oklch(0.76 0.005 285)",
           "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
+          "glass-liquid-opacity": "58%",
+          "glass-liquid-clear-opacity": "10%",
+          "glass-liquid-clear-dim": "35%",
+          "glass-liquid-blur": "18px",
+          "glass-liquid-clear-blur": "4px",
+          "glass-liquid-saturate": "160%",
+          "glass-refraction": "14px",
+          "glass-bezel": "12px",
+          "glass-depth-opacity": "12%",
+          "glass-depth-blur": "6px",
+          "glass-inactive-strength": "0.4",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "85%",
           "glass-border-width": "1px",
           "glass-highlight-opacity": "92%",
           "glass-highlight-color": "oklch(1 0 0)",
           "glass-light-angle": "-45deg",
-          "glass-specular": "70%",
-          "glass-edge-shade": "0%",
+          "glass-specular": "88%",
+          "glass-edge-shade": "22%",
           "glass-illumination": "22%",
-          "glass-shadow-color": "oklch(0.3 0.05 270)",
+          "glass-shadow-color": "oklch(0 0 0)",
           "glass-shadow-opacity": "12%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
@@ -1821,35 +2141,47 @@
           "glass-glow": "0%"
         },
         "dark": {
-          "glass-tint": "oklch(0.24 0.012 285)",
+          "glass-tint": "oklch(0.227 0.004 286.1)",
           "glass-opacity": "26%",
           "glass-opacity-strong": "55%",
           "glass-opacity-subtle": "12%",
+          "glass-opacity-thick": "70%",
           "glass-blur": "16px",
           "glass-saturate": "240%",
           "glass-brightness": "100%",
           "glass-sheen": "5%",
           "glass-sheen-angle": "135deg",
           "glass-texture": "none",
-          "glass-fill-tint": "oklch(0.6 0.01 285)",
+          "glass-fill-tint": "oklch(0.575 0.012 286)",
           "glass-fill-opacity": "24%",
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
-          "glass-label": "oklch(0.985 0 0)",
+          "glass-label": "oklch(1 0 none)",
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.88 0.01 285)",
-          "glass-label-tertiary": "oklch(0.62 0.01 285)",
+          "glass-label-tertiary": "oklch(0.66 0.01 285)",
           "glass-label-quaternary": "oklch(0.45 0.01 285)",
           "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
+          "glass-liquid-opacity": "48%",
+          "glass-liquid-clear-opacity": "8%",
+          "glass-liquid-clear-dim": "35%",
+          "glass-liquid-blur": "18px",
+          "glass-liquid-clear-blur": "4px",
+          "glass-liquid-saturate": "160%",
+          "glass-refraction": "14px",
+          "glass-bezel": "12px",
+          "glass-depth-opacity": "12%",
+          "glass-depth-blur": "6px",
+          "glass-inactive-strength": "0.4",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "12%",
           "glass-border-width": "1px",
           "glass-highlight-opacity": "14%",
           "glass-highlight-color": "oklch(1 0 0)",
           "glass-light-angle": "-45deg",
-          "glass-specular": "30%",
-          "glass-edge-shade": "18%",
+          "glass-specular": "65%",
+          "glass-edge-shade": "32%",
           "glass-illumination": "22%",
           "glass-shadow-color": "oklch(0 0 0)",
           "glass-shadow-opacity": "45%",
@@ -1876,33 +2208,45 @@
           "glass-opacity": "38%",
           "glass-opacity-strong": "74%",
           "glass-opacity-subtle": "28%",
+          "glass-opacity-thick": "86%",
           "glass-blur": "10px",
           "glass-saturate": "150%",
           "glass-brightness": "100%",
           "glass-sheen": "16%",
           "glass-sheen-angle": "120deg",
           "glass-texture": "none",
-          "glass-fill-tint": "oklch(0.55 0.01 285)",
+          "glass-fill-tint": "oklch(0.575 0.012 286)",
           "glass-fill-opacity": "12%",
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
-          "glass-label": "oklch(0.145 0 0)",
+          "glass-label": "oklch(0 0 none)",
           "glass-clarity": "0.5",
-          "glass-label-secondary": "oklch(0.44 0.01 285)",
-          "glass-label-tertiary": "oklch(0.6 0.01 285)",
+          "glass-label-secondary": "oklch(0.37 0.012 286)",
+          "glass-label-tertiary": "oklch(0.52 0.01 286)",
           "glass-label-quaternary": "oklch(0.76 0.005 285)",
           "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
+          "glass-liquid-opacity": "58%",
+          "glass-liquid-clear-opacity": "10%",
+          "glass-liquid-clear-dim": "35%",
+          "glass-liquid-blur": "18px",
+          "glass-liquid-clear-blur": "4px",
+          "glass-liquid-saturate": "160%",
+          "glass-refraction": "14px",
+          "glass-bezel": "12px",
+          "glass-depth-opacity": "12%",
+          "glass-depth-blur": "6px",
+          "glass-inactive-strength": "0.4",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "100%",
           "glass-border-width": "1.5px",
           "glass-highlight-opacity": "100%",
           "glass-highlight-color": "oklch(1 0 0)",
           "glass-light-angle": "-45deg",
-          "glass-specular": "70%",
-          "glass-edge-shade": "0%",
+          "glass-specular": "88%",
+          "glass-edge-shade": "22%",
           "glass-illumination": "22%",
-          "glass-shadow-color": "oklch(0.3 0.05 270)",
+          "glass-shadow-color": "oklch(0 0 0)",
           "glass-shadow-opacity": "12%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
@@ -1911,35 +2255,47 @@
           "glass-glow": "0%"
         },
         "dark": {
-          "glass-tint": "oklch(0.24 0.012 285)",
+          "glass-tint": "oklch(0.227 0.004 286.1)",
           "glass-opacity": "34%",
           "glass-opacity-strong": "72%",
           "glass-opacity-subtle": "24%",
+          "glass-opacity-thick": "84%",
           "glass-blur": "10px",
           "glass-saturate": "150%",
           "glass-brightness": "100%",
           "glass-sheen": "6%",
           "glass-sheen-angle": "120deg",
           "glass-texture": "none",
-          "glass-fill-tint": "oklch(0.6 0.01 285)",
+          "glass-fill-tint": "oklch(0.575 0.012 286)",
           "glass-fill-opacity": "24%",
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
-          "glass-label": "oklch(0.985 0 0)",
+          "glass-label": "oklch(1 0 none)",
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.88 0.01 285)",
-          "glass-label-tertiary": "oklch(0.62 0.01 285)",
+          "glass-label-tertiary": "oklch(0.66 0.01 285)",
           "glass-label-quaternary": "oklch(0.45 0.01 285)",
           "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
+          "glass-liquid-opacity": "48%",
+          "glass-liquid-clear-opacity": "8%",
+          "glass-liquid-clear-dim": "35%",
+          "glass-liquid-blur": "18px",
+          "glass-liquid-clear-blur": "4px",
+          "glass-liquid-saturate": "160%",
+          "glass-refraction": "14px",
+          "glass-bezel": "12px",
+          "glass-depth-opacity": "12%",
+          "glass-depth-blur": "6px",
+          "glass-inactive-strength": "0.4",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "28%",
           "glass-border-width": "1.5px",
           "glass-highlight-opacity": "30%",
           "glass-highlight-color": "oklch(1 0 0)",
           "glass-light-angle": "-45deg",
-          "glass-specular": "30%",
-          "glass-edge-shade": "18%",
+          "glass-specular": "65%",
+          "glass-edge-shade": "32%",
           "glass-illumination": "22%",
           "glass-shadow-color": "oklch(0 0 0)",
           "glass-shadow-opacity": "45%",
@@ -1966,6 +2322,7 @@
           "glass-opacity": "72%",
           "glass-opacity-strong": "86%",
           "glass-opacity-subtle": "68%",
+          "glass-opacity-thick": "94%",
           "glass-blur": "30px",
           "glass-saturate": "140%",
           "glass-brightness": "85%",
@@ -1979,20 +2336,31 @@
           "glass-label": "oklch(0.985 0 0)",
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.88 0.01 270)",
-          "glass-label-tertiary": "oklch(0.6 0.01 285)",
+          "glass-label-tertiary": "oklch(0.52 0.01 286)",
           "glass-label-quaternary": "oklch(0.76 0.005 285)",
           "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
+          "glass-liquid-opacity": "72%",
+          "glass-liquid-clear-opacity": "10%",
+          "glass-liquid-clear-dim": "35%",
+          "glass-liquid-blur": "18px",
+          "glass-liquid-clear-blur": "4px",
+          "glass-liquid-saturate": "160%",
+          "glass-refraction": "14px",
+          "glass-bezel": "12px",
+          "glass-depth-opacity": "12%",
+          "glass-depth-blur": "6px",
+          "glass-inactive-strength": "0.4",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "16%",
           "glass-border-width": "1px",
           "glass-highlight-opacity": "18%",
           "glass-highlight-color": "oklch(1 0 0)",
           "glass-light-angle": "-45deg",
-          "glass-specular": "70%",
-          "glass-edge-shade": "0%",
+          "glass-specular": "88%",
+          "glass-edge-shade": "22%",
           "glass-illumination": "22%",
-          "glass-shadow-color": "oklch(0.3 0.05 270)",
+          "glass-shadow-color": "oklch(0 0 0)",
           "glass-shadow-opacity": "30%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
@@ -2005,31 +2373,43 @@
           "glass-opacity": "60%",
           "glass-opacity-strong": "84%",
           "glass-opacity-subtle": "24%",
+          "glass-opacity-thick": "92%",
           "glass-blur": "30px",
           "glass-saturate": "140%",
           "glass-brightness": "85%",
           "glass-sheen": "6%",
           "glass-sheen-angle": "160deg",
           "glass-texture": "none",
-          "glass-fill-tint": "oklch(0.6 0.01 285)",
+          "glass-fill-tint": "oklch(0.575 0.012 286)",
           "glass-fill-opacity": "24%",
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
-          "glass-label": "oklch(0.985 0 0)",
+          "glass-label": "oklch(1 0 none)",
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.88 0.01 285)",
-          "glass-label-tertiary": "oklch(0.62 0.01 285)",
+          "glass-label-tertiary": "oklch(0.66 0.01 285)",
           "glass-label-quaternary": "oklch(0.45 0.01 285)",
           "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
+          "glass-liquid-opacity": "48%",
+          "glass-liquid-clear-opacity": "8%",
+          "glass-liquid-clear-dim": "35%",
+          "glass-liquid-blur": "18px",
+          "glass-liquid-clear-blur": "4px",
+          "glass-liquid-saturate": "160%",
+          "glass-refraction": "14px",
+          "glass-bezel": "12px",
+          "glass-depth-opacity": "12%",
+          "glass-depth-blur": "6px",
+          "glass-inactive-strength": "0.4",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "12%",
           "glass-border-width": "1px",
           "glass-highlight-opacity": "14%",
           "glass-highlight-color": "oklch(1 0 0)",
           "glass-light-angle": "-45deg",
-          "glass-specular": "30%",
-          "glass-edge-shade": "18%",
+          "glass-specular": "65%",
+          "glass-edge-shade": "32%",
           "glass-illumination": "22%",
           "glass-shadow-color": "oklch(0 0 0)",
           "glass-shadow-opacity": "45%",
@@ -2056,33 +2436,45 @@
           "glass-opacity": "90%",
           "glass-opacity-strong": "96%",
           "glass-opacity-subtle": "75%",
+          "glass-opacity-thick": "100%",
           "glass-blur": "0px",
           "glass-saturate": "100%",
           "glass-brightness": "100%",
           "glass-sheen": "0%",
           "glass-sheen-angle": "160deg",
           "glass-texture": "none",
-          "glass-fill-tint": "oklch(0.55 0.01 285)",
+          "glass-fill-tint": "oklch(0.575 0.012 286)",
           "glass-fill-opacity": "12%",
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
-          "glass-label": "oklch(0.145 0 0)",
+          "glass-label": "oklch(0 0 none)",
           "glass-clarity": "0.5",
-          "glass-label-secondary": "oklch(0.44 0.01 285)",
-          "glass-label-tertiary": "oklch(0.6 0.01 285)",
+          "glass-label-secondary": "oklch(0.37 0.012 286)",
+          "glass-label-tertiary": "oklch(0.52 0.01 286)",
           "glass-label-quaternary": "oklch(0.76 0.005 285)",
           "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
+          "glass-liquid-opacity": "58%",
+          "glass-liquid-clear-opacity": "10%",
+          "glass-liquid-clear-dim": "35%",
+          "glass-liquid-blur": "0px",
+          "glass-liquid-clear-blur": "0px",
+          "glass-liquid-saturate": "160%",
+          "glass-refraction": "0px",
+          "glass-bezel": "12px",
+          "glass-depth-opacity": "0%",
+          "glass-depth-blur": "0px",
+          "glass-inactive-strength": "0.4",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "85%",
           "glass-border-width": "1px",
           "glass-highlight-opacity": "92%",
           "glass-highlight-color": "oklch(1 0 0)",
           "glass-light-angle": "-45deg",
-          "glass-specular": "70%",
-          "glass-edge-shade": "0%",
+          "glass-specular": "88%",
+          "glass-edge-shade": "22%",
           "glass-illumination": "22%",
-          "glass-shadow-color": "oklch(0.3 0.05 270)",
+          "glass-shadow-color": "oklch(0 0 0)",
           "glass-shadow-opacity": "12%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
@@ -2091,35 +2483,47 @@
           "glass-glow": "0%"
         },
         "dark": {
-          "glass-tint": "oklch(0.24 0.012 285)",
+          "glass-tint": "oklch(0.227 0.004 286.1)",
           "glass-opacity": "90%",
           "glass-opacity-strong": "96%",
           "glass-opacity-subtle": "75%",
+          "glass-opacity-thick": "100%",
           "glass-blur": "0px",
           "glass-saturate": "100%",
           "glass-brightness": "100%",
           "glass-sheen": "0%",
           "glass-sheen-angle": "160deg",
           "glass-texture": "none",
-          "glass-fill-tint": "oklch(0.6 0.01 285)",
+          "glass-fill-tint": "oklch(0.575 0.012 286)",
           "glass-fill-opacity": "24%",
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
-          "glass-label": "oklch(0.985 0 0)",
+          "glass-label": "oklch(1 0 none)",
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.88 0.01 285)",
-          "glass-label-tertiary": "oklch(0.62 0.01 285)",
+          "glass-label-tertiary": "oklch(0.66 0.01 285)",
           "glass-label-quaternary": "oklch(0.45 0.01 285)",
           "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
+          "glass-liquid-opacity": "48%",
+          "glass-liquid-clear-opacity": "8%",
+          "glass-liquid-clear-dim": "35%",
+          "glass-liquid-blur": "0px",
+          "glass-liquid-clear-blur": "0px",
+          "glass-liquid-saturate": "160%",
+          "glass-refraction": "0px",
+          "glass-bezel": "12px",
+          "glass-depth-opacity": "0%",
+          "glass-depth-blur": "0px",
+          "glass-inactive-strength": "0.4",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "12%",
           "glass-border-width": "1px",
           "glass-highlight-opacity": "14%",
           "glass-highlight-color": "oklch(1 0 0)",
           "glass-light-angle": "-45deg",
-          "glass-specular": "30%",
-          "glass-edge-shade": "18%",
+          "glass-specular": "65%",
+          "glass-edge-shade": "32%",
           "glass-illumination": "22%",
           "glass-shadow-color": "oklch(0 0 0)",
           "glass-shadow-opacity": "45%",
@@ -2146,33 +2550,45 @@
           "glass-opacity": "40%",
           "glass-opacity-strong": "74%",
           "glass-opacity-subtle": "28%",
+          "glass-opacity-thick": "86%",
           "glass-blur": "56px",
           "glass-saturate": "200%",
           "glass-brightness": "100%",
           "glass-sheen": "0%",
           "glass-sheen-angle": "160deg",
           "glass-texture": "none",
-          "glass-fill-tint": "oklch(0.55 0.01 285)",
+          "glass-fill-tint": "oklch(0.575 0.012 286)",
           "glass-fill-opacity": "12%",
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
-          "glass-label": "oklch(0.145 0 0)",
+          "glass-label": "oklch(0 0 none)",
           "glass-clarity": "0.5",
-          "glass-label-secondary": "oklch(0.44 0.01 285)",
-          "glass-label-tertiary": "oklch(0.6 0.01 285)",
+          "glass-label-secondary": "oklch(0.37 0.012 286)",
+          "glass-label-tertiary": "oklch(0.52 0.01 286)",
           "glass-label-quaternary": "oklch(0.76 0.005 285)",
           "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
+          "glass-liquid-opacity": "58%",
+          "glass-liquid-clear-opacity": "10%",
+          "glass-liquid-clear-dim": "35%",
+          "glass-liquid-blur": "18px",
+          "glass-liquid-clear-blur": "4px",
+          "glass-liquid-saturate": "160%",
+          "glass-refraction": "14px",
+          "glass-bezel": "12px",
+          "glass-depth-opacity": "12%",
+          "glass-depth-blur": "6px",
+          "glass-inactive-strength": "0.4",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "35%",
           "glass-border-width": "1px",
           "glass-highlight-opacity": "50%",
           "glass-highlight-color": "oklch(1 0 0)",
           "glass-light-angle": "-45deg",
-          "glass-specular": "70%",
-          "glass-edge-shade": "0%",
+          "glass-specular": "88%",
+          "glass-edge-shade": "22%",
           "glass-illumination": "22%",
-          "glass-shadow-color": "oklch(0.3 0.05 270)",
+          "glass-shadow-color": "oklch(0 0 0)",
           "glass-shadow-opacity": "12%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "60px",
@@ -2181,35 +2597,47 @@
           "glass-glow": "0%"
         },
         "dark": {
-          "glass-tint": "oklch(0.24 0.012 285)",
+          "glass-tint": "oklch(0.227 0.004 286.1)",
           "glass-opacity": "35%",
           "glass-opacity-strong": "72%",
           "glass-opacity-subtle": "24%",
+          "glass-opacity-thick": "84%",
           "glass-blur": "56px",
           "glass-saturate": "200%",
           "glass-brightness": "100%",
           "glass-sheen": "0%",
           "glass-sheen-angle": "160deg",
           "glass-texture": "none",
-          "glass-fill-tint": "oklch(0.6 0.01 285)",
+          "glass-fill-tint": "oklch(0.575 0.012 286)",
           "glass-fill-opacity": "24%",
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
-          "glass-label": "oklch(0.985 0 0)",
+          "glass-label": "oklch(1 0 none)",
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.88 0.01 285)",
-          "glass-label-tertiary": "oklch(0.62 0.01 285)",
+          "glass-label-tertiary": "oklch(0.66 0.01 285)",
           "glass-label-quaternary": "oklch(0.45 0.01 285)",
           "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
+          "glass-liquid-opacity": "48%",
+          "glass-liquid-clear-opacity": "8%",
+          "glass-liquid-clear-dim": "35%",
+          "glass-liquid-blur": "18px",
+          "glass-liquid-clear-blur": "4px",
+          "glass-liquid-saturate": "160%",
+          "glass-refraction": "14px",
+          "glass-bezel": "12px",
+          "glass-depth-opacity": "12%",
+          "glass-depth-blur": "6px",
+          "glass-inactive-strength": "0.4",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "6%",
           "glass-border-width": "1px",
           "glass-highlight-opacity": "8%",
           "glass-highlight-color": "oklch(1 0 0)",
           "glass-light-angle": "-45deg",
-          "glass-specular": "30%",
-          "glass-edge-shade": "18%",
+          "glass-specular": "65%",
+          "glass-edge-shade": "32%",
           "glass-illumination": "22%",
           "glass-shadow-color": "oklch(0 0 0)",
           "glass-shadow-opacity": "45%",
@@ -2236,33 +2664,45 @@
           "glass-opacity": "48%",
           "glass-opacity-strong": "74%",
           "glass-opacity-subtle": "28%",
+          "glass-opacity-thick": "86%",
           "glass-blur": "24px",
           "glass-saturate": "220%",
           "glass-brightness": "100%",
           "glass-sheen": "8%",
           "glass-sheen-angle": "160deg",
           "glass-texture": "none",
-          "glass-fill-tint": "oklch(0.55 0.01 285)",
+          "glass-fill-tint": "oklch(0.575 0.012 286)",
           "glass-fill-opacity": "12%",
           "glass-fill-opacity-strong": "20%",
           "glass-thumb": "oklch(1 0 0)",
-          "glass-label": "oklch(0.145 0 0)",
+          "glass-label": "oklch(0 0 none)",
           "glass-clarity": "0.5",
-          "glass-label-secondary": "oklch(0.44 0.01 285)",
-          "glass-label-tertiary": "oklch(0.6 0.01 285)",
+          "glass-label-secondary": "oklch(0.37 0.012 286)",
+          "glass-label-tertiary": "oklch(0.52 0.01 286)",
           "glass-label-quaternary": "oklch(0.76 0.005 285)",
           "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
+          "glass-liquid-opacity": "58%",
+          "glass-liquid-clear-opacity": "10%",
+          "glass-liquid-clear-dim": "35%",
+          "glass-liquid-blur": "18px",
+          "glass-liquid-clear-blur": "4px",
+          "glass-liquid-saturate": "160%",
+          "glass-refraction": "14px",
+          "glass-bezel": "12px",
+          "glass-depth-opacity": "12%",
+          "glass-depth-blur": "6px",
+          "glass-inactive-strength": "0.4",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "70%",
           "glass-border-width": "1px",
           "glass-highlight-opacity": "92%",
           "glass-highlight-color": "oklch(1 0 0)",
           "glass-light-angle": "-45deg",
-          "glass-specular": "70%",
-          "glass-edge-shade": "0%",
+          "glass-specular": "88%",
+          "glass-edge-shade": "22%",
           "glass-illumination": "22%",
-          "glass-shadow-color": "oklch(0.3 0.05 270)",
+          "glass-shadow-color": "oklch(0 0 0)",
           "glass-shadow-opacity": "12%",
           "glass-shadow-y": "10px",
           "glass-shadow-blur": "30px",
@@ -2271,35 +2711,47 @@
           "glass-glow": "38%"
         },
         "dark": {
-          "glass-tint": "oklch(0.24 0.012 285)",
+          "glass-tint": "oklch(0.227 0.004 286.1)",
           "glass-opacity": "40%",
           "glass-opacity-strong": "72%",
           "glass-opacity-subtle": "24%",
+          "glass-opacity-thick": "84%",
           "glass-blur": "24px",
           "glass-saturate": "220%",
           "glass-brightness": "100%",
           "glass-sheen": "8%",
           "glass-sheen-angle": "160deg",
           "glass-texture": "none",
-          "glass-fill-tint": "oklch(0.6 0.01 285)",
+          "glass-fill-tint": "oklch(0.575 0.012 286)",
           "glass-fill-opacity": "24%",
           "glass-fill-opacity-strong": "36%",
           "glass-thumb": "oklch(1 0 0 / 20%)",
-          "glass-label": "oklch(0.985 0 0)",
+          "glass-label": "oklch(1 0 none)",
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.88 0.01 285)",
-          "glass-label-tertiary": "oklch(0.62 0.01 285)",
+          "glass-label-tertiary": "oklch(0.66 0.01 285)",
           "glass-label-quaternary": "oklch(0.45 0.01 285)",
           "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
+          "glass-liquid-opacity": "48%",
+          "glass-liquid-clear-opacity": "8%",
+          "glass-liquid-clear-dim": "35%",
+          "glass-liquid-blur": "18px",
+          "glass-liquid-clear-blur": "4px",
+          "glass-liquid-saturate": "160%",
+          "glass-refraction": "14px",
+          "glass-bezel": "12px",
+          "glass-depth-opacity": "12%",
+          "glass-depth-blur": "6px",
+          "glass-inactive-strength": "0.4",
           "glass-border-color": "oklch(1 0 0)",
           "glass-border-opacity": "22%",
           "glass-border-width": "1px",
           "glass-highlight-opacity": "14%",
           "glass-highlight-color": "oklch(1 0 0)",
           "glass-light-angle": "-45deg",
-          "glass-specular": "30%",
-          "glass-edge-shade": "18%",
+          "glass-specular": "65%",
+          "glass-edge-shade": "32%",
           "glass-illumination": "22%",
           "glass-shadow-color": "oklch(0 0 0)",
           "glass-shadow-opacity": "45%",
@@ -2538,7 +2990,7 @@
     {
       "name": "type-default",
       "type": "registry:theme",
-      "title": "Default type",
+      "title": "App fonts type",
       "description": "Your app's fonts on a major-third scale. Sets the type scale, leading, weights, case and numerals.",
       "categories": [
         "glass",
@@ -4607,6 +5059,31 @@
       ]
     },
     {
+      "name": "liquid-glass",
+      "type": "registry:ui",
+      "title": "Liquid glass",
+      "description": "A floating regular or clear lens with optical edge refraction, pointer illumination and optional light tracking. Dim bright media beneath clear controls.",
+      "categories": [
+        "glass",
+        "surfaces"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass.json",
+        "{REGISTRY_URL}/r/glass-effects.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/liquid-glass.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/liquid-glass.tsx"
+        }
+      ]
+    },
+    {
       "name": "card",
       "type": "registry:ui",
       "title": "Card",
@@ -4644,6 +5121,7 @@
       ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-portal.json",
         "{REGISTRY_URL}/r/glass-theme.json"
       ],
       "files": [
@@ -4806,7 +5284,6 @@
             "color": "var(--primary)"
           },
           "& :where(blockquote)": {
-            "border-inline-start": "3px solid var(--primary)",
             "padding-inline-start": "1em",
             "font-family": "var(--glass-font-heading, --theme(--font-heading, --theme(--font-sans, ui-sans-serif, system-ui, sans-serif)))",
             "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), 1))",
@@ -4824,7 +5301,7 @@
             "font-family": "var(--glass-font-mono, --theme(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace))",
             "font-size": "calc(1rem * var(--glass-text-scale) * pow(var(--glass-type-ratio), -1))",
             "line-height": "1.6",
-            "background-color": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity-subtle) * min(1, var(--glass-clarity) * 2) + (100% - var(--glass-opacity-subtle)) * max(0, var(--glass-clarity) * 2 - 1)), transparent)",
+            "background-color": "color-mix(in oklch, var(--glass-tinted, var(--glass-tint)) calc(var(--glass-opacity-subtle) * (0.5 + 0.5 * min(1, var(--glass-clarity) * 2)) + (100% - var(--glass-opacity-subtle)) * max(0, var(--glass-clarity) * 2 - 1)), transparent)",
             "border": "var(--glass-border-width) solid color-mix(in oklch, var(--glass-border-color) var(--glass-border-opacity), transparent)",
             "border-radius": "var(--glass-radius-control)",
             "padding": "1em 1.2em",
@@ -4923,8 +5400,9 @@
             "color": "var(--muted-foreground)"
           },
           "& :where(.markdown-alert)": {
-            "border-inline-start": "3px solid var(--primary)",
-            "padding-inline-start": "1em",
+            "background-color": "color-mix(in oklch, var(--glass-fill-tint) var(--glass-fill-opacity), transparent)",
+            "border-radius": "var(--glass-radius-control)",
+            "padding": "0.75em 1em",
             "font-family": "inherit",
             "font-size": "inherit",
             "line-height": "inherit",
@@ -4936,9 +5414,6 @@
             "display": "flex",
             "align-items": "center",
             "gap": "0.4em"
-          },
-          "& :where(.markdown-alert-warning, .markdown-alert-caution)": {
-            "border-inline-start-color": "var(--destructive)"
           },
           "& :where(.markdown-alert-warning, .markdown-alert-caution) :where(.markdown-alert-title)": {
             "color": "var(--destructive)"
@@ -5188,7 +5663,7 @@
       "name": "glass-group",
       "type": "registry:ui",
       "title": "Glass group",
-      "description": "One shared liquid backdrop for neighbouring controls (Apple's GlassEffectContainer), with an optional selection that slides and morphs between them.",
+      "description": "One shared liquid capsule for neighboring controls, with an optional sliding selection. Use GlassCluster for sibling shapes that merge and separate.",
       "categories": [
         "glass",
         "controls"
@@ -5206,6 +5681,77 @@
           "path": "src/components/glass/glass-group.tsx",
           "type": "registry:ui",
           "target": "@components/glass/glass-group.tsx"
+        }
+      ]
+    },
+    {
+      "name": "glass-cluster",
+      "type": "registry:ui",
+      "title": "Glass cluster",
+      "description": "Sibling controls form a shared glass contour as they approach. Smooth union mask on web; system glass container on native.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/glass-cluster.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/glass-cluster.tsx"
+        }
+      ]
+    },
+    {
+      "name": "background-extension",
+      "type": "registry:ui",
+      "title": "Background extension",
+      "description": "Mirrored, softened imagery continues beneath leading and trailing chrome. Foreground content renders once.",
+      "categories": [
+        "glass",
+        "surfaces"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/background-extension.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/background-extension.tsx"
+        }
+      ]
+    },
+    {
+      "name": "glass-morph",
+      "type": "registry:ui",
+      "title": "Glass morph",
+      "description": "Stable sibling identities preserve continuity through insertion, removal and reordering. Native delegates to SwiftUI namespaces and effect IDs.",
+      "categories": [
+        "glass",
+        "controls"
+      ],
+      "dependencies": [
+        "cn"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-cluster.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/glass/glass-morph.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/glass-morph.tsx"
         }
       ]
     },
@@ -5377,6 +5923,8 @@
       ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-transitions.json",
+        "{REGISTRY_URL}/r/glass-portal.json",
         "{REGISTRY_URL}/r/button.json"
       ],
       "files": [
@@ -5402,6 +5950,8 @@
       ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-transitions.json",
+        "{REGISTRY_URL}/r/glass-portal.json",
         "{REGISTRY_URL}/r/button.json"
       ],
       "files": [
@@ -5428,6 +5978,8 @@
       ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-transitions.json",
+        "{REGISTRY_URL}/r/glass-portal.json",
         "{REGISTRY_URL}/r/button.json"
       ],
       "files": [
@@ -5442,7 +5994,7 @@
       "name": "action-sheet",
       "type": "registry:ui",
       "title": "Action sheet",
-      "description": "The iOS action sheet: a few choices in one liquid group rising from the bottom, Cancel in its own capsule — on the alert-dialog primitives.",
+      "description": "A short choice presentation with passive dismissal. Web uses Dialog and custom glass; supported native iOS choices use a source-anchored system confirmation dialog.",
       "categories": [
         "glass",
         "overlays"
@@ -5453,7 +6005,8 @@
       ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/glass-style.json",
-        "{REGISTRY_URL}/r/alert-dialog.json"
+        "{REGISTRY_URL}/r/glass-transitions.json",
+        "{REGISTRY_URL}/r/dialog.json"
       ],
       "files": [
         {
@@ -5477,7 +6030,9 @@
         "radix-ui"
       ],
       "registryDependencies": [
-        "{REGISTRY_URL}/r/glass-style.json"
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-transitions.json",
+        "{REGISTRY_URL}/r/glass-portal.json"
       ],
       "files": [
         {
@@ -5501,7 +6056,8 @@
         "radix-ui"
       ],
       "registryDependencies": [
-        "{REGISTRY_URL}/r/glass-style.json"
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-portal.json"
       ],
       "files": [
         {
@@ -5526,7 +6082,9 @@
         "lucide-react"
       ],
       "registryDependencies": [
-        "{REGISTRY_URL}/r/glass-style.json"
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-transitions.json",
+        "{REGISTRY_URL}/r/glass-portal.json"
       ],
       "files": [
         {
@@ -5608,7 +6166,8 @@
         "{REGISTRY_URL}/r/dropdown-menu.json",
         "{REGISTRY_URL}/r/glass-group.json",
         "{REGISTRY_URL}/r/scroll-edge.json",
-        "{REGISTRY_URL}/r/use-glass-pointer.json"
+        "{REGISTRY_URL}/r/use-glass-pointer.json",
+        "{REGISTRY_URL}/r/glass-toolbar-layout.json"
       ],
       "files": [
         {
@@ -5669,7 +6228,7 @@
       "name": "sidebar",
       "type": "registry:ui",
       "title": "Sidebar",
-      "description": "A floating, inset liquid sidebar: collapsible, two levels, an overlay on phones, and BackgroundExtension to run media under it.",
+      "description": "An edge-attached liquid sidebar with accent symbols, compact modal navigation and image-only background extension.",
       "categories": [
         "glass",
         "navigation"
@@ -5680,7 +6239,9 @@
         "lucide-react"
       ],
       "registryDependencies": [
-        "{REGISTRY_URL}/r/glass-style.json"
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-portal.json",
+        "{REGISTRY_URL}/r/background-extension.json"
       ],
       "files": [
         {
@@ -6458,7 +7019,9 @@
         "lucide-react"
       ],
       "registryDependencies": [
-        "{REGISTRY_URL}/r/glass-style.json"
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-transitions.json",
+        "{REGISTRY_URL}/r/glass-portal.json"
       ],
       "files": [
         {
@@ -6685,7 +7248,9 @@
         "lucide-react"
       ],
       "registryDependencies": [
-        "{REGISTRY_URL}/r/glass-style.json"
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-transitions.json",
+        "{REGISTRY_URL}/r/glass-portal.json"
       ],
       "files": [
         {
@@ -6710,6 +7275,8 @@
       ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/glass-transitions.json",
+        "{REGISTRY_URL}/r/glass-portal.json",
         "{REGISTRY_URL}/r/button.json"
       ],
       "files": [
@@ -6868,6 +7435,80 @@
       ]
     },
     {
+      "name": "liquid-glass-02",
+      "type": "registry:block",
+      "title": "More Apple glass examples",
+      "description": "Landmarks extension and badges, Notes nonmodal formatting and adaptive toolbar, search placements and material comparisons.",
+      "categories": [
+        "glass",
+        "blocks"
+      ],
+      "dependencies": [
+        "cn",
+        "lucide-react",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/background-extension.json",
+        "{REGISTRY_URL}/r/backdrop.json",
+        "{REGISTRY_URL}/r/button.json",
+        "{REGISTRY_URL}/r/glass.json",
+        "{REGISTRY_URL}/r/glass-morph.json",
+        "{REGISTRY_URL}/r/input.json",
+        "{REGISTRY_URL}/r/liquid-glass.json",
+        "{REGISTRY_URL}/r/search-field.json",
+        "{REGISTRY_URL}/r/sheet.json",
+        "{REGISTRY_URL}/r/slider.json",
+        "{REGISTRY_URL}/r/textarea.json",
+        "{REGISTRY_URL}/r/theme-scope.json",
+        "{REGISTRY_URL}/r/toolbar.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/blocks/liquid-glass-02.tsx",
+          "type": "registry:component",
+          "target": "@components/glass-blocks/liquid-glass-02.tsx"
+        }
+      ]
+    },
+    {
+      "name": "liquid-glass-01",
+      "type": "registry:block",
+      "title": "Liquid Glass examples",
+      "description": "Six interactive Apple-inspired scenes: clear Photos controls, Music MiniPlayer and tabs, Maps search and sheet detents, Safari address bar, Mail sidebar and floating tools.",
+      "categories": [
+        "glass",
+        "blocks"
+      ],
+      "dependencies": [
+        "cn",
+        "lucide-react",
+        "radix-ui"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
+        "{REGISTRY_URL}/r/button.json",
+        "{REGISTRY_URL}/r/dropdown-menu.json",
+        "{REGISTRY_URL}/r/liquid-glass.json",
+        "{REGISTRY_URL}/r/navigation-bar.json",
+        "{REGISTRY_URL}/r/segmented-control.json",
+        "{REGISTRY_URL}/r/sheet.json",
+        "{REGISTRY_URL}/r/sidebar.json",
+        "{REGISTRY_URL}/r/slider.json",
+        "{REGISTRY_URL}/r/switch.json",
+        "{REGISTRY_URL}/r/toolbar.json",
+        "{REGISTRY_URL}/r/scroll-edge.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/blocks/liquid-glass-01.tsx",
+          "type": "registry:component",
+          "target": "@components/glass-blocks/liquid-glass-01.tsx"
+        }
+      ]
+    },
+    {
       "name": "dashboard-01",
       "type": "registry:block",
       "title": "Dashboard",
@@ -6877,9 +7518,12 @@
         "blocks"
       ],
       "dependencies": [
-        "lucide-react"
+        "cn",
+        "lucide-react",
+        "radix-ui"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
         "{REGISTRY_URL}/r/activity-rings.json",
         "{REGISTRY_URL}/r/button.json",
         "{REGISTRY_URL}/r/card.json",
@@ -6907,9 +7551,12 @@
         "blocks"
       ],
       "dependencies": [
-        "lucide-react"
+        "cn",
+        "lucide-react",
+        "radix-ui"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
         "{REGISTRY_URL}/r/area-chart.json",
         "{REGISTRY_URL}/r/bar-list.json",
         "{REGISTRY_URL}/r/card.json",
@@ -6937,9 +7584,12 @@
         "blocks"
       ],
       "dependencies": [
-        "lucide-react"
+        "cn",
+        "lucide-react",
+        "radix-ui"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
         "{REGISTRY_URL}/r/grouped-list.json",
         "{REGISTRY_URL}/r/segmented-control.json",
         "{REGISTRY_URL}/r/slider.json",
@@ -6963,9 +7613,12 @@
         "blocks"
       ],
       "dependencies": [
-        "lucide-react"
+        "cn",
+        "lucide-react",
+        "radix-ui"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
         "{REGISTRY_URL}/r/button.json",
         "{REGISTRY_URL}/r/card.json",
         "{REGISTRY_URL}/r/input.json",
@@ -6990,9 +7643,12 @@
         "blocks"
       ],
       "dependencies": [
-        "lucide-react"
+        "cn",
+        "lucide-react",
+        "radix-ui"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/glass-style.json",
         "{REGISTRY_URL}/r/avatar.json",
         "{REGISTRY_URL}/r/button.json",
         "{REGISTRY_URL}/r/card.json",
@@ -7004,6 +7660,25 @@
           "path": "src/components/blocks/chat-01.tsx",
           "type": "registry:component",
           "target": "@components/glass-blocks/chat-01.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-toolbar-layout",
+      "type": "registry:ui",
+      "title": "Native toolbar allocation",
+      "description": "Generated from the shared pure web/native command allocator.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/native/toolbar-layout.ts",
+          "type": "registry:lib",
+          "target": "@components/glass/native/toolbar-layout.ts"
         }
       ]
     },
@@ -7186,6 +7861,172 @@
       ]
     },
     {
+      "name": "native-liquid-glass-02",
+      "type": "registry:ui",
+      "title": "More Apple glass examples (native)",
+      "description": "Landmarks extension and badges, Notes nonmodal formatting and adaptive toolbar, search placements and material comparisons. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "lucide-react-native"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-background-extension.json",
+        "{REGISTRY_URL}/r/native-backdrop.json",
+        "{REGISTRY_URL}/r/native-button.json",
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-glass-morph.json",
+        "{REGISTRY_URL}/r/native-input.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-search-field.json",
+        "{REGISTRY_URL}/r/native-sheet.json",
+        "{REGISTRY_URL}/r/native-slider.json",
+        "{REGISTRY_URL}/r/native-tokens.json",
+        "{REGISTRY_URL}/r/native-toolbar.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/liquid-glass-02.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/liquid-glass-02.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-glass-morph",
+      "type": "registry:ui",
+      "title": "Glass morph (native)",
+      "description": "Stable sibling identities preserve continuity through insertion, removal and reordering. Native delegates to SwiftUI namespaces and effect IDs. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-tokens.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/glass-morph.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/glass-morph.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-background-extension",
+      "type": "registry:ui",
+      "title": "Background extension (native)",
+      "description": "Mirrored, softened imagery continues beneath leading and trailing chrome. Foreground content renders once. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-tokens.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/background-extension.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/background-extension.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-glass-cluster",
+      "type": "registry:ui",
+      "title": "Glass cluster (native)",
+      "description": "Sibling controls form a shared glass contour as they approach. Smooth union mask on web; system glass container on native. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-segmented-control.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/glass-cluster.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/glass-cluster.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-liquid-glass",
+      "type": "registry:ui",
+      "title": "Liquid glass (native)",
+      "description": "A floating regular or clear lens with optical edge refraction, pointer illumination and optional light tracking. Dim bright media beneath clear controls. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-glass.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/liquid-glass.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/liquid-glass.tsx"
+        }
+      ]
+    },
+    {
+      "name": "native-liquid-glass-01",
+      "type": "registry:ui",
+      "title": "Liquid Glass examples (native)",
+      "description": "Six interactive Apple-inspired scenes: clear Photos controls, Music MiniPlayer and tabs, Maps search and sheet detents, Safari address bar, Mail sidebar and floating tools. React Native: iOS, Android and web.",
+      "categories": [
+        "glass",
+        "native"
+      ],
+      "dependencies": [
+        "react-native-reanimated",
+        "lucide-react-native",
+        "react-native-svg"
+      ],
+      "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
+        "{REGISTRY_URL}/r/native-backdrop.json",
+        "{REGISTRY_URL}/r/native-action-sheet.json",
+        "{REGISTRY_URL}/r/native-button.json",
+        "{REGISTRY_URL}/r/native-dock.json",
+        "{REGISTRY_URL}/r/native-dropdown-menu.json",
+        "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-input.json",
+        "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-scroll-edge.json",
+        "{REGISTRY_URL}/r/native-search-field.json",
+        "{REGISTRY_URL}/r/native-segmented-control.json",
+        "{REGISTRY_URL}/r/native-sheet.json",
+        "{REGISTRY_URL}/r/native-slider.json",
+        "{REGISTRY_URL}/r/native-tokens.json",
+        "{REGISTRY_URL}/r/native-ui.json"
+      ],
+      "files": [
+        {
+          "path": "registry/native/liquid-glass-01.tsx",
+          "type": "registry:ui",
+          "target": "@components/glass/native/liquid-glass-01.tsx"
+        }
+      ]
+    },
+    {
       "name": "native-typography",
       "type": "registry:ui",
       "title": "Typography (native)",
@@ -7288,6 +8129,7 @@
         "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-glass.json",
         "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-tokens.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
@@ -7465,7 +8307,9 @@
       ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/native-a11y.json",
+        "{REGISTRY_URL}/r/native-glass.json",
         "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-tokens.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
@@ -7516,7 +8360,9 @@
       ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/native-a11y.json",
+        "{REGISTRY_URL}/r/native-glass.json",
         "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-tokens.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
@@ -7531,7 +8377,7 @@
       "name": "native-glass-group",
       "type": "registry:ui",
       "title": "Glass group (native)",
-      "description": "One shared liquid backdrop for neighbouring controls (Apple's GlassEffectContainer), with an optional selection that slides and morphs between them. React Native: iOS, Android and web.",
+      "description": "One shared liquid capsule for neighboring controls, with an optional sliding selection. Use GlassCluster for sibling shapes that merge and separate. React Native: iOS, Android and web.",
       "categories": [
         "glass",
         "native"
@@ -7599,6 +8445,7 @@
         "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-glass.json",
         "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-tokens.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
@@ -7682,6 +8529,7 @@
         "{REGISTRY_URL}/r/native-dialog.json",
         "{REGISTRY_URL}/r/native-dropdown-menu.json",
         "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-toolbar-layout.json",
         "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-scroll-edge.json",
         "{REGISTRY_URL}/r/native-segmented-control.json",
@@ -7705,9 +8553,11 @@
         "native"
       ],
       "dependencies": [
+        "react-native-svg",
         "react-native-reanimated"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
@@ -7731,6 +8581,7 @@
         "react-native-reanimated"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-dialog.json",
         "{REGISTRY_URL}/r/native-scroll-edge.json",
         "{REGISTRY_URL}/r/native-ui.json"
@@ -7747,7 +8598,7 @@
       "name": "native-sidebar",
       "type": "registry:ui",
       "title": "Sidebar (native)",
-      "description": "A floating, inset liquid sidebar: collapsible, two levels, an overlay on phones, and BackgroundExtension to run media under it. React Native: iOS, Android and web.",
+      "description": "An edge-attached liquid sidebar with accent symbols, compact modal navigation and image-only background extension. React Native: iOS, Android and web.",
       "categories": [
         "glass",
         "native"
@@ -7759,6 +8610,7 @@
       "registryDependencies": [
         "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-dialog.json",
+        "{REGISTRY_URL}/r/native-background-extension.json",
         "{REGISTRY_URL}/r/native-glass.json",
         "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-segmented-control.json",
@@ -7895,13 +8747,16 @@
       "dependencies": [
         "react-native-gesture-handler",
         "react-native-reanimated",
-        "@expo/ui"
+        "@expo/ui",
+        "react-native-screens"
       ],
       "registryDependencies": [
         "{REGISTRY_URL}/r/native-a11y.json",
+        "{REGISTRY_URL}/r/native-button.json",
         "{REGISTRY_URL}/r/native-dialog.json",
         "{REGISTRY_URL}/r/native-glass.json",
         "{REGISTRY_URL}/r/native-press.json",
+        "{REGISTRY_URL}/r/native-tokens.json",
         "{REGISTRY_URL}/r/native-ui.json"
       ],
       "files": [
@@ -7916,7 +8771,7 @@
       "name": "native-action-sheet",
       "type": "registry:ui",
       "title": "Action sheet (native)",
-      "description": "The iOS action sheet: a few choices in one liquid group rising from the bottom, Cancel in its own capsule — on the alert-dialog primitives. React Native: iOS, Android and web.",
+      "description": "A short choice presentation with passive dismissal. Web uses Dialog and custom glass; supported native iOS choices use a source-anchored system confirmation dialog. React Native: iOS, Android and web.",
       "categories": [
         "glass",
         "native"
@@ -7929,7 +8784,9 @@
         "{REGISTRY_URL}/r/native-glass.json",
         "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-segmented-control.json",
-        "{REGISTRY_URL}/r/native-ui.json"
+        "{REGISTRY_URL}/r/native-ui.json",
+        "{REGISTRY_URL}/r/native-button.json",
+        "{REGISTRY_URL}/r/native-tokens.json"
       ],
       "files": [
         {
@@ -8008,7 +8865,8 @@
         "{REGISTRY_URL}/r/native-dialog.json",
         "{REGISTRY_URL}/r/native-popover.json",
         "{REGISTRY_URL}/r/native-press.json",
-        "{REGISTRY_URL}/r/native-ui.json"
+        "{REGISTRY_URL}/r/native-ui.json",
+        "{REGISTRY_URL}/r/native-tokens.json"
       ],
       "files": [
         {
@@ -8773,7 +9631,8 @@
         "{REGISTRY_URL}/r/native-calendar.json",
         "{REGISTRY_URL}/r/native-popover.json",
         "{REGISTRY_URL}/r/native-press.json",
-        "{REGISTRY_URL}/r/native-ui.json"
+        "{REGISTRY_URL}/r/native-ui.json",
+        "{REGISTRY_URL}/r/native-tokens.json"
       ],
       "files": [
         {

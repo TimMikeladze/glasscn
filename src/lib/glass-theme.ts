@@ -186,37 +186,38 @@ export const TYPE_RATIOS: Record<string, string> = {
 
 export const TOKENS: TokenDef[] = [
   // Colour (set by palettes)
-  { name: "primary", group: "Colour", label: "Accent", description: "Buttons, selection, rings, the first chart colour.", light: "oklch(0.657 0.19 34.8)", dark: "oklch(0.728 0.171 36.5)", control: colour },
-  { name: "primary-foreground", group: "Colour", label: "On accent", description: "Text and icons on the accent.", light: "oklch(0.99 0 0)", dark: "oklch(0.18 0.02 30)", control: colour },
-  { name: "ring", group: "Colour", label: "Focus ring", description: "Keyboard focus outlines.", light: "oklch(0.657 0.19 34.8)", dark: "oklch(0.728 0.171 36.5)", control: colour },
-  { name: "chart-1", group: "Colour", label: "Chart 1", description: "First data series (rings, sparklines).", light: "oklch(0.657 0.19 34.8)", dark: "oklch(0.728 0.171 36.5)", control: colour },
-  { name: "chart-2", group: "Colour", label: "Chart 2", description: "Second data series.", light: "oklch(0.685 0.189 296.4)", dark: "oklch(0.685 0.189 296.4)", control: colour },
-  { name: "chart-3", group: "Colour", label: "Chart 3", description: "Third data series.", light: "oklch(0.803 0.159 69.8)", dark: "oklch(0.803 0.159 69.8)", control: colour },
-  { name: "chart-4", group: "Colour", label: "Chart 4", description: "Fourth data series.", light: "oklch(0.7 0.14 160)", dark: "oklch(0.75 0.14 160)", control: colour },
-  { name: "chart-5", group: "Colour", label: "Chart 5", description: "Fifth data series.", light: "oklch(0.68 0.15 230)", dark: "oklch(0.74 0.14 230)", control: colour },
-  { name: "chart-6", group: "Colour", label: "Chart 6", description: "Sixth data series — darker, so it parts from its neighbours by lightness as well as hue.", light: "oklch(0.48 0.12 255)", dark: "oklch(0.62 0.12 255)", control: colour },
-  { name: "chart-7", group: "Colour", label: "Chart 7", description: "Seventh data series — lighter.", light: "oklch(0.74 0.09 195)", dark: "oklch(0.88 0.08 195)", control: colour },
-  { name: "chart-8", group: "Colour", label: "Chart 8", description: "Eighth series and \"Other\" — a near-neutral.", light: "oklch(0.62 0.02 260)", dark: "oklch(0.6 0.02 260)", control: colour },
-  { name: "aurora-1", group: "Colour", label: "Aurora 1", description: "Top-left blob.", light: "oklch(0.829 0.098 37.8)", dark: "oklch(0.48 0.132 31.7)", control: colour },
-  { name: "aurora-2", group: "Colour", label: "Aurora 2", description: "Right blob.", light: "oklch(0.809 0.109 296.4)", dark: "oklch(0.401 0.159 289.2)", control: colour },
-  { name: "aurora-3", group: "Colour", label: "Aurora 3", description: "Bottom blob.", light: "oklch(0.907 0.07 70.2)", dark: "oklch(0.456 0.088 60.9)", control: colour },
-  { name: "success", group: "Colour", label: "Success", description: "Done, kept, connected.", light: "oklch(0.52 0.14 150)", dark: "oklch(0.74 0.16 150)", control: colour },
-  { name: "success-foreground", group: "Colour", label: "On success", description: "Text on a success fill.", light: "oklch(0.99 0 0)", dark: "oklch(0.18 0.03 150)", control: colour },
-  { name: "warning", group: "Colour", label: "Warning", description: "Needs attention.", light: "oklch(0.78 0.16 80)", dark: "oklch(0.8 0.15 80)", control: colour },
-  { name: "warning-foreground", group: "Colour", label: "On warning", description: "Text on a warning fill.", light: "oklch(0.22 0.04 80)", dark: "oklch(0.22 0.04 80)", control: colour },
-  { name: "info", group: "Colour", label: "Info", description: "Neutral news.", light: "oklch(0.52 0.14 240)", dark: "oklch(0.74 0.13 240)", control: colour },
-  { name: "info-foreground", group: "Colour", label: "On info", description: "Text on an info fill.", light: "oklch(0.99 0 0)", dark: "oklch(0.18 0.03 240)", control: colour },
-  { name: "aurora-base", group: "Colour", label: "Ground", description: "The page colour under the aurora.", light: "oklch(0.955 0.007 268.5)", dark: "oklch(0.116 0.006 285.4)", control: colour },
+  { name: "primary", group: "Colour", label: "Accent", description: "Buttons, selection, rings, the first chart colour.", light: "oklch(0.543 0.187 256.2)", dark: "oklch(0.543 0.187 256.2)", control: colour },
+  { name: "primary-foreground", group: "Colour", label: "On accent", description: "Text and icons on the accent.", light: "oklch(1 0 none)", dark: "oklch(1 0 none)", control: colour },
+  { name: "ring", group: "Colour", label: "Focus ring", description: "Keyboard focus outlines.", light: "oklch(0.543 0.187 256.2)", dark: "oklch(0.543 0.187 256.2)", control: colour },
+  { name: "chart-1", group: "Colour", label: "Chart 1", description: "First data series (rings, sparklines).", light: "oklch(0.543 0.187 256.2)", dark: "oklch(0.543 0.187 256.2)", control: colour },
+  { name: "chart-2", group: "Colour", label: "Chart 2", description: "Second data series.", light: "oklch(0.73 0.194 147.4)", dark: "oklch(0.756 0.208 147)", control: colour },
+  { name: "chart-3", group: "Colour", label: "Chart 3", description: "Third data series.", light: "oklch(0.753 0.172 55.7)", dark: "oklch(0.762 0.167 57.1)", control: colour },
+  { name: "chart-4", group: "Colour", label: "Chart 4", description: "Fourth data series.", light: "oklch(0.622 0.263 322.5)", dark: "oklch(0.658 0.279 322.4)", control: colour },
+  { name: "chart-5", group: "Colour", label: "Chart 5", description: "Fifth data series.", light: "oklch(0.65 0.238 17.9)", dark: "oklch(0.658 0.231 16)", control: colour },
+  { name: "chart-6", group: "Colour", label: "Chart 6", description: "Sixth data series — darker, so it parts from its neighbours by lightness as well as hue.", light: "oklch(0.559 0.23 279.3)", dark: "oklch(0.641 0.193 274.7)", control: colour },
+  { name: "chart-7", group: "Colour", label: "Chart 7", description: "Seventh data series — lighter.", light: "oklch(0.745 0.127 203.3)", dark: "oklch(0.787 0.134 203.3)", control: colour },
+  { name: "chart-8", group: "Colour", label: "Chart 8", description: "Eighth series and \"Other\" — a near-neutral.", light: "oklch(0.648 0.007 286.2)", dark: "oklch(0.681 0.007 286.2)", control: colour },
+  { name: "aurora-1", group: "Colour", label: "Aurora 1", description: "Top-left blob.", light: "oklch(0.963 0.007 286.3)", dark: "oklch(0 0 none)", control: colour },
+  { name: "aurora-2", group: "Colour", label: "Aurora 2", description: "Right blob.", light: "oklch(0.963 0.007 286.3)", dark: "oklch(0 0 none)", control: colour },
+  { name: "aurora-3", group: "Colour", label: "Aurora 3", description: "Bottom blob.", light: "oklch(0.963 0.007 286.3)", dark: "oklch(0 0 none)", control: colour },
+  { name: "success", group: "Colour", label: "Success", description: "Done, kept, connected.", light: "oklch(0.52 0.143 150)", dark: "oklch(0.74 0.15 150)", control: colour },
+  { name: "success-foreground", group: "Colour", label: "On success", description: "Text on a success fill.", light: "oklch(0.99 0 0)", dark: "oklch(0.2 0.04 150)", control: colour },
+  { name: "warning", group: "Colour", label: "Warning", description: "Needs attention.", light: "oklch(0.8 0.16 80)", dark: "oklch(0.8 0.16 80)", control: colour },
+  { name: "warning-foreground", group: "Colour", label: "On warning", description: "Text on a warning fill.", light: "oklch(0.2 0.04 80)", dark: "oklch(0.2 0.04 80)", control: colour },
+  { name: "info", group: "Colour", label: "Info", description: "Neutral news.", light: "oklch(0.52 0.089 205)", dark: "oklch(0.74 0.126 205)", control: colour },
+  { name: "info-foreground", group: "Colour", label: "On info", description: "Text on an info fill.", light: "oklch(0.99 0 0)", dark: "oklch(0.2 0.036 205)", control: colour },
+  { name: "aurora-base", group: "Colour", label: "Ground", description: "The page colour under the aurora.", light: "oklch(0.963 0.007 286.3)", dark: "oklch(0 0 none)", control: colour },
 
   // Material
-  { name: "glass-tint", group: "Material", label: "Frost colour", description: "The colour of the pane itself.", light: "oklch(1 0 0)", dark: "oklch(0.24 0.012 285)", control: colour },
+  { name: "glass-tint", group: "Material", label: "Frost colour", description: "The colour of the pane itself.", light: "oklch(1 0 0)", dark: "oklch(0.227 0.004 286.1)", control: colour },
   { name: "glass-opacity", group: "Material", label: "Frost", description: "How opaque a default pane is.", light: "52%", dark: "45%", control: range(0, 100, 1, "%") },
   { name: "glass-opacity-strong", group: "Material", label: "Frost (strong)", description: "Dialogs, menus, popovers, the header.", light: "74%", dark: "72%", control: range(0, 100, 1, "%") },
   { name: "glass-opacity-subtle", group: "Material", label: "Frost (subtle)", description: "Code blocks, previews, quiet panes.", light: "28%", dark: "24%", control: range(0, 100, 1, "%") },
+  { name: "glass-opacity-thick", group: "Material", label: "Frost (thick)", description: "The fourth standard material tier; web tuning, not Apple's private opacity.", light: "86%", dark: "84%", control: range(0, 100, 1, "%") },
   { name: "glass-blur", group: "Material", label: "Blur", description: "How much the backdrop is blurred.", light: "28px", dark: "28px", control: range(0, 80, 1, "px") },
   { name: "glass-saturate", group: "Material", label: "Saturation", description: "How vivid the colour behind stays.", light: "180%", dark: "180%", control: range(0, 300, 5, "%") },
   { name: "glass-brightness", group: "Material", label: "Brightness", description: "Lighten or darken what shows through.", light: "100%", dark: "100%", control: range(40, 160, 1, "%") },
-  { name: "glass-sheen", group: "Material", label: "Sheen", description: "A specular gradient across the pane.", light: "10%", dark: "5%", control: range(0, 60, 1, "%") },
+  { name: "glass-sheen", group: "Material", label: "Sheen", description: "A specular gradient across the pane.", light: "0%", dark: "0%", control: range(0, 60, 1, "%") },
   { name: "glass-sheen-angle", group: "Material", label: "Sheen angle", description: "Where the light comes from.", light: "160deg", dark: "160deg", control: range(0, 360, 5, "deg") },
   {
     name: "glass-texture",
@@ -227,38 +228,44 @@ export const TOKENS: TokenDef[] = [
     dark: "none",
     control: { type: "select", options: Object.entries(TEXTURES).map(([label, value]) => ({ label, value })) },
   },
-  { name: "glass-fill-tint", group: "Material", label: "Fill colour", description: "Inputs, tracks, idle pills on glass.", light: "oklch(0.55 0.01 285)", dark: "oklch(0.6 0.01 285)", control: colour },
+  { name: "glass-fill-tint", group: "Material", label: "Fill colour", description: "Inputs, tracks, idle pills on glass.", light: "oklch(0.575 0.012 286)", dark: "oklch(0.575 0.012 286)", control: colour },
   { name: "glass-fill-opacity", group: "Material", label: "Fill", description: "How strong control fills are.", light: "12%", dark: "24%", control: range(0, 60, 1, "%") },
   { name: "glass-fill-opacity-strong", group: "Material", label: "Fill (strong)", description: "Hovered and pressed fills, tracks.", light: "20%", dark: "36%", control: range(0, 80, 1, "%") },
   { name: "glass-thumb", group: "Material", label: "Thumb", description: "The raised thumb of segmented controls.", light: "oklch(1 0 0)", dark: "oklch(1 0 0 / 20%)", control: colour },
-  { name: "glass-label", group: "Material", label: "Text on glass", description: "Text inside panes (remaps --foreground there).", light: "oklch(0.145 0 0)", dark: "oklch(0.985 0 0)", control: colour },
+  { name: "glass-label", group: "Material", label: "Text on glass", description: "Text inside panes (remaps --foreground there).", light: "oklch(0 0 none)", dark: "oklch(1 0 none)", control: colour },
   { name: "glass-clarity", group: "Material", label: "Clarity", description: "0 ultra clear → 1 fully tinted, like iOS 27's Liquid Glass slider. Scales every frost.", light: "0.5", dark: "0.5", control: range(0, 1, 0.01, "") },
-  { name: "glass-label-secondary", group: "Material", label: "Secondary text", description: "Muted text inside panes (remaps --muted-foreground there).", light: "oklch(0.44 0.01 285)", dark: "oklch(0.88 0.01 285)", control: colour },
-  { name: "glass-label-tertiary", group: "Material", label: "Tertiary text", description: "Placeholders and unavailable items inside panes.", light: "oklch(0.6 0.01 285)", dark: "oklch(0.62 0.01 285)", control: colour },
+  { name: "glass-label-secondary", group: "Material", label: "Secondary text", description: "Muted text inside panes (remaps --muted-foreground there).", light: "oklch(0.37 0.012 286)", dark: "oklch(0.88 0.01 285)", control: colour },
+  { name: "glass-label-tertiary", group: "Material", label: "Tertiary text", description: "Placeholders and unavailable items inside panes.", light: "oklch(0.52 0.01 286)", dark: "oklch(0.66 0.01 285)", control: colour },
   { name: "glass-label-quaternary", group: "Material", label: "Quaternary text", description: "Watermarks inside panes.", light: "oklch(0.76 0.005 285)", dark: "oklch(0.45 0.01 285)", control: colour },
   { name: "glass-separator-opacity", group: "Material", label: "Separator", description: "Hairlines between rows, inside panes.", light: "12%", dark: "16%", control: range(0, 60, 1, "%") },
   { name: "glass-knob", group: "Material", label: "Knob", description: "Switch and slider knobs.", light: "oklch(1 0 0)", dark: "oklch(1 0 0)", control: colour },
 
   // Liquid — the control layer (toolbars, the dock, floating buttons, menus, sheets)
-  { name: "glass-liquid-opacity", group: "Liquid", label: "Liquid frost", description: "How opaque liquid (regular) glass is — the control layer.", light: "46%", dark: "40%", control: range(0, 100, 1, "%") },
-  { name: "glass-liquid-clear-opacity", group: "Liquid", label: "Clear frost", description: "Clear glass, only over media and with a dim.", light: "10%", dark: "8%", control: range(0, 60, 1, "%") },
-  { name: "glass-liquid-clear-dim", group: "Liquid", label: "Clear dim", description: "The dimming layer under clear glass, so bold white content stays legible over bright media (Apple: 35%).", light: "30%", dark: "20%", control: range(0, 60, 1, "%") },
-  { name: "glass-liquid-blur", group: "Liquid", label: "Liquid blur", description: "Less blur than the material: the backdrop stays readable through the lens.", light: "12px", dark: "12px", control: range(0, 60, 1, "px") },
-  { name: "glass-liquid-saturate", group: "Liquid", label: "Liquid saturation", description: "Colour carried through liquid glass.", light: "200%", dark: "200%", control: range(0, 300, 5, "%") },
+  { name: "glass-liquid-opacity", group: "Liquid", label: "Liquid frost", description: "glasscn's regular-glass diffusion. These values approximate the 27 material, not Apple's private constants.", light: "58%", dark: "48%", control: range(0, 100, 1, "%") },
+  { name: "glass-liquid-clear-opacity", group: "Liquid", label: "Clear frost", description: "Clear glass over media. Dim bright media behind it only when needed.", light: "10%", dark: "8%", control: range(0, 60, 1, "%") },
+  { name: "glass-liquid-clear-dim", group: "Liquid", label: "Media dim", description: "Suggested dim for bright media behind clear controls. Apply to the media, and omit for dark or already dimmed content.", light: "35%", dark: "35%", control: range(0, 60, 1, "%") },
+  { name: "glass-liquid-blur", group: "Liquid", label: "Liquid diffusion", description: "glasscn's diffusion radius for complex content behind regular glass.", light: "18px", dark: "18px", control: range(0, 60, 1, "px") },
+  { name: "glass-liquid-clear-blur", group: "Liquid", label: "Clear diffusion", description: "Light diffusion over media. A web approximation of the clear system material.", light: "4px", dark: "4px", control: range(0, 30, 1, "px") },
+  { name: "glass-liquid-saturate", group: "Liquid", label: "Liquid saturation", description: "Colour carried through liquid glass.", light: "160%", dark: "160%", control: range(0, 300, 5, "%") },
+  { name: "glass-refraction", group: "Liquid", label: "Refraction", description: "Maximum edge displacement in pixels. Requires GlassEffects; 0 disables. Apple's native shader chooses its own optics.", light: "14px", dark: "14px", control: range(0, 32, 1, "px") },
+  { name: "glass-bezel", group: "Liquid", label: "Lens bezel", description: "Width of the rounded refracting edge.", light: "12px", dark: "12px", control: range(1, 32, 1, "px") },
+  { name: "glass-depth-opacity", group: "Liquid", label: "Large-surface diffusion", description: "Additional web frost as regular glass grows. Native chooses its own thickness.", light: "12%", dark: "12%", control: range(0, 30, 1, "%") },
+  { name: "glass-depth-blur", group: "Liquid", label: "Large-surface blur", description: "Additional web diffusion on large regular controls.", light: "6px", dark: "6px", control: range(0, 20, 1, "px") },
+  { name: "glass-inactive-strength", group: "Liquid", label: "Inactive highlights", description: "Remaining web rim and shadow strength when its window is inactive.", light: "0.4", dark: "0.4", control: range(0, 1, 0.05, "") },
 
   // Rim
-  { name: "glass-border-color", group: "Rim", label: "Rim colour", description: "The edge around every pane.", light: "oklch(1 0 0)", dark: "oklch(1 0 0)", control: colour },
+  { name: "glass-border-color", group: "Rim", label: "Rim colour", description: "The edge around content panes. Liquid Glass draws it only under Increase Contrast or Show control borders.", light: "oklch(1 0 0)", dark: "oklch(1 0 0)", control: colour },
   { name: "glass-border-opacity", group: "Rim", label: "Rim", description: "How visible the edge is.", light: "85%", dark: "12%", control: range(0, 100, 1, "%") },
   { name: "glass-border-width", group: "Rim", label: "Rim width", description: "Edge thickness.", light: "1px", dark: "1px", control: range(0, 4, 0.5, "px") },
   { name: "glass-highlight-opacity", group: "Rim", label: "Highlight", description: "The inset top edge catching light.", light: "92%", dark: "14%", control: range(0, 100, 1, "%") },
   { name: "glass-highlight-color", group: "Rim", label: "Highlight colour", description: "The colour of rims, speculars and the press glow.", light: "oklch(1 0 0)", dark: "oklch(1 0 0)", control: colour },
   { name: "glass-light-angle", group: "Rim", label: "Light angle", description: "Where the virtual light comes from: the lit side of a liquid rim (-45deg = top left).", light: "-45deg", dark: "-45deg", control: range(-180, 180, 5, "deg") },
-  { name: "glass-specular", group: "Rim", label: "Specular", description: "Rim highlight strength on the lit side of liquid glass.", light: "70%", dark: "30%", control: range(0, 100, 1, "%") },
-  { name: "glass-edge-shade", group: "Rim", label: "Edge shade", description: "The darkened inner edge on the shadow side (iOS 27).", light: "0%", dark: "18%", control: range(0, 60, 1, "%") },
+  { name: "glass-specular", group: "Rim", label: "Specular", description: "Rim highlight strength on the lit side of liquid glass.", light: "88%", dark: "65%", control: range(0, 100, 1, "%") },
+  { name: "glass-edge-shade", group: "Rim", label: "Edge shade", description: "The darkened inner edge on the shadow side (iOS 27).", light: "22%", dark: "32%", control: range(0, 60, 1, "%") },
   { name: "glass-illumination", group: "Rim", label: "Illumination", description: "The glow that spreads from the finger when liquid glass is pressed.", light: "22%", dark: "22%", control: range(0, 60, 1, "%") },
 
   // Depth
-  { name: "glass-shadow-color", group: "Depth", label: "Shadow colour", description: "Colour of the drop shadow.", light: "oklch(0.3 0.05 270)", dark: "oklch(0 0 0)", control: colour },
+  { name: "glass-shadow-color", group: "Depth", label: "Shadow colour", description: "Colour of the drop shadow.", light: "oklch(0 0 0)", dark: "oklch(0 0 0)", control: colour },
   { name: "glass-shadow-opacity", group: "Depth", label: "Shadow", description: "Drop shadow strength.", light: "12%", dark: "45%", control: range(0, 80, 1, "%") },
   { name: "glass-shadow-y", group: "Depth", label: "Shadow offset", description: "How far below the pane the shadow falls.", light: "10px", dark: "10px", control: range(0, 60, 1, "px") },
   { name: "glass-shadow-blur", group: "Depth", label: "Shadow blur", description: "How soft the shadow is.", light: "30px", dark: "30px", control: range(0, 120, 1, "px") },
@@ -462,10 +469,56 @@ function tuned(hue: number, light: { primary: string; aurora: string[]; rings: s
   return { light: scheme(light, false, gen.light), dark: scheme(dark, true, gen.dark) }
 }
 
+/**
+ * Apple's default appearance. Charts are the iOS 27 system colours (HIG Color, Specifications;
+ * read back from the macOS 27 SDK). The web accent is Apple's own web blue, #0071E3, which
+ * apple.com uses for filled buttons because it carries a white label at 4.7:1 (held at 5:1 here); iOS 27's
+ * systemBlue (#0088FF) carries white at 3.5:1, which the HIG allows only for bold text. The
+ * native track uses the exact iOS 27 colours on iOS (tokens.tsx). No aurora: the blobs take
+ * the grouped-background ground.
+ */
+function systemPalette(): GlassTheme {
+  const APPLE = {
+    light: { green: "oklch(0.73 0.194 147.4)", orange: "oklch(0.753 0.172 55.7)", purple: "oklch(0.622 0.263 322.5)", pink: "oklch(0.65 0.238 17.9)", indigo: "oklch(0.559 0.23 279.3)", teal: "oklch(0.745 0.127 203.3)", gray: "oklch(0.648 0.007 286.2)", ground: "oklch(0.963 0.007 286.3)" },
+    dark: { green: "oklch(0.756 0.208 147)", orange: "oklch(0.762 0.167 57.1)", purple: "oklch(0.658 0.279 322.4)", pink: "oklch(0.658 0.232 16)", indigo: "oklch(0.641 0.193 274.7)", teal: "oklch(0.787 0.134 203.3)", gray: "oklch(0.681 0.007 286.2)", ground: "oklch(0 0 none)" },
+  }
+  // #0071E3, nudged to 5:1 with white so the label still holds 4.5:1 once prominent glass
+  // composites the accent over a bright backdrop
+  const WEB_BLUE = accentFor("oklch(0.563 0.193 256.2)", "oklch(1 0 0)")
+  const scheme = (dark: boolean): Tokens => {
+    // rounded OKLCH of an sRGB colour can land a hair outside sRGB; map it back
+    const c = Object.fromEntries(Object.entries(dark ? APPLE.dark : APPLE.light).map(([k, v]) => [k, v.includes("none") ? v : mapColour(v)])) as typeof APPLE.light
+    return {
+      ...statusColours(256, dark),
+      primary: WEB_BLUE,
+      ring: WEB_BLUE,
+      "primary-foreground": "oklch(1 0 none)",
+      "chart-1": WEB_BLUE,
+      "chart-2": c.green,
+      "chart-3": c.orange,
+      "chart-4": c.purple,
+      "chart-5": c.pink,
+      "chart-6": c.indigo,
+      "chart-7": c.teal,
+      "chart-8": c.gray,
+      "aurora-1": c.ground,
+      "aurora-2": c.ground,
+      "aurora-3": c.ground,
+      "aurora-base": c.ground,
+    }
+  }
+  return { light: scheme(false), dark: scheme(true) }
+}
+
 export const PALETTES: Record<string, PaletteDef> = {
+  system: {
+    title: "System",
+    description: "Apple's default appearance: Apple's blue on the system greys, the system colours for charts, no aurora. The default.",
+    theme: systemPalette(),
+  },
   dusk: {
     title: "Dusk",
-    description: "Coral over violet and peach — the default.",
+    description: "Coral over violet and peach.",
     theme: tuned(
       35,
       { primary: "oklch(0.657 0.19 34.8)", aurora: ["oklch(0.829 0.098 37.8)", "oklch(0.809 0.109 296.4)", "oklch(0.907 0.07 70.2)"], rings: ["oklch(0.685 0.189 296.4)", "oklch(0.803 0.159 69.8)"] },
@@ -545,8 +598,8 @@ export const MATERIALS: Record<string, PresetDef> = {
     title: "Vivid",
     description: "Clear and vivid: little frost, strong saturation, a bright sheen.",
     tokens: { "glass-blur": "16px", "glass-saturate": "240%", "glass-sheen": "22%", "glass-sheen-angle": "135deg" },
-    light: { "glass-opacity": "28%", "glass-opacity-strong": "55%", "glass-opacity-subtle": "14%" },
-    dark: { "glass-opacity": "26%", "glass-opacity-strong": "55%", "glass-opacity-subtle": "12%", "glass-sheen": "5%" },
+    light: { "glass-opacity": "28%", "glass-opacity-strong": "55%", "glass-opacity-subtle": "14%", "glass-opacity-thick": "70%" },
+    dark: { "glass-opacity": "26%", "glass-opacity-strong": "55%", "glass-opacity-subtle": "12%", "glass-opacity-thick": "70%", "glass-sheen": "5%" },
   },
   crystal: {
     title: "Crystal",
@@ -561,18 +614,18 @@ export const MATERIALS: Record<string, PresetDef> = {
     tokens: { "glass-tint": "oklch(0.2 0.01 270)", "glass-blur": "30px", "glass-saturate": "140%", "glass-brightness": "85%", "glass-border-color": "oklch(1 0 0)", "glass-sheen": "6%" },
     // dark panes in the light scheme too: text, fills and thumbs inside them follow the dark scheme
     light: {
-      "glass-opacity": "72%", "glass-opacity-strong": "86%", "glass-opacity-subtle": "68%", "glass-border-opacity": "16%", "glass-highlight-opacity": "18%", "glass-shadow-opacity": "30%",
+      "glass-opacity": "72%", "glass-opacity-strong": "86%", "glass-opacity-subtle": "68%", "glass-opacity-thick": "94%", "glass-border-opacity": "16%", "glass-highlight-opacity": "18%", "glass-shadow-opacity": "30%",
       "glass-label": "oklch(0.985 0 0)", "glass-label-secondary": "oklch(0.88 0.01 270)", "glass-liquid-opacity": "72%",
       "glass-fill-tint": "oklch(0.6 0.01 285)", "glass-fill-opacity": "24%", "glass-fill-opacity-strong": "36%", "glass-thumb": "oklch(1 0 0 / 20%)",
     },
-    dark: { "glass-opacity": "60%", "glass-opacity-strong": "84%" },
+    dark: { "glass-opacity": "60%", "glass-opacity-strong": "84%", "glass-opacity-thick": "92%" },
   },
   matte: {
     title: "Matte",
     description: "No blur at all — opaque panes. The fastest option on slow devices.",
-    tokens: { "glass-blur": "0px", "glass-saturate": "100%", "glass-sheen": "0%" },
-    light: { "glass-opacity": "90%", "glass-opacity-strong": "96%", "glass-opacity-subtle": "75%" },
-    dark: { "glass-opacity": "90%", "glass-opacity-strong": "96%", "glass-opacity-subtle": "75%" },
+    tokens: { "glass-blur": "0px", "glass-liquid-blur": "0px", "glass-liquid-clear-blur": "0px", "glass-refraction": "0px", "glass-depth-opacity": "0%", "glass-depth-blur": "0px", "glass-saturate": "100%", "glass-sheen": "0%" },
+    light: { "glass-opacity": "90%", "glass-opacity-strong": "96%", "glass-opacity-subtle": "75%", "glass-opacity-thick": "100%" },
+    dark: { "glass-opacity": "90%", "glass-opacity-strong": "96%", "glass-opacity-subtle": "75%", "glass-opacity-thick": "100%" },
   },
   vapor: {
     title: "Vapor",
@@ -612,7 +665,7 @@ export interface TypePresetDef extends PresetDef {
 }
 
 export const TYPE_PRESETS: Record<string, TypePresetDef> = {
-  default: { title: "Default", description: "Your app's fonts on a major-third scale." },
+  default: { title: "App fonts", description: "Your app's fonts on a major-third scale." },
   system: {
     title: "System",
     description: "San Francisco everywhere, SF Rounded for figures — native and instant, nothing to load.",
@@ -707,7 +760,7 @@ export function createGlassTheme(options: CreateThemeOptions = {}): GlassTheme {
   warnUnknown("type preset", options.type, TYPE_PRESETS)
   if (typeof options.density === "string") warnUnknown("density", options.density, DENSITIES)
   const theme = defaultTheme()
-  const palette = typeof options.palette === "object" ? paletteFromHue(options.palette) : PALETTES[options.palette ?? "dusk"]?.theme
+  const palette = typeof options.palette === "object" ? paletteFromHue(options.palette) : PALETTES[options.palette ?? "system"]?.theme
   if (palette) {
     Object.assign(theme.light, palette.light)
     Object.assign(theme.dark, palette.dark)
@@ -719,7 +772,7 @@ export function createGlassTheme(options: CreateThemeOptions = {}): GlassTheme {
     const d = typeof options.density === "number" ? options.density : DENSITIES[options.density] ?? 1
     theme.light["glass-density"] = theme.dark["glass-density"] = String(d)
   }
-  const type = TYPE_PRESETS[options.type ?? "default"]
+  const type = TYPE_PRESETS[options.type ?? "system"]
   applyPreset(theme, type)
   applyFonts(theme, type?.fonts)
   applyFonts(theme, options.fonts)
@@ -922,11 +975,12 @@ export function decodeTheme(code: string): GlassTheme | null {
 
 /** Parse `oklch(L C H [/ A%])` → [L, C, H, A]. */
 export function parseOklch(value: string): [number, number, number, number] | null {
-  const m = value.trim().match(/^oklch\(\s*([\d.]+)(%?)\s+([\d.]+)\s+([\d.]+)(?:deg)?\s*(?:\/\s*([\d.]+)(%?))?\s*\)$/i)
+  // a `none` hue is an achromatic colour that doesn't pull a color-mix() toward hue 0
+  const m = value.trim().match(/^oklch\(\s*([\d.]+)(%?)\s+([\d.]+)\s+([\d.]+|none)(?:deg)?\s*(?:\/\s*([\d.]+)(%?))?\s*\)$/i)
   if (!m) return null
   const l = Number(m[1]) / (m[2] ? 100 : 1)
   const a = m[5] === undefined ? 1 : Number(m[5]) / (m[6] ? 100 : 1)
-  return [l, Number(m[3]), Number(m[4]), a]
+  return [l, Number(m[3]), m[4].toLowerCase() === "none" ? 0 : Number(m[4]), a]
 }
 
 /** OKLCH → linear sRGB, unclamped (out-of-gamut colours fall outside 0–1). */
@@ -1016,8 +1070,8 @@ const over = (top: RGB, bottom: RGB, alpha: number): RGB => [0, 1, 2].map((i) =>
 /** shadcn's default foregrounds — text outside panes. */
 const FOREGROUND: Record<Scheme, string> = { light: "oklch(0.145 0 0)", dark: "oklch(0.985 0 0)" }
 
-export type Tier = "subtle" | "default" | "strong" | "liquid"
-const TIER_OPACITY: Record<Tier, string> = { subtle: "glass-opacity-subtle", default: "glass-opacity", strong: "glass-opacity-strong", liquid: "glass-liquid-opacity" }
+export type Tier = "subtle" | "default" | "strong" | "thick" | "liquid"
+const TIER_OPACITY: Record<Tier, string> = { subtle: "glass-opacity-subtle", default: "glass-opacity", strong: "glass-opacity-strong", thick: "glass-opacity-thick", liquid: "glass-liquid-opacity" }
 
 /** The frost opacity a clarity setting produces (mirrors the stylesheet): 0.5 keeps it, 0 halves… to clear, 1 → opaque. */
 export function clarityOpacity(opacity: number, clarity: number): number {
@@ -1088,7 +1142,7 @@ export function legibilityReport(theme: GlassTheme, scheme: Scheme, { clarity }:
     const l = relativeLuminance(c)
     return round(Math.min(...panes(tier).map((p) => contrastRatio(l, p))), 2)
   }
-  const tiers: Tier[] = ["subtle", "default", "strong", "liquid"]
+  const tiers: Tier[] = ["subtle", "default", "strong", "thick", "liquid"]
   const label = get("glass-label") ?? FOREGROUND[scheme]
   const secondary = get("glass-label-secondary")
   const primary = col(get("primary"))
@@ -1172,6 +1226,7 @@ export interface NativeScheme {
   glassSubtle: string
   glass: string
   glassStrong: string
+  glassThick: string
   /** The control layer. */
   glassLiquid: string
   glassLiquidClear: string
@@ -1191,6 +1246,10 @@ export interface NativeScheme {
   knob: string
   blur: number
   liquidBlur: number
+  clearBlur: number
+  saturate: number
+  liquidSaturate: number
+  brightness: number
   specular: number
   edgeShade: number
   illumination: number
@@ -1281,6 +1340,7 @@ function nativeScheme(t: Tokens, scheme: Scheme): NativeScheme {
     glassSubtle: tier("glass-opacity-subtle"),
     glass: tier("glass-opacity"),
     glassStrong: tier("glass-opacity-strong"),
+    glassThick: tier("glass-opacity-thick"),
     glassLiquid: tier("glass-liquid-opacity"),
     glassLiquidClear: tier("glass-liquid-clear-opacity"),
     glassClearDim: at("oklch(0 0 0)", pct(t["glass-liquid-clear-dim"])),
@@ -1298,6 +1358,10 @@ function nativeScheme(t: Tokens, scheme: Scheme): NativeScheme {
     knob: oklchToRgb(t["glass-knob"]),
     blur: pt(t["glass-blur"]),
     liquidBlur: pt(t["glass-liquid-blur"]),
+    clearBlur: pt(t["glass-liquid-clear-blur"]),
+    saturate: pct(t["glass-saturate"]),
+    liquidSaturate: pct(t["glass-liquid-saturate"]),
+    brightness: pct(t["glass-brightness"]),
     specular: pct(t["glass-specular"]),
     edgeShade: pct(t["glass-edge-shade"]),
     illumination: pct(t["glass-illumination"]),

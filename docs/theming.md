@@ -6,13 +6,13 @@ Everything visual in glasscn is a primitive CSS variable, grouped into eleven di
 
 Primitives live on `:root` / `.dark` (or any element). **Derived values never do.** Colours like the frost, rim and shadow are computed from the primitives inside the utilities and `@theme inline` tokens, so they're evaluated on the element that uses them. That's what lets you override a primitive on any subtree and re-theme just that subtree. A `--glass: color-mix(…var(--glass-opacity)…)` declared on `:root` would be computed once at `:root` and ignore overrides on children.
 
-## Dimensions (101 primitives)
+## Dimensions (108 primitives)
 
 | Group | Primitives |
 |---|---|
 | Colour | `primary` `primary-foreground` `ring` `chart-1..5` `success` `warning` `info` (+ `-foreground`) `aurora-1..3` `aurora-base` |
 | Material | `glass-tint` `glass-opacity` `-strong` `-subtle` `glass-blur` `glass-saturate` `glass-brightness` `glass-sheen` `glass-sheen-angle` `glass-texture` `glass-fill-tint` `glass-fill-opacity` `-strong` `glass-thumb` `glass-knob` `glass-clarity` `glass-label` `glass-label-secondary` `-tertiary` `-quaternary` `glass-separator-opacity` |
-| Liquid | `glass-liquid-opacity` `glass-liquid-clear-opacity` `glass-liquid-clear-dim` `glass-liquid-blur` `glass-liquid-saturate` |
+| Liquid | `glass-liquid-opacity` `glass-liquid-clear-opacity` `glass-liquid-clear-dim` `glass-liquid-blur` `glass-liquid-clear-blur` `glass-liquid-saturate` `glass-refraction` `glass-bezel` |
 | Rim | `glass-border-color` `glass-border-opacity` `glass-border-width` `glass-highlight-opacity` `glass-highlight-color` `glass-light-angle` `glass-specular` `glass-edge-shade` `glass-illumination` |
 | Depth | `glass-shadow-color` `glass-shadow-opacity` `glass-shadow-y` `glass-shadow-blur` `glass-shadow-over-content` `glass-glow` `glass-dim` |
 | Shape | `glass-radius-surface` `glass-radius-control` `glass-radius-button` `glass-radius-badge` `glass-ring-width` |
@@ -75,7 +75,7 @@ Every shipped palette × material, in both schemes, is tested to WCAG AA with `l
 
 Each preset is a shadcn `registry:theme` item, and they compose.
 
-- Palettes (12): Dusk, Ocean, Rose, Sage, Amber, Graphite (hand-tuned) + Lavender, Mint, Cherry, Lagoon, Sand, Midnight (generated from a hue).
+- Palettes (13): System, the default, is Apple's iOS/macOS appearance (systemBlue accent, system greys, system colours as charts, no aurora). Dusk, Ocean, Rose, Sage, Amber, Graphite are hand-tuned; Lavender, Mint, Cherry, Lagoon, Sand, Midnight are generated from a hue. The default type preset is System (San Francisco); `type-default` is now titled App fonts.
 - Materials (7): frosted (default), vivid, crystal, smoked, matte, vapor, neon.
 - Shapes (4): round (default), soft, sharp, square.
 - Motion (4): spring (default), smooth, snappy, still. Spring and snappy are real springs: `spring({ stiffness, damping, mass })` emits a CSS `linear()` curve.
@@ -114,3 +114,11 @@ Shipped as the registry item `theme-scope`.
 ## Site
 
 `/themes` is the Theme Studio. It has every primitive as a control, presets, a hue harmony generator, randomise, a legibility badge, export as CSS / registry item / TypeScript / share link, and "apply to the whole site". The scoped live preview has its own scheme and continues into a catalogue of every registry item, components and blocks, each with its docs demo, read straight from the registry ([`studio-catalogue.md`](studio-catalogue.md)).
+
+## Optical control surfaces
+
+`GlassEffects` enhances small floating control surfaces on Chromium. `LiquidGlass` installs it automatically. Regular and clear have separate diffusion radii; `glass-refraction` and `glass-bezel` control the bounded convex-edge model. Other engines retain the full CSS material. These are glasscn optical parameters, not Apple shader constants.
+
+Material presets include the Liquid group, so `material-matte` disables both diffusion and displacement. Scoped theme values follow body-mounted portals. The foundation also ships `glass-cn`: its named radius and spacing groups make class overrides work in installed apps.
+
+`GlassPreferences` stores clarity, Reduce Transparency and Reduce Bright Effects for the viewer. A bright-media dim belongs behind a clear surface; it is not built into the clear material. See [Liquid Glass](liquid-glass.md) and the source-linked `/showcase`.

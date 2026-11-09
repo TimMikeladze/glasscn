@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { ChevronDownIcon, RotateCcwIcon } from "lucide-react"
 
 import { Button } from "@/components/glass/button"

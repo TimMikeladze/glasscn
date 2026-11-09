@@ -47,7 +47,7 @@ function Face({ children, variant = "glass", icon }: { children?: React.ReactNod
   const bg = variant === "primary" ? ui.primary : variant === "destructive" ? ui.destructive : ui.fillStrong
   const color = variant === "primary" ? ui.primaryForeground : variant === "destructive" ? ui.destructiveForeground : ui.foreground
   return (
-    <View style={{ height: ui.control.default, minWidth: icon ? ui.control.default : undefined, paddingHorizontal: icon ? 0 : ui.pad.default, borderRadius: ui.radius.button, backgroundColor: bg, alignItems: "center", justifyContent: "center" }}>
+    <View style={{ minHeight: ui.control.default, minWidth: icon ? ui.control.default : undefined, paddingHorizontal: icon ? 0 : ui.pad.default, paddingVertical: icon ? 0 : ui.pad.xs / 2, borderRadius: ui.radius.button, backgroundColor: bg, alignItems: "center", justifyContent: "center" }}>
       {typeof children === "string" ? (
         <GText size="sm" weight="600" color={color}>
           {children}
@@ -99,7 +99,7 @@ function ControlledDialog() {
         <DialogContent showCloseButton={false}>
           <DialogHeader>
             <DialogTitle>Controlled</DialogTitle>
-            <DialogDescription>No corner close — the footer's built-in Close button, the backdrop, Escape or back.</DialogDescription>
+            <DialogDescription>No corner close — the footer’s built-in Close button, the backdrop, Escape or back.</DialogDescription>
           </DialogHeader>
           <DialogFooter showCloseButton />
         </DialogContent>
@@ -124,7 +124,7 @@ function SideSheet({ side }: { side: "top" | "right" | "bottom" | "left" }) {
           <GText size="sm" weight="600">
             Name
           </GText>
-          <TextInput placeholder="Jiu-jitsu" placeholderTextColor={ui.mutedForeground} style={{ height: ui.control.default, borderRadius: ui.radius.control, paddingHorizontal: 12, backgroundColor: ui.fill, color: ui.foreground }} />
+          <TextInput placeholder="Jiu-jitsu" placeholderTextColor={ui.mutedForeground} style={{ minHeight: ui.control.default, fontSize: ui.text.base, borderRadius: ui.radius.control, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: ui.fill, color: ui.foreground }} />
         </View>
         <SheetFooter>
           <SheetClose onPress={() => toast.success("Area added")}>
@@ -138,6 +138,7 @@ function SideSheet({ side }: { side: "top" | "right" | "bottom" | "left" }) {
 
 function DetentSheet({ native = true, guarded, controlled, inspector }: { native?: boolean; guarded?: boolean; controlled?: boolean; inspector?: boolean }) {
   const [detent, setDetent] = React.useState(0)
+  const custom = !native || guarded
   const label = inspector ? "Inspector (modal false)" : guarded ? "Guarded dismiss" : controlled ? `Controlled detent: ${detent}` : native ? "Detents (system sheet)" : "Detents (native={false})"
   return (
     <Sheet>
@@ -147,18 +148,18 @@ function DetentSheet({ native = true, guarded, controlled, inspector }: { native
       <SheetContent
         side="bottom"
         native={native}
-        detents={["medium", "large", 0.3]}
+        detents={[0.3, "medium", "large"]}
         detent={controlled ? detent : undefined}
-        onDetentChange={setDetent}
+        onDetentChange={custom || controlled ? setDetent : undefined}
         modal={!inspector}
         onBeforeDismiss={guarded ? () => new Promise<boolean>((resolve) => resolve(confirmDismiss())) : undefined}
       >
         <SheetHeader>
           <SheetTitle>Tonight’s entry</SheetTitle>
-          <SheetDescription>Drag the grabber between detents; tap it to cycle; drag down to dismiss.</SheetDescription>
+          <SheetDescription>{custom ? "Drag the grabber between detents; tap it to cycle; drag down to dismiss." : "Drag up for more room, or down to dismiss."}</SheetDescription>
         </SheetHeader>
         <View style={{ paddingHorizontal: 20 }}>
-          <Body>Detent index: {detent}</Body>
+          <Body>{custom ? `Detent index: ${detent}` : "The sheet grows as you drag it."}</Body>
         </View>
       </SheetContent>
     </Sheet>
@@ -534,13 +535,13 @@ export const demos: Record<string, Demo> = {
             <SideSheet side="bottom" />
           </Row>
         </Section>
-        <Section title="Detents" note="iOS/Android: the system sheet (@expo/ui BottomSheet). native={false}, a controlled detent or onBeforeDismiss use the Reanimated sheet: drag, rubber-band, tap the grabber to cycle.">
+        <Section title="Detents" note="iOS uses the system sheet for controlled detents and nonmodal background interaction. native={false} and pre-dismiss veto use the custom sheet. Android uses its system sheet for basic uncontrolled presentations.">
           <Row>
             <DetentSheet />
             <DetentSheet native={false} />
             <DetentSheet controlled />
             <DetentSheet guarded />
-            <DetentSheet inspector native={false} />
+            <DetentSheet inspector />
           </Row>
         </Section>
       </>

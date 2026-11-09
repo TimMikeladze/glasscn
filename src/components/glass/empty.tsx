@@ -1,6 +1,6 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 /**
  * shadcn's Empty: what a list, search or page shows when there's nothing in it — an icon tile,

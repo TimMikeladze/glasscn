@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { ToggleGroup as ToggleGroupPrimitive } from "radix-ui"
 
 import { slidingIndicatorClass, useSlidingIndicator } from "@/hooks/use-sliding-indicator"
@@ -116,7 +116,7 @@ function SegmentedControlItem({ className, value, ...props }: React.ComponentPro
       value={value}
       className={cn(
         // before the thumb is measured (server render, no JS) the chosen item draws the thumb itself
-        "relative z-10 inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-concentric px-3 text-sm font-medium whitespace-nowrap text-muted-foreground transition-colors duration-(--glass-duration) ease-out glass-focus-inset hover:text-foreground group-data-dragging/segmented:cursor-grabbing active:bg-fill group-data-dragging/segmented:active:bg-transparent disabled:pointer-events-none disabled:text-glass-label-tertiary data-[state=on]:font-semibold data-[state=on]:text-foreground not-in-data-indicator-ready:data-[state=on]:bg-glass-thumb not-in-data-indicator-ready:data-[state=on]:shadow-glass-knob group-data-[size=lg]/segmented:text-base group-data-[size=sm]/segmented:px-2 group-data-[size=sm]/segmented:text-xs [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
+        "relative z-10 inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-concentric px-3 text-sm font-medium whitespace-nowrap text-foreground transition-colors duration-(--glass-duration) ease-out glass-focus-inset hover:text-foreground group-data-dragging/segmented:cursor-grabbing active:bg-fill group-data-dragging/segmented:active:bg-transparent disabled:pointer-events-none disabled:text-glass-label-tertiary data-[state=on]:font-semibold data-[state=on]:text-foreground not-in-data-indicator-ready:data-[state=on]:bg-glass-thumb not-in-data-indicator-ready:data-[state=on]:shadow-glass-knob group-data-[size=lg]/segmented:text-base group-data-[size=sm]/segmented:px-2 group-data-[size=sm]/segmented:text-xs [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}

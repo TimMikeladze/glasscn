@@ -74,6 +74,7 @@ export function Press(props: PressProps) {
 }
 
 function PressSlot({ children, onPress, onLongPress, haptic, style, asChild: _a, squash: _s, hover: _h, liquid: _l, dim: _d, ...rest }: PressProps) {
+  void [_a, _s, _h, _l, _d]
   const child = children as React.ReactElement<Pressish>
   const own = typeof style === "function" ? style({ pressed: false, hovered: false }) : style
   return React.cloneElement(child, {
@@ -90,6 +91,7 @@ function PressSlot({ children, onPress, onLongPress, haptic, style, asChild: _a,
 }
 
 function PressView({ haptic = false, squash, hover = 1, liquid = false, dim = false, style, onPress, onPressIn, onPressOut, onHoverIn, onHoverOut, disabled, accessibilityRole = "button", asChild: _asChild, ...props }: PressProps) {
+  void _asChild
   const ui = useUI()
   const still = useReducedMotion() || ui.motion.duration === 0
   const sx = useSharedValue(1)
@@ -98,6 +100,13 @@ function PressView({ haptic = false, squash, hover = 1, liquid = false, dim = fa
   const [pressed, setPressed] = React.useState(false)
   const [hovered, setHovered] = React.useState(false)
   const spring = ui.motion.springConfig
+  React.useEffect(() => {
+    if (still) {
+      sx.set(1)
+      sy.set(1)
+      fade.set(1)
+    }
+  }, [still, sx, sy, fade])
 
   const to = (x: number, y: number) => {
     if (still) return
@@ -111,11 +120,11 @@ function PressView({ haptic = false, squash, hover = 1, liquid = false, dim = fa
       const k = ui.motion.pressStretch
       to(s * (1 + k), s * (1 - k))
     }
-    if (dim) fade.set(withTiming(0.72, { duration: 80 }))
+    if (dim && !still) fade.set(withTiming(0.72, { duration: 80 }))
   }
   const up = () => {
     to(hovered ? hover : 1, hovered ? hover : 1)
-    if (dim) fade.set(withTiming(1, { duration: 160 }))
+    if (dim) fade.set(still ? 1 : withTiming(1, { duration: 160 }))
   }
 
   const resolved = typeof style === "function" ? style({ pressed, hovered }) : style

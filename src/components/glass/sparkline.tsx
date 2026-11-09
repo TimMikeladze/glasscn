@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 import { areaPath, drawEase, glassTime, polylineLength, sanitizeId, scaleSeries, smoothPath } from "@/lib/glass-charts"
 

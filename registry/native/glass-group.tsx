@@ -27,10 +27,10 @@ type GlassGroupProps = {
 }
 
 /**
- * Apple's GlassEffectContainer: neighbouring controls share ONE Liquid Glass backdrop instead of
- * each being its own glass (never liquid in liquid — items are transparent). The indicator is a
+ * One shared Liquid Glass capsule with transparent actions. The indicator is a
  * fill that springs to the selected item on Reanimated: x, y, width, height and its concentric
- * radius (NAT-19). On iOS 26 the backdrop sits in a `GlassContainer` so it morphs with sibling glass.
+ * radius (NAT-19). This does not split or merge the individual actions; use GlassCluster for
+ * separate sibling effects. Its outer container can still merge the capsule with neighboring glass.
  */
 export function GlassGroup({ selected, indicator, orientation, vertical, spacing = 8, accessibilityLabel, style, children }: GlassGroupProps) {
   const ui = useUI()

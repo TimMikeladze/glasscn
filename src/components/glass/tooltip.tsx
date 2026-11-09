@@ -1,8 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { Tooltip as TooltipPrimitive } from "radix-ui"
+import { GlassPortal } from "@/lib/glass-portal"
 
 function TooltipProvider({ delayDuration = 120, ...props }: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
   return <TooltipPrimitive.Provider data-slot="tooltip-provider" delayDuration={delayDuration} {...props} />
@@ -24,7 +25,7 @@ function TooltipTrigger({ ...props }: React.ComponentProps<typeof TooltipPrimiti
 /** A small liquid-glass capsule (the control layer) that grows out of its trigger. */
 function TooltipContent({ className, sideOffset = 6, children, ...props }: React.ComponentProps<typeof TooltipPrimitive.Content>) {
   return (
-    <TooltipPrimitive.Portal>
+    <GlassPortal>{(container) => <TooltipPrimitive.Portal container={container}>
       <TooltipPrimitive.Content
         data-slot="tooltip-content"
         data-glass-motion=""
@@ -37,7 +38,7 @@ function TooltipContent({ className, sideOffset = 6, children, ...props }: React
       >
         {children}
       </TooltipPrimitive.Content>
-    </TooltipPrimitive.Portal>
+    </TooltipPrimitive.Portal>}</GlassPortal>
   )
 }
 

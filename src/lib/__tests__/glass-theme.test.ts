@@ -12,7 +12,6 @@ import {
   TOKEN_NAMES,
   createGlassTheme,
   decodeTheme,
-  defaultTheme,
   encodeTheme,
   accentFor,
   inSrgbGamut,
@@ -70,7 +69,10 @@ describe("palettes", () => {
 
 describe("createGlassTheme", () => {
   it("is the defaults when given nothing", () => {
-    expect(createGlassTheme()).toEqual({ ...defaultTheme(), light: { ...defaultTheme().light, ...PALETTES.dusk.theme.light }, dark: { ...defaultTheme().dark, ...PALETTES.dusk.theme.dark } })
+    // the default is Apple's system appearance: the System palette and San Francisco
+    expect(createGlassTheme()).toEqual(createGlassTheme({ palette: "system", material: "frosted", shape: "round", motion: "spring", type: "system" }))
+    expect(createGlassTheme().light).toMatchObject(PALETTES.system.theme.light)
+    expect(createGlassTheme().dark).toMatchObject(PALETTES.system.theme.dark)
   })
   it("layers palette, material, shape, motion, density, then overrides — later wins", () => {
     const t = createGlassTheme({ palette: "ocean", material: "vivid", shape: "square", motion: "still", density: "compact", tokens: { "glass-blur": "3px" }, dark: { "glass-glow": "20%" } })
@@ -124,7 +126,7 @@ describe("outputs", () => {
   it("makes a valid shadcn theme item and inline style vars", () => {
     const item = themeToRegistryItem(theme, "my-theme")
     expect(item).toMatchObject({ name: "my-theme", type: "registry:theme" })
-    expect(Object.keys(item.cssVars.light)).toHaveLength(TOKENS.filter((t) => !t.optional).length)
+    expect(Object.keys(item.cssVars.light)).toHaveLength(TOKENS.filter((t) => !t.optional || theme.light[t.name]).length)
     expect(themeVars(theme, "dark")["--glass-blur"]).toBe("10px")
   })
   it("round-trips a share code, keeping only safe known tokens", () => {
@@ -244,8 +246,13 @@ describe("typography", () => {
       }
     }
   })
-  it("leaves fonts unset by default — the app's fonts apply", () => {
+  it("uses San Francisco by default, with nothing to load", () => {
     const t = createGlassTheme()
+    expect(t.light["glass-font-sans"]).toMatch(/-apple-system/)
+    expect(fontStylesheetUrl(t)).toBeNull()
+  })
+  it("leaves fonts unset with the App fonts preset — the app's fonts apply", () => {
+    const t = createGlassTheme({ type: "default" })
     expect([t.light["glass-font-sans"], t.light["glass-font-heading"]]).toEqual(["", ""])
     expect(themeToCss(t)).not.toMatch(/--glass-font-(sans|heading|display|mono)/)
     expect(fontStylesheetUrl(t)).toBeNull()

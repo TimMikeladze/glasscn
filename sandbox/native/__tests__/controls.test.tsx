@@ -1,5 +1,7 @@
 import * as React from "react"
 import { act, fireEvent, screen } from "@testing-library/react-native"
+import { State, type PanGesture } from "react-native-gesture-handler"
+import { fireGestureHandler, getByGestureTestId } from "react-native-gesture-handler/jest-utils"
 
 import { Checkbox } from "@/components/glass/native/checkbox"
 import { SegmentedControl, SegmentedControlItem } from "@/components/glass/native/segmented-control"
@@ -55,6 +57,19 @@ describe("Checkbox", () => {
 })
 
 describe("Slider", () => {
+  it("commits the clamped live value when a custom drag is cancelled", async () => {
+    const commit = jest.fn()
+    await renderThemed(<Slider native={false} testID="volume" defaultValue={[50]} onValueCommit={commit} />)
+    await fireEvent(screen.getByTestId("volume"), "layout", { nativeEvent: { layout: { x: 0, y: 0, width: 224, height: 44 } } })
+    await act(() => fireGestureHandler<PanGesture>(getByGestureTestId("volume-drag"), [
+      { state: State.BEGAN, x: 112, translationX: 0 },
+      { state: State.ACTIVE, x: 400, translationX: 288 },
+      { state: State.CANCELLED, x: 400, translationX: 288 },
+    ]))
+    expect(commit).toHaveBeenLastCalledWith([100])
+    expect(screen.getByRole("adjustable").props.accessibilityValue.now).toBe(100)
+  })
+
   it("is adjustable with a value, and steps on increment/decrement", async () => {
     const onChange = jest.fn()
     await renderThemed(<Slider native={false} aria-label="Volume" defaultValue={[50]} step={10} onValueChange={onChange} />)
@@ -74,6 +89,15 @@ describe("Slider", () => {
 })
 
 describe("SegmentedControl", () => {
+  it("uses a native lens while the custom selection is held", async () => {
+    await renderThemed(<SegmentedControl native={false} defaultValue="a"><SegmentedControlItem value="a">A</SegmentedControlItem><SegmentedControlItem value="b">B</SegmentedControlItem></SegmentedControl>)
+    expect(screen.queryByTestId("GlassView")).toBeNull()
+    await fireEvent(screen.getAllByRole("radio")[0], "pressIn")
+    expect(screen.getByTestId("GlassView")).toBeTruthy()
+    await fireEvent(screen.getAllByRole("radio")[0], "pressOut")
+    expect(screen.queryByTestId("GlassView")).toBeNull()
+  })
+
   function Controlled() {
     const [v, setV] = React.useState("day")
     return (

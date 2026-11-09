@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 export interface TrackerBlock {
   /** Shown on hover and read by screen readers. */

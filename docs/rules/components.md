@@ -5,7 +5,7 @@ Follow shadcn's conventions exactly, then the glass ones.
 ## shadcn conventions
 - One file per item in `src/components/glass/<name>.tsx`; named exports; `function` components, not `const` arrows or `forwardRef` (React 19 passes `ref` as a prop).
 - Every rendered part has `data-slot="<part>"`; state goes on `data-*` (`data-variant`, `data-size`, `data-state`) so it can be styled from outside.
-- Props: `React.ComponentProps<"div">` or `React.ComponentProps<typeof Primitive.Root>`, spread last; `className` merged **last** through `cn` (from the `cn` package).
+- Props: `React.ComponentProps<"div">` or `React.ComponentProps<typeof Primitive.Root>`, spread last; `className` merged **last** through `cn` (from `@/lib/glass-cn`, the foundation's named-token merge configuration).
 - Variants with `cva`, exported beside the component (`buttonVariants`); defaults via `defaultVariants`.
 - `asChild` via `Slot.Root` from `radix-ui` where the element may be a link.
 - Radix through the unified `radix-ui` package. Icons from `lucide-react`.

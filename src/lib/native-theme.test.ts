@@ -31,9 +31,9 @@ const deltaE = (a: [number, number, number], b: [number, number, number]) => Mat
 const names = Object.keys(PALETTES)
 
 describe("native tokens", () => {
-  it("cover all 12 palettes", () => {
+  it("cover all 13 palettes", () => {
     expect(Object.keys(NATIVE).sort()).toEqual([...names].sort())
-    expect(names).toHaveLength(12)
+    expect(names).toHaveLength(13)
   })
 
   for (const palette of names) {

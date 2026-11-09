@@ -13,57 +13,47 @@ export const metadata = pageMetadata(PAGES.native)
 const FOUNDATION = ["native-tokens", "native-glass", "native-aurora", "native-press", "native-ui"]
 const components = nativeItems.filter((i) => !FOUNDATION.includes(i.name) && i.name !== "native-chart-math")
 
-const usage = `import { View } from "react-native"
-import { Aurora } from "@/components/glass/native/aurora"
-import { Button } from "@/components/glass/native/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/glass/native/card"
-import { ActivityRings } from "@/components/glass/native/activity-rings"
-import { GlassThemeProvider } from "@/components/glass/native/tokens"
-import { Toaster, toast } from "@/components/glass/native/toaster"
+const usage = `import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { KeyboardProvider } from "react-native-keyboard-controller"
+import { SafeAreaProvider } from "react-native-safe-area-context"
+import { LiquidGlass01 } from "@/components/glass/native/liquid-glass-01"
 
 export default function Screen() {
   return (
-    <GlassThemeProvider palette="ocean">
-      <View style={{ flex: 1, padding: 20, justifyContent: "center" }}>
-        <Aurora />
-        <Card>
-          <CardHeader>
-            <CardTitle>Tonight’s reflection</CardTitle>
-            <CardDescription>Three rings, closing as the day goes.</CardDescription>
-          </CardHeader>
-          <CardContent style={{ alignItems: "center" }}>
-            <ActivityRings rings={[{ value: 0.8 }, { value: 0.55 }, { value: 1.2 }]} size={140} />
-          </CardContent>
-          <CardFooter>
-            <Button onPress={() => toast.success("Sealed")}>Seal tonight</Button>
-          </CardFooter>
-        </Card>
-        <Toaster />
-      </View>
-    </GlassThemeProvider>
+    <SafeAreaProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <KeyboardProvider>
+          <LiquidGlass01 scene="music" style={{ flex: 1 }} />
+        </KeyboardProvider>
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   )
 }`
 
 export default function Native() {
   return (
     <>
-      <PageHeader eyebrow="Guides" title="React Native" description="Every component and block, for Expo: one React Native file for iOS, Android and the web — Liquid Glass on iOS 26 included." />
+      <PageHeader eyebrow="Guides" title="React Native" description="Every component and block, for Expo: system Liquid Glass on iOS 27, generated themes, and the same parts on Android and the web." />
       <P>
-        Every component is plain React Native, so the same file runs on iOS, Android and the web. <C>native-glass</C> picks the best surface the platform has: native Liquid Glass (<C>expo-glass-effect</C>) on iOS 26, a UIVisualEffect blur (<C>expo-blur</C>) on older iOS,{" "}
-        <C>backdrop-filter</C> under react-native-web, and a translucent fill on Android. The palettes are the same six, as plain values.
+        Native Liquid Glass starts untinted and follows the system appearance. Regular glass carries floating controls; clear glass belongs over media. Content cards use standard material. System switches, sliders, pickers, menus and sheets use Expo’s native UI components. The same source renders on Android and react-native-web with platform materials and generated theme tokens.
       </P>
       <InstallCommand args={`add ${FOUNDATION.map((n) => itemUrl(n)).join(" ")}`} />
       <P className="mt-4">
         Needs a <C>components.json</C> in the Expo project (as react-native-reusables uses) so the CLI knows your aliases. Files land in <C>components/glass/native/</C>.
       </P>
-      <H2>Usage</H2>
+      <H2>Run the Apple-inspired examples</H2>
+      <InstallCommand args={`add ${itemUrl("native-liquid-glass-01")}`} />
+      <P>Choose Photos, Music, Maps, Safari, Mail or Controls. The native sandbox has all six scenes, separate material examples, and sibling glass merging.</P>
+      <InstallCommand args={`add ${itemUrl("native-liquid-glass-02")}`} />
+      <P>For Landmarks, Notes, Search and Materials, use <C>LiquidGlass02</C> from <C>native/liquid-glass-02</C> with the matching lowercase scene name. These add image extension, identified badges, prioritized toolbar overflow, editable nonmodal formatting and scoped search tokens.</P>
       <CodeBlock code={usage} html={`<pre><code>${usage.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</code></pre>`} title="app/index.tsx" />
-      <H2>Two rules from shipping it</H2>
+      <H2>Preserve the system effect</H2>
       <P>
-        Liquid Glass won’t render under an ancestor whose opacity starts below 1. Fade entrances and screen transitions blank it — so on iOS 26, animate with translate and scale instead (
+        Keep opacity at one on native glass and its ancestors. Animate position, size or the optical effect instead (
         <C>canFade()</C> from <C>native-glass</C> tells you when).
       </P>
-      <P>Animated drops Pressable’s function-style form, so <C>Press</C> takes a plain style.</P>
+      <P>Use <C>materialized</C> for optical presentation exits; <C>visible</C> hides the entire surface. Reduce Motion stops elastic/effect animation. <C>GText</C> and <C>GIcon</C> supply dynamic neutral foregrounds so labels stay readable when regular glass changes appearance.</P>
+      <P>Leave palette and scheme unset to preserve system defaults. Set them explicitly in <C>GlassThemeProvider</C> to theme a subtree. Android can opt into a blur target with <C>GlassBlurTarget</C>; otherwise the material uses a readable fill. Bright media can use a dim behind clear controls; dark media needs none.</P>
       <H2>Components</H2>
       <P>
         Every web component and block has a native twin under the same name with a <C>native-</C> prefix: the same parts and props, one file that renders on iOS, Android and the web

@@ -1,4 +1,4 @@
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 /** Headings and paragraphs for the docs' own pages. */
 export function PageHeader({ eyebrow, title, description }: { eyebrow?: string; title: string; description?: string }) {

@@ -30,6 +30,13 @@ const at = (name) => `${R}/${name}.json`
 
 export const foundations = [
   {
+    name: "glass-toolbar-layout",
+    type: "registry:lib",
+    title: "Toolbar command layout",
+    description: "Pure width allocation for prioritized, pinned and overflow-only toolbar commands, shared with native.",
+    files: [{ path: "src/lib/glass-toolbar-layout.ts", type: "registry:lib", target: "@lib/glass-toolbar-layout.ts" }],
+  },
+  {
     name: "glass-style",
     type: "registry:lib",
     title: "Glass style",
@@ -38,8 +45,11 @@ export const foundations = [
     categories: ["glass", "foundations"],
     // tw-animate-css: overlay enter/exit classes (animate-in, zoom-in-95…). `shadcn init` already imports it.
     dependencies: ["cn", "class-variance-authority", "tw-animate-css"],
-    docs: 'glasscn is installed. Put <Aurora /> (shadcn add @glasscn-app/aurora) behind your app, and make sure your global CSS has @import "tw-animate-css"; (shadcn init adds it) so overlays animate.',
-    files: [{ path: "src/lib/glass-variants.ts", type: "registry:lib", target: "@lib/glass-variants.ts" }],
+    docs: 'glasscn is installed. Place floating controls over your content. For web refraction, add @glasscn-app/glass-effects and mount <GlassEffects /> once in the app root. Keep @import "tw-animate-css"; in your global CSS (shadcn init adds it) so overlays animate.',
+    files: [
+      { path: "src/lib/glass-variants.ts", type: "registry:lib", target: "@lib/glass-variants.ts" },
+      { path: "src/lib/glass-cn.ts", type: "registry:lib", target: "@lib/glass-cn.ts" },
+    ],
     // cssVars + css are filled in by scripts/generate.mjs from src/lib/glass-theme.ts and registry/stylesheet.mjs
   },
   {
@@ -75,6 +85,41 @@ export const foundations = [
     categories: ["glass", "foundations"],
     files: [{ path: "src/lib/glass-charts.ts", type: "registry:lib", target: "@lib/glass-charts.ts" }],
   },
+  {
+    name: "glass-optics",
+    type: "registry:lib",
+    title: "Glass optics",
+    description: "A bounded rounded-lens displacement map for web control surfaces. Geometry only; no backdrop pixels are read.",
+    categories: ["glass", "foundations"],
+    files: [{ path: "src/lib/glass-optics.ts", type: "registry:lib", target: "@lib/glass-optics.ts" }],
+  },
+  {
+    name: "glass-portal",
+    type: "registry:lib",
+    title: "Glass portal",
+    description: "Carries scoped theme primitives and appearance into body-mounted overlays without clipping them to a preview.",
+    categories: ["glass", "foundations"],
+    dependencies: ["radix-ui"],
+    files: [{ path: "src/lib/glass-portal.tsx", type: "registry:lib", target: "@lib/glass-portal.tsx" }],
+  },
+  {
+    name: "glass-transitions",
+    type: "registry:lib",
+    title: "Glass presentation transitions",
+    description: "Source-to-presentation transitions with per-instance identity, synchronous React snapshots and reduced-motion fallback.",
+    categories: ["glass", "foundations"],
+    dependencies: ["react-dom"],
+    files: [{ path: "src/lib/glass-transitions.ts", type: "registry:lib", target: "@lib/glass-transitions.ts" }],
+  },
+  {
+    name: "glass-effects",
+    type: "registry:component",
+    title: "Glass effects",
+    description: "Install once at the app root to add optical refraction and pointer illumination to floating controls, including portals. CSS material fallback on WebKit and Firefox.",
+    categories: ["glass", "foundations"],
+    registryDependencies: [foundation, at("glass-optics")],
+    files: [{ path: "src/components/glass/glass-effects.tsx", type: "registry:component", target: "@components/glass/glass-effects.tsx" }],
+  },
 ]
 
 export const components = [
@@ -82,8 +127,9 @@ export const components = [
   ui("aurora", "Aurora", "The living ground: three palette blobs drifting over the base colour. Pure CSS, reduced-motion aware.", { categories: ["surfaces"] }),
   ui("backdrop", "Backdrop", "A ground for glass besides the aurora: a photo with an optional scrim, a muted looping video (paused under reduced motion), a palette mesh, or a fine noise.", { categories: ["surfaces"] }),
   ui("glass", "Glass", "A glass pane — material (content) or liquid (control layer, regular or clear). Intensity, tint and elevation variants; asChild.", { deps: ["radix-ui"], categories: ["surfaces"] }),
+  ui("liquid-glass", "Liquid glass", "A floating regular or clear lens with optical edge refraction, pointer illumination and optional light tracking. Dim bright media beneath clear controls.", { reg: [at("glass"), at("glass-effects")], categories: ["surfaces"] }),
   ui("card", "Card", "shadcn's Card API on glass: header, title, description, action, content, footer, a hero image — regular, thick or solid material, and asChild for a pressable link card.", { deps: ["radix-ui"], categories: ["surfaces"] }),
-  ui("theme-scope", "Theme scope", "Re-theme a subtree at runtime: a different palette, material, shape or scheme for one card, section or preview.", { reg: [at("glass-theme")], categories: ["surfaces"] }),
+  ui("theme-scope", "Theme scope", "Re-theme a subtree at runtime: a different palette, material, shape or scheme for one card, section or preview.", { reg: [at("glass-portal"), at("glass-theme")], categories: ["surfaces"] }),
   // typography
   ui("typography", "Typography", "Heading, Text, Display, Blockquote, InlineCode, List and TextLink on the theme's modular scale — fonts, weights, case and numerals from the type tokens.", { deps: ["radix-ui", "class-variance-authority"], categories: ["typography"] }),
   ui("prose", "Prose", "Rich text (Markdown, MDX, CMS) set in the theme's type: headings, links, lists, quotes, code, tables.", { deps: ["radix-ui"], categories: ["typography"] }),
@@ -97,7 +143,10 @@ export const components = [
   ui("checkbox", "Checkbox", "shadcn's Checkbox on glass: a soft box that fills with the accent, with an indeterminate dash.", { deps: ["radix-ui", "lucide-react"], categories: ["controls"] }),
   ui("segmented-control", "Segmented control", "The iOS segmented control: one concentric thumb slides to the chosen segment and can be dragged across them as a lens; capsule or rounded, or momentary actions.", { deps: ["radix-ui"], reg: [hook], categories: ["controls"] }),
   ui("tabs", "Tabs", "Tabs with a sliding pill (glass capsule, plain) or a sliding underline.", { deps: ["radix-ui", "class-variance-authority"], reg: [hook], categories: ["controls"] }),
-  ui("glass-group", "Glass group", "One shared liquid backdrop for neighbouring controls (Apple's GlassEffectContainer), with an optional selection that slides and morphs between them.", { deps: ["radix-ui"], reg: [hook], categories: ["controls"] }),
+  ui("glass-group", "Glass group", "One shared liquid capsule for neighboring controls, with an optional sliding selection. Use GlassCluster for sibling shapes that merge and separate.", { deps: ["radix-ui"], reg: [hook], categories: ["controls"] }),
+  ui("glass-cluster", "Glass cluster", "Sibling controls form a shared glass contour as they approach. Smooth union mask on web; system glass container on native.", { deps: ["radix-ui"], categories: ["controls"] }),
+  ui("background-extension", "Background extension", "Mirrored, softened imagery continues beneath leading and trailing chrome. Foreground content renders once.", { categories: ["surfaces"] }),
+  ui("glass-morph", "Glass morph", "Stable sibling identities preserve continuity through insertion, removal and reordering. Native delegates to SwiftUI namespaces and effect IDs.", { reg: [at("glass-cluster")], categories: ["controls"] }),
   ui("slider", "Slider", "A soft track, an accent range and capsule knobs that turn into lenses while dragged. Ranges, ticks, a neutral origin, end icons, a value bubble and a thumbless progress variant.", { deps: ["radix-ui"], categories: ["controls"] }),
   ui("progress", "Progress", "A capsule bar filling from the second chart colour into the accent.", { deps: ["radix-ui"], categories: ["controls"] }),
   ui("kbd", "Kbd", "Keycaps on glass, singly or grouped.", { categories: ["controls"] }),
@@ -109,20 +158,20 @@ export const components = [
     extraFiles: [{ path: "src/components/glass/glass-preferences-script.tsx", type: "registry:ui", target: "@components/glass/glass-preferences-script.tsx" }],
   }),
   // overlays
-  ui("dialog", "Dialog", "A liquid-glass modal over a dimmed page that morphs out of its trigger (View Transitions) or materialises in place.", { deps: ["radix-ui", "lucide-react", "react-dom"], reg: [at("button")], categories: ["overlays"] }),
-  ui("alert-dialog", "Alert dialog", "An Apple-style alert on strong glass: a bold title, a short message and capsule actions — for confirming destructive or irreversible choices. Only its buttons close it.", { deps: ["radix-ui"], reg: [at("button")], categories: ["overlays"] }),
-  ui("sheet", "Sheet", "A floating glass panel that slides in from any edge, inset like an iPad sheet — with detents, a grabber, drag-to-dismiss and a non-modal inspector mode.", { deps: ["radix-ui", "lucide-react"], reg: [at("button")], categories: ["overlays"] }),
-  ui("action-sheet", "Action sheet", "The iOS action sheet: a few choices in one liquid group rising from the bottom, Cancel in its own capsule — on the alert-dialog primitives.", { deps: ["radix-ui"], reg: [at("alert-dialog")], categories: ["overlays"] }),
-  ui("popover", "Popover", "Floating glass content anchored to a trigger.", { deps: ["radix-ui"], categories: ["overlays"] }),
-  ui("tooltip", "Tooltip", "A small glass capsule on hover and focus.", { deps: ["radix-ui"], categories: ["overlays"] }),
-  ui("dropdown-menu", "Dropdown menu", "A glass menu: items, checkbox and radio items, labels, shortcuts, submenus.", { deps: ["radix-ui", "lucide-react"], categories: ["overlays"] }),
+  ui("dialog", "Dialog", "A liquid-glass modal over a dimmed page that morphs out of its trigger (View Transitions) or materialises in place.", { deps: ["radix-ui", "lucide-react", "react-dom"], reg: [at("glass-transitions"), at("glass-portal"), at("button")], categories: ["overlays"] }),
+  ui("alert-dialog", "Alert dialog", "An Apple-style alert on strong glass: a bold title, a short message and capsule actions — for confirming destructive or irreversible choices. Only its buttons close it.", { deps: ["radix-ui"], reg: [at("glass-transitions"), at("glass-portal"), at("button")], categories: ["overlays"] }),
+  ui("sheet", "Sheet", "A floating glass panel that slides in from any edge, inset like an iPad sheet — with detents, a grabber, drag-to-dismiss and a non-modal inspector mode.", { deps: ["radix-ui", "lucide-react"], reg: [at("glass-transitions"), at("glass-portal"), at("button")], categories: ["overlays"] }),
+  ui("action-sheet", "Action sheet", "A short choice presentation with passive dismissal. Web uses Dialog and custom glass; supported native iOS choices use a source-anchored system confirmation dialog.", { deps: ["radix-ui"], reg: [at("glass-transitions"), at("dialog")], categories: ["overlays"] }),
+  ui("popover", "Popover", "Floating glass content anchored to a trigger.", { reg: [at("glass-transitions"), at("glass-portal")], deps: ["radix-ui"], categories: ["overlays"] }),
+  ui("tooltip", "Tooltip", "A small glass capsule on hover and focus.", { reg: [at("glass-portal")], deps: ["radix-ui"], categories: ["overlays"] }),
+  ui("dropdown-menu", "Dropdown menu", "A glass menu: items, checkbox and radio items, labels, shortcuts, submenus.", { reg: [at("glass-transitions"), at("glass-portal")], deps: ["radix-ui", "lucide-react"], categories: ["overlays"] }),
   ui("toaster", "Toaster", "Sonner toasts dressed in glass: bottom-right on wide screens, top-centre on phones, clear of the Dock and a top Toolbar.", { deps: ["sonner", "lucide-react"], categories: ["overlays"] }),
   // navigation
   ui("dock", "Dock", "The floating tab bar: a liquid capsule of destinations with a sliding pill and badges, drag-to-scrub, minimize on scroll, an accessory, a search tab and a tinted action button.", { deps: ["radix-ui"], reg: [hook, at("use-glass-pointer"), at("scroll-edge"), at("search-field")], categories: ["navigation"] }),
-  ui("toolbar", "Toolbar", "A floating toolbar on the control layer: button groups sharing one liquid capsule, spacers, a title, an overflow menu, a prominent action and minimize on scroll.", { deps: ["radix-ui", "lucide-react"], reg: [at("dropdown-menu"), at("glass-group"), at("scroll-edge"), at("use-glass-pointer")], categories: ["navigation"] }),
+  ui("toolbar", "Toolbar", "A floating toolbar on the control layer: button groups sharing one liquid capsule, spacers, a title, an overflow menu, a prominent action and minimize on scroll.", { deps: ["radix-ui", "lucide-react"], reg: [at("dropdown-menu"), at("glass-group"), at("scroll-edge"), at("use-glass-pointer"), at("glass-toolbar-layout")], categories: ["navigation"] }),
   ui("scroll-edge", "Scroll edge", "Keeps bars legible over scrolling content — a progressive blur or a hard strip — and tells the bars when content is under them.", { categories: ["navigation"] }),
   ui("navigation-bar", "Navigation bar", "iOS's navigation bar: a large title that scrolls away into a small inline one, leading and trailing slots.", { reg: [at("scroll-edge")], categories: ["navigation"] }),
-  ui("sidebar", "Sidebar", "A floating, inset liquid sidebar: collapsible, two levels, an overlay on phones, and BackgroundExtension to run media under it.", { deps: ["radix-ui", "lucide-react"], categories: ["navigation"] }),
+  ui("sidebar", "Sidebar", "An edge-attached liquid sidebar with accent symbols, compact modal navigation and image-only background extension.", { reg: [at("glass-portal"), at("background-extension")], deps: ["radix-ui", "lucide-react"], categories: ["navigation"] }),
   ui("search-field", "Search field", "A capsule search field: clear and cancel, a minimized button that morphs open, suggestions, and a bottom placement that rides the keyboard.", { deps: ["lucide-react"], categories: ["navigation"] }),
   ui("grouped-list", "Grouped list", "iOS Settings-style inset grouped rows on glass: headers, footers, icon tiles, values, chevrons.", { deps: ["radix-ui", "lucide-react"], categories: ["navigation"] }),
   // data
@@ -157,7 +206,7 @@ export const components = [
   // M3 forms
   ui("spinner", "Spinner", "An activity indicator: an arc or iOS's radial ticks, a status with a label, a still frame under reduced motion. Button's loading state uses it.", { categories: ["controls"] }),
   ui("skeleton", "Skeleton", "A loading placeholder: a fill with a soft shimmer, still under reduced motion.", { categories: ["controls"] }),
-  ui("select", "Select", "shadcn's Select on glass: a field trigger, a liquid list that grows out of it with a leading check, groups and labels — or a pill pop-up button showing the current choice.", { deps: ["radix-ui", "lucide-react"], categories: ["controls"] }),
+  ui("select", "Select", "shadcn's Select on glass: a field trigger, a liquid list that grows out of it with a leading check, groups and labels — or a pill pop-up button showing the current choice.", { reg: [at("glass-transitions"), at("glass-portal")], deps: ["radix-ui", "lucide-react"], categories: ["controls"] }),
   ui("radio-group", "Radio group", "shadcn's RadioGroup on glass: accent circles with a dot, 44pt hit areas, and a card variant where the whole tile selects.", { deps: ["radix-ui"], categories: ["controls"] }),
   ui("field", "Field", "shadcn's Field: label, control, description and error laid out together — and wired: ids, htmlFor, aria-describedby and aria-invalid. Sets, legends, groups, horizontal rows.", { deps: ["class-variance-authority"], reg: [at("label"), at("separator")], categories: ["controls"] }),
   ui("input-group", "Input group", "One filled field holding an input or textarea and addons: a search icon, units, clear, password reveal, a submit capsule.", { deps: ["class-variance-authority"], reg: [at("button"), at("input"), at("textarea")], categories: ["controls"] }),
@@ -166,8 +215,8 @@ export const components = [
   ui("toggle-group", "Toggle group", "Toggles in a row, single or multiple choice, joined or spaced.", { deps: ["radix-ui", "class-variance-authority"], reg: [at("toggle")], categories: ["controls"] }),
   ui("stepper", "Stepper", "Apple's − / + capsule pair: a spinbutton with arrow keys, Shift ×10 and hold-to-repeat, beside the value it changes.", { deps: ["lucide-react"], categories: ["controls"] }),
   ui("drawer", "Drawer", "shadcn's Drawer API on the bottom Sheet: a grabber, medium and large detents, drag to resize or dismiss — no vaul.", { reg: [at("sheet")], categories: ["overlays"] }),
-  ui("context-menu", "Context menu", "Right-click or long-press for the dropdown menu's liquid panel at the pointer, with a preview that lifts while it's open.", { deps: ["radix-ui", "lucide-react"], categories: ["overlays"] }),
-  ui("confirmation-popover", "Confirmation popover", "A destructive confirm anchored to the button that asked — an alertdialog popover with Cancel focused.", { deps: ["radix-ui"], reg: [at("button")], categories: ["overlays"] }),
+  ui("context-menu", "Context menu", "Right-click or long-press for the dropdown menu's liquid panel at the pointer, with a preview that lifts while it's open.", { reg: [at("glass-transitions"), at("glass-portal")], deps: ["radix-ui", "lucide-react"], categories: ["overlays"] }),
+  ui("confirmation-popover", "Confirmation popover", "A destructive confirm anchored to the button that asked — an alertdialog popover with Cancel focused.", { deps: ["radix-ui"], reg: [at("glass-transitions"), at("glass-portal"), at("button")], categories: ["overlays"] }),
   ui("scroll-area", "Scroll area", "shadcn's ScrollArea with capsule thumbs that read on glass, a focusable viewport and optional faded edges.", { deps: ["radix-ui"], categories: ["surfaces"] }),
   ui("accordion", "Accordion", "Apple's disclosure rows: a trailing chevron that turns down, content that slides open, plain or as an inset grouped list.", { deps: ["radix-ui", "lucide-react"], categories: ["surfaces"] }),
   ui("collapsible", "Collapsible", "Show and hide a region from a trigger, with a measured height animation.", { deps: ["radix-ui"], categories: ["surfaces"] }),
@@ -182,12 +231,14 @@ const block = (name, title, description, reg) => ({
   title,
   description,
   categories: ["glass", "blocks"],
-  dependencies: ["lucide-react"],
-  registryDependencies: reg.map(at),
+  dependencies: ["cn", "lucide-react", "radix-ui"],
+  registryDependencies: [foundation, ...reg.map(at)],
   files: [{ path: `src/components/blocks/${name}.tsx`, type: "registry:component", target: `@components/glass-blocks/${name}.tsx` }],
 })
 
 export const blocks = [
+  block("liquid-glass-02", "More Apple glass examples", "Landmarks extension and badges, Notes nonmodal formatting and adaptive toolbar, search placements and material comparisons.", ["background-extension", "backdrop", "button", "glass", "glass-morph", "input", "liquid-glass", "search-field", "sheet", "slider", "textarea", "theme-scope", "toolbar"]),
+  block("liquid-glass-01", "Liquid Glass examples", "Six interactive Apple-inspired scenes: clear Photos controls, Music MiniPlayer and tabs, Maps search and sheet detents, Safari address bar, Mail sidebar and floating tools.", ["button", "dropdown-menu", "liquid-glass", "navigation-bar", "segmented-control", "sheet", "sidebar", "slider", "switch", "toolbar", "scroll-edge"]),
   block("dashboard-01", "Dashboard", "Activity rings, stat tiles, a ranged sparkline and a 39-week heatmap.", ["activity-rings", "button", "card", "dropdown-menu", "heatmap", "segmented-control", "sparkline", "stat"]),
   block("analytics-01", "Analytics", "KPIs with deltas over the range, stacked active minutes, the training mix as a donut, a recovery gauge, top habits and a sortable table of recent sessions.", ["area-chart", "bar-list", "card", "data-table", "donut-chart", "gauge", "kpi", "segmented-control"]),
   block("settings-01", "Settings", "iOS Settings in glass: grouped rows, icon tiles, a switch, a segmented control and a slider.", ["grouped-list", "segmented-control", "slider", "switch"]),
@@ -206,7 +257,7 @@ const native = (name, title, description, deps, reg = [], ext = "tsx") => ({
   files: [{ path: `registry/native/${name}.${ext}`, type: ext === "ts" ? "registry:lib" : "registry:ui", target: `@components/glass/native/${name}.${ext}` }],
 })
 
-const NATIVE_NAMES = ["typography", "prose", "card", "theme-scope", "button", "badge", "input", "textarea", "label", "kbd", "separator", "avatar", "switch", "checkbox", "segmented-control", "glass-group", "tabs", "slider", "progress", "dock", "toolbar", "scroll-edge", "navigation-bar", "sidebar", "search-field", "grouped-list", "dialog", "alert-dialog", "sheet", "action-sheet", "popover", "tooltip", "dropdown-menu", "toaster", "activity-rings", "progress-ring", "sparkline", "stat", "bar-list", "gauge", "tracker", "category-bar", "heatmap", "chart", "area-chart", "bar-chart", "line-chart", "donut-chart", "table", "data-table", "chat", "dashboard-01", "analytics-01", "settings-01", "auth-01", "chat-01", "chat-markdown", "chat-parts", "command", "combobox", "calendar", "date-picker", "spinner", "skeleton", "select", "radio-group", "field", "input-group", "button-group", "toggle", "toggle-group", "stepper", "drawer", "context-menu", "confirmation-popover", "scroll-area", "accordion", "collapsible", "alert", "item", "empty", "backdrop", "kpi", "widget", "range-chart", "tabs-layout"]
+const NATIVE_NAMES = ["liquid-glass-02", "glass-morph", "background-extension", "glass-cluster", "liquid-glass", "liquid-glass-01", "typography", "prose", "card", "theme-scope", "button", "badge", "input", "textarea", "label", "kbd", "separator", "avatar", "switch", "checkbox", "segmented-control", "glass-group", "tabs", "slider", "progress", "dock", "toolbar", "scroll-edge", "navigation-bar", "sidebar", "search-field", "grouped-list", "dialog", "alert-dialog", "sheet", "action-sheet", "popover", "tooltip", "dropdown-menu", "toaster", "activity-rings", "progress-ring", "sparkline", "stat", "bar-list", "gauge", "tracker", "category-bar", "heatmap", "chart", "area-chart", "bar-chart", "line-chart", "donut-chart", "table", "data-table", "chat", "dashboard-01", "analytics-01", "settings-01", "auth-01", "chat-01", "chat-markdown", "chat-parts", "command", "combobox", "calendar", "date-picker", "spinner", "skeleton", "select", "radio-group", "field", "input-group", "button-group", "toggle", "toggle-group", "stepper", "drawer", "context-menu", "confirmation-popover", "scroll-area", "accordion", "collapsible", "alert", "item", "empty", "backdrop", "kpi", "widget", "range-chart", "tabs-layout"]
 
 /**
  * The native port of every web component and block: one React Native file per
@@ -231,6 +282,7 @@ function nativeComponents() {
 }
 
 export const nativeItems = [
+  native("toolbar-layout", "Native toolbar allocation", "Generated from the shared pure web/native command allocator.", [], [], "ts"),
   {
     ...native("tokens", "Native tokens", "The glasscn palettes and presets for React Native, generated from the web theme engine: a GlassThemeProvider and useGlassTheme().", [], ["a11y"]),
     files: [

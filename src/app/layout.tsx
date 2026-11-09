@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
 
 import { Aurora } from "@/components/glass/aurora"
 import { GlassPreferencesScript } from "@/components/glass/glass-preferences-script"
+import { GlassEffects } from "@/components/glass/glass-effects"
 import { Providers, paletteScript } from "@/components/site/providers"
 import { SiteHeader } from "@/components/site/site-header"
 import { docsNav } from "@/components/site/docs-nav-data"
@@ -12,21 +12,19 @@ import { rootMetadata } from "@/lib/metadata"
 import { PALETTES } from "@/lib/glass-theme"
 import "./globals.css"
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })
-
 export const metadata: Metadata = rootMetadata
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const stars = await repoStars()
   return (
-    <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="en" suppressHydrationWarning className="antialiased">
       <head>
         <script dangerouslySetInnerHTML={{ __html: paletteScript }} />
         <GlassPreferencesScript />
       </head>
       <body className="type-glass min-h-dvh">
         <Providers palettes={Object.keys(PALETTES)}>
+          <GlassEffects />
           <Aurora />
           <SiteHeader stars={stars} nav={docsNav} />
           {children}

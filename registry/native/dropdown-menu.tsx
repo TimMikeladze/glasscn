@@ -6,7 +6,8 @@ import { CheckIcon, ChevronRightIcon } from "lucide-react-native"
 import { textChildren, useControllableOpen } from "@/components/glass/native/dialog"
 import { Floating, useAnchorRect, type Align, type Side } from "@/components/glass/native/popover"
 import { Press, haptics } from "@/components/glass/native/press"
-import { GText, alpha, useUI, web, type GTextProps, type UI } from "@/components/glass/native/ui"
+import { GIcon, GText, alpha, useUI, web, type GTextProps, type UI } from "@/components/glass/native/ui"
+import { nativeControlTheme, useGlassThemeOptions } from "@/components/glass/native/tokens"
 
 type MenuCtx = { open: boolean; setOpen: (open: boolean) => void; triggerRef: React.RefObject<View | null> }
 const MenuContext = React.createContext<MenuCtx | null>(null)
@@ -35,7 +36,9 @@ function DropdownMenu({ open, defaultOpen, onOpenChange, native = true, children
   const [value, setOpen] = useControllableOpen(open, defaultOpen, onOpenChange)
   const triggerRef = React.useRef<View>(null)
   const ctx = React.useMemo(() => ({ open: value, setOpen, triggerRef }), [value, setOpen])
-  const plan = Platform.OS !== "web" && native && (longPress || (open === undefined && !defaultOpen)) ? nativePlan(children) : null
+  // The iOS community MenuView has no open/close events. Preserve observable state when requested.
+  const observesOpen = open !== undefined || !!defaultOpen || (Platform.OS === "ios" && !!onOpenChange)
+  const plan = Platform.OS !== "web" && native && !observesOpen ? nativePlan(children) : null
   if (plan) return <SystemMenu plan={plan} longPress={longPress} onOpenChange={onOpenChange} />
   return <MenuContext.Provider value={ctx}>{children}</MenuContext.Provider>
 }
@@ -143,10 +146,16 @@ function nativePlan(children: React.ReactNode): Plan | null {
 /** iOS / Android: the trigger's face inside the system menu (the menu owns the touch). */
 function SystemMenu({ plan, longPress, onOpenChange }: { plan: Plan; longPress: boolean; onOpenChange?: (open: boolean) => void }) {
   const ui = useUI()
+  const appearance = nativeControlTheme(ui, useGlassThemeOptions())
   const { style, children, accessibilityLabel } = plan.trigger.props
   const face = typeof style === "function" ? style({ pressed: false, hovered: false }) : style
+  // The SwiftUI Menu's label is an RN host view, so iOS gives the menu button no name (AXLabel
+  // null). One accessible element around it carries the trigger's label; activating it taps the
+  // menu at its centre.
   return (
+    <View accessible accessibilityRole="button" accessibilityLabel={accessibilityLabel} aria-haspopup="menu" style={{ alignSelf: "flex-start" }}>
     <MenuView
+      colorScheme={appearance.colorScheme}
       actions={plan.actions}
       shouldOpenOnLongPress={longPress}
       onOpenMenu={() => onOpenChange?.(true)}
@@ -159,10 +168,11 @@ function SystemMenu({ plan, longPress, onOpenChange }: { plan: Plan; longPress: 
     >
       {/* SwiftUI hosts this (matchContents) and sizes it from the outer view: keep the styled face
           one level down, or a bare string measures to zero width */}
-      <View pointerEvents="none" accessibilityRole="button" accessibilityLabel={accessibilityLabel} aria-haspopup="menu">
+      <View pointerEvents="none" accessible={false}>
         <View style={[{ minHeight: ui.control.default, flexDirection: "row", alignItems: "center", justifyContent: "center" }, face]}>{textChildren(children)}</View>
       </View>
     </MenuView>
+    </View>
   )
 }
 
@@ -221,7 +231,7 @@ function itemChildren(children: React.ReactNode, ui: UI, color: string, iconColo
   return React.Children.map(children, (c) => {
     if (typeof c === "string" || typeof c === "number") return <GText size="sm" color={color}>{c}</GText>
     if (React.isValidElement<{ color?: string; size?: number }>(c) && c.type !== DropdownMenuShortcut && typeof c.type !== "string" && c.props.color === undefined) {
-      return React.cloneElement(c, { color: iconColor, size: c.props.size ?? 16 })
+      return <GIcon color={iconColor} size={16}>{c}</GIcon>
     }
     return c
   })
@@ -378,7 +388,7 @@ function DropdownMenuSubTrigger({ children, onSelect, ...props }: ItemBase) {
     >
       {children}
       <View style={{ marginLeft: "auto", transform: [{ rotate: sub.open ? "90deg" : "0deg" }] }}>
-        <ChevronRightIcon size={16} color={ui.mutedForeground} />
+        <GIcon><ChevronRightIcon size={16} color={ui.mutedForeground} /></GIcon>
       </View>
     </MenuRow>
   )

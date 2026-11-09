@@ -98,7 +98,7 @@ function TooltipContent({ style, children, side = "top", align = "center", sideO
   if (Platform.OS === "web") {
     return (
       <WebTip open={open} rect={rect} side={side} align={align} sideOffset={sideOffset}>
-        <Glass variant="liquid" visible={open} radius={ui.radius.button} role="tooltip" style={capsule} {...props}>
+        <Glass variant="liquid" materialized={open} radius={ui.radius.button} role="tooltip" style={capsule} {...props}>
           {body}
         </Glass>
       </WebTip>

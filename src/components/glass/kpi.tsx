@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 import { Stat, StatChart, StatDescription, StatLabel, StatSkeleton, StatTrend, StatValue, formatStat } from "@/components/glass/stat"
 

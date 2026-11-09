@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 /** A keycap on glass. */
 function Kbd({ className, ...props }: React.ComponentProps<"kbd">) {

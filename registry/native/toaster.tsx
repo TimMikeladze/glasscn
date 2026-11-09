@@ -10,7 +10,7 @@ import { useInsets } from "@/components/glass/native/dialog"
 import { Glass, canFade } from "@/components/glass/native/glass"
 import { Press, haptics } from "@/components/glass/native/press"
 import { toastDuration, toastStore, type Toast, type ToastOptions, type ToastType } from "@/components/glass/native/toast-store"
-import { GText, useUI, web } from "@/components/glass/native/ui"
+import { GIcon, GText, useUI, web } from "@/components/glass/native/ui"
 
 export type { Toast, ToastOptions, ToastType }
 
@@ -128,7 +128,7 @@ function Spinner() {
   const spin = useAnimatedStyle(() => ({ transform: [{ rotate: `${turn.value * 360}deg` }] }))
   return (
     <Animated.View style={spin}>
-      <Loader2Icon size={16} color={ui.mutedForeground} />
+      <GIcon><Loader2Icon size={16} color={ui.mutedForeground} /></GIcon>
     </Animated.View>
   )
 }
@@ -230,7 +230,7 @@ function ToastItem({ toast: t, index, top, offset, expanded, duration, onPress, 
       >
         {/* the pane is liquid glass: it grows on press, never dims (native rule 3) */}
         <Press onPress={onPress} liquid accessibilityRole="alert" accessibilityLiveRegion="polite" accessibilityHint={expanded ? "Collapses the notifications" : "Shows all notifications"}>
-          <Glass variant="liquid" visible={!closing || fade} radius={ui.radius.surface} style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 16, paddingVertical: 14 }}>
+          <Glass variant="liquid" materialized={!closing || fade} radius={ui.radius.surface} style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 16, paddingVertical: 14 }}>
             <ToastIcon type={t.type} />
             <View style={{ flex: 1, gap: 2 }}>
               {typeof t.title === "string" || typeof t.title === "number" ? (

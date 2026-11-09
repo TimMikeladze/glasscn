@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 /**
  * Scroll awareness for the floating bars (toolbar, dock, navigation bar): where the
@@ -61,7 +61,7 @@ export function useScrollMinimized(ref: React.RefObject<HTMLElement | null>, ena
       frame = requestAnimationFrame(() => {
         frame = 0
         const y = position()
-        const next = nextMinimized(state, last, y)
+        const next = ref.current?.querySelector(":focus-visible") ? false : nextMinimized(state, last, y)
         // ignore jitter: move the anchor only once a step was big enough to decide
         if (next !== state || Math.abs(y - last) > 8) last = y
         state = next
@@ -69,8 +69,14 @@ export function useScrollMinimized(ref: React.RefObject<HTMLElement | null>, ena
       })
     }
     target.addEventListener("scroll", onScroll, { passive: true })
+    const onFocus = (event: FocusEvent) => {
+      if (event.target instanceof Element && event.target.matches(":focus-visible")) { state = false; setMinimized(false) }
+    }
+    const bar = ref.current
+    bar?.addEventListener("focusin", onFocus)
     return () => {
       target.removeEventListener("scroll", onScroll)
+      bar?.removeEventListener("focusin", onFocus)
       cancelAnimationFrame(frame)
     }
   }, [ref, enabled])
@@ -79,6 +85,30 @@ export function useScrollMinimized(ref: React.RefObject<HTMLElement | null>, ena
 
 type Edge = "top" | "bottom"
 
+/** Bars track their own scrolling content; callers do not need a separate sentinel. */
+export function useScrollOverContent(ref: React.RefObject<HTMLElement | null>, edge: Edge | null) {
+  const subscribe = React.useCallback((notify: () => void) => {
+    if (!edge) return () => {}
+    const parent = scrollParent(ref.current)
+    const target = parent ?? window
+    target.addEventListener("scroll", notify, { passive: true })
+    window.addEventListener("resize", notify)
+    const resize = new ResizeObserver(notify)
+    resize.observe(parent ?? document.documentElement)
+    return () => { target.removeEventListener("scroll", notify); window.removeEventListener("resize", notify); resize.disconnect() }
+  }, [ref, edge])
+  const snapshot = React.useCallback(() => {
+    if (!edge || !ref.current) return false
+    const parent = scrollParent(ref.current)
+    const y = parent ? parent.scrollTop : window.scrollY
+    if (edge === "top") return y > 0
+    const height = parent ? parent.clientHeight : window.innerHeight
+    const extent = parent ? parent.scrollHeight : document.documentElement.scrollHeight
+    return y + height < extent - 1
+  }, [ref, edge])
+  return React.useSyncExternalStore(subscribe, snapshot, () => false)
+}
+
 /**
  * Bars at an edge (`data-bar-edge="top" | "bottom"`) inside `root` — or on the page
  * when root is null — get `data-over-content` while `over` is true.
@@ -86,6 +116,7 @@ type Edge = "top" | "bottom"
 function markBars(root: HTMLElement | null, edge: Edge, over: boolean) {
   const scope: ParentNode = root ?? document
   scope.querySelectorAll<HTMLElement>(`[data-bar-edge="${edge}"]`).forEach((bar) => {
+    if (scrollParent(bar) !== root) return
     if (over) bar.setAttribute("data-over-content", "")
     else bar.removeAttribute("data-over-content")
   })
@@ -120,7 +151,7 @@ function useOverContent(sentinel: React.RefObject<HTMLElement | null>, edge: Edg
 
 type ScrollEdgeProps = Omit<React.ComponentProps<"div">, "children"> & {
   edge?: Edge
-  /** `soft` blurs progressively; `hard` is a near-opaque strip for dense text and pinned headers; `automatic` is soft on touch, hard with a fine pointer. */
+  /** `automatic` diffuses content into a uniform bar with a fading edge; `soft` and `hard` explicitly override it. */
   variant?: "automatic" | "soft" | "hard"
 }
 
@@ -142,7 +173,7 @@ function ScrollEdge({ edge = "top", variant = "automatic", className, ...props }
       {...props}
     >
       {/* the material lives on a child: the scroll-edge utilities set their own position */}
-      <div className="size-full group-data-[variant=hard]/scroll-edge:scroll-edge-hard group-data-[variant=soft]/scroll-edge:scroll-edge-soft pointer-coarse:group-data-[variant=automatic]/scroll-edge:scroll-edge-soft pointer-fine:group-data-[variant=automatic]/scroll-edge:scroll-edge-hard" />
+      <div className="size-full group-data-[variant=hard]/scroll-edge:scroll-edge-hard group-data-[variant=soft]/scroll-edge:scroll-edge-soft group-data-[variant=automatic]/scroll-edge:scroll-edge-automatic" />
     </div>
   )
   const mark = <div ref={sentinel} data-slot="scroll-edge-sentinel" aria-hidden className="h-px w-full" />

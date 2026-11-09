@@ -94,7 +94,7 @@ export function Floating({ open, anchor, onClose, side = "bottom", align = "cent
           onLayout={onLayout}
           style={[{ position: "absolute", left: spot ? spot.left : -10000, top: spot ? spot.top : 0, maxWidth: win.width - 16, maxHeight: win.height - 16 }, entrance]}
         >
-          <Glass variant="liquid" visible={open} radius={radius ?? ui.radius.surface - 6} style={style} {...props}>
+          <Glass variant="liquid" materialized={open} radius={radius ?? ui.radius.surface - 6} style={style} {...props}>
             {children}
           </Glass>
         </Animated.View>

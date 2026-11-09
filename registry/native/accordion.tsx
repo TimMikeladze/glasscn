@@ -5,7 +5,7 @@ import { ChevronRightIcon } from "lucide-react-native"
 
 import { useReducedMotion } from "@/components/glass/native/a11y"
 import { Press, haptics } from "@/components/glass/native/press"
-import { GText, useUI } from "@/components/glass/native/ui"
+import { GIcon, GText, useUI } from "@/components/glass/native/ui"
 
 type Ctx = { open: string[]; toggle: (v: string) => void; variant: "default" | "grouped" }
 const AccordionContext = React.createContext<Ctx | null>(null)
@@ -77,7 +77,7 @@ function AccordionTrigger({ children, disabled }: { children?: React.ReactNode; 
         children
       )}
       <Animated.View style={chevron}>
-        <ChevronRightIcon size={16} color={ui.mutedForeground} />
+        <GIcon><ChevronRightIcon size={16} color={ui.mutedForeground} /></GIcon>
       </Animated.View>
     </Press>
   )

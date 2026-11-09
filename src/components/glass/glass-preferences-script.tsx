@@ -10,6 +10,10 @@ export interface GlassPreferencesValue {
   clarity: number
   /** Frost every pane almost opaque (clarity ≥ 0.9), as the OS setting does. */
   reduceTransparency: boolean
+  /** Suppress specular and press illumination while keeping the chosen material. */
+  reduceHighlights?: boolean
+  /** Give floating controls a visible contrasting border. */
+  showBorders?: boolean
 }
 
 export const GLASS_PREFERENCES_KEY = "glass-preferences"
@@ -17,8 +21,11 @@ export const GLASS_PREFERENCES_KEY = "glass-preferences"
 export const GLASS_PREFERENCES_EVENT = "glass-preferences"
 const STYLE_ID = "glass-preferences"
 const ATTR = "data-glass-reduce-transparency"
+const HIGHLIGHTS_ATTR = "data-glass-reduce-highlights"
+const BORDERS_ATTR = "data-glass-show-borders"
+const PREFERENCE_TARGETS = ":where(:root,[data-glass-scope],.glass,.glass-strong,.glass-subtle,.glass-thick,.glass-liquid,.glass-liquid-clear,.glass-prominent,.glass-knob-lens)"
 
-export const DEFAULT_GLASS_PREFERENCES: GlassPreferencesValue = { clarity: 0.5, reduceTransparency: false }
+export const DEFAULT_GLASS_PREFERENCES: GlassPreferencesValue = { clarity: 0.5, reduceTransparency: false, reduceHighlights: false, showBorders: false }
 /** The clarity reduce transparency floors to: maps the default frosts to ≈ the prefers-reduced-transparency values. */
 export const REDUCED_TRANSPARENCY_CLARITY = 0.9
 
@@ -31,7 +38,7 @@ export function parseGlassPreferences(raw: string | null): GlassPreferencesValue
     const v = JSON.parse(raw) as Partial<GlassPreferencesValue>
     const clarity = Number(v.clarity)
     if (!Number.isFinite(clarity)) return null
-    return { clarity: clamp(clarity), reduceTransparency: v.reduceTransparency === true }
+    return { clarity: clamp(clarity), reduceTransparency: v.reduceTransparency === true, reduceHighlights: v.reduceHighlights === true, showBorders: v.showBorders === true }
   } catch {
     return null
   }
@@ -45,7 +52,7 @@ export const effectiveClarity = (p: GlassPreferencesValue) => (p.reduceTranspare
  * default); `:where()` keeps specificity at zero so the OS accessibility overrides — also !important,
  * on `:root, [data-glass-scope]` — still win.
  */
-export const glassPreferencesCss = (p: GlassPreferencesValue) => `:where(:root,[data-glass-scope]){--glass-clarity:${effectiveClarity(p)}!important}`
+export const glassPreferencesCss = (p: GlassPreferencesValue) => `${PREFERENCE_TARGETS}{--glass-clarity:${effectiveClarity(p)}!important${p.reduceTransparency ? ";--glass-refraction:0px!important" : ""}${p.reduceHighlights || p.reduceTransparency ? ";--glass-specular:0%!important;--glass-illumination:0%!important" : ""}}`
 
 /** Writes (or, with null, removes) the preference style and the reduce-transparency attribute. */
 export function applyGlassPreferences(p: GlassPreferencesValue | null, doc: Document = document) {
@@ -54,6 +61,8 @@ export function applyGlassPreferences(p: GlassPreferencesValue | null, doc: Docu
   if (!p) {
     el?.remove()
     root.removeAttribute(ATTR)
+    root.removeAttribute(HIGHLIGHTS_ATTR)
+    root.removeAttribute(BORDERS_ATTR)
     return
   }
   if (!el) {
@@ -64,10 +73,12 @@ export function applyGlassPreferences(p: GlassPreferencesValue | null, doc: Docu
   const css = glassPreferencesCss(p)
   if (el.textContent !== css) el.textContent = css
   root.toggleAttribute(ATTR, p.reduceTransparency)
+  root.toggleAttribute(HIGHLIGHTS_ATTR, !!(p.reduceHighlights || p.reduceTransparency))
+  root.toggleAttribute(BORDERS_ATTR, !!p.showBorders)
 }
 
 /** The same as applyGlassPreferences(stored), as an inline script for <head> — no flash of the default clarity. */
-export const glassPreferencesScript = `try{var p=JSON.parse(localStorage.getItem(${JSON.stringify(GLASS_PREFERENCES_KEY)})||"null"),c=p&&Number(p.clarity);if(p&&isFinite(c)){c=Math.round(Math.min(1,Math.max(0,c))*100)/100;if(p.reduceTransparency===true){c=Math.max(${REDUCED_TRANSPARENCY_CLARITY},c);document.documentElement.setAttribute("${ATTR}","")}var s=document.createElement("style");s.id="${STYLE_ID}";s.textContent=":where(:root,[data-glass-scope]){--glass-clarity:"+c+"!important}";document.head.appendChild(s)}}catch(e){}`
+export const glassPreferencesScript = `try{var p=JSON.parse(localStorage.getItem(${JSON.stringify(GLASS_PREFERENCES_KEY)})||"null"),c=p&&Number(p.clarity);if(p&&isFinite(c)){c=Math.round(Math.min(1,Math.max(0,c))*100)/100;if(p.reduceTransparency===true){c=Math.max(${REDUCED_TRANSPARENCY_CLARITY},c);document.documentElement.setAttribute("${ATTR}","")}if(p.reduceHighlights===true||p.reduceTransparency===true)document.documentElement.setAttribute("${HIGHLIGHTS_ATTR}","");if(p.showBorders===true)document.documentElement.setAttribute("${BORDERS_ATTR}","");var s=document.createElement("style");s.id="${STYLE_ID}";s.textContent=${JSON.stringify(PREFERENCE_TARGETS)}+"{--glass-clarity:"+c+"!important"+(p.reduceTransparency===true?";--glass-refraction:0px!important":"")+((p.reduceHighlights===true||p.reduceTransparency===true)?";--glass-specular:0%!important;--glass-illumination:0%!important":"")+"}";document.head.appendChild(s)}}catch(e){}`
 
 /** Put once in the root layout's <head> (with suppressHydrationWarning on <html>, as next-themes asks). */
 function GlassPreferencesScript() {

@@ -8,7 +8,7 @@ import { cva, type VariantProps } from "class-variance-authority"
  *                 Cards, panes, tiles: anything in the flow of the page.
  *   liquid        the control layer — `glass-liquid`. Toolbars, the dock, floating buttons,
  *                 menus, popovers, sheets, dialogs. Inside it use fills, never more glass.
- *   liquid-clear  `glass-liquid-clear`: over photos and video only (it dims what's behind).
+ *   liquid-clear  `glass-liquid-clear`: over photos and video; dim bright media separately.
  * `intensity` applies to the material only.
  *
  * Any primitive can be overridden on any element, e.g. `[--glass-blur:8px]` or
@@ -28,6 +28,10 @@ export const glassVariants = cva("relative", {
       default: "",
       strong: "",
       subtle: "",
+      ultraThin: "",
+      thin: "",
+      regular: "",
+      thick: "",
     },
     tint: {
       none: "",
@@ -45,6 +49,10 @@ export const glassVariants = cva("relative", {
     { variant: "material", intensity: "default", class: "glass" },
     { variant: "material", intensity: "strong", class: "glass-strong" },
     { variant: "material", intensity: "subtle", class: "glass-subtle" },
+    { variant: "material", intensity: "ultraThin", class: "glass-subtle" },
+    { variant: "material", intensity: "thin", class: "glass" },
+    { variant: "material", intensity: "regular", class: "glass-strong" },
+    { variant: "material", intensity: "thick", class: "glass-thick" },
   ],
   defaultVariants: {
     variant: "material",

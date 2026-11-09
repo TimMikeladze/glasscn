@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { MenuIcon, MoonIcon, PaletteIcon, SlidersHorizontalIcon, StarIcon, SunIcon } from "lucide-react"
 
 import { Button } from "@/components/glass/button"
@@ -22,6 +22,7 @@ import { DocsNav } from "./docs-nav"
 import type { NavSection } from "./docs-nav-data"
 
 const NAV = [
+  { href: "/showcase", label: "Showcase" },
   { href: "/docs", label: "Docs" },
   { href: "/docs/button", label: "Components" },
   { href: "/themes", label: "Studio" },
@@ -29,8 +30,10 @@ const NAV = [
   { href: "/docs/native", label: "Native" },
 ]
 
+// Every trailing control is the same 32px circle with a 16px glyph in the same tone.
+const headerIcon = "size-8 text-foreground/70 hover:text-foreground"
 const socialLink =
-  "hidden h-8 items-center rounded-full px-2.5 text-foreground/70 outline-none transition-colors hover:bg-fill hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring sm:inline-flex"
+  "glass-focus hidden h-8 min-w-8 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-fill hover:text-foreground sm:inline-flex [&_svg]:size-4"
 
 export function PaletteSwatch({ palette, className }: { palette: Palette; className?: string }) {
   return (
@@ -48,11 +51,11 @@ export function SiteHeader({ stars, nav }: { stars: number | null; nav: NavSecti
   const { palette, setPalette, palettes } = usePalette()
   const [menu, setMenu] = React.useState(false)
   return (
-    <header className="sticky top-0 z-40 px-3 pt-3">
-      <div className="glass-strong mx-auto flex h-14 max-w-6xl items-center gap-2 rounded-full pr-2 pl-4">
+    <header className="sticky top-0 z-40 min-w-0 w-full px-3 pt-3">
+      <div className="glass-strong mx-auto flex h-14 min-w-0 w-full max-w-6xl items-center gap-2 rounded-full pr-2 pl-4">
         <Sheet open={menu} onOpenChange={setMenu}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon-sm" className="md:hidden" aria-label="Menu">
+            <Button variant="ghost" size="icon-sm" className="xl:hidden" aria-label="Menu">
               <MenuIcon />
             </Button>
           </SheetTrigger>
@@ -61,15 +64,18 @@ export function SiteHeader({ stars, nav }: { stars: number | null; nav: NavSecti
               <SheetTitle>glasscn</SheetTitle>
             </SheetHeader>
             <div className="px-3 pb-6">
+              <nav aria-label="Site navigation" className="mb-5 grid gap-1 border-b border-glass-border pb-4">
+                {NAV.map((item) => <Link key={item.href} href={item.href} onClick={() => setMenu(false)} className="glass-focus rounded-control px-pad-sm py-2 text-sm font-medium hover:bg-fill">{item.label}</Link>)}
+              </nav>
               <DocsNav sections={nav} onNavigate={() => setMenu(false)} />
             </div>
           </SheetContent>
         </Sheet>
-        <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-          <Logo />
-          glasscn
+        <Link href="/" aria-label="glasscn" className="flex shrink-0 items-center gap-2 font-semibold tracking-tight">
+          <Logo className="shrink-0" />
+          <span className="hidden min-[360px]:inline">glasscn</span>
         </Link>
-        <nav className="ml-4 hidden items-center gap-1 md:flex">
+        <nav aria-label="Primary navigation" className="ml-4 hidden shrink-0 items-center gap-1 xl:flex">
           {NAV.map((n) => {
             const on = n.href === "/docs" ? pathname === "/docs" || pathname === "/docs/installation" : pathname.startsWith(n.href)
             return (
@@ -83,13 +89,13 @@ export function SiteHeader({ stars, nav }: { stars: number | null; nav: NavSecti
             )
           })}
         </nav>
-        <div className="ml-auto flex items-center gap-0.5">
+        <div className="ml-auto flex shrink-0 items-center">
           <DropdownMenu>
             <Tooltip>
               <TooltipTrigger asChild>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon-sm" aria-label="Palette">
-                    <PaletteIcon />
+                  <Button variant="ghost" size="icon-sm" className={headerIcon} aria-label="Palette">
+                    <PaletteIcon className="size-4" />
                   </Button>
                 </DropdownMenuTrigger>
               </TooltipTrigger>
@@ -111,8 +117,8 @@ export function SiteHeader({ stars, nav }: { stars: number | null; nav: NavSecti
             <Tooltip>
               <TooltipTrigger asChild>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon-sm" aria-label="Glass preferences">
-                    <SlidersHorizontalIcon />
+                  <Button variant="ghost" size="icon-sm" className={headerIcon} aria-label="Glass preferences">
+                    <SlidersHorizontalIcon className="size-4" />
                   </Button>
                 </PopoverTrigger>
               </TooltipTrigger>
@@ -128,9 +134,9 @@ export function SiteHeader({ stars, nav }: { stars: number | null; nav: NavSecti
           </Popover>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon-sm" aria-label="Toggle dark mode" onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>
-                <SunIcon className="hidden dark:block" />
-                <MoonIcon className="dark:hidden" />
+              <Button variant="ghost" size="icon-sm" className={headerIcon} aria-label="Toggle dark mode" onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>
+                <SunIcon className="hidden size-4 dark:block" />
+                <MoonIcon className="size-4 dark:hidden" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>Light / dark</TooltipContent>
@@ -140,24 +146,24 @@ export function SiteHeader({ stars, nav }: { stars: number | null; nav: NavSecti
             target="_blank"
             rel="noreferrer"
             aria-label={stars ? `glasscn on GitHub — ${stars} stars` : "glasscn on GitHub"}
-            className={cn(socialLink, stars ? "gap-1.5 pr-3" : null)}
+            className={cn(socialLink, stars ? "gap-1 px-2" : null)}
           >
-            <GitHubIcon className="size-4" />
+            <GitHubIcon />
             {/* Omitted when unknown or zero — a lone "0" reads as broken, not humble. */}
             {stars ? (
               <span className="flex items-center gap-1 text-xs font-medium tabular-nums">
-                <StarIcon className="size-3 fill-current opacity-70" aria-hidden />
+                <StarIcon className="size-3! fill-current opacity-70" aria-hidden />
                 {formatStars(stars)}
               </span>
             ) : null}
           </a>
           <a href={site.author.twitter} target="_blank" rel="noreferrer" aria-label="Author on X" className={socialLink}>
-            <XIcon className="size-4" />
+            <XIcon />
           </a>
           <a href={site.author.linkedin} target="_blank" rel="noreferrer" aria-label="Author on LinkedIn" className={socialLink}>
-            <LinkedInIcon className="size-4" />
+            <LinkedInIcon />
           </a>
-          <Button asChild size="sm" className="ml-1 hidden sm:inline-flex">
+          <Button asChild size="sm" className="ml-2 hidden sm:inline-flex">
             <Link href="/docs/installation">Get started</Link>
           </Button>
         </div>

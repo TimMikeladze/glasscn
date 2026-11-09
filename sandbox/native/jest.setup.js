@@ -50,3 +50,5 @@ console.error = (...args) => {
   if (typeof args[0] === "string" && args[0].includes("not wrapped in act(")) return
   error(...args)
 }
+// Screens render without a navigator in component tests; focus effects have nothing to observe.
+jest.mock("expo-router", () => ({ ...jest.requireActual("expo-router"), useFocusEffect: () => {} }))

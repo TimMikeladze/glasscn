@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { areaY, defineChart, lineY, ruleX } from "@tanstack/charts"
 import { crosshair } from "@tanstack/charts/crosshair"
 import { decorative } from "@tanstack/charts/mark/decorative"

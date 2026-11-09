@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { Separator as SeparatorPrimitive } from "radix-ui"
 
 /** A hairline that reads on glass: the separator token (the label colour at --glass-separator-opacity), not the page border. */

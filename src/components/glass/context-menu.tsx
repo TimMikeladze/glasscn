@@ -1,8 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { ContextMenu as ContextMenuPrimitive } from "radix-ui"
+import { GlassPortal } from "@/lib/glass-portal"
 import { CheckIcon, ChevronRightIcon } from "lucide-react"
 
 /**
@@ -34,8 +35,8 @@ function ContextMenuGroup({ ...props }: React.ComponentProps<typeof ContextMenuP
   return <ContextMenuPrimitive.Group data-slot="context-menu-group" {...props} />
 }
 
-function ContextMenuPortal({ ...props }: React.ComponentProps<typeof ContextMenuPrimitive.Portal>) {
-  return <ContextMenuPrimitive.Portal data-slot="context-menu-portal" {...props} />
+function ContextMenuPortal({ container, ...props }: React.ComponentProps<typeof ContextMenuPrimitive.Portal>) {
+  return <GlassPortal container={container}>{(host) => <ContextMenuPrimitive.Portal data-slot="context-menu-portal" container={host} {...props} />}</GlassPortal>
 }
 
 function ContextMenuSub({ ...props }: React.ComponentProps<typeof ContextMenuPrimitive.Sub>) {
@@ -68,9 +69,9 @@ function ContextMenuSubContent({ className, ...props }: React.ComponentProps<typ
 
 function ContextMenuContent({ className, ...props }: React.ComponentProps<typeof ContextMenuPrimitive.Content>) {
   return (
-    <ContextMenuPrimitive.Portal>
+    <ContextMenuPortal>
       <ContextMenuPrimitive.Content data-slot="context-menu-content" data-glass-motion="" className={cn(menuSurface, className)} {...props} />
-    </ContextMenuPrimitive.Portal>
+    </ContextMenuPortal>
   )
 }
 

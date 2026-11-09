@@ -14,11 +14,12 @@ Three layers (NAT-50..54), cheapest first.
 
 ### Component (jest-expo)
 
-`sandbox/native/__tests__/`, using the jest-expo `ios` preset and Testing Library 14. Config: `jest.config.js` (maps `@/components/glass/native/*` to `registry/native`, or to `GLASS_NATIVE_DIR`), `jest.resolver.js` (registry files resolve bare imports from the sandbox's `node_modules`, never the repo root's), `jest.setup.js` (mocks reanimated + worklets, gesture-handler, keyboard-controller, expo-blur/glass-effect/haptics/video, lucide, FlashList → FlatList) and `jest.expo-ui.js` (every `@expo/ui` entry point → plain views). Liquid Glass is reported available, so tests see the iOS 26 path.
+`sandbox/native/__tests__/`, using the jest-expo `ios` preset and Testing Library 14. Config: `jest.config.js` (maps `@/components/glass/native/*` to `registry/native`, or to `GLASS_NATIVE_DIR`), `jest.resolver.js` (registry files resolve bare imports from the sandbox's `node_modules`, never the repo root's), `jest.setup.js` (mocks reanimated + worklets, gesture-handler, keyboard-controller, expo-blur/glass-effect/haptics/video, lucide, FlashList → FlatList), `jest.expo-ui.js` (system views) and `jest.expo-ui-modifiers.js` (inspectable presentation modifiers). Liquid Glass is reported available so tests see the supported system-effect path; this does not simulate the compositor.
 
 - `controls.test.tsx`: switch, checkbox, slider and segmented control, checking role, `accessibilityState`/`accessibilityValue`, controlled and uncontrolled, disabled, adjustable increment.
 - `demos.test.tsx`: renders every entry in `DEMOS`. Native's "Text strings must be rendered within a `<Text>`" invariant fails the test, and the structural check fails it if a `Glass variant="liquid" | "liquid-clear"` (or bare `interactive`) has a `Press dim` or a fading (opacity < 1 or animated) ancestor. `structure.test.tsx` proves the check catches both.
 - `helpers.test.tsx`: `placeFloating`, `snap`, toaster store.
+- Liquid material/navigation/cluster/showcase tests inspect untinted automatic effects, opaque accessibility fallbacks, real sibling effect composition, sheet detents, system-menu callbacks and example actions. `controlled-gestures.test.tsx` preserves shared values across rerenders, exposing repeated parent-rejected scrub bugs hidden by the stock Reanimated mock.
 
 `pnpm verify:native` (NAT-54) copies the tests into the shadcn-installed app and runs them with `GLASS_NATIVE_DIR` pointing at the installed `src/components/glass/native`.
 
@@ -36,7 +37,7 @@ npm run visual:update    # accept them as the new baselines
 
 Maestro screenshots land in `~/.maestro/tests/<run>/`; `scripts/visual.mjs` picks the newest run of every "Visual baselines …" flow. Match text carefully: a section heading with the same text as a button is matched first (use `index:` or a `testID` → `id:`). The first Maestro run on a fresh simulator can crash Expo Go inside Apple's XCTest automation thread; re-run.
 
-Maestro isn't wired into CI. It would need a macOS runner with a booted iOS 26 simulator, Expo Go and Metro, then the commands above (CI only runs on `main` and PRs). Android would run on an emulator with `appId` switched. forceRTL and the largest Dynamic Type need a native restart; set them in the simulator's settings and re-run the flows.
+Maestro isn't wired into CI. It would need a macOS runner with a booted iOS 27 simulator, Expo Go and Metro, then the commands above (CI only runs on `main` and PRs). Android would run on an emulator with `appId` switched. Force RTL and the largest Dynamic Type need a native restart; set them in the simulator's settings and re-run the flows. The [27 runtime audit](research/native-liquid-glass-audit.md) records the actual simulator matrix, interactions, captures and verification limits separately from Jest results.
 
 ## End-to-end (`e2e/`)
 
@@ -53,7 +54,11 @@ It reuses a dev server on `E2E_BASE_URL` (default `http://localhost:3011`) and s
 |---|---|---|
 | `a11y.spec.ts` | QA-02, A11Y-06 | axe (WCAG 2.1 A/AA) on every `/docs/*` page and `/themes`; `/themes` and the blocks again in light/dark × matte/smoked |
 | `visual.spec.ts` | QA-03 | `toHaveScreenshot` of docs previews (button, card, tabs, slider, dashboard-01) × dusk/ocean/rose × light/dark × shape-square/density-compact. Baselines in `e2e/__screenshots__`, Chromium only |
-| `liquid-surfaces.spec.ts` | QA-09 | Chromium, WebKit and Firefox: glass surfaces render with a `backdrop-filter` blur, so refraction degrades to frost, never to nothing |
+| `liquid-surfaces.spec.ts` | QA-09 | Chromium, WebKit and Firefox: complete CSS material, showcase rendering and newly opened portal enhancement/release; refraction falls back to frost |
+| `liquid-surfaces.behavior.spec.ts` | LG-06/11, NAV-02/04, SHT-02 | Three-engine checks for actual source transition geometry, scoped portal themes, mobile sidebar focus/inert behavior, scrolled bars and full-height sheets |
+| `glass-showcase.spec.ts` | LG-14/16 | Example actions, keyboard tabs, reverse-scroll expansion, optical/preference toggles, actual edge-pixel displacement versus neutral center, fixed-width merge geometry and showcase axe checks |
 | `blur-budget.spec.ts` | UX-04 | ≤ 12 elements with a `backdrop-filter` in the initial 1440×900 viewport of `/`, `/docs`, `/docs/button`, `/docs/dashboard-01`, `/themes` |
 
 Themes are applied the way the site persists them: `glasscn-palette`, `theme` and `glasscn-custom-css` (preset items' `cssVars`) in localStorage before first paint (`e2e/theme.ts`). Screenshots run with reduced motion, so the aurora is still.
+
+The pure `glass-optics` tests cover rounded-lens geometry, neutral interior and bounded displacement. Component regressions cover configured token-class merging, cluster ref composition and interrupted source transitions. These tests establish glasscn's browser model; Apple does not publish the shader constants needed to claim identical optical output. See the [27 work record](plans/apple-liquid-glass-27.md) for the verified totals and install/build results.

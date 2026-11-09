@@ -92,11 +92,10 @@ function Display({ size = "lg", style, ...props }: Omit<GTextProps, "size"> & { 
   return <GText font="display" maxFontSizeMultiplier={MAX_FONT_SCALE.display} style={[d, { letterSpacing: -0.03 * d.fontSize }, style]} {...props} />
 }
 
-/** A pulled quote in the heading face, ruled with the accent. */
+/** A pulled quote in the heading face, indented. */
 function Blockquote({ style, children, ...props }: ViewProps) {
-  const ui = useUI()
   return (
-    <View style={[{ borderStartWidth: 3, borderStartColor: ui.primary, paddingStart: 16 }, style]} {...props}>
+    <View style={[{ paddingStart: 16 }, style]} {...props}>
       {typeof children === "string" || typeof children === "number" ? (
         <GText font="heading" size="lg" tone="muted" weight="400">
           {children}

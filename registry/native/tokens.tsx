@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useColorScheme } from "react-native"
+import { Platform, useColorScheme } from "react-native"
 
 import { useHighContrast } from "@/components/glass/native/a11y"
 import { PALETTES, PRESETS, type DensityName, type MaterialName, type MotionName, type PaletteName, type ShapeName, type TypeName } from "@/components/glass/native/tokens.generated"
@@ -39,6 +39,7 @@ export interface NativeScheme {
   glassSubtle: string
   glass: string
   glassStrong: string
+  glassThick: string
   glassLiquid: string
   glassLiquidClear: string
   glassClearDim: string
@@ -56,6 +57,10 @@ export interface NativeScheme {
   knob: string
   blur: number
   liquidBlur: number
+  clearBlur: number
+  saturate: number
+  liquidSaturate: number
+  brightness: number
   specular: number
   edgeShade: number
   illumination: number
@@ -69,6 +74,9 @@ export interface NativeScheme {
   fonts: { sans?: string; heading?: string; display?: string; mono?: string }
 }
 export type NativeHighContrast = Pick<NativeScheme, "glassBorder" | "separator" | "labelSecondary" | "labelTertiary" | "fill" | "fillStrong" | "primary" | "ring">
+/** Clear media controls use bright labels independently of the app's scheme. */
+export const CLEAR_MEDIA_LABELS: Partial<NativeScheme> = { label: "#fafafa", labelSecondary: "#e5e5e5", labelTertiary: "#d4d4d4", foreground: "#fafafa" }
+export const NativeGlassLabelsContext = React.createContext<GlassTheme | null>(null)
 export interface NativeTheme {
   light: NativeScheme
   dark: NativeScheme
@@ -84,7 +92,7 @@ export interface GlassTheme extends NativeScheme {
   highContrast: boolean
   /** Secondary text — the label-secondary tier. */
   mutedForeground: string
-  /** The tint laid into Liquid Glass so it reads on a pale ground (the liquid frost). */
+  /** Frost color for content fills and outlines. Native Liquid Glass has no default tint. */
   glassTint: string
 }
 
@@ -101,8 +109,18 @@ export interface ThemeOptions {
   tokens?: Partial<NativeScheme>
 }
 
+// System on iOS is the OS's own appearance: the iOS 27 system colours (HIG Color,
+// Specifications). systemBlue carries white at 3.5:1, which the HIG allows for bold text, so
+// labels on it are semibold. The web's System palette uses Apple's web blue (#0071E3) instead.
+const IOS_SYSTEM: Record<"light" | "dark" | "lightHC" | "darkHC", Partial<NativeScheme>> = {
+  light: { primary: "#0088ff", primaryForeground: "#ffffff", ring: "#0088ff", destructive: "#ff383c", destructiveForeground: "#ffffff", chart: ["#0088ff", "#34c759", "#ff8d28", "#cb30e0", "#ff2d55", "#6155f5", "#00c3d0", "#8e8e93"] },
+  dark: { primary: "#0091ff", primaryForeground: "#ffffff", ring: "#0091ff", destructive: "#ff4245", destructiveForeground: "#ffffff", chart: ["#0091ff", "#30d158", "#ff9230", "#db34f2", "#ff375f", "#6d7cff", "#00d2e0", "#98989d"] },
+  lightHC: { primary: "#1e6ef4", ring: "#1e6ef4", destructive: "#e9152d" },
+  darkHC: { primary: "#5cb8ff", ring: "#5cb8ff", destructive: "#ff6165" },
+}
+
 /** The theme for a scheme and presets, as the web's createGlassTheme would make it. Pure. */
-export function buildGlassTheme(scheme: Scheme, palette: PaletteName = "dusk", options: Omit<ThemeOptions, "palette"> = {}): GlassTheme {
+export function buildGlassTheme(scheme: Scheme, palette: PaletteName = "system", options: Omit<ThemeOptions, "palette"> = {}): GlassTheme {
   const p = PALETTES[palette] ?? PALETTES.dusk
   const s: NativeScheme = { ...p[scheme] }
   for (const group of ["material", "shape", "motion", "density", "type"] as const) {
@@ -111,16 +129,34 @@ export function buildGlassTheme(scheme: Scheme, palette: PaletteName = "dusk", o
     if (diff) Object.assign(s, diff)
   }
   if (options.highContrast) Object.assign(s, p.highContrast[scheme])
+  if (palette === "system" && Platform.OS === "ios") Object.assign(s, IOS_SYSTEM[scheme], options.highContrast ? IOS_SYSTEM[`${scheme}HC`] : null)
   Object.assign(s, options.tokens)
   return {
     ...s,
     scheme,
-    palette: PALETTES[palette] ? palette : "dusk",
+    palette: PALETTES[palette] ? palette : "system",
     highContrast: !!options.highContrast,
     // text on glass: the label tier, so `foreground` reads inside panes as on the web
     foreground: s.label,
     mutedForeground: s.labelSecondary,
     glassTint: s.glassLiquid,
+  }
+}
+
+/** Labels for untinted system surfaces must not inherit a content-material tint's label color. */
+export function nativeGlassLabels(theme: GlassTheme, overrides?: Partial<NativeScheme>): Partial<NativeScheme> {
+  const base = buildGlassTheme(theme.scheme, theme.palette, { highContrast: theme.highContrast })
+  const keys = ["label", "labelSecondary", "labelTertiary", "labelQuaternary", "foreground"] as const
+  return Object.fromEntries(keys.map((key) => [key, overrides?.[key] ?? base[key]]))
+}
+
+/** Omitted provider options leave system controls at their platform defaults. */
+export function nativeControlTheme(theme: GlassTheme, options: ThemeOptions & { scheme?: Scheme }) {
+  return {
+    colorScheme: options.scheme,
+    // the System palette is the OS's own appearance: system controls keep their native tints
+    // (a green iOS switch, the user's accent), unless a raw accent is set
+    seedColor: (options.palette !== undefined && options.palette !== "system") || options.tokens?.primary !== undefined ? theme.primary : undefined,
   }
 }
 
@@ -144,7 +180,7 @@ export function GlassThemeProvider({ children, ...props }: Ctx & { children: Rea
 /** The provider's options, merged up the tree (for scopes that re-provide). */
 export const useGlassThemeOptions = () => React.useContext(GlassThemeContext) ?? {}
 
-/** The current tokens: the provider's palette, presets and scheme, else Dusk and the system scheme; Increase Contrast from the OS. */
+/** The current tokens: the provider's palette, presets and scheme, else System and the system scheme; Increase Contrast from the OS. */
 export function useGlassTheme(): GlassTheme {
   const ctx = React.useContext(GlassThemeContext)
   const system = useColorScheme()
@@ -152,8 +188,7 @@ export function useGlassTheme(): GlassTheme {
   const scheme: Scheme = ctx?.scheme ?? (system === "dark" ? "dark" : "light")
   const highContrast = ctx?.highContrast ?? osContrast
   return React.useMemo(
-    () => buildGlassTheme(scheme, ctx?.palette ?? "dusk", { ...ctx, highContrast }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    () => buildGlassTheme(scheme, ctx?.palette ?? "system", { ...ctx, highContrast }),
     [scheme, ctx, highContrast]
   )
 }

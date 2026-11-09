@@ -3,7 +3,7 @@ import { TextInput, type TextInputProps } from "react-native"
 
 import { useFieldIds } from "@/components/glass/native/field"
 import { labelIdFor, useLabelTarget } from "@/components/glass/native/label"
-import { alpha, useUI, web } from "@/components/glass/native/ui"
+import { alpha, useGlassForeground, useUI, web } from "@/components/glass/native/ui"
 
 export type InputProps = TextInputProps & {
   /** Mark the value invalid: a destructive ring, announced as invalid (the web's aria-invalid). */
@@ -21,6 +21,8 @@ export type InputProps = TextInputProps & {
  */
 export function useField({ invalid: invalidProp, "aria-invalid": ariaInvalid, disabled, onFocus, onBlur, editable, id: idProp, accessibilityHint, ...rest }: InputProps) {
   const ui = useUI()
+  const foreground = useGlassForeground(ui.foreground)
+  const placeholder = useGlassForeground(ui.mutedForeground)
   const field = useFieldIds()
   const ref = React.useRef<TextInput>(null)
   const [focused, setFocused] = React.useState(false)
@@ -42,7 +44,7 @@ export function useField({ invalid: invalidProp, "aria-invalid": ariaInvalid, di
       // the web reads aria-describedby; VoiceOver and TalkBack read the hint
       "aria-describedby": field ? [field.hint && invalid ? field.error : null, field.description].filter(Boolean).join(" ") : undefined,
       accessibilityHint: hint,
-      placeholderTextColor: ui.mutedForeground,
+      placeholderTextColor: placeholder,
       selectionColor: alpha(ui.primary, 0.45),
       cursorColor: ui.primary,
       onFocus: (e: Parameters<NonNullable<TextInputProps["onFocus"]>>[0]) => {
@@ -61,7 +63,7 @@ export function useField({ invalid: invalidProp, "aria-invalid": ariaInvalid, di
       backgroundColor: focused ? ui.fillStrong : ui.fill,
       paddingHorizontal: 14,
       fontSize: ui.text.base,
-      color: ui.foreground,
+      color: foreground,
       borderWidth: 3,
       borderColor: ring,
       opacity: disabled ? 0.5 : 1,

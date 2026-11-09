@@ -1,5 +1,5 @@
 import * as React from "react"
-import { StyleSheet, View, type PressableProps, type StyleProp, type ViewStyle } from "react-native"
+import { Platform, StyleSheet, View, type PressableProps, type StyleProp, type ViewStyle } from "react-native"
 import Animated from "react-native-reanimated"
 
 import { Backdrop, DialogPortal, useControllableOpen, useEntrance, useInsets, usePresence } from "@/components/glass/native/dialog"
@@ -7,8 +7,12 @@ import { Glass } from "@/components/glass/native/glass"
 import { Press, haptics } from "@/components/glass/native/press"
 import { withGlyphs } from "@/components/glass/native/segmented-control"
 import { GText, useUI, type GTextProps } from "@/components/glass/native/ui"
+import { Button } from "@/components/glass/native/button"
+import { nativeControlTheme, useGlassThemeOptions } from "@/components/glass/native/tokens"
 
-type Ctx = { open: boolean; setOpen: (open: boolean) => void }
+type SystemAction = { label: string; role: "default" | "destructive" | "cancel"; disabled?: boolean; onAction?: () => void; accessibilityLabel?: string; testID?: string }
+type SystemSheet = { title: string; message?: string; actions: SystemAction[] }
+type Ctx = { open: boolean; setOpen: (open: boolean) => void; system: SystemSheet | null }
 const SheetCtx = React.createContext<Ctx | null>(null)
 function useActionSheet() {
   const ctx = React.useContext(SheetCtx)
@@ -16,29 +20,125 @@ function useActionSheet() {
   return ctx
 }
 
-/** Root: open state, controlled or not. */
-function ActionSheet({ open, defaultOpen, onOpenChange, children }: { open?: boolean; defaultOpen?: boolean; onOpenChange?: (open: boolean) => void; children?: React.ReactNode }) {
-  const [value, setOpen] = useControllableOpen(open, defaultOpen, onOpenChange)
-  const ctx = React.useMemo(() => ({ open: value, setOpen }), [value, setOpen])
+type ActionSheetProps = {
+  open?: boolean
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean) => void
+  /** Plain, uncontrolled iOS choices use the source-attached system dialog. Controlled state, rich content, styling, RN action events and Cancel callbacks use the custom sheet. false always selects custom. */
+  native?: boolean
+  children?: React.ReactNode
+}
+
+function ActionSheet({ open, defaultOpen, onOpenChange, native = true, children }: ActionSheetProps) {
+  const [value, updateOpen] = useControllableOpen(open, defaultOpen, onOpenChange)
+  const current = React.useRef(value)
+  React.useLayoutEffect(() => { current.current = value }, [value])
+  const setOpen = React.useCallback((next: boolean) => {
+    if (open !== undefined) { updateOpen(next); return }
+    if (current.current === next) return
+    // A selected system action and SwiftUI's state event report the same close.
+    current.current = next
+    updateOpen(next)
+  }, [open, updateOpen])
+  const system = native && Platform.OS === "ios" && open === undefined ? systemSheet(children) : null
+  const ctx = { open: value, setOpen, system }
   return <SheetCtx.Provider value={ctx}>{children}</SheetCtx.Provider>
 }
 
 type PressLike = Omit<PressableProps, "style" | "children"> & { style?: StyleProp<ViewStyle>; children?: React.ReactNode }
-
-function ActionSheetTrigger({ children, onPress, ...props }: PressLike) {
-  const { setOpen } = useActionSheet()
-  return (
-    <Press accessibilityRole="button" aria-haspopup="dialog" {...props} onPress={(e) => (onPress?.(e), setOpen(true))}>
-      {children}
-    </Press>
-  )
+type ActionProps = PressLike & {
+  /** Event-free selection; RN onPress retains its event on the custom path. Cancel callbacks also select custom because SwiftUI runs its cancel closure on passive dismissal. */
+  onAction?: () => void
 }
 
-/**
- * The iOS action sheet: the choices share one glass group rising from the bottom;
- * ActionSheetCancel sits in its own capsule below. Tapping outside cancels.
- */
+function parts(children: React.ReactNode): React.ReactNode[] {
+  return React.Children.toArray(children).flatMap((child) => React.isValidElement<{ children?: React.ReactNode }>(child) && child.type === React.Fragment ? parts(child.props.children) : [child])
+}
+
+function hasOnly(props: object, names: string[]) {
+  return Object.entries(props).every(([key, value]) => value === undefined || names.includes(key))
+}
+
+function plain(children: React.ReactNode): string | null {
+  const nodes = parts(children)
+  return nodes.length && nodes.every((node) => typeof node === "string" || typeof node === "number") ? nodes.join("") : null
+}
+
+/** Read only supported declarative parts; every other prop stays on the custom path. */
+function systemSheet(children: React.ReactNode): SystemSheet | null {
+  const nodes = parts(children)
+  const triggers = nodes.filter((node) => React.isValidElement(node) && node.type === ActionSheetTrigger)
+  const contents = nodes.filter((node) => React.isValidElement(node) && node.type === ActionSheetContent)
+  if (nodes.length !== 2 || triggers.length !== 1 || contents.length !== 1) return null
+  const content = contents[0] as React.ReactElement<{ children?: React.ReactNode }>
+  if (!hasOnly(content.props, ["children"])) return null
+  const result: SystemSheet = { title: "", actions: [] }
+  let titles = 0, messages = 0, cancels = 0
+  const read = (children: React.ReactNode): boolean => parts(children).every((node) => {
+    if (!React.isValidElement<Record<string, unknown>>(node)) return false
+    const props = node.props
+    if (node.type === ActionSheetHeader) return hasOnly(props, ["children"]) && read(props.children as React.ReactNode)
+    if (node.type === ActionSheetTitle || node.type === ActionSheetDescription) {
+      const text = plain(props.children as React.ReactNode)
+      if (text === null || !hasOnly(props, ["children"])) return false
+      if (node.type === ActionSheetTitle) { result.title = text; return ++titles === 1 }
+      result.message = text; return ++messages === 1
+    }
+    if (node.type !== ActionSheetAction && node.type !== ActionSheetCancel) return false
+    const cancel = node.type === ActionSheetCancel
+    const label = plain(props.children as React.ReactNode ?? (cancel ? "Cancel" : undefined))
+    // SwiftUI also runs cancel-role actions on outside dismissal, without a reason.
+    if (label === null || props.variant === "preferred" || (cancel && props.onAction !== undefined) || !hasOnly(props, ["children", "variant", "disabled", "onAction", "accessibilityLabel", "aria-label", "testID"]) || (cancel && ++cancels > 1)) return false
+    result.actions.push({ label, role: cancel ? "cancel" : props.variant === "destructive" ? "destructive" : "default", disabled: props.disabled as boolean | undefined, onAction: props.onAction as (() => void) | undefined, accessibilityLabel: (props.accessibilityLabel ?? props["aria-label"]) as string | undefined, testID: props.testID as string | undefined })
+    return true
+  })
+  return read(content.props.children) && result.actions.some((action) => action.role !== "cancel") ? result : null
+}
+
+function ActionSheetTrigger({ children, onPress, asChild, ...props }: PressLike & { asChild?: boolean }) {
+  const { setOpen, system } = useActionSheet()
+  // A library Button inside RNHostView must stay RN rather than nesting SwiftUI Hosts.
+  const button = React.isValidElement<React.ComponentProps<typeof Button>>(children) && children.type === Button
+  const source = system && button ? React.cloneElement(children, { native: false }) : children
+  const trigger = (
+    <Press asChild={asChild || button} accessibilityRole="button" aria-haspopup="dialog" {...props} onPress={(e) => (onPress?.(e), setOpen(true))}>
+      {source}
+    </Press>
+  )
+  return system ? <SystemPresentation>{trigger}</SystemPresentation> : trigger
+}
+
+function SystemPresentation({ children }: { children: React.ReactElement }) {
+  const { open, setOpen, system } = useActionSheet()
+  const ui = useUI()
+  const appearance = nativeControlTheme(ui, useGlassThemeOptions())
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const SwiftUI = require("@expo/ui/swift-ui") as typeof import("@expo/ui/swift-ui")
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const modifiers = require("@expo/ui/swift-ui/modifiers") as typeof import("@expo/ui/swift-ui/modifiers")
+  if (!system) return children
+  return <SwiftUI.Host matchContents {...appearance} style={{ alignSelf: "flex-start" }}>
+    <SwiftUI.ConfirmationDialog title={system.title} titleVisibility={system.title ? "visible" : "hidden"} isPresented={open} onIsPresentedChange={setOpen}>
+      <SwiftUI.ConfirmationDialog.Trigger><SwiftUI.RNHostView matchContents>{children}</SwiftUI.RNHostView></SwiftUI.ConfirmationDialog.Trigger>
+      <SwiftUI.ConfirmationDialog.Actions>{system.actions.map((action, index) => <SwiftUI.Button key={index} label={action.label} role={action.role} testID={action.testID} modifiers={[modifiers.disabled(!!action.disabled), modifiers.accessibilityLabel(action.accessibilityLabel ?? action.label)]} onPress={() => {
+        if (action.disabled) return
+        if (action.role === "destructive") haptics.notify("warning")
+        else haptics.selection()
+        action.onAction?.()
+        setOpen(false)
+      }} />)}</SwiftUI.ConfirmationDialog.Actions>
+      {system.message ? <SwiftUI.ConfirmationDialog.Message><SwiftUI.Text>{system.message}</SwiftUI.Text></SwiftUI.ConfirmationDialog.Message> : null}
+    </SwiftUI.ConfirmationDialog>
+  </SwiftUI.Host>
+}
+
+/** System source presentation where supported; otherwise the custom bottom group and separate Cancel capsule. */
 function ActionSheetContent({ children }: { children?: React.ReactNode }) {
+  const { system } = useActionSheet()
+  return system ? null : <CustomContent>{children}</CustomContent>
+}
+
+function CustomContent({ children }: { children?: React.ReactNode }) {
   const ui = useUI()
   const { open, setOpen } = useActionSheet()
   const { mounted, progress } = usePresence(open, 280)
@@ -52,7 +152,7 @@ function ActionSheetContent({ children }: { children?: React.ReactNode }) {
       <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
         <Backdrop progress={progress} onPress={() => setOpen(false)} />
         <Animated.View role="dialog" aria-modal accessibilityViewIsModal style={[{ position: "absolute", left: 12, right: 12, bottom: insets.bottom + 12, gap: 8, alignSelf: "center", maxWidth: 420 }, entrance]}>
-          <Glass variant="liquid" visible={open} radius={ui.radius.surface} style={{ overflow: "hidden" }}>
+          <Glass variant="liquid" materialized={open} radius={ui.radius.surface} style={{ overflow: "hidden" }}>
             {rest.map((c, i) => (
               <View key={i} style={i ? { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: ui.separator } : null}>
                 {c}
@@ -78,19 +178,22 @@ function ActionSheetDescription(props: GTextProps) {
   return <GText size="xs" tone="muted" align="center" {...props} />
 }
 
-function Row({ children, onPress, color, bold, destructive, ...props }: PressLike & { color: string; bold?: boolean; destructive?: boolean }) {
+function Row({ children, onPress, onAction, color, bold, destructive, style, disabled, ...props }: ActionProps & { color: string; bold?: boolean; destructive?: boolean }) {
   const ui = useUI()
   const { setOpen } = useActionSheet()
   return (
     <Press
       accessibilityRole="button"
+      disabled={disabled}
       onPress={(e) => {
+        if (disabled) return
         if (destructive) haptics.notify("warning")
         else haptics.selection()
         onPress?.(e)
+        onAction?.()
         setOpen(false)
       }}
-      style={{ height: ui.control.lg + 8, flexDirection: "row", gap: 8, alignItems: "center", justifyContent: "center" }}
+      style={[{ minHeight: ui.control.lg + 8, paddingVertical: 8, flexDirection: "row", gap: 8, alignItems: "center", justifyContent: "center" }, style]}
       {...props}
     >
       {withGlyphs(children, { color, size: 20, text: "base", weight: bold ? "600" : "400" })}
@@ -99,17 +202,17 @@ function Row({ children, onPress, color, bold, destructive, ...props }: PressLik
 }
 
 /** A choice; closes the sheet. */
-function ActionSheetAction({ variant = "default", ...props }: PressLike & { variant?: "default" | "destructive" | "preferred" }) {
+function ActionSheetAction({ variant = "default", ...props }: ActionProps & { variant?: "default" | "destructive" | "preferred" }) {
   const ui = useUI()
   return <Row color={variant === "destructive" ? ui.destructive : ui.primary} bold={variant === "preferred"} destructive={variant === "destructive"} {...props} />
 }
 
-/** Cancel, in its own capsule. */
-function ActionSheetCancel({ children = "Cancel", ...props }: PressLike) {
+/** System Cancel placement belongs to iOS; custom Cancel has a separate capsule. A callback selects custom to distinguish explicit selection from passive dismissal. */
+function ActionSheetCancel({ children = "Cancel", ...props }: ActionProps) {
   const ui = useUI()
   const { open } = useActionSheet()
   return (
-    <Glass variant="liquid" visible={open} radius={ui.radius.surface}>
+    <Glass variant="liquid" materialized={open} radius={ui.radius.surface}>
       <Row color={ui.primary} bold {...props}>
         {children}
       </Row>

@@ -149,5 +149,5 @@ export function hitSlop(height: number, width: number = height, min: number = HI
   return v || h ? { top: v, bottom: v, left: h, right: h } : undefined
 }
 
-/** Font scaling caps per role, so large Dynamic Type grows text without breaking layout. */
-export const MAX_FONT_SCALE = { body: 2, label: 1.6, heading: 1.6, display: 1.2 } as const
+/** Zero leaves Dynamic Type uncapped. A caller can still set an explicit multiplier. */
+export const MAX_FONT_SCALE = { body: 0, label: 0, heading: 0, display: 0 } as const

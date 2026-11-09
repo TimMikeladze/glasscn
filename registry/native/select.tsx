@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/glass/native/dropdown-menu"
-import { GText, useUI, type GTextProps } from "@/components/glass/native/ui"
+import { GIcon, GText, useUI, type GTextProps } from "@/components/glass/native/ui"
 
 type Ctx = { value?: string; setValue: (v: string) => void; labels: React.RefObject<Map<string, React.ReactNode>>; disabled?: boolean }
 const SelectContext = React.createContext<Ctx | null>(null)
@@ -75,7 +75,7 @@ function SelectTrigger({ size = "default", variant = "default", style, children,
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
         {children}
-        <Icon size={pill ? 14 : 16} color={ui.mutedForeground} />
+        <GIcon><Icon size={pill ? 14 : 16} color={ui.mutedForeground} /></GIcon>
       </View>
     </DropdownMenuTrigger>
   )

@@ -34,9 +34,11 @@ describe("llms-full.txt", () => {
 
   it("includes the design rules and the material guidance", () => {
     expect(full).toContain("## Design rules")
-    expect(full).toContain("**Glass needs content beneath it.**")
-    expect(full).toContain("**Never liquid on liquid.**")
+    expect(full).toContain("Put content behind a lens.")
+    expect(full).toContain("Inside liquid use fills and readable glyphs.")
     expect(full).toContain("## Material vs Liquid Glass")
+    expect(full).toContain("Regular glass diffuses complex content")
+    expect(full).toContain("27 releases refine diffusion")
     expect(full).toContain("material-vivid")
   })
 })

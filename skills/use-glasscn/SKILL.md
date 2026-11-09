@@ -12,7 +12,7 @@ glasscn is shadcn components in glass, on Apple's Liquid Glass model. The APIs m
 ## Install
 
 ```bash
-npx shadcn@latest add https://glasscn.app/r/glass-style.json https://glasscn.app/r/theme-dusk.json   # foundation + a palette
+npx shadcn@latest add https://glasscn.app/r/glass-style.json https://glasscn.app/r/theme-system.json   # foundation + the default palette
 npx shadcn@latest add https://glasscn.app/r/aurora.json https://glasscn.app/r/card.json https://glasscn.app/r/button.json
 ```
 
@@ -49,7 +49,7 @@ See `references/recipes.md` for screen recipes.
 
 ## Theme
 
-- **Presets compose** (each replaces only its own group): `theme-<palette>` (dusk ocean rose sage amber graphite lavender mint cherry lagoon sand midnight), `material-<frosted|vivid|crystal|smoked|matte|vapor|neon>`, `shape-<round|soft|sharp|square>`, `motion-<spring|smooth|snappy|still>`, `density-<compact|default|comfortable>`, `type-<default|system|modern|editorial|friendly|technical|classic|grotesk>`.
+- **Presets compose** (each replaces only its own group): `theme-<palette>` (system dusk ocean rose sage amber graphite lavender mint cherry lagoon sand midnight), `material-<frosted|vivid|crystal|smoked|matte|vapor|neon>`, `shape-<round|soft|sharp|square>`, `motion-<spring|smooth|snappy|still>`, `density-<compact|default|comfortable>`, `type-<default|system|modern|editorial|friendly|technical|classic|grotesk>`.
 - **Any primitive, any element:** `<Card className="[--glass-blur:8px] [--glass-opacity:70%]">`, `<section className="[--glass-density:0.85]">`.
 - **At runtime / per subtree:** `<ThemeScope palette="ocean" material="vivid" scheme="dark">…</ThemeScope>`, or `theme={createGlassTheme({ palette: { hue: 200, harmony: "triadic" }, shape: "soft", tokens: {...} })}` from `@/lib/glass-theme`.
 - **Fonts:** app fonts are shadcn `registry:font` items: `font-inter`, `font-heading-fraunces`, `font-mono-jetbrains-mono` (the CLI wires next/font). Theme fonts are optional overrides: `<ThemeScope fonts={{ heading: "fraunces" }} loadFonts>` or `[--glass-font-heading:…]`.

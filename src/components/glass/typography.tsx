@@ -1,6 +1,6 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { Slot } from "radix-ui"
 
 /**
@@ -103,7 +103,7 @@ function Blockquote({ className, ...props }: React.ComponentProps<"blockquote">)
   return (
     <blockquote
       data-slot="blockquote"
-      className={cn("border-s-[3px] border-primary ps-4 font-glass-heading type-step-1 [line-height:var(--glass-heading-leading)] text-muted-foreground", className)}
+      className={cn("ps-4 font-glass-heading type-step-1 [line-height:var(--glass-heading-leading)] text-muted-foreground", className)}
       {...props}
     />
   )

@@ -13,13 +13,13 @@ const componentsJson = `{
   }
 }`
 
-const layout = `import { Aurora } from "@/components/glass/aurora"
+const layout = `import { GlassEffects } from "@/components/glass/glass-effects"
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>
-        <Aurora />
+      <body className="bg-(--aurora-base)">
+        <GlassEffects />
         {children}
       </body>
     </html>
@@ -36,16 +36,16 @@ export default function Installation() {
       </Step>
       <Step n={2} title="Add the foundation and a palette">
         <P className="mb-0">
-          <C>glass-style</C> brings the tokens, the <C>glass</C> utilities and the keyframes. A theme sets the accent, ring, aurora and chart colours — pick one of six.
+          <C>glass-style</C> brings the tokens, the <C>glass</C> utilities and the keyframes. A palette sets the accent, ring, ground and chart colours. <C>theme-system</C> is Apple&rsquo;s default appearance; twelve coloured palettes add an aurora.
         </P>
-        <InstallCommand args={`add ${itemUrl("glass-style")} ${itemUrl("theme-dusk")}`} />
+        <InstallCommand args={`add ${itemUrl("glass-style")} ${itemUrl("glass-effects")} ${itemUrl("theme-system")}`} />
       </Step>
       <Step n={3} title="Add components">
         <P className="mb-0">Each pulls in what it needs (the foundation, helpers, Radix) automatically.</P>
-        <InstallCommand args={`add ${itemUrl("aurora")} ${itemUrl("card")} ${itemUrl("button")}`} />
+        <InstallCommand args={`add ${itemUrl("card")} ${itemUrl("button")}`} />
       </Step>
-      <Step n={4} title="Put the aurora behind everything">
-        <P className="mb-0">Glass needs something to frost. The aurora is fixed behind the page by default.</P>
+      <Step n={4} title="Add a ground and the glass runtime">
+        <P className="mb-0">Put photos, an article or a list behind floating controls. The page ground is <C>--aurora-base</C>; add <C>aurora</C> if you pick a coloured palette. GlassEffects enhances control surfaces and newly opened portals on Chromium; other engines keep the CSS material. LiquidGlass installs the shared runtime automatically.</P>
         <CodeBlock code={layout} html={`<pre><code>${layout.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</code></pre>`} title="app/layout.tsx" />
       </Step>
       <H2>Use the {registryNamespace} namespace</H2>
@@ -59,7 +59,7 @@ export default function Installation() {
       <H2>Where files go</H2>
       <P>
         Components install to <C>components/glass/*</C> (beside shadcn’s <C>components/ui</C>, never over it), blocks to <C>components/glass-blocks/*</C>, helpers to <C>lib/</C> and{" "}
-        <C>hooks/</C>. Imports follow your <C>components.json</C> aliases. Class merging uses the <C>cn</C> package, like current shadcn.
+        <C>hooks/</C>. Imports follow your <C>components.json</C> aliases. Class merging uses the foundation’s <C>glass-cn</C> helper, which teaches <C>cn</C> the named radius and spacing tokens.
       </P>
     </>
   )

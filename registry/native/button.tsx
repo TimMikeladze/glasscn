@@ -1,12 +1,13 @@
 import * as React from "react"
-import { ActivityIndicator, View, type PressableProps, type ViewProps, type StyleProp, type TextStyle, type ViewStyle } from "react-native"
+import { ActivityIndicator, Platform, View, type PressableProps, type ViewProps, type StyleProp, type TextStyle, type ViewStyle } from "react-native"
 
 import { ChevronDownIcon } from "lucide-react-native"
 
-import { hitSlop } from "@/components/glass/native/a11y"
-import { Glass, canFade } from "@/components/glass/native/glass"
-import { Press } from "@/components/glass/native/press"
-import { GText, alpha, useUI, web, type UI } from "@/components/glass/native/ui"
+import { hitSlop, useReduceTransparency } from "@/components/glass/native/a11y"
+import { Glass, canFade, hasLiquidGlass } from "@/components/glass/native/glass"
+import { haptics, Press } from "@/components/glass/native/press"
+import { nativeControlTheme, useGlassThemeOptions } from "@/components/glass/native/tokens"
+import { GIcon, GText, alpha, useUI, web, type UI } from "@/components/glass/native/ui"
 
 type Variant = "default" | "glass" | "prominent" | "tinted" | "secondary" | "outline" | "ghost" | "destructive" | "link"
 type Size = "default" | "xs" | "sm" | "lg" | "icon" | "icon-xs" | "icon-sm" | "icon-lg"
@@ -56,6 +57,7 @@ function buttonVariants(ui: UI, { variant = "default", size = "default", shape =
   const container: ViewStyle = {
     // minHeight so Dynamic Type can grow the label (NAT-23)
     minHeight: height,
+    maxWidth: "100%",
     minWidth: icon ? height : undefined,
     paddingHorizontal: icon ? 0 : ui.pad[s.pad as keyof UI["pad"]],
     gap: s.gap,
@@ -68,9 +70,10 @@ function buttonVariants(ui: UI, { variant = "default", size = "default", shape =
     backgroundColor: bg[variant],
     borderWidth: variant === "outline" ? 1 : 0,
     borderColor: ui.glassBorder,
-    ...(variant === "default" ? { shadowColor: ui.primary, shadowOpacity: 0.32, shadowRadius: 11, shadowOffset: { width: 0, height: 8 }, elevation: 3 } : null),
+    // Apple's filled buttons cast no coloured glow
+    ...(variant === "default" ? { shadowColor: "#000", shadowOpacity: 0.08, shadowRadius: 2, shadowOffset: { width: 0, height: 1 }, elevation: 1 } : null),
   }
-  const text: TextStyle = { color: fg[variant], fontSize: s.font, lineHeight: Math.round(s.font * 1.3), fontWeight: "500", textDecorationLine: variant === "link" ? "underline" : "none" }
+  const text: TextStyle = { color: fg[variant], fontSize: s.font, lineHeight: Math.round(s.font * 1.3), fontWeight: variant === "default" || variant === "prominent" || variant === "destructive" ? "600" : "500", flexShrink: 1, textDecorationLine: variant === "link" ? "underline" : "none" }
   return { container, text, iconSize: s.icon, color: fg[variant] }
 }
 
@@ -82,7 +85,7 @@ export function decorate(children: React.ReactNode, text: StyleProp<TextStyle>, 
       return s ? <GText style={text}>{s}</GText> : null
     }
     if (React.isValidElement<{ color?: string; size?: number }>(child) && child.type !== React.Fragment && child.type !== GText) {
-      return React.cloneElement(child, { color: child.props.color ?? color, size: child.props.size ?? iconSize })
+      return <GIcon color={color} size={iconSize}>{child}</GIcon>
     }
     return child
   })
@@ -94,7 +97,37 @@ export function decorate(children: React.ReactNode, text: StyleProp<TextStyle>, 
  * `prominent` is Liquid Glass tinted with the accent; `loading` shows a spinner in place of
  * the leading icon (or over the label) and ignores presses.
  */
-function Button({
+function Button(props: ButtonProps) {
+  const ui = useUI()
+  const solid = useReduceTransparency() || (ui.blur === 0 && ui.liquidBlur === 0 && ui.clearBlur === 0)
+  const allowed = new Set(["native", "variant", "size", "shape", "disabled", "loading", "loadingText", "children", "onAction", "accessibilityLabel", "aria-label", "testID"])
+  const system = !solid && props.native !== false && !props.loading && Platform.OS === "ios" && hasLiquidGlass() && (props.variant === "glass" || props.variant === "prominent") && !props.size?.startsWith("icon") && (typeof props.children === "string" || typeof props.children === "number") && Object.entries(props).every(([key, value]) => value === undefined || allowed.has(key))
+  return system ? <SystemGlassButton {...props} /> : <CustomButton {...props} />
+}
+
+function SystemGlassButton({ variant, size = "default", shape = "pill", disabled, children, onAction, accessibilityLabel, testID, ...props }: ButtonProps) {
+  const ui = useUI()
+  const appearance = nativeControlTheme(ui, useGlassThemeOptions())
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const SwiftUI = require("@expo/ui/swift-ui") as typeof import("@expo/ui/swift-ui")
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const modifiers = require("@expo/ui/swift-ui/modifiers") as typeof import("@expo/ui/swift-ui/modifiers")
+  return <SwiftUI.Host matchContents {...appearance} style={{ alignSelf: "flex-start" }}>
+    <SwiftUI.Button label={String(children)} testID={testID} onPress={() => {
+      if (disabled) return
+      haptics.selection()
+      onAction?.()
+    }} modifiers={[
+      modifiers.buttonStyle(variant === "prominent" ? "glassProminent" : "glass"),
+      modifiers.controlSize(size === "lg" ? "large" : size === "sm" ? "small" : size === "xs" ? "mini" : "regular"),
+      modifiers.buttonBorderShape(shape === "pill" ? "capsule" : "roundedRectangle", shape === "rounded" ? ui.radius.control : undefined),
+      modifiers.disabled(!!disabled),
+      modifiers.accessibilityLabel(accessibilityLabel ?? props["aria-label"] ?? String(children)),
+    ]} />
+  </SwiftUI.Host>
+}
+
+function CustomButton({
   variant = "default",
   size = "default",
   shape = "pill",
@@ -104,8 +137,11 @@ function Button({
   style,
   children,
   onPress,
+  onAction,
+  native,
   ...props
 }: ButtonProps) {
+  void native
   const ui = useUI()
   const v = buttonVariants(ui, { variant, size, shape })
   const items = React.Children.toArray(children)
@@ -141,7 +177,7 @@ function Button({
       accessibilityRole="button"
       aria-busy={loading}
       aria-disabled={!!disabled}
-      onPress={loading ? undefined : onPress}
+      onPress={loading ? undefined : (event) => { onPress?.(event); onAction?.() }}
       disabled={disabled}
       haptic
       liquid={glass}
@@ -165,6 +201,10 @@ function Button({
 }
 
 type ButtonProps = Omit<PressableProps, "style" | "children"> & {
+  /** Plain iOS glass labels with onAction use SwiftUI button styles. RN onPress/event callbacks, custom content, loading and styling use Press/Glass. false always uses that custom path. */
+  native?: boolean
+  /** Event-free action supported by both system and custom buttons. RN onPress keeps its event and selects the custom path. */
+  onAction?: () => void
   variant?: Variant
   size?: Size
   shape?: Shape

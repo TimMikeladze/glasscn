@@ -39,7 +39,7 @@ export default function GlassScreen() {
       </Section>
       <Section title="Material intensity">
         <View style={{ flexDirection: "row", gap: 10 }}>
-          {(["subtle", "default", "strong"] as const).map((i) => (
+          {(["ultraThin", "thin", "regular", "thick"] as const).map((i) => (
             <Glass key={i} intensity={i} style={{ flex: 1, height: 64, alignItems: "center", justifyContent: "center" }}>
               <Body>{i}</Body>
             </Glass>

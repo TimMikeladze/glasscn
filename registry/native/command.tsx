@@ -4,7 +4,7 @@ import { SearchIcon } from "lucide-react-native"
 
 import { Dialog, DialogContent, DialogDescription, DialogTitle, type DialogProps } from "@/components/glass/native/dialog"
 import { Press, haptics } from "@/components/glass/native/press"
-import { GText, alpha, useUI, web, type GTextProps } from "@/components/glass/native/ui"
+import { GIcon, GText, useGlassForeground, useUI, web, type GTextProps } from "@/components/glass/native/ui"
 
 /**
  * shadcn's Command for React Native: a search capsule that filters the items below it.
@@ -71,16 +71,18 @@ function CommandDialog({ title = "Command palette", description = "Search for a 
 /** The search capsule. */
 function CommandInput({ style, onChangeText, ...props }: TextInputProps) {
   const ui = useUI()
+  const foreground = useGlassForeground(ui.foreground)
+  const placeholder = useGlassForeground(ui.mutedForeground)
   const { query, setQuery } = useCommand()
   // in a CommandDialog the search takes the keyboard straight away
   const inDialog = React.useContext(CommandDialogContext)
   return (
     <View style={{ padding: 8, paddingBottom: 4 }}>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 8, height: ui.control.default, borderRadius: ui.radius.button, backgroundColor: ui.fill, paddingHorizontal: 12 }}>
-        <SearchIcon size={16} color={ui.mutedForeground} />
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8, minHeight: ui.control.default, borderRadius: ui.radius.button, backgroundColor: ui.fill, paddingHorizontal: 12 }}>
+        <GIcon><SearchIcon size={16} color={ui.mutedForeground} /></GIcon>
         <TextInput
           accessibilityRole="search"
-          placeholderTextColor={alpha(ui.mutedForeground, 0.8)}
+          placeholderTextColor={placeholder}
           selectionColor={ui.primary}
           cursorColor={ui.primary}
           autoCorrect={false}
@@ -92,7 +94,7 @@ function CommandInput({ style, onChangeText, ...props }: TextInputProps) {
             setQuery(t)
             onChangeText?.(t)
           }}
-          style={[{ flex: 1, height: "100%", fontSize: ui.text.base, color: ui.foreground }, web({ outlineStyle: "none" }), style]}
+          style={[{ flex: 1, minHeight: ui.control.default, fontSize: ui.text.base, color: foreground }, web({ outlineStyle: "none" }), style]}
         />
       </View>
     </View>
@@ -208,7 +210,7 @@ function CommandItem({
             {c}
           </GText>
         ) : React.isValidElement<{ color?: string; size?: number }>(c) && typeof c.type !== "string" && c.type !== CommandShortcut && c.type !== GText && c.props.color === undefined ? (
-          React.cloneElement(c, { color: ui.mutedForeground, size: c.props.size ?? 16 })
+          <GIcon color={ui.mutedForeground} size={16}>{c}</GIcon>
         ) : (
           c
         )

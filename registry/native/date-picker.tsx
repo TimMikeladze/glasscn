@@ -6,7 +6,8 @@ import { CalendarIcon } from "lucide-react-native"
 import { Calendar, type CalendarProps, type DateRange } from "@/components/glass/native/calendar"
 import { Floating, useAnchorRect } from "@/components/glass/native/popover"
 import { Press } from "@/components/glass/native/press"
-import { GText, useUI, web } from "@/components/glass/native/ui"
+import { GIcon, GText, useUI, web } from "@/components/glass/native/ui"
+import { nativeControlTheme, useGlassThemeOptions } from "@/components/glass/native/tokens"
 
 /**
  * A date (or range, or date and time) behind a button: iOS's compact capsule
@@ -47,6 +48,7 @@ function DatePicker(props: DatePickerProps) {
 
 function SystemDatePicker(props: Extract<DatePickerProps, { mode?: "single" }> & { dialog: boolean }) {
   const ui = useUI()
+  const appearance = nativeControlTheme(ui, useGlassThemeOptions())
   const [inner, setInner] = React.useState<Date | undefined>(props.defaultValue)
   const [open, setOpen] = React.useState(false)
   const value = props.value ?? inner
@@ -60,8 +62,8 @@ function SystemDatePicker(props: Extract<DatePickerProps, { mode?: "single" }> &
       mode={props.time ? "datetime" : "date"}
       display={props.dialog ? "default" : "compact"}
       presentation={props.dialog ? "dialog" : "inline"}
-      accentColor={ui.primary}
-      themeVariant={ui.scheme}
+      accentColor={appearance.seedColor}
+      themeVariant={appearance.colorScheme}
       locale={props.locale}
       disabled={props.disabled}
       onChange={(e, d) => {
@@ -133,7 +135,7 @@ function GlassDatePicker(props: DatePickerProps & { onOpen?: () => void }) {
             web({ cursor: "pointer" }),
           ]}
         >
-          {variant === "field" ? <CalendarIcon size={16} color={ui.mutedForeground} /> : null}
+          {variant === "field" ? <GIcon><CalendarIcon size={16} color={ui.mutedForeground} /></GIcon> : null}
           <GText size="sm" weight={variant === "compact" ? "500" : undefined} color={!label ? ui.mutedForeground : open && variant === "compact" ? ui.primary : ui.foreground} style={{ fontVariant: ["tabular-nums"] }}>
             {label ?? placeholder}
           </GText>

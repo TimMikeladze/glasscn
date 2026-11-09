@@ -81,9 +81,7 @@ export default function SidebarDemo() {
         </SidebarContent>
       </Sidebar>
       <SidebarInset className="overflow-y-auto">
-        <BackgroundExtension>
-          <div className="h-48 bg-[linear-gradient(135deg,var(--aurora-1),var(--aurora-2),var(--aurora-3))]" />
-        </BackgroundExtension>
+        <BackgroundExtension src="/showcase/alpine.jpg" alt="Mountain lake" start={272} className="h-48" />
         <div className="grid gap-2 p-4">
           <SidebarTrigger />
           <h2 className="type-glass-heading text-xl">Tonight</h2>

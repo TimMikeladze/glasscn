@@ -4,7 +4,7 @@ import { MinusIcon, PlusIcon } from "lucide-react-native"
 
 import { hitSlop } from "@/components/glass/native/a11y"
 import { Press } from "@/components/glass/native/press"
-import { useUI } from "@/components/glass/native/ui"
+import { GIcon, useUI } from "@/components/glass/native/ui"
 
 /** Apple's − / + capsule pair: an adjustable (VoiceOver swipe up/down), hold to repeat. Show the value beside it. */
 function Stepper({
@@ -72,7 +72,7 @@ function Stepper({
       accessibilityElementsHidden
       style={{ flex: 1, alignItems: "center", justifyContent: "center", opacity: disabled || (dir < 0 ? value <= min : value >= max) ? 0.35 : 1 }}
     >
-      {dir < 0 ? <MinusIcon size={16} color={ui.foreground} /> : <PlusIcon size={16} color={ui.foreground} />}
+      {dir < 0 ? <GIcon><MinusIcon size={16} color={ui.foreground} /></GIcon> : <GIcon><PlusIcon size={16} color={ui.foreground} /></GIcon>}
     </Press>
   )
   return (

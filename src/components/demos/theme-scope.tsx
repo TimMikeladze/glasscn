@@ -1,9 +1,10 @@
-import { PenIcon } from "lucide-react"
+import { EyeIcon } from "lucide-react"
 
 import { Button } from "@/components/glass/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/glass/card"
 import { Switch } from "@/components/glass/switch"
 import { ThemeScope } from "@/components/glass/theme-scope"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/glass/popover"
 
 function Sample({ title }: { title: string }) {
   return (
@@ -13,9 +14,15 @@ function Sample({ title }: { title: string }) {
         <CardDescription>Same component, its own theme.</CardDescription>
       </CardHeader>
       <CardContent className="flex items-center justify-between gap-2">
-        <Button size="sm">
-          <PenIcon data-icon="inline-start" /> Write
-        </Button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button size="sm"><EyeIcon data-icon="inline-start" />Preview</Button>
+          </PopoverTrigger>
+          <PopoverContent aria-label={title}>
+            <p className="type-glass-heading">{title}</p>
+            <p className="text-sm text-muted-foreground">Some thoughts need a little room.</p>
+          </PopoverContent>
+        </Popover>
         <Switch defaultChecked aria-label="On" size="sm" />
       </CardContent>
     </Card>

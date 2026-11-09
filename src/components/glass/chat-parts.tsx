@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { Collapsible as CollapsiblePrimitive } from "radix-ui"
 import { AlertCircleIcon, BrainIcon, CheckIcon, ChevronDownIcon, FileIcon, GlobeIcon, LoaderIcon, RotateCwIcon, WrenchIcon, XIcon } from "lucide-react"
 

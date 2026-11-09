@@ -1,8 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { Select as SelectPrimitive } from "radix-ui"
+import { GlassPortal } from "@/lib/glass-portal"
+import { GlassMorphContext, useGlassMorphRef, useGlassPresentation } from "@/lib/glass-transitions"
 import { CheckIcon, ChevronDownIcon, ChevronsUpDownIcon, ChevronUpIcon } from "lucide-react"
 
 /**
@@ -11,8 +13,9 @@ import { CheckIcon, ChevronDownIcon, ChevronsUpDownIcon, ChevronUpIcon } from "l
  * check. `variant="pill"` on the trigger is Apple's pop-up button: a capsule showing the current
  * choice with up-down chevrons — for a short set of mutually exclusive options, no submenus.
  */
-function Select({ ...props }: React.ComponentProps<typeof SelectPrimitive.Root>) {
-  return <SelectPrimitive.Root data-slot="select" {...props} />
+function Select({ open, defaultOpen, onOpenChange, ...props }: React.ComponentProps<typeof SelectPrimitive.Root>) {
+  const presentation = useGlassPresentation({ open, defaultOpen, onOpenChange })
+  return <GlassMorphContext.Provider value={presentation}><SelectPrimitive.Root data-slot="select" open={presentation.open} onOpenChange={presentation.setOpen} {...props} /></GlassMorphContext.Provider>
 }
 
 function SelectGroup({ ...props }: React.ComponentProps<typeof SelectPrimitive.Group>) {
@@ -28,10 +31,13 @@ function SelectTrigger({
   size = "default",
   variant = "default",
   children,
+  ref,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & { size?: "sm" | "default" | "lg"; variant?: "default" | "pill" }) {
+  const source = useGlassMorphRef<HTMLButtonElement>("trigger", ref)
   return (
     <SelectPrimitive.Trigger
+      ref={source}
       data-slot="select-trigger"
       data-size={size}
       data-variant={variant}
@@ -55,13 +61,17 @@ function SelectTrigger({
 
 /** The dropdown menu's liquid panel, morphing out of the select trigger. Rows inside are fills. */
 const selectSurface =
-  "glass-liquid relative z-50 min-w-(--radix-select-trigger-width) overflow-x-hidden overflow-y-auto overscroll-contain rounded-surface-sm text-popover-foreground glass-materialize glass-morph-origin [--glass-morph-w:var(--radix-select-trigger-width)] [--glass-morph-h:var(--radix-select-trigger-height)] [--glass-morph-origin:var(--radix-select-content-transform-origin)] max-h-(--radix-select-content-available-height)"
+  "glass-liquid relative z-50 min-w-(--radix-select-trigger-width) overflow-x-hidden overflow-y-auto overscroll-contain rounded-surface-sm text-popover-foreground glass-materialize data-morphing:animate-none! data-morphing:[clip-path:none] data-morphing:transition-none glass-morph-origin [--glass-morph-w:var(--radix-select-trigger-width)] [--glass-morph-h:var(--radix-select-trigger-height)] [--glass-morph-origin:var(--radix-select-content-transform-origin)] max-h-(--radix-select-content-available-height)"
 
-function SelectContent({ className, children, position = "popper", align = "start", ...props }: React.ComponentProps<typeof SelectPrimitive.Content>) {
+function SelectContent({ className, ref, children, position = "popper", align = "start", ...props }: React.ComponentProps<typeof SelectPrimitive.Content>) {
+  const morph = React.useContext(GlassMorphContext)
+  const target = useGlassMorphRef<HTMLDivElement>("content", ref)
   return (
-    <SelectPrimitive.Portal>
+    <GlassPortal>{(container) => <SelectPrimitive.Portal container={container}>
       <SelectPrimitive.Content
+        ref={target}
         data-slot="select-content"
+        data-morphing={morph?.morphing || undefined}
         data-glass-motion=""
         className={cn(selectSurface, position === "popper" && "data-[side=bottom]:translate-y-1.5 data-[side=top]:-translate-y-1.5", className)}
         position={position}
@@ -72,7 +82,7 @@ function SelectContent({ className, children, position = "popper", align = "star
         <SelectPrimitive.Viewport className={cn("p-1.5", position === "popper" && "h-(--radix-select-trigger-height) w-full min-w-(--radix-select-trigger-width) scroll-my-1.5")}>{children}</SelectPrimitive.Viewport>
         <SelectScrollDownButton />
       </SelectPrimitive.Content>
-    </SelectPrimitive.Portal>
+    </SelectPrimitive.Portal>}</GlassPortal>
   )
 }
 

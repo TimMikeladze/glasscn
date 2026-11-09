@@ -9,7 +9,7 @@ import { HIT_MIN, announce, hitSlop, useReducedMotion } from "@/components/glass
 import { Button } from "@/components/glass/native/button"
 import { Glass, canFade } from "@/components/glass/native/glass"
 import { Press } from "@/components/glass/native/press"
-import { GText, alpha, useUI, web, type UI } from "@/components/glass/native/ui"
+import { GIcon, GText, alpha, useUI, web, type UI } from "@/components/glass/native/ui"
 
 /**
  * A conversation in parts. It renders whatever you pass — local state, a socket,
@@ -170,7 +170,7 @@ function ChatThread({ style, children, layout = "bubble", inset = 0, onLoadOlder
             hitSlop={hitSlop(ui.control.default)}
             style={{ height: ui.control.default, minWidth: ui.control.default, paddingHorizontal: 10, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 }}
           >
-            <ArrowDownIcon size={16} color={ui.foreground} />
+            <GIcon><ArrowDownIcon size={16} color={ui.foreground} /></GIcon>
             {unread ? (
               <GText size="sm" weight="500" style={{ fontVariant: ["tabular-nums"] }}>
                 {unread > 99 ? "99+" : String(unread)}

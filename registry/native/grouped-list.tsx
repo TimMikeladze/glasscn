@@ -116,7 +116,7 @@ export function GroupedListTitle({ style, children, ...props }: ViewProps) {
       {React.Children.map(children, (c) =>
         typeof c === "string" || typeof c === "number" ? (
           // iOS body: 17pt
-          <GText style={{ fontSize: 17, lineHeight: 22 }} maxFontSizeMultiplier={MAX_FONT_SCALE.body} color={destructive ? ui.destructive : ui.foreground} numberOfLines={1}>
+          <GText style={{ fontSize: 17, lineHeight: 22 }} maxFontSizeMultiplier={MAX_FONT_SCALE.body} color={destructive ? ui.destructive : ui.foreground}>
             {c}
           </GText>
         ) : (

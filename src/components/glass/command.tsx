@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Command as CommandPrimitive } from "cmdk"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { SearchIcon } from "lucide-react"
 
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/glass/dialog"
@@ -73,9 +73,10 @@ function CommandEmpty({ className, ...props }: React.ComponentProps<typeof Comma
   return <CommandPrimitive.Empty data-slot="command-empty" className={cn("py-6 text-center text-sm text-muted-foreground", className)} {...props} />
 }
 
-function CommandGroup({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.Group>) {
+function CommandGroup({ className, ref, ...props }: React.ComponentProps<typeof CommandPrimitive.Group>) {
   return (
     <CommandPrimitive.Group
+      ref={withListScroll(ref, (node) => node.querySelector<HTMLElement>("[cmdk-group-heading]"))}
       data-slot="command-group"
       className={cn(
         "overflow-hidden text-foreground **:[[cmdk-group-heading]]:px-2.5 **:[[cmdk-group-heading]]:pt-2 **:[[cmdk-group-heading]]:pb-1 **:[[cmdk-group-heading]]:text-xs **:[[cmdk-group-heading]]:font-semibold **:[[cmdk-group-heading]]:tracking-wide **:[[cmdk-group-heading]]:text-muted-foreground **:[[cmdk-group-heading]]:uppercase",
@@ -90,10 +91,33 @@ function CommandSeparator({ className, ...props }: React.ComponentProps<typeof C
   return <CommandPrimitive.Separator data-slot="command-separator" className={cn("-mx-1.5 my-1.5 h-px bg-separator", className)} {...props} />
 }
 
+// cmdk calls Element.scrollIntoView on the selected row at mount and on every arrow key.
+// The native call also scrolls the page, so a Command embedded low on a long page jumped
+// the window to it on load. Rows and group headings scroll only their own list.
+function scrollWithinList(this: HTMLElement) {
+  const list = this.closest<HTMLElement>("[cmdk-list]")
+  if (!list) return
+  const pad = parseFloat(getComputedStyle(list).scrollPaddingTop) || 0
+  const row = this.getBoundingClientRect()
+  const box = list.getBoundingClientRect()
+  if (row.top < box.top + pad) list.scrollTop -= box.top + pad - row.top
+  else if (row.bottom > box.bottom - pad) list.scrollTop += row.bottom - (box.bottom - pad)
+}
+
+function withListScroll(ref: React.Ref<HTMLDivElement> | undefined, target: (node: HTMLDivElement) => HTMLElement | null) {
+  return (node: HTMLDivElement | null) => {
+    const el = node && target(node)
+    if (el) el.scrollIntoView = scrollWithinList
+    if (typeof ref === "function") return ref(node)
+    if (ref) ref.current = node
+  }
+}
+
 /** A row: a fill follows the pointer and arrow keys (as the dropdown menu's rows). 44pt on touch. */
-function CommandItem({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.Item>) {
+function CommandItem({ className, ref, ...props }: React.ComponentProps<typeof CommandPrimitive.Item>) {
   return (
     <CommandPrimitive.Item
+      ref={withListScroll(ref, (node) => node)}
       data-slot="command-item"
       className={cn(
         "relative flex cursor-default items-center gap-2.5 rounded-control-sm px-2.5 py-2 text-sm outline-hidden select-none pointer-coarse:py-3 data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[selected=true]:bg-fill-strong [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground",

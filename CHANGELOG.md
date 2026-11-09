@@ -2,6 +2,44 @@
 
 Registry items are copied into your app, so re-run `npx shadcn add @glasscn-app/<item>` to pick up a change. IDs refer to [`docs/roadmap.md`](docs/roadmap.md).
 
+## Unreleased — Apple Liquid Glass 27 rebuild (2026-11-08)
+
+### Breaking
+
+- System palette values follow iOS/macOS 27 (`#0088FF` systemBlue, `#FF383C` systemRed and the rest of the HIG table) on native iOS; the web uses Apple's web blue `#0071E3` so white labels pass AA. Filled and prominent button labels are semibold. Labels use achromatic `oklch(… none)` so accent ink mixes keep the accent's hue. The web clarity slider's clear end keeps half the frost. Prose blockquotes, Markdown alerts and the native Blockquote drop their accent rail.
+- Apple's system appearance is the default everywhere: the new `system` palette (systemBlue accent, `#F2F2F7`/black grounds, system colours as chart series, no aurora), the System type preset (San Francisco) and neutral frost, labels, fills and shadows. Dusk is now one palette among thirteen; the docs site, showcase, Studio and native sandbox all start in System and follow the OS light/dark setting.
+- Native Liquid Glass starts untinted with automatic system appearance. Explicit tint/scheme overrides remain available; `visible` hides the whole surface, while `materialized` controls its effect lifecycle. `GText`/`GIcon` use dynamic semantic foregrounds inside system glass.
+- Clear glass no longer dims its own backdrop. Place a separate dim behind controls over bright media; omit it for dark media or an already-dimmed player. `Card` accepts content materials, not Liquid Glass variants (LG-01).
+- Mac/iPad-style sidebars now meet container edges and use accent-colored symbols. Automatic scroll edges have a continuous diffuse treatment, including the uniform scrolled toolbar top (NAV-02/04).
+- Components import the shipped, configured `glass-cn` helper so themed radius and spacing overrides merge correctly in both this site and shadcn-installed apps.
+- The showcase scenes follow Apple's layouts on both tracks ([independent review](docs/research/independent-ui-ux-review.md)): Photos (Share | Favorite·Info | Delete, photo undimmed outside the control bands), Music (tabs leading, Search trailing, minimized tab → accessory → search), Mail (split view, back chevrons, compose in the bottom toolbar), Notes (symbol bar items, tinted Done, plain document, Aa format sheet), Maps (search in the bottom card on iPhone, leading column on iPad), Safari (Back, domain-only capsule, More; a small pill when collapsed), Search (one field and scope bar, recents list). Labels, test IDs and some accessible names changed.
+- Liquid Glass surfaces lose the uniform white hairline; their edge is the two-sided specular/edge-shade rim. Increase Contrast, Show control borders and forced colours still draw a solid border.
+- `ToolbarCommands` shows a command's icon or its label, not both. Filled and prominent buttons drop the coloured glow on both tracks.
+- Native iOS text sizes are Apple's text-style defaults (Body 17, Subheadline 15, Large Title 34…) instead of the web's 1.25 scale. Native `ScrollEdge` variants are gradients that fade out at their inner end.
+- Overlay transition helpers now ship as `glass-transitions`; `glass-morph` names the new identified sibling component. Native system Button actions use explicit eventless `onAction`; RN `onPress` keeps its event through the custom path. Native `LiquidGlass` no longer accepts ineffective browser-only `optics`/`followLight` props.
+
+### Added
+
+- `GlassEffects`, `LiquidGlass` and `GlassCluster`: bounded Chromium edge refraction, pointer illumination and sibling split/merge, with complete CSS materials in Safari/Firefox. Native uses the actual OS glass renderer and sibling effect container (LG-14/16).
+- Installable `liquid-glass-01` / `native-liquid-glass-01` with Photos, Music, Maps, Safari, Mail and expandable controls; the source-linked `/showcase` includes material and merging labs. [Research and audits](docs/research/apple-liquid-glass-2026-11.md) distinguish Apple requirements from glasscn tuning.
+- Separate clear-blur, refraction and bezel primitives; Reduce bright effects preference; direct-surface transparency/contrast overrides that remain effective inside scoped themes.
+- `liquid-glass-02` / `native-liquid-glass-02`: Landmarks, Notes, Search and Materials extend the showcase to ten scenes. Both tracks gain `GlassMorph`, image-only `BackgroundExtension`, prioritized/pinned `ToolbarCommands`, removable SearchField tokens and four named standard material tiers. The [55-case parity matrix](docs/research/apple-liquid-glass-parity-matrix.md) separates system delegation, custom compositions, browser approximations and unavailable APIs.
+- Locally derived regular-glass depth, inactive-window web treatment and Show control borders. New theme primitives bring the engine to 108 tokens.
+
+### Fixed
+
+- `/themes` opened 7,500–14,000 px down the page: cmdk scrolled its selected row into view with the window. Command rows now scroll only their list.
+- Hydration mismatch on `/`: `GlassEffects` waits for React to hydrate a node before enhancing it.
+- Showcase sheets presented over the docs page; `SheetContent container` presents them inside their scene.
+- Native system menu triggers had no VoiceOver name; native `GlassEffectGroup` ignored a forced scheme; the minimized native Dock put the accessory first.
+- Site header trailing controls use one size, glyph size and tone.
+- Scoped portal theme inheritance; real source-position transitions and interrupted transition cleanup; hidden sidebar focus; adaptive shadows; scroll minimization and full-height sheet anchoring (LG-06/11, NAV-02, SHT-01/02).
+- Native system sheet detent routing, menu callback paths, effect visibility, fading ancestors, semantic vibrancy and Dynamic Type. Custom gestures stay on the UI thread and recover when a controlled parent rejects repeated changes; minimized/search Dock layouts stay bounded.
+- Next and its ESLint configuration are patched to 16.4.5 so fresh consumer builds pass the framework's security check.
+- Clear-label contrast at opaque clarity, live scoped style-text optics, child-only/paused geometry tracking, centered/scaled identity motion, exit glass bounds and live Reduce Motion cleanup. Native sheets now use supported iOS detents/nonmodal interaction, preserve repeated controlled rejections and keep real Button anchors functional; semantic GText ramps prevent clipping at the largest accessibility sizes.
+- Landing/Studio width from 320–1440 px: the header switches to a complete compact menu before desktop links overflow, and Studio's preview column can shrink.
+- ActionSheet allows passive outside/Escape dismissal on web. Supported plain uncontrolled iOS choices use an actual source-attached system confirmation dialog; explicit eventful/custom choices and Cancel callbacks retain the custom presentation without duplicate close notifications.
+
 ## Unreleased — M4 native rebuild (2026-10-11)
 
 ### Breaking (native)

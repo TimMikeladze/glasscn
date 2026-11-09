@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 /**
  * An activity indicator. `variant="ring"` (default) is an arc; `variant="ticks"` is iOS's radial

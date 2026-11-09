@@ -13,6 +13,7 @@ module.exports = {
   moduleNameMapper: {
     "^@/components/glass/native/(.*)$": `${native}/$1`,
     "^@/(.*)$": "<rootDir>/src/$1",
+    "^@expo/ui/swift-ui/modifiers$": "<rootDir>/jest.expo-ui-modifiers.js",
     "^@expo/ui(/.*)?$": "<rootDir>/jest.expo-ui.js",
   },
   // registry/native resolves its imports from this app's node_modules

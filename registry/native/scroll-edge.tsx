@@ -1,8 +1,10 @@
 import * as React from "react"
-import { View, type NativeScrollEvent, type NativeSyntheticEvent, type ViewProps } from "react-native"
+import { type NativeScrollEvent, type NativeSyntheticEvent, type ViewProps } from "react-native"
+import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg"
 import Animated, { runOnJS, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated"
 
-import { alpha, useUI } from "@/components/glass/native/ui"
+import { useReducedMotion } from "@/components/glass/native/a11y"
+import { useUI } from "@/components/glass/native/ui"
 
 /** The next minimized state from one scroll step (same rule as the web). */
 export function nextMinimized(prev: boolean, from: number, to: number, { threshold = 8, offset = 48 } = {}) {
@@ -90,40 +92,58 @@ export function useScrollEdge() {
   return React.useContext(ScrollEdgeContext)
 }
 
+// Opacity stops from the bar's edge (0) inward (1). Every variant fades to nothing at its inner
+// end, so no edge cuts through a line of text. `automatic` holds near-uniform under a top bar
+// (the 27 toolbar region) and fades sooner behind a floating bottom bar; `hard` keeps a firm
+// strip with only a short feather.
+const STOPS = {
+  automatic: { top: [[0, 0.9], [0.6, 0.82], [1, 0]], bottom: [[0, 0.82], [0.45, 0.5], [1, 0]] },
+  soft: { top: [[0, 0.6], [1, 0]], bottom: [[0, 0.6], [1, 0]] },
+  hard: { top: [[0, 1], [0.85, 1], [1, 0]], bottom: [[0, 1], [0.85, 1], [1, 0]] },
+} as const
+
 /**
- * The band that keeps a bar legible over content: `soft` fades out in steps (a
- * progressive veil), `hard` is a near-opaque strip. Absolutely positioned at the
- * edge of its parent; show it with `visible` (e.g. `overTop` from useScrollEdges)
- * or drive it from a scroll value with `progress` (0 → 1). Never a parent of glass,
- * so fading it is safe.
+ * A diffuse region behind bars, so content scrolling under them stays out of the way of their
+ * labels. `automatic` approximates the 27 treatment: near-uniform under a top bar, a shorter fade
+ * behind a floating bottom bar. `soft` is a plain fade; `hard` a firm strip. System navigation
+ * draws its own effect; this is the React Native approximation.
+ * Absolutely positioned at the edge of its parent; show it with `visible` (e.g. `overTop` from
+ * useScrollEdges) or drive it from a scroll value with `progress` (0 → 1). Never a parent of
+ * glass, so fading it is safe.
  */
 export function ScrollEdge({
   edge = "top",
-  variant = "soft",
+  variant = "automatic",
   visible = true,
   progress,
   size = 80,
   style,
   ...props
-}: ViewProps & { edge?: "top" | "bottom"; variant?: "soft" | "hard"; visible?: boolean; progress?: SharedValue<number>; size?: number }) {
+}: ViewProps & { edge?: "top" | "bottom"; variant?: "automatic" | "soft" | "hard"; visible?: boolean; progress?: SharedValue<number>; size?: number }) {
   const ui = useUI()
-  const base = ui.scheme === "dark" ? "#000000" : "#FFFFFF"
-  const steps = variant === "hard" ? [0.88] : [0.55, 0.4, 0.26, 0.14, 0.05]
+  const reduced = useReducedMotion() || ui.motion.duration === 0
+  const id = React.useId().replace(/:/g, "")
   const shown = useSharedValue(visible ? 1 : 0)
   React.useEffect(() => {
-    shown.set(withTiming(visible ? 1 : 0, { duration: ui.motion.duration }))
-  }, [visible, shown, ui.motion.duration])
+    shown.set(reduced ? (visible ? 1 : 0) : withTiming(visible ? 1 : 0, { duration: ui.motion.duration }))
+  }, [visible, shown, ui.motion.duration, reduced])
   const fade = useAnimatedStyle(() => ({ opacity: progress ? Math.min(1, Math.max(0, progress.value)) : shown.value }))
+  const stops = STOPS[variant][edge]
   return (
     <Animated.View
       pointerEvents="none"
       aria-hidden
-      style={[{ position: "absolute", left: 0, right: 0, [edge]: 0, height: size, flexDirection: edge === "top" ? "column" : "column-reverse" }, fade, style]}
+      style={[{ position: "absolute", left: 0, right: 0, [edge]: 0, height: size }, fade, style]}
       {...props}
     >
-      {steps.map((a, i) => (
-        <View key={i} style={{ flex: 1, backgroundColor: alpha(base, a) }} />
-      ))}
+      <Svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0,0,100,100">
+        <Defs>
+          <LinearGradient id={`edge-${id}`} x1="0" y1={edge === "top" ? "0" : "1"} x2="0" y2={edge === "top" ? "1" : "0"}>
+            {stops.map(([offset, opacity]) => <Stop key={offset} offset={offset} stopColor={ui.glassSolid} stopOpacity={opacity} />)}
+          </LinearGradient>
+        </Defs>
+        <Rect x="0" y="0" width="100" height="100" fill={`url(#edge-${id})`} />
+      </Svg>
     </Animated.View>
   )
 }

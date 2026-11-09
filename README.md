@@ -1,9 +1,9 @@
 # glasscn
 
-A shadcn-compatible registry of glass components: frosted surfaces over an animated aurora, iOS-style controls and data pieces. You install them as source with the shadcn CLI and theme them with CSS variables. Every component and block also has a React Native version.
+A shadcn registry with Liquid Glass control surfaces, standard content materials and web/native components. You install them as source with the shadcn CLI and theme them with CSS variables. Every component and block also has a React Native version.
 
 ```bash
-pnpm dlx shadcn@latest add https://glasscn.app/r/glass-style.json https://glasscn.app/r/theme-dusk.json
+pnpm dlx shadcn@latest add https://glasscn.app/r/glass-style.json https://glasscn.app/r/glass-effects.json https://glasscn.app/r/theme-system.json
 pnpm dlx shadcn@latest add https://glasscn.app/r/card.json https://glasscn.app/r/button.json
 ```
 
@@ -17,28 +17,34 @@ Or set the namespace once in `components.json` and add items by name:
 pnpm dlx shadcn@latest add @glasscn-app/dock
 ```
 
+## Run the glass examples
+
+[The showcase](https://glasscn.app/showcase) has ten scenes: Photos, Music, Maps, Safari, Mail, Controls, Landmarks, Notes, Search and Materials, plus optical and split/merge experiments. Install `@glasscn-app/liquid-glass-01` for the first six or `@glasscn-app/liquid-glass-02` for the four advanced scenes; native items use the `native-` prefix. The `scene` prop selects the example. The [official-example matrix](docs/research/apple-liquid-glass-parity-matrix.md) maps 55 baseline behaviors plus four provisional/platform cases to implementations and evidence.
+
+Render `<GlassEffects />` once near the web app root to enhance floating controls and portals. `<LiquidGlass>` installs the shared runtime itself. Native uses Apple’s system effect untinted by default. Chromium adds edge refraction; Safari and Firefox keep the complete CSS material. The [Apple source study](docs/research/apple-liquid-glass-2026-11.md) lists what Apple doesn't publish.
+
 ## What's in it
 
 | | Items |
 |---|---|
-| Foundation | `glass-style` (101 primitives, `glass` / `glass-strong` / `glass-subtle` and the liquid-layer utilities, theme tokens, keyframes, fallbacks, `glassVariants`); `glass-theme` (the theme engine); `glass-charts`; `use-sliding-indicator`; `use-glass-pointer` |
-| Palettes (12) | `theme-dusk` `-ocean` `-rose` `-sage` `-amber` `-graphite` `-lavender` `-mint` `-cherry` `-lagoon` `-sand` `-midnight` |
+| Foundation | `glass-style` (108 primitives, `glass` / `glass-strong` / `glass-subtle` and the liquid-layer utilities, theme tokens, keyframes, fallbacks, `glassVariants`); `glass-theme` (the theme engine); `glass-charts`; `use-sliding-indicator`; `use-glass-pointer` |
+| Palettes (13) | `theme-system` (default) `theme-dusk` `-ocean` `-rose` `-sage` `-amber` `-graphite` `-lavender` `-mint` `-cherry` `-lagoon` `-sand` `-midnight` |
 | Materials (7) | `material-frosted` `-vivid` `-crystal` `-smoked` `-matte` `-vapor` `-neon` |
 | Shape · Motion · Density | `shape-round` `-soft` `-sharp` `-square` · `motion-spring` `-smooth` `-snappy` `-still` · `density-compact` `-default` `-comfortable` |
-| Surfaces | `aurora` `glass` `card` `theme-scope` |
-| Controls | `button` `badge` `input` `textarea` `label` `checkbox` `switch` `segmented-control` `tabs` `slider` `progress` `kbd` `separator` `avatar` `glass-preferences` |
+| Surfaces | `aurora` `glass` `liquid-glass` `card` `theme-scope` `background-extension` |
+| Controls | `button` `badge` `input` `textarea` `label` `checkbox` `switch` `segmented-control` `tabs` `slider` `progress` `kbd` `separator` `avatar` `glass-preferences` `glass-group` `glass-cluster` `glass-morph` |
 | Overlays | `dialog` `sheet` `popover` `tooltip` `dropdown-menu` `toaster` |
 | Navigation | `dock` `grouped-list` |
 | Data | `activity-rings` `progress-ring` `sparkline` `stat` `heatmap` `bar-list` `gauge` `tracker` `category-bar` |
 | Charts | `chart` `area-chart` `bar-chart` `line-chart` `donut-chart` (TanStack Charts) |
 | Tables | `table` `data-table` (TanStack Table v9) |
 | Chat | `chat` |
-| Blocks | `dashboard-01` `analytics-01` `settings-01` `auth-01` `chat-01` |
+| Blocks | `liquid-glass-01` `liquid-glass-02` `dashboard-01` `analytics-01` `settings-01` `auth-01` `chat-01` |
 | React Native | `native-tokens` `native-glass` `native-aurora` `native-press` `native-ui`, plus a `native-<name>` twin of every component and block (iOS, Android and web through react-native-web) |
 
 Components that shadcn also has (Button, Card, Dialog, Tabs and so on) keep shadcn's props and parts, so switching is an import change from `@/components/ui/x` to `@/components/glass/x`. Files land in `components/glass/`, next to shadcn's, and never overwrite them.
 
-The theme is 101 primitives in eleven groups: colour, material (frost, blur, saturation, brightness, sheen, grain), rim, depth (shadow, inner glow), shape, density, motion, aurora, fonts and type. Presets compose. You can override any primitive on any element (`[--glass-blur:8px]`), and `ThemeScope` re-themes a subtree at runtime.
+The theme is 108 primitives in eleven groups: colour, material (frost, blur, saturation, brightness, sheen, grain), liquid optics, rim, depth (shadow, inner glow), shape, density, motion, aurora, fonts and type. Presets compose. You can override any primitive on any element (`[--glass-blur:8px]`), and `ThemeScope` re-themes a subtree at runtime.
 
 The Theme Studio at `/themes` has a control for every primitive, a hue-harmony palette generator, randomise, a scoped live preview with its own scheme and a legibility estimate. It exports a one-line `npx shadcn add` command, CSS, a shadcn theme item, TypeScript or a share link, and can apply the theme to the whole site.
 

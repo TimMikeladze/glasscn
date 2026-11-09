@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { Slot } from "radix-ui"
 
 import { slidingIndicatorClass, useSlidingIndicator } from "@/hooks/use-sliding-indicator"
@@ -9,10 +9,9 @@ import { slidingIndicatorClass, useSlidingIndicator } from "@/hooks/use-sliding-
 const SELECTED = '[data-slot="glass-group-item"]:is([data-state="on"], [aria-pressed="true"], [aria-current="page"], [aria-selected="true"])'
 
 /**
- * Apple's GlassEffectContainer for the web: neighbouring controls share ONE liquid backdrop
- * instead of each being its own glass (glass can't sample glass). Items inside are transparent;
- * an optional `indicator` slides a fill to the selected item, morphing to its size and corners.
- * Toolbar groups, button groups and segmented strips are built on it.
+ * A shared liquid capsule for neighboring toolbar controls. Items are transparent;
+ * an optional `indicator` slides a fill to the selected item's size and corners.
+ * Use GlassCluster for separate sibling shapes that merge and split.
  */
 function GlassGroup({
   className,

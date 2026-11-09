@@ -7,7 +7,7 @@ import { Glass } from "@/components/glass/native/glass"
 import { ChatBubble } from "@/components/glass/native/chat"
 import { ChatMarkdown } from "@/components/glass/native/chat-markdown"
 import { Press } from "@/components/glass/native/press"
-import { GText, alpha, useUI, web } from "@/components/glass/native/ui"
+import { GIcon, GText, alpha, useUI, web } from "@/components/glass/native/ui"
 
 /**
  * The pieces of an AI reply for React Native, shaped after AI SDK's `UIMessage.parts`,
@@ -37,7 +37,7 @@ function Disclosure({ icon, label, open, onToggle }: { icon: React.ReactNode; la
       <GText size="sm" tone="muted">
         {label}
       </GText>
-      <ChevronDownIcon size={16} color={ui.mutedForeground} style={{ transform: [{ rotate: open ? "180deg" : "0deg" }] }} />
+      <GIcon><ChevronDownIcon size={16} color={ui.mutedForeground} style={{ transform: [{ rotate: open ? "180deg" : "0deg" }] }} /></GIcon>
     </Press>
   )
 }
@@ -53,7 +53,7 @@ function ChatReasoning({ children, streaming = false, duration, defaultOpen, sty
   return (
     <View style={[{ width: "100%" }, style]} {...props}>
       <Disclosure
-        icon={<BrainIcon size={16} color={ui.mutedForeground} />}
+        icon={<GIcon><BrainIcon size={16} color={ui.mutedForeground} /></GIcon>}
         label={label}
         open={open}
         onToggle={() => {
@@ -101,7 +101,7 @@ function ChatTool({ name, state, input, output, errorText, onApprove, onDeny, de
   return (
     <View style={[{ width: "100%", borderRadius: ui.radius.control, borderWidth: 1, borderColor: ui.glassBorder, backgroundColor: ui.fill, overflow: "hidden" }, style]} {...props}>
       <Press accessibilityRole="button" aria-expanded={open} onPress={() => setOpen(!open)} style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 12, paddingVertical: 8 }}>
-        <WrenchIcon size={16} color={ui.mutedForeground} />
+        <GIcon><WrenchIcon size={16} color={ui.mutedForeground} /></GIcon>
         <GText size="sm" font="mono" numberOfLines={1} style={{ flex: 1 }}>
           {name}
         </GText>
@@ -173,7 +173,7 @@ function ChatSources({ sources, defaultOpen = false, style, ...props }: ViewProp
   if (!sources.length) return null
   return (
     <View style={[{ width: "100%", gap: 6 }, style]} {...props}>
-      <Disclosure icon={<GlobeIcon size={16} color={ui.mutedForeground} />} label={sources.length === 1 ? "1 source" : `${sources.length} sources`} open={open} onToggle={() => setOpen(!open)} />
+      <Disclosure icon={<GIcon><GlobeIcon size={16} color={ui.mutedForeground} /></GIcon>} label={sources.length === 1 ? "1 source" : `${sources.length} sources`} open={open} onToggle={() => setOpen(!open)} />
       {open ? (
         <View role="list" style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
           {sources.map((s, i) => (
@@ -197,7 +197,7 @@ function ChatFile({ url, mediaType, filename, style, ...props }: ViewProps & { u
     )
   return (
     <Press accessibilityRole="link" onPress={() => void Linking.openURL(url)} style={[{ flexDirection: "row", alignItems: "center", gap: 8, borderRadius: ui.radius.control, backgroundColor: ui.fill, paddingHorizontal: 12, paddingVertical: 8, alignSelf: "flex-start" }, style]}>
-      <FileIcon size={16} color={ui.mutedForeground} />
+      <GIcon><FileIcon size={16} color={ui.mutedForeground} /></GIcon>
       <GText size="sm" numberOfLines={1}>
         {filename ?? mediaType}
       </GText>
@@ -209,7 +209,7 @@ function ChatAttachment({ name, previewUrl, onRemove, uploading = false, style, 
   const ui = useUI()
   return (
     <View aria-busy={uploading || undefined} style={[{ flexDirection: "row", alignItems: "center", gap: 6, height: ui.control.sm, maxWidth: 192, borderRadius: ui.radius.control - 4, backgroundColor: ui.fillStrong, paddingLeft: 4, paddingRight: 2 }, style]} {...props}>
-      {previewUrl ? <Image source={{ uri: previewUrl }} alt="" style={{ width: 24, height: 24, borderRadius: 6 }} /> : <FileIcon size={14} color={ui.mutedForeground} style={{ marginLeft: 4 }} />}
+      {previewUrl ? <Image source={{ uri: previewUrl }} alt="" style={{ width: 24, height: 24, borderRadius: 6 }} /> : <GIcon><FileIcon size={14} color={ui.mutedForeground} style={{ marginLeft: 4 }} /></GIcon>}
       <GText size="xs" numberOfLines={1} style={{ flexShrink: 1 }}>
         {name}
       </GText>

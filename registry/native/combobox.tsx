@@ -5,7 +5,7 @@ import { CheckIcon, ChevronsUpDownIcon, XIcon } from "lucide-react-native"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/glass/native/command"
 import { Floating, useAnchorRect } from "@/components/glass/native/popover"
 import { Press, haptics } from "@/components/glass/native/press"
-import { GText, alpha, useUI, web } from "@/components/glass/native/ui"
+import { GIcon, GText, alpha, useUI, web } from "@/components/glass/native/ui"
 
 /**
  * A searchable select: a fill field that opens a glass panel with a search capsule.
@@ -84,7 +84,7 @@ function Combobox(props: ComboboxProps) {
               {selected.length ? labelOf(selected[0]) : placeholder}
             </GText>
           )}
-          <ChevronsUpDownIcon size={16} color={ui.mutedForeground} style={{ marginLeft: "auto" }} />
+          <GIcon><ChevronsUpDownIcon size={16} color={ui.mutedForeground} style={{ marginLeft: "auto" }} /></GIcon>
         </Press>
       </View>
       <Floating open={open} anchor={rect} onClose={() => setOpen(false)} align="start" sideOffset={6} style={{ width: Math.max(224, rect?.width ?? 0), overflow: "hidden" }}>

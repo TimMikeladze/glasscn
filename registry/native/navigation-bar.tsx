@@ -2,9 +2,10 @@ import * as React from "react"
 import { View, type ViewProps } from "react-native"
 import Animated, { useAnimatedStyle, useDerivedValue, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated"
 
+import { useReducedMotion } from "@/components/glass/native/a11y"
 import { useInsets } from "@/components/glass/native/dialog"
 import { ScrollEdge, useScrollEdge } from "@/components/glass/native/scroll-edge"
-import { GText } from "@/components/glass/native/ui"
+import { GText, useUI } from "@/components/glass/native/ui"
 
 /** How far the large title scrolls before the inline title has fully taken over. */
 const HANDOFF = [28, 52] as const
@@ -44,14 +45,16 @@ function NavigationBar({
   trailing?: React.ReactNode
 }) {
   const insets = useInsets()
+  const ui = useUI()
+  const reduced = useReducedMotion() || ui.motion.duration === 0
   const edges = useScrollEdge()
   const fallback = useSharedValue(0)
   const scrollY = scrollProp ?? edges?.scrollY ?? fallback
   const inline = titleDisplayMode === "inline"
   const manual = useSharedValue(collapsed ? 1 : 0)
   React.useEffect(() => {
-    manual.set(withTiming(collapsed ? 1 : 0, { duration: 200 }))
-  }, [collapsed, manual])
+    manual.set(reduced ? (collapsed ? 1 : 0) : withTiming(collapsed ? 1 : 0, { duration: ui.motion.duration }))
+  }, [collapsed, manual, reduced, ui.motion.duration])
   const hasManual = collapsed !== undefined
   const progress = useDerivedValue(() => {
     if (inline) return 1
@@ -68,7 +71,7 @@ function NavigationBar({
   return (
     <View role="banner" style={[{ position: "absolute", top: 0, left: 0, right: 0, paddingTop: insets.top, zIndex: 30 }, style]} {...props}>
       <ScrollEdge edge="top" progress={progress} size={insets.top + 72} />
-      <View style={{ height: 56, flexDirection: "row", alignItems: "center", paddingHorizontal: 12, gap: 8 }}>
+      <View style={{ minHeight: 56, flexDirection: "row", alignItems: "center", paddingVertical: 8, paddingHorizontal: 12, gap: 8 }}>
         <View style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 8 }}>
           {leading}
           {lead}

@@ -67,7 +67,7 @@ import {
 } from "@/components/glass/native/dropdown-menu"
 import { Input } from "@/components/glass/native/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/glass/native/table"
-import { GText, useUI } from "@/components/glass/native/ui"
+import { GIcon, GText, useUI } from "@/components/glass/native/ui"
 
 /**
  * The web data-table recipe as one component, on TanStack Table v9 and the glass `table`:
@@ -301,7 +301,7 @@ function DataTableFacetedFilter<TData extends RowData, TValue extends CellData>(
               accessibilityLabel={selected.size ? `${title}, ${selected.size} selected` : title}
               style={{ flexDirection: "row", alignItems: "center", gap: 6, height: ui.control.sm, paddingHorizontal: ui.pad.xs, borderRadius: ui.radius.button, borderWidth: 1, borderStyle: "dashed", borderColor: ui.separator, backgroundColor: ui.fill }}
             >
-              <CirclePlusIcon size={14} color={ui.mutedForeground} />
+              <GIcon><CirclePlusIcon size={14} color={ui.mutedForeground} /></GIcon>
               <GText size="sm" weight="500">
                 {title}
               </GText>
@@ -327,7 +327,7 @@ function DataTableFacetedFilter<TData extends RowData, TValue extends CellData>(
                       set(next)
                     }}
                   >
-                    {Icon ? <Icon size={16} color={ui.mutedForeground} /> : null}
+                    {Icon ? <GIcon><Icon size={16} color={ui.mutedForeground} /></GIcon> : null}
                     <GText size="sm" style={{ flex: 1 }}>
                       {option.label}
                     </GText>
@@ -360,7 +360,7 @@ function DataTableViewOptions<TData extends RowData>({ table }: { table: DataTab
       {() => (
         <DropdownMenu>
           <DropdownMenuTrigger style={{ flexDirection: "row", alignItems: "center", gap: 6, height: ui.control.sm, paddingHorizontal: ui.pad.xs, borderRadius: ui.radius.button, backgroundColor: ui.fill }}>
-            <Settings2Icon size={14} color={ui.foreground} />
+            <GIcon><Settings2Icon size={14} color={ui.foreground} /></GIcon>
             <GText size="sm" weight="500">
               {labels.view}
             </GText>
@@ -389,7 +389,7 @@ function DataTableRowActions({ children, label }: { children: React.ReactNode; l
   return (
     <DropdownMenu>
       <DropdownMenuTrigger accessibilityLabel={label ?? labels.rowActions} style={{ width: ui.control.sm, height: ui.control.sm, alignItems: "center", justifyContent: "center", borderRadius: ui.radius.button }}>
-        <EllipsisIcon size={16} color={ui.mutedForeground} />
+        <GIcon><EllipsisIcon size={16} color={ui.mutedForeground} /></GIcon>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">{children}</DropdownMenuContent>
     </DropdownMenu>
@@ -419,7 +419,7 @@ function DataTableSearch<TData extends RowData>({ table, placeholder }: { table:
   }, [settled, table])
   return (
     <View style={{ width: "100%", maxWidth: 320, justifyContent: "center" }}>
-      <SearchIcon color={ui.mutedForeground} size={16} style={{ position: "absolute", start: 12, zIndex: 1 }} pointerEvents="none" />
+      <GIcon><SearchIcon color={ui.mutedForeground} size={16} style={{ position: "absolute", start: 12, zIndex: 1 }} pointerEvents="none" /></GIcon>
       <Input
         accessibilityLabel={placeholder ?? labels.search}
         placeholder={placeholder ?? labels.search}
@@ -497,7 +497,7 @@ function DataTablePagination<TData extends RowData>({ table, pageSizes = [10, 20
             <GText size="sm" weight="500" style={numeric}>
               {String(pageSize)}
             </GText>
-            <ChevronsUpDownIcon size={14} color={ui.mutedForeground} />
+            <GIcon><ChevronsUpDownIcon size={14} color={ui.mutedForeground} /></GIcon>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuRadioGroup value={String(pageSize)} onValueChange={(v) => table.setPageSize(Number(v))}>

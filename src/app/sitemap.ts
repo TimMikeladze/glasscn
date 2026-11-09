@@ -8,6 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const url = (path: string) => new URL(path, siteUrl).toString()
   return [
     { url: url("/"), changeFrequency: "weekly", priority: 1 },
+    { url: url("/showcase"), changeFrequency: "weekly", priority: 0.9 },
     ...docsNav.flatMap((section) =>
       section.links.map((l) => ({ url: url(l.href), changeFrequency: section.label === "Guides" ? ("weekly" as const) : ("monthly" as const), priority: section.label === "Guides" ? 0.8 : 0.6 }))
     ),

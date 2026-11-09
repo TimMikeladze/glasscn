@@ -1,99 +1,35 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { Dialog as DialogPrimitive } from "radix-ui"
+import { GlassPortal } from "@/lib/glass-portal"
 import { XIcon } from "lucide-react"
-import { flushSync } from "react-dom"
+import { GlassMorphContext, useGlassMorphRef, useGlassPresentation } from "@/lib/glass-transitions"
 
 import { Button } from "@/components/glass/button"
-
-type Morph = { setTrigger: (el: HTMLElement | null) => void; setContent: (el: HTMLElement | null) => void; morphing: boolean }
-const MorphContext = React.createContext<Morph | null>(null)
-const MORPH_NAME = "glass-dialog"
-
-/** A same-document View Transition between the trigger and the panel, where supported and motion is allowed. */
-type TransitionDocument = Document & { startViewTransition?: (cb: () => void) => { finished: Promise<void> } }
-const canMorph = () =>
-  typeof document !== "undefined" && typeof (document as TransitionDocument).startViewTransition === "function" && !matchMedia("(prefers-reduced-motion: reduce)").matches
-
-function viewTransition(update: () => void, from: HTMLElement | null | undefined, to: () => HTMLElement | null | undefined): Promise<void> {
-  const doc = document as TransitionDocument
-  if (!doc.startViewTransition || !from?.isConnected) {
-    update()
-    return Promise.resolve()
-  }
-  from.style.viewTransitionName = MORPH_NAME
-  const t = doc.startViewTransition(() => {
-    from.style.viewTransitionName = ""
-    flushSync(update)
-    const el = to()
-    if (el) el.style.viewTransitionName = MORPH_NAME
-  })
-  // snapshots are flat images: the live element (and its backdrop blur) takes over when it ends
-  return t.finished.catch(() => {}).finally(() => {
-    const el = to()
-    if (el) el.style.viewTransitionName = ""
-  })
-}
 
 /**
  * Opens out of its trigger: the trigger morphs into the panel (and back on close) with a
  * View Transition where the browser has them; elsewhere, and under reduced motion, the panel
  * materialises in place. Controlled or not, as Radix's Dialog.
  */
-function Dialog({ open: openProp, defaultOpen = false, onOpenChange, ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
-  const [inner, setInner] = React.useState(defaultOpen)
-  const [morphing, setMorphing] = React.useState(false)
-  const open = openProp ?? inner
-  const trigger = React.useRef<HTMLElement | null>(null)
-  const content = React.useRef<HTMLElement | null>(null)
-  const morph = React.useMemo<Morph>(
-    () => ({
-      setTrigger: (el) => {
-        trigger.current = el
-      },
-      setContent: (el) => {
-        content.current = el
-      },
-      morphing,
-    }),
-    [morphing]
-  )
-  const setOpen = (next: boolean) => {
-    const apply = () => {
-      if (openProp === undefined) setInner(next)
-      onOpenChange?.(next)
-    }
-    const t = trigger.current
-    if (!t?.isConnected || !canMorph()) return apply()
-    flushSync(() => setMorphing(true))
-    const done = next ? viewTransition(apply, t, () => content.current) : viewTransition(apply, content.current, () => t)
-    done.finally(() => setMorphing(false))
-  }
+function Dialog({ open, defaultOpen = false, onOpenChange, ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
+  const presentation = useGlassPresentation({ open, defaultOpen, onOpenChange })
   return (
-    <MorphContext.Provider value={morph}>
-      <DialogPrimitive.Root data-slot="dialog" open={open} onOpenChange={setOpen} {...props} />
-    </MorphContext.Provider>
+    <GlassMorphContext.Provider value={presentation}>
+      <DialogPrimitive.Root data-slot="dialog" open={presentation.open} onOpenChange={presentation.setOpen} {...props} />
+    </GlassMorphContext.Provider>
   )
 }
 
-function DialogTrigger({ onClick, ...props }: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
-  const morph = React.useContext(MorphContext)
-  return (
-    <DialogPrimitive.Trigger
-      data-slot="dialog-trigger"
-      onClick={(e) => {
-        morph?.setTrigger(e.currentTarget)
-        onClick?.(e)
-      }}
-      {...props}
-    />
-  )
+function DialogTrigger({ ref, ...props }: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
+  const source = useGlassMorphRef<HTMLButtonElement>("trigger", ref)
+  return <DialogPrimitive.Trigger ref={source} data-slot="dialog-trigger" {...props} />
 }
 
-function DialogPortal({ ...props }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
-  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
+function DialogPortal({ container, ...props }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
+  return <GlassPortal container={container}>{(host) => <DialogPrimitive.Portal data-slot="dialog-portal" container={host} {...props} />}</GlassPortal>
 }
 
 function DialogClose({ ...props }: React.ComponentProps<typeof DialogPrimitive.Close>) {
@@ -127,12 +63,8 @@ function DialogContent({
   ref,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & { showCloseButton?: boolean }) {
-  const morph = React.useContext(MorphContext)
-  const setRef = (node: HTMLDivElement | null) => {
-    morph?.setContent(node)
-    if (typeof ref === "function") ref(node)
-    else if (ref) ref.current = node
-  }
+  const morph = React.useContext(GlassMorphContext)
+  const setRef = useGlassMorphRef<HTMLDivElement>("content", ref)
   return (
     <DialogPortal>
       <DialogOverlay />

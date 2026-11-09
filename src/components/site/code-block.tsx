@@ -1,4 +1,4 @@
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 import { CopyButton } from "./copy-button"
 

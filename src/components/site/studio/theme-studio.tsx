@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTheme } from "next-themes"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { DicesIcon, DownloadIcon, ImageIcon, MoonIcon, RotateCcwIcon, SparklesIcon, SunIcon } from "lucide-react"
 import { toast } from "sonner"
 
@@ -56,7 +56,7 @@ interface Recipe {
   density: number
   type: string
 }
-const START: Recipe = { palette: "dusk", hue: 35, harmony: "analogous", chroma: 0.17, material: "frosted", shape: "round", motion: "spring", density: 1, type: "default" }
+const START: Recipe = { palette: "system", hue: 257, harmony: "analogous", chroma: 0.17, material: "frosted", shape: "round", motion: "spring", density: 1, type: "system" }
 const EMPTY = { light: {} as Tokens, dark: {} as Tokens }
 
 /** Which token groups each preset owns — choosing a preset clears your edits there. */
@@ -181,7 +181,7 @@ function Studio({ initialCode, initialApplied }: { initialCode: string; initialA
   const changedCount = new Set([...Object.keys(overrides.light), ...Object.keys(overrides.dark)]).size
 
   return (
-    <div className="mx-auto grid max-w-[1400px] gap-5 px-4 pt-8 pb-12 sm:px-6 lg:grid-cols-[400px_1fr]">
+    <div className="mx-auto grid min-w-0 w-full max-w-[1400px] gap-5 px-4 pt-8 pb-12 *:min-w-0 sm:px-6 lg:grid-cols-[400px_minmax(0,1fr)]">
       <aside className="lg:sticky lg:top-24 lg:h-[calc(100dvh-7.5rem)]">
         <Glass className="flex h-full flex-col overflow-hidden">
           <div className="flex items-center gap-2 border-b border-glass-border p-4">

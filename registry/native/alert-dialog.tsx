@@ -89,7 +89,7 @@ function AlertDialogContent({ style, children, size = "default", ...props }: Vie
         <AlertDialogOverlay progress={progress} />
         <Animated.View style={[{ width: Math.min(width - 32, size === "sm" ? 320 : 448), maxHeight: height - insets.top - insets.bottom - 32 }, entrance]}>
           <SizeContext.Provider value={size}>
-            <Glass variant="liquid" visible={open} radius={ui.radius.surface} accessibilityViewIsModal aria-modal {...a11y} style={[{ padding: pad, gap: 16 }, style]} {...props}>
+            <Glass variant="liquid" materialized={open} radius={ui.radius.surface} accessibilityViewIsModal aria-modal {...a11y} style={[{ padding: pad, gap: 16 }, style]} {...props}>
               {textChildren(children)}
             </Glass>
           </SizeContext.Provider>

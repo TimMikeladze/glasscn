@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 import { Label } from "@/components/glass/label"
 import { Slider } from "@/components/glass/slider"
@@ -105,6 +105,14 @@ function GlassPreferences({ className, ...props }: React.ComponentProps<"div">) 
           checked={preferences.reduceTransparency}
           onCheckedChange={(on) => setPreferences({ reduceTransparency: on })}
         />
+      </div>
+      <div data-slot="glass-preferences-reduce-highlights" className="flex items-center justify-between gap-3">
+        <div className="grid gap-1"><Label htmlFor={`${id}-highlights`}>Reduce bright effects</Label><p id={`${id}-highlights-hint`} className="text-xs text-muted-foreground">Remove bright rims and press flashes.</p></div>
+        <Switch id={`${id}-highlights`} aria-describedby={`${id}-highlights-hint`} checked={preferences.reduceHighlights ?? false} onCheckedChange={(on) => setPreferences({ reduceHighlights: on })} />
+      </div>
+      <div data-slot="glass-preferences-show-borders" className="flex items-center justify-between gap-3">
+        <div className="grid gap-1"><Label htmlFor={`${id}-borders`}>Show control borders</Label><p id={`${id}-borders-hint`} className="text-xs text-muted-foreground">Make floating control edges easier to see.</p></div>
+        <Switch id={`${id}-borders`} aria-describedby={`${id}-borders-hint`} checked={preferences.showBorders ?? false} onCheckedChange={(on) => setPreferences({ showBorders: on })} />
       </div>
       {customised ? (
         <button

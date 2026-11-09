@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
-import { scrollParent } from "@/components/glass/scroll-edge"
+import { scrollParent, useScrollOverContent } from "@/components/glass/scroll-edge"
 
 /**
  * iOS's navigation bar: a large title that scrolls away with the content and hands
@@ -35,32 +35,42 @@ function NavigationBar({
   subtitle?: React.ReactNode
 }) {
   const large = React.useRef<HTMLDivElement>(null)
+  const bar = React.useRef<HTMLElement>(null)
+  const over = useScrollOverContent(bar, "top")
   const [collapsed, setCollapsed] = React.useState(titleDisplayMode === "inline")
   React.useEffect(() => {
     const el = large.current
     if (!el || typeof IntersectionObserver === "undefined") return
     // collapsed once the large title has passed under the bar
-    const observer = new IntersectionObserver(([entry]) => setCollapsed(!entry.isIntersecting), { root: scrollParent(el), rootMargin: "-56px 0px 0px 0px" })
-    observer.observe(el)
-    return () => observer.disconnect()
+    let observer: IntersectionObserver | undefined
+    const observe = () => {
+      observer?.disconnect()
+      observer = new IntersectionObserver(([entry]) => setCollapsed(!entry.isIntersecting), { root: scrollParent(el), rootMargin: `-${bar.current?.offsetHeight ?? 56}px 0px 0px 0px` })
+      observer.observe(el)
+    }
+    observe()
+    const resize = new ResizeObserver(observe)
+    if (bar.current) resize.observe(bar.current)
+    return () => { observer?.disconnect(); resize.disconnect() }
   }, [titleDisplayMode])
   const inline = titleDisplayMode === "inline"
   return (
     <>
       <header
+        ref={bar}
         data-slot="navigation-bar"
-        data-collapsed={collapsed ? "" : undefined}
+        data-collapsed={inline || collapsed ? "" : undefined}
         data-bar-edge="top"
-        data-over-content={collapsed ? "" : undefined}
+        data-over-content={over ? "" : undefined}
         className={cn(
-          "sticky top-0 isolate z-30 grid h-[calc(3.5rem*var(--glass-density))] grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 pt-[env(safe-area-inset-top)]",
+          "sticky top-0 isolate z-30 grid h-[calc(3.5rem*var(--glass-density)+env(safe-area-inset-top))] grid-cols-[1fr_auto_1fr] items-center gap-2 px-3 pt-[env(safe-area-inset-top)]",
           className
         )}
         {...props}
       >
         {/* the scroll edge under the bar once content is beneath it (the utility sets its own position, so it sits on a child) */}
         <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[calc(100%+1.5rem)] opacity-0 transition-opacity duration-(--glass-duration) ease-glass in-data-over-content:opacity-100">
-          <div className="size-full scroll-edge-soft" />
+          <div className="size-full scroll-edge-automatic" />
         </div>
         {children}
         <div
@@ -68,14 +78,14 @@ function NavigationBar({
           aria-hidden={!inline}
           role={inline ? "heading" : undefined}
           aria-level={inline ? 1 : undefined}
-          className="col-start-2 row-start-1 min-w-0 truncate text-center type-glass-heading text-base opacity-0 transition-opacity duration-(--glass-duration) ease-glass in-data-collapsed:opacity-100"
+          className="col-start-2 row-start-1 min-w-0 truncate text-center type-headline opacity-0 transition-opacity duration-(--glass-duration) ease-glass in-data-collapsed:opacity-100"
         >
           {title}
         </div>
       </header>
       {inline ? null : (
         <div ref={large} data-slot="navigation-bar-large-title" className="px-4 pt-1 pb-2">
-          <h1 className="type-glass-display text-3xl">{title}</h1>
+          <h1 className="type-large-title font-semibold">{title}</h1>
           {subtitle ? <p className="text-sm text-muted-foreground">{subtitle}</p> : null}
         </div>
       )}

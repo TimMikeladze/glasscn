@@ -2,7 +2,7 @@ import * as React from "react"
 import { Platform } from "react-native"
 import { NativeTabs, type NativeTabsProps } from "expo-router/unstable-native-tabs"
 
-import { useGlassTheme } from "@/components/glass/native/tokens"
+import { nativeControlTheme, useGlassTheme, useGlassThemeOptions } from "@/components/glass/native/tokens"
 import { alpha } from "@/components/glass/native/ui"
 
 /**
@@ -29,21 +29,23 @@ import { alpha } from "@/components/glass/native/ui"
  * moves inline beside the folded bar — read where with `useTabsAccessoryPlacement()`.
  * Android: a Material navigation bar on the solid glass colour with the accent indicator.
  */
-function GlassTabsLayout({ minimizeBehavior = "onScrollDown", children, ...props }: NativeTabsProps) {
+function GlassTabsLayout({ minimizeBehavior = "automatic", children, ...props }: NativeTabsProps) {
   const t = useGlassTheme()
+  const appearance = nativeControlTheme(t, useGlassThemeOptions())
+  const themed = appearance.seedColor !== undefined
   const android = Platform.OS === "android"
   return (
     <NativeTabs
       minimizeBehavior={minimizeBehavior}
-      tintColor={t.primary}
-      iconColor={{ default: t.labelSecondary, selected: t.primary }}
-      labelStyle={{ default: { color: t.labelSecondary }, selected: { color: t.primary } }}
-      badgeBackgroundColor={t.destructive}
-      badgeTextColor={t.destructiveForeground}
+      tintColor={appearance.seedColor}
+      iconColor={themed ? { default: t.labelSecondary, selected: t.primary } : undefined}
+      labelStyle={themed ? { default: { color: t.labelSecondary }, selected: { color: t.primary } } : undefined}
+      badgeBackgroundColor={themed ? t.destructive : undefined}
+      badgeTextColor={themed ? t.destructiveForeground : undefined}
       // Android: Material 3 — the bar on the solid glass colour, the accent's indicator pill
-      backgroundColor={android ? t.glassSolid : undefined}
-      indicatorColor={alpha(t.primary, 0.18)}
-      rippleColor={alpha(t.primary, 0.12)}
+      backgroundColor={android && themed ? t.glassSolid : undefined}
+      indicatorColor={themed ? alpha(t.primary, 0.18) : undefined}
+      rippleColor={themed ? alpha(t.primary, 0.12) : undefined}
       labelVisibilityMode={android ? "labeled" : undefined}
       // iPad: the tab bar adapts into a sidebar
       sidebarAdaptable

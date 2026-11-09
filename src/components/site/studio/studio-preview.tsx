@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { BellIcon, BookOpenIcon, CheckIcon, FlameIcon, MoonIcon, PenIcon, SearchIcon, BarChart3Icon, DropletIcon, ClockIcon } from "lucide-react"
 
 import { ActivityRings } from "@/components/glass/activity-rings"
@@ -215,7 +215,7 @@ export function StudioPreview({ theme, scheme, ground = "aurora" }: { theme: Gla
               </GroupedListItem>
             </GroupedListContent>
           </GroupedList>
-          <div className="glass-strong grid gap-3 rounded-surface p-5" role="dialog" aria-label="Example dialog">
+          <div className="glass-strong grid gap-3 rounded-surface p-5" role="group" aria-label="Example dialog">
             <div className="type-glass-heading text-lg">Erase every night?</div>
             <p className="text-sm text-muted-foreground">311 nights will be removed from this device.</p>
             <div className="flex justify-end gap-2">

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { barX, barY, defineChart, group, type ChannelAccessorContext } from "@tanstack/charts"
 import { scaleBand } from "@tanstack/charts/scales/band"
 import { tooltip } from "@tanstack/charts/tooltip"

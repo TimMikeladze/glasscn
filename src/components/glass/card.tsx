@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { Slot } from "radix-ui"
 
 import { glassVariants, type GlassVariantProps } from "@/lib/glass-variants"
@@ -20,7 +20,6 @@ const MATERIAL = { regular: "default", thick: "strong" } as const
 function Card({
   className,
   size = "default",
-  variant,
   material = "regular",
   intensity,
   tint,
@@ -28,7 +27,7 @@ function Card({
   asChild = false,
   ...props
 }: React.ComponentProps<"div"> &
-  GlassVariantProps & {
+  Omit<GlassVariantProps, "variant"> & {
     size?: "default" | "sm"
     material?: "regular" | "thick" | "solid"
     /** Render as the child element (a link) — the whole card is the target, with a press state. */
@@ -43,7 +42,7 @@ function Card({
       className={cn(
         material === "solid"
           ? cn("relative border border-separator bg-card", elevation !== "flat" && "shadow-sm")
-          : glassVariants({ variant, intensity: intensity ?? MATERIAL[material], tint, elevation }),
+          : glassVariants({ intensity: intensity ?? MATERIAL[material], tint, elevation }),
         asChild && "glass-focus glass-press cursor-pointer transition-[scale] duration-(--glass-duration) ease-glass",
         "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-surface py-(--card-spacing) text-[calc(0.875rem*var(--glass-text-scale))] text-card-foreground [--card-spacing:--theme(--spacing-card)] [--glass-container-pad:var(--card-spacing)] [--glass-container-radius:var(--glass-radius-surface)] has-data-[slot=card-footer]:pb-0 data-[size=sm]:rounded-surface-sm data-[size=sm]:[--card-spacing:--theme(--spacing-card-sm)] data-[size=sm]:[--glass-container-radius:calc(var(--glass-radius-surface)*0.75)] data-[size=sm]:has-data-[slot=card-footer]:pb-0",
         className

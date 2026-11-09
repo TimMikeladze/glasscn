@@ -115,7 +115,7 @@ export function llmsTxt() {
 /** The index plus every item in full and the design rules. */
 export function llmsFullTxt() {
   const rules = nest(readDoc("rules/design.md"))
-  const liquid = section(readDoc("liquid-glass.md"), "TL;DR").split(/\n\nThe five changes/)[0]
+  const liquid = section(readDoc("liquid-glass.md"), "What Apple documents")
   return (
     [
       ...header(),

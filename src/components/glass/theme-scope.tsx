@@ -1,7 +1,8 @@
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 import { TOKENS, createGlassTheme, fontStylesheetUrl, sanitizeTokens, type CreateThemeOptions, type GlassTheme, type TokenGroup, type Tokens } from "@/lib/glass-theme"
+import { GlassScopeProvider } from "@/lib/glass-portal"
 
 type Presets = Pick<CreateThemeOptions, "palette" | "material" | "shape" | "motion" | "density" | "type" | "fonts">
 
@@ -154,7 +155,7 @@ function ThemeScope({
       {fontUrl ? <link rel="stylesheet" href={fontUrl} precedence="glass-fonts" /> : null}
       {/* a plain, in-place <style>: it must update on every change (a hoisted, keyed one would not) */}
       {css ? <style>{css}</style> : null}
-      {children}
+      <GlassScopeProvider scope={id}>{children}</GlassScopeProvider>
     </div>
   )
 }

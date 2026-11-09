@@ -44,7 +44,7 @@ const Ctx = React.createContext<SandboxTheme | null>(null)
 export function SandboxThemeProvider({ children }: { children: React.ReactNode }) {
   const system = useColorScheme()
   const url = Linking.useLinkingURL()
-  const [palette, setPalette] = React.useState<PaletteName>("dusk")
+  const [palette, setPalette] = React.useState<PaletteName>("system")
   const [scheme, setScheme] = React.useState<Scheme>(system === "dark" ? "dark" : "light")
   const [presets, setPresets] = React.useState<Presets>({})
   const [a11y, setA11yState] = React.useState<Partial<Record<A11ySetting, boolean>>>({})

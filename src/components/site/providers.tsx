@@ -8,14 +8,14 @@ import { Toaster } from "@/components/glass/toaster"
 export type Palette = string
 const KEY = "glasscn-palette"
 
-const PaletteContext = React.createContext<{ palette: Palette; setPalette: (p: Palette) => void; palettes: Palette[] }>({ palette: "dusk", setPalette: () => {}, palettes: ["dusk"] })
+const PaletteContext = React.createContext<{ palette: Palette; setPalette: (p: Palette) => void; palettes: Palette[] }>({ palette: "system", setPalette: () => {}, palettes: ["system"] })
 
 function readPalette(palettes: Palette[]): Palette {
   try {
     const v = localStorage.getItem(KEY)
-    return v && palettes.includes(v) ? v : "dusk"
+    return v && palettes.includes(v) ? v : "system"
   } catch {
-    return "dusk"
+    return "system"
   }
 }
 
@@ -38,7 +38,7 @@ export function usePalette() {
  * glass-theme never ship to the browser just to list their keys.
  */
 export function Providers({ palettes, children }: { palettes: Palette[]; children: React.ReactNode }) {
-  const palette = React.useSyncExternalStore(subscribe, () => readPalette(palettes), () => "dusk")
+  const palette = React.useSyncExternalStore(subscribe, () => readPalette(palettes), () => "system")
   const setPalette = React.useCallback((p: Palette) => {
     try {
       localStorage.setItem(KEY, p)

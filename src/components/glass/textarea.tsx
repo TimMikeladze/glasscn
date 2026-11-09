@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 /**
  * A filled text area that grows with its content (`field-sizing: content`), up to `maxRows`

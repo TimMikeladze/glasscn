@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { ArrowDownIcon, ArrowUpIcon, RotateCwIcon, SquareIcon } from "lucide-react"
 
 import { Button } from "@/components/glass/button"

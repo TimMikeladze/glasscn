@@ -1,27 +1,25 @@
 import * as React from "react"
-import { Animated as RNAnimated, Platform, View, type LayoutChangeEvent, type LayoutRectangle, type StyleProp, type ViewProps, type ViewStyle } from "react-native"
+import { Platform, StyleSheet, View, type LayoutChangeEvent, type LayoutRectangle, type StyleProp, type ViewProps, type ViewStyle } from "react-native"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
+import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring, type SharedValue } from "react-native-reanimated"
 import { SegmentedControl as NativeSegmented } from "@expo/ui/community/segmented-control"
 
 import { useReducedMotion } from "@/components/glass/native/a11y"
+import { Glass } from "@/components/glass/native/glass"
 import { haptics, Press } from "@/components/glass/native/press"
-import { GText, useUI, web, type TextSize } from "@/components/glass/native/ui"
-
-/**
- * @deprecated read `useReducedMotion()` from `native-a11y`. Kept for files that still read a ref.
- * A ref whose `.current` is the live Reduce Motion setting.
- */
-export function useReduceMotion() {
-  const reduced = useReducedMotion()
-  const ref = React.useRef(reduced)
-  React.useEffect(() => {
-    ref.current = reduced
-  }, [reduced])
-  return ref
-}
+import { nativeControlTheme, useGlassThemeOptions } from "@/components/glass/native/tokens"
+import { GIcon, GText, useUI, web, type TextSize } from "@/components/glass/native/ui"
 
 type Frames = Record<string, LayoutRectangle>
+
+/** Availability is separate from geometry: disabled native views still deliver layout. */
+export function useDisabledItems() {
+  const [disabledItems, setDisabledItems] = React.useState<Record<string, boolean>>({})
+  const setItemDisabled = React.useCallback((value: string, disabled: boolean) => {
+    setDisabledItems((prev) => prev[value] === disabled ? prev : { ...prev, [value]: disabled })
+  }, [])
+  return { disabledItems, setItemDisabled }
+}
 
 /** Frames reported by items' onLayout, keyed by value. */
 function useFrames() {
@@ -46,7 +44,7 @@ function useFrames() {
  * and it springs to the current item — x, y, width, height and (with `radius`) corners.
  * Physical layout coordinates, so it follows RTL rows without flipping.
  */
-export function useSlidingSelection(current: string | undefined, { radius }: { radius?: (frame: LayoutRectangle) => number } = {}) {
+export function useSlidingSelection(current: string | undefined, { radius, liveFrame }: { radius?: (frame: LayoutRectangle) => number; liveFrame?: SharedValue<LayoutRectangle | null> } = {}) {
   const ui = useUI()
   const reduced = useReducedMotion()
   const { frames, register } = useFrames()
@@ -79,43 +77,14 @@ export function useSlidingSelection(current: string | undefined, { radius }: { r
     position: "absolute",
     left: 0,
     top: 0,
-    width: w.value,
-    height: h.value,
-    transform: [{ translateX: x.value }, { translateY: y.value }],
+    width: liveFrame?.value?.width ?? w.value,
+    height: liveFrame?.value?.height ?? h.value,
+    transform: [{ translateX: liveFrame?.value?.x ?? x.value }, { translateY: liveFrame?.value?.y ?? y.value }],
     // the thumb is never faded in: an absent frame hides it by size
     ...(radius ? { borderRadius: r.value } : null),
-    ...(shown.value ? null : { width: 0, height: 0 }),
+    ...(shown.value || liveFrame?.value ? null : { width: 0, height: 0 }),
   }))
   return { register, style, frames, ready: !!frame }
-}
-
-/**
- * @deprecated RN `Animated` version kept so callers not yet on Reanimated keep working;
- * use `useSlidingSelection` (Reanimated) instead.
- */
-export function useSlidingIndicator(current: string | undefined) {
-  const { frames, register } = useFrames()
-  const [box] = React.useState(() => ({ x: new RNAnimated.Value(0), y: new RNAnimated.Value(0), w: new RNAnimated.Value(0), h: new RNAnimated.Value(0) }))
-  const placed = React.useRef(false)
-  const reduced = useReducedMotion()
-  const frame = current ? frames[current] : undefined
-  React.useEffect(() => {
-    if (!frame) return
-    const to = [
-      [box.x, frame.x],
-      [box.y, frame.y],
-      [box.w, frame.width],
-      [box.h, frame.height],
-    ] as const
-    if (!placed.current || reduced) {
-      placed.current = true
-      to.forEach(([v, n]) => v.setValue(n))
-      return
-    }
-    RNAnimated.parallel(to.map(([v, n]) => RNAnimated.spring(v, { toValue: n, friction: 9, tension: 200, useNativeDriver: false }))).start()
-  }, [frame, box, reduced])
-  const style: StyleProp<ViewStyle> = { position: "absolute", left: box.x as unknown as number, top: box.y as unknown as number, width: box.w as unknown as number, height: box.h as unknown as number, opacity: frame ? 1 : 0 }
-  return { register, style, box, ready: !!frame }
 }
 
 /** Wraps string children in GText and tints/sizes bare icon elements (lucide-react-native). */
@@ -123,19 +92,19 @@ export function withGlyphs(children: React.ReactNode, { color, size, text = "sm"
   return React.Children.map(children, (child) => {
     if (typeof child === "string" || typeof child === "number") {
       return (
-        <GText size={text} weight={weight} color={color} numberOfLines={1}>
+        <GText size={text} weight={weight} color={color} numberOfLines={1} style={{ flexShrink: 1 }}>
           {child}
         </GText>
       )
     }
     if (React.isValidElement<{ color?: string; size?: number }>(child) && child.type !== React.Fragment && child.props.color === undefined) {
-      return React.cloneElement(child, { color, size: child.props.size ?? size })
+      return <GIcon color={color} size={size}>{child}</GIcon>
     }
     return child
   })
 }
 
-type Ctx = { value: string; select: (v: string) => void; register: (v: string) => (e: LayoutChangeEvent) => void; size: "sm" | "default" | "lg"; radius: number; scrubbing: boolean }
+type Ctx = { value: string; select: (v: string) => void; register: (v: string) => (e: LayoutChangeEvent) => void; setItemDisabled: (value: string, disabled: boolean) => void; size: "sm" | "default" | "lg"; radius: number; scrubbing: boolean; disabled?: boolean; hold: (on: boolean) => void }
 const SegmentedContext = React.createContext<Ctx | null>(null)
 
 type SegmentedControlProps = Omit<ViewProps, "children"> & {
@@ -150,7 +119,8 @@ type SegmentedControlProps = Omit<ViewProps, "children"> & {
   disabled?: boolean
   /**
    * iOS/Android render the system control (`@expo/ui`) when every segment is plain text and
-   * none is disabled. `false` forces the glass one everywhere.
+   * none is disabled, shape is unspecified and no accent is forced. The system owns
+   * shape/accent on that path; explicit choices and `false` use the custom control.
    */
   native?: boolean
   children?: React.ReactNode
@@ -184,58 +154,80 @@ function plainItems(children: React.ReactNode): Item[] | null {
  * Drag from the thumb to scrub across segments. `momentary` makes the segments plain actions.
  * NAT-80: the system control on iOS/Android for plain text segments.
  */
-export function SegmentedControl({ value, defaultValue, onValueChange, size = "default", shape = "capsule", momentary = false, disabled, native = true, style, children, ...props }: SegmentedControlProps) {
+export function SegmentedControl({ value, defaultValue, onValueChange, size = "default", shape, momentary = false, disabled, native = true, style, children, ...props }: SegmentedControlProps) {
+  const { disabledItems, setItemDisabled } = useDisabledItems()
   const ui = useUI()
+  const appearance = nativeControlTheme(ui, useGlassThemeOptions())
   const [inner, setInner] = React.useState(defaultValue ?? "")
   const current = momentary ? "" : (value ?? inner)
   const select = React.useCallback(
     (v: string) => {
-      if (disabled || !v) return
+      if (disabled || !v || disabledItems[v]) return
       if (!momentary) setInner(v)
       onValueChange?.(v)
     },
-    [disabled, momentary, onValueChange]
+    [disabled, disabledItems, momentary, onValueChange]
   )
   const height = { sm: 28, default: 36, lg: 44 }[size]
   // concentric: the thumb's radius is the track's minus its 2pt padding
-  const radius = shape === "capsule" ? Math.min(ui.radius.button, height / 2) : ui.radius.control
-  const { register, style: thumb, frames } = useSlidingSelection(current)
+  const radius = (shape ?? "capsule") === "capsule" ? Math.min(ui.radius.button, height / 2) : ui.radius.control
+  const liveFrame = useSharedValue<LayoutRectangle | null>(null)
+  const { register, style: thumb, frames } = useSlidingSelection(current, { liveFrame })
   const [scrubbing, setScrubbing] = React.useState(false)
   const lens = useSharedValue(1)
-  const reduced = useReducedMotion()
+  const reduced = useReducedMotion() || ui.motion.duration === 0
 
   // drag-to-scrub (NAT-37): a pan that starts on the thumb moves the selection under the finger
   const scrub = useSharedValue(false)
-  const at = (x: number, y: number) => Object.entries(frames).find(([, f]) => x >= f.x && x <= f.x + f.width && y >= f.y - 8 && y <= f.y + f.height + 8)?.[0]
+  const boxes = useSharedValue<Frames>({})
+  const selected = useSharedValue(current)
+  React.useEffect(() => {
+    boxes.set(Object.fromEntries(Object.entries(frames).filter(([key]) => !disabledItems[key])))
+    if (!scrub.get()) selected.set(current)
+  }, [frames, disabledItems, current, boxes, selected, scrub])
+  const at = (x: number, y: number) => {
+    "worklet"
+    return Object.entries(boxes.value).find(([, f]) => x >= f.x && x <= f.x + f.width && y >= f.y - 8 && y <= f.y + f.height + 8)?.[0]
+  }
+  const changed = (v: string) => {
+    haptics.selection()
+    select(v)
+  }
+  const finish = () => {
+    setScrubbing(false)
+    liveFrame.set(null)
+    selected.set(current)
+  }
   const pan = Gesture.Pan()
-    .runOnJS(true)
     .enabled(!disabled && !momentary)
     .activeOffsetX([-8, 8])
     .failOffsetY([-8, 8])
     .onStart((e) => {
-      scrub.set(at(e.x, e.y) === current)
-      if (!scrub.get()) return
-      setScrubbing(true)
+      selected.set(current)
+      scrub.set(at(e.x - e.translationX, e.y - e.translationY) === current)
+      if (!scrub.value) return
+      runOnJS(setScrubbing)(true)
       if (!reduced) lens.set(withSpring(1.04, ui.motion.springConfig))
     })
     .onUpdate((e) => {
-      if (!scrub.get()) return
+      if (!scrub.value) return
       const v = at(e.x, e.y)
-      if (v && v !== (value ?? inner)) {
-        haptics.selection()
-        select(v)
+      if (v && v !== selected.value) {
+        selected.set(v)
+        liveFrame.set(boxes.value[v])
+        runOnJS(changed)(v)
       }
     })
     .onFinalize(() => {
       scrub.set(false)
-      setScrubbing(false)
-      lens.set(withSpring(1, ui.motion.springConfig))
+      runOnJS(finish)()
+      lens.set(reduced ? 1 : withSpring(1, ui.motion.springConfig))
     })
   const lensStyle = useAnimatedStyle(() => ({ transform: [{ scale: lens.value }] }))
 
-  const ctx = React.useMemo(() => ({ value: current, select, register, size, radius, scrubbing }), [current, select, register, size, radius, scrubbing])
+  const ctx = React.useMemo(() => ({ value: current, select, register, setItemDisabled, size, radius, scrubbing, disabled, hold: setScrubbing }), [current, select, register, setItemDisabled, size, radius, scrubbing, disabled])
 
-  const items = native && !momentary && Platform.OS !== "web" ? plainItems(children) : null
+  const items = native && !momentary && shape === undefined && appearance.seedColor === undefined && Platform.OS !== "web" ? plainItems(children) : null
   if (items) {
     const index = items.findIndex((i) => i.value === current)
     return (
@@ -243,7 +235,7 @@ export function SegmentedControl({ value, defaultValue, onValueChange, size = "d
         values={items.map((i) => i.label)}
         selectedIndex={index < 0 ? undefined : index}
         enabled={!disabled}
-        appearance={ui.scheme}
+        appearance={appearance.colorScheme}
         onChange={(e) => select(items[e.nativeEvent.selectedSegmentIndex]?.value ?? "")}
         style={[{ minHeight: height, alignSelf: "stretch" }, style as StyleProp<ViewStyle>]}
         testID={props.testID}
@@ -267,10 +259,12 @@ export function SegmentedControl({ value, defaultValue, onValueChange, size = "d
             style={[
               thumb,
               lensStyle,
-              { borderRadius: Math.max(0, radius - 2), backgroundColor: scrubbing ? ui.knob : ui.thumb },
-              ui.scheme === "light" && { shadowColor: "#000", shadowOpacity: 0.12, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
+              { borderRadius: Math.max(0, radius - 2), backgroundColor: scrubbing ? "transparent" : ui.thumb },
+              !scrubbing && ui.scheme === "light" && { shadowColor: "#000", shadowOpacity: 0.12, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
             ]}
-          />
+          >
+            {scrubbing && !disabled ? <Glass variant="liquid" interactive raised={false} radius={Math.max(0, radius - 2)} style={StyleSheet.absoluteFill} /> : null}
+          </Animated.View>
           {children}
         </View>
       </GestureDetector>
@@ -280,7 +274,7 @@ export function SegmentedControl({ value, defaultValue, onValueChange, size = "d
 
 export function SegmentedControlItem({
   value,
-  disabled,
+  disabled: disabledProp,
   style,
   children,
   ...props
@@ -288,6 +282,12 @@ export function SegmentedControlItem({
   const ui = useUI()
   const ctx = React.useContext(SegmentedContext)
   if (!ctx) throw new Error("SegmentedControlItem must be inside SegmentedControl")
+  const disabled = disabledProp || ctx.disabled
+  const setItemDisabled = ctx.setItemDisabled
+  React.useEffect(() => {
+    setItemDisabled(value, !!disabled)
+    return () => setItemDisabled(value, true)
+  }, [setItemDisabled, value, disabled])
   const on = ctx.value === value
   const color = on ? ui.foreground : ui.mutedForeground
   return (
@@ -297,6 +297,8 @@ export function SegmentedControlItem({
       disabled={disabled}
       onLayout={ctx.register(value)}
       onPress={() => ctx.select(value)}
+      onPressIn={() => ctx.hold(true)}
+      onPressOut={() => ctx.hold(false)}
       accessibilityRole="radio"
       aria-checked={on}
       aria-selected={on}

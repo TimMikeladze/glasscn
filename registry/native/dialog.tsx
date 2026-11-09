@@ -8,7 +8,7 @@ import { XIcon } from "lucide-react-native"
 import { useReducedMotion } from "@/components/glass/native/a11y"
 import { Glass, canFade } from "@/components/glass/native/glass"
 import { Press } from "@/components/glass/native/press"
-import { GText, useUI, web, type GTextProps } from "@/components/glass/native/ui"
+import { GIcon, GText, useUI, web, type GTextProps } from "@/components/glass/native/ui"
 
 /** Radix-style open state: controlled by `open`/`onOpenChange`, or uncontrolled from `defaultOpen`. */
 export function useControllableOpen(open: boolean | undefined, defaultOpen: boolean | undefined, onOpenChange?: (open: boolean) => void) {
@@ -51,7 +51,7 @@ export function usePresence(open: boolean, duration = 220) {
 /**
  * The entrance every overlay shares: translate and scale in from `from`. Opacity
  * only where glass may fade — never on or above Liquid Glass (iOS 26), which
- * materialises through `Glass visible` instead.
+ * materialises through `Glass materialized` instead.
  */
 export function useEntrance(progress: SharedValue<number>, { x = 0, y = 0, scale = 1 }: { x?: number; y?: number; scale?: number } = {}) {
   const fade = canFade()
@@ -105,7 +105,7 @@ export function CloseButton({ onPress, style }: { onPress: () => void; style?: S
       hitSlop={Math.ceil((44 - ui.control.sm) / 2)}
       style={[{ position: "absolute", top: 14, right: 14, width: ui.control.sm, height: ui.control.sm, borderRadius: ui.radius.button, alignItems: "center", justifyContent: "center", backgroundColor: ui.fillStrong }, web({ cursor: "pointer" }), style]}
     >
-      <XIcon size={16} color={ui.foreground} />
+      <GIcon><XIcon size={16} color={ui.foreground} /></GIcon>
     </Press>
   )
 }
@@ -231,7 +231,7 @@ function DialogContent({ style, children, showCloseButton = true, ...props }: Vi
         <Animated.View style={[{ width: Math.min(width - 32, 448), maxHeight }, entrance]}>
           <Glass
             variant="liquid"
-            visible={open}
+            materialized={open}
             radius={ui.radius.surface}
             accessibilityViewIsModal
             role="dialog"

@@ -1,6 +1,6 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 /**
  * shadcn's Alert: an inline callout on a fill (it sits on panes — not glass). An icon, a title

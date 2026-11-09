@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 /**
  * shadcn's Table on glass. It has no pane of its own — put it inside a Card:

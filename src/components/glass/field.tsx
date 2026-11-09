@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 import { Label } from "@/components/glass/label"
 import { Separator } from "@/components/glass/separator"

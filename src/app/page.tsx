@@ -9,6 +9,7 @@ import { Settings01 } from "@/components/blocks/settings-01"
 import { Auth01 } from "@/components/blocks/auth-01"
 import { Analytics01 } from "@/components/blocks/analytics-01"
 import { Chat01 } from "@/components/blocks/chat-01"
+import { LiquidGlass01 } from "@/components/blocks/liquid-glass-01"
 import { ComponentGallery } from "@/components/site/component-gallery"
 import { HomeExamples } from "@/components/site/home-examples"
 import { ThemeStrip } from "@/components/site/theme-strip"
@@ -37,22 +38,22 @@ export default function Home() {
   const count = docs.length
   const gallery = docs.filter((d) => d.group !== "Blocks").map(({ slug, title, description, group }) => ({ slug, title, description, group }))
   return (
-    <main className="mx-auto flex max-w-6xl flex-col gap-24 px-4 pt-16 sm:px-6 sm:pt-24">
+    <main className="mx-auto flex min-w-0 w-full max-w-6xl flex-col gap-24 px-4 pt-16 sm:px-6 sm:pt-24">
       <section className="flex flex-col items-center gap-6 text-center">
         <Badge variant="glass" className="h-7 px-3">
           shadcn registry · {count} components & blocks
         </Badge>
         <h1 className="max-w-3xl font-glass-heading text-5xl leading-[1.02] font-bold tracking-tight text-balance sm:text-7xl">
-          Glass, for <span className="bg-linear-to-r from-primary via-chart-2 to-chart-3 bg-clip-text text-transparent">shadcn</span>.
+          Liquid Glass, for shadcn.
         </h1>
         <p className="max-w-xl text-lg text-balance text-muted-foreground">
-          Frosted surfaces over a living aurora, iOS-grade controls and data pieces — installed as source with the shadcn CLI, themed entirely with CSS variables.
+          Apple-inspired controls and native system materials. Install the source with the shadcn CLI and theme it with CSS variables.
         </p>
-        <InstallCommand className="w-full max-w-2xl text-left" args={`add ${itemUrl("glass-style")} ${itemUrl("theme-dusk")}`} />
+        <InstallCommand className="w-full max-w-2xl text-left" args={`add ${itemUrl("glass-style")} ${itemUrl("glass-effects")} ${itemUrl("theme-dusk")}`} />
         <div className="flex flex-wrap justify-center gap-3">
           <Button asChild size="lg">
-            <Link href="/docs">
-              Browse components <ArrowRightIcon data-icon="inline-end" />
+            <Link href="/showcase">
+              Explore the glass <ArrowRightIcon data-icon="inline-end" />
             </Link>
           </Button>
           <Button asChild size="lg" variant="glass">
@@ -61,15 +62,16 @@ export default function Home() {
         </div>
       </section>
 
-      <section aria-label="A dashboard built from glasscn">
-        <Dashboard01 />
+      <section aria-label="Clear Liquid Glass over a photo" className="grid gap-4">
+        <LiquidGlass01 scene="photos" photoBase="/showcase" className="h-[32rem] sm:h-[36rem]" />
+        <p className="text-center text-sm text-muted-foreground">Clear controls over media. Change the photo, favorite it, or open its information. <Link href="/showcase" className="text-primary-ink underline underline-offset-4">Try all ten examples</Link>.</p>
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
         {[
           { icon: CodeIcon, title: "shadcn's APIs, in glass", body: "Button, Card, Dialog, Tabs… keep their props and parts. Swapping is an import path: @/components/ui → @/components/glass." },
           { icon: LayersIcon, title: "Tokens all the way down", body: "Frost, rim, blur, saturation, aurora — every one a CSS variable. Two hooks (--glass-bg, --glass-elevation) restyle any surface from a class." },
-          { icon: SmartphoneIcon, title: "Web and React Native", body: "Every component has a native-* twin for Expo: one React Native file for iOS, Android and the web. Liquid Glass on iOS 26, blur on older iOS, a fill on Android." },
+          { icon: SmartphoneIcon, title: "Web and React Native", body: "Every component has a native-* twin for Expo: one React Native file for iOS, Android and the web. System Liquid Glass on iOS 27, a blur target on Android, and token-based materials on the web." },
         ].map((f) => (
           <Card key={f.title}>
             <CardHeader>
@@ -183,6 +185,7 @@ export default function Home() {
           <p className="text-muted-foreground">Whole screens, ready to wire up: analytics, Settings and sign-in — plus the dashboard and chat above.</p>
         </div>
         <Analytics01 />
+        <Dashboard01 />
         <div className="grid *:min-w-0 items-start gap-8 lg:grid-cols-2">
           <Settings01 />
           <div className="flex h-full items-center">

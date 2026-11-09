@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { SearchIcon, XIcon } from "lucide-react"
 
 /**
@@ -15,11 +15,15 @@ import { SearchIcon, XIcon } from "lucide-react"
  *     suggestions={matches} onSuggestionSelect={open} />
  */
 
+export type SearchToken = { id: string; label: string }
+
 type Suggestion = string | { value: string; label: React.ReactNode }
 const suggestionValue = (s: Suggestion) => (typeof s === "string" ? s : s.value)
 const suggestionLabel = (s: Suggestion) => (typeof s === "string" ? s : s.label)
 
 type SearchFieldProps = Omit<React.ComponentProps<"input">, "value" | "defaultValue" | "onChange" | "onSubmit"> & {
+  tokens?: readonly SearchToken[]
+  onTokenRemove?: (id: string) => void
   value?: string
   defaultValue?: string
   onValueChange?: (value: string) => void
@@ -73,6 +77,8 @@ function SearchField({
   value,
   defaultValue = "",
   onValueChange,
+  tokens = [],
+  onTokenRemove,
   onSubmit,
   minimized = false,
   expanded,
@@ -151,6 +157,9 @@ function SearchField({
           className="glass-liquid glass-shadow-adaptive flex h-control-lg w-full min-w-0 flex-1 items-center gap-2 rounded-button ps-3.5 pe-1.5 transition-[width] duration-(--glass-duration) ease-glass focus-within:outline-(length:--glass-ring-width) focus-within:outline-ring/60 starting:w-control-lg motion-reduce:transition-none"
         >
           <SearchIcon aria-hidden className="size-4.5 shrink-0 text-muted-foreground" />
+          {tokens.length ? <div data-slot="search-field-tokens" role="group" aria-label="Search filters" className="flex max-w-1/2 shrink items-center gap-1 overflow-x-auto overscroll-x-contain">
+            {tokens.map(token => <span key={token.id} data-slot="search-field-token" className="inline-flex shrink-0 items-center gap-1 rounded-badge bg-fill px-2 py-1 text-sm text-foreground"><span>{token.label}</span>{onTokenRemove ? <button type="button" aria-label={`Remove ${token.label} filter`} onClick={() => { onTokenRemove(token.id); input.current?.focus() }} className="glass-focus hit-area inline-flex size-control-xs items-center justify-center rounded-button text-muted-foreground"><XIcon className="size-3" /></button> : null}</span>)}
+          </div> : null}
           <input
             ref={input}
             id={id}
@@ -182,7 +191,10 @@ function SearchField({
             onKeyDown={(e) => {
               onKeyDown?.(e)
               if (e.defaultPrevented) return
-              if (listOpen && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+              if (e.key === "Backspace" && !text && tokens.length && onTokenRemove) {
+                onTokenRemove(tokens[tokens.length - 1].id)
+                e.preventDefault()
+              } else if (listOpen && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
                 const n = suggestions.length
                 setActive((i) => (e.key === "ArrowDown" ? (i + 1) % n : (i - 1 + n) % n))
                 e.preventDefault()

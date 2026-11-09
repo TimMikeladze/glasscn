@@ -5,6 +5,7 @@ import { BellIcon, BookIcon, ChevronLeftIcon, HouseIcon, MoonIcon, PenIcon, Plus
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/glass/native/accordion"
 import { ActionSheet, ActionSheetAction, ActionSheetCancel, ActionSheetContent, ActionSheetDescription, ActionSheetHeader, ActionSheetTitle, ActionSheetTrigger } from "@/components/glass/native/action-sheet"
+import { Button } from "@/components/glass/native/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/glass/native/collapsible"
 import { Combobox } from "@/components/glass/native/combobox"
 import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut } from "@/components/glass/native/command"
@@ -389,7 +390,19 @@ function SearchFieldDemo() {
 
 function ActionSheetDemo() {
   return (
-    <Section title="Actions · destructive · preferred · cancel" note="Liquid glass group from the bottom; Cancel in its own capsule. Selection tick; destructive buzzes a warning.">
+    <>
+    <Section title="System choices" note="Plain onAction choices use the source-attached iOS system dialog. Cancel placement and visibility belong to the system; other platforms use the custom sheet.">
+      <ActionSheet>
+        <ActionSheetTrigger asChild><Button variant="glass">Entry options</Button></ActionSheetTrigger>
+        <ActionSheetContent>
+          <ActionSheetHeader><ActionSheetTitle>Night 311</ActionSheetTitle><ActionSheetDescription>Choose an action for this entry.</ActionSheetDescription></ActionSheetHeader>
+          <ActionSheetAction onAction={() => toast("Copied")}>Copy as text</ActionSheetAction>
+          <ActionSheetAction variant="destructive" onAction={() => toast.error("Deleted")}>Delete</ActionSheetAction>
+          <ActionSheetCancel />
+        </ActionSheetContent>
+      </ActionSheet>
+    </Section>
+    <Section title="Custom choices" note="Rich content, preferred styling and RN press callbacks use the custom bottom group with its separate Cancel capsule.">
       <ActionSheet>
         <ActionSheetTrigger>
           <Face>Share night</Face>
@@ -414,6 +427,7 @@ function ActionSheetDemo() {
         </ActionSheetContent>
       </ActionSheet>
     </Section>
+    </>
   )
 }
 

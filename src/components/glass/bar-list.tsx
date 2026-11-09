@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 import { barShares, drawEase, glassTime } from "@/lib/glass-charts"
 

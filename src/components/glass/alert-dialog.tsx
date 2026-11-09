@@ -1,8 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { AlertDialog as AlertDialogPrimitive } from "radix-ui"
+import { GlassPortal } from "@/lib/glass-portal"
+import { GlassMorphContext, useGlassMorphRef, useGlassPresentation } from "@/lib/glass-transitions"
 
 import { Button } from "@/components/glass/button"
 
@@ -12,16 +14,18 @@ import { Button } from "@/components/glass/button"
  * trailing (row) or on top (stacked), Cancel leading or at the bottom. Only the
  * buttons close it: no outside-click dismiss; Escape cancels.
  */
-function AlertDialog({ ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Root>) {
-  return <AlertDialogPrimitive.Root data-slot="alert-dialog" {...props} />
+function AlertDialog({ open, defaultOpen, onOpenChange, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Root>) {
+  const presentation = useGlassPresentation({ open, defaultOpen, onOpenChange })
+  return <GlassMorphContext.Provider value={presentation}><AlertDialogPrimitive.Root data-slot="alert-dialog" open={presentation.open} onOpenChange={presentation.setOpen} {...props} /></GlassMorphContext.Provider>
 }
 
-function AlertDialogTrigger({ ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Trigger>) {
-  return <AlertDialogPrimitive.Trigger data-slot="alert-dialog-trigger" {...props} />
+function AlertDialogTrigger({ ref, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Trigger>) {
+  const source = useGlassMorphRef<HTMLButtonElement>("trigger", ref)
+  return <AlertDialogPrimitive.Trigger ref={source} data-slot="alert-dialog-trigger" {...props} />
 }
 
-function AlertDialogPortal({ ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Portal>) {
-  return <AlertDialogPrimitive.Portal data-slot="alert-dialog-portal" {...props} />
+function AlertDialogPortal({ container, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Portal>) {
+  return <GlassPortal container={container}>{(host) => <AlertDialogPrimitive.Portal data-slot="alert-dialog-portal" container={host} {...props} />}</GlassPortal>
 }
 
 
@@ -44,17 +48,22 @@ function AlertDialogOverlay({ className, ...props }: React.ComponentProps<typeof
 function AlertDialogContent({
   className,
   size = "default",
+  ref,
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Content> & { size?: "default" | "sm" }) {
+  const morph = React.useContext(GlassMorphContext)
+  const target = useGlassMorphRef<HTMLDivElement>("content", ref)
   return (
     <AlertDialogPortal>
       <AlertDialogOverlay />
       <AlertDialogPrimitive.Content
+        ref={target}
         data-slot="alert-dialog-content"
+        data-morphing={morph?.morphing || undefined}
         data-size={size}
         data-glass-motion=""
         className={cn(
-          "group/alert-dialog-content glass-liquid fixed inset-0 z-50 m-auto grid h-fit max-h-[calc(100dvh-2rem)] w-full max-w-[calc(100%-2rem)] gap-4 overflow-y-auto overscroll-contain rounded-surface p-(--alert-spacing) text-sm text-popover-foreground outline-hidden glass-materialize [--alert-spacing:calc(1.5rem*var(--glass-density))] data-[size=default]:sm:max-w-md data-[size=sm]:max-w-xs data-[size=sm]:[--alert-spacing:calc(1.25rem*var(--glass-density))]",
+          "group/alert-dialog-content glass-liquid fixed inset-0 z-50 m-auto grid h-fit max-h-[calc(100dvh-2rem)] w-full max-w-[calc(100%-2rem)] gap-4 overflow-y-auto overscroll-contain rounded-surface p-(--alert-spacing) text-sm text-popover-foreground outline-hidden glass-materialize data-morphing:animate-none! [--alert-spacing:calc(1.5rem*var(--glass-density))] data-[size=default]:sm:max-w-md data-[size=sm]:max-w-xs data-[size=sm]:[--alert-spacing:calc(1.25rem*var(--glass-density))]",
           className
         )}
         {...props}

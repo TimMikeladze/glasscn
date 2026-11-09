@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 /**
  * A filled field on glass: soft fill, a hairline rim, accent caret, a focus outline; invalid draws

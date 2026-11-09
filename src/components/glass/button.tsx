@@ -1,6 +1,6 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { Slot } from "radix-ui"
 
 import { Spinner as ActivitySpinner } from "@/components/glass/spinner"
@@ -22,13 +22,14 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: `glass-press bg-primary text-primary-foreground shadow-glass-accent hover:brightness-105 ${dim}`,
+        // Apple's filled and prominent button labels are semibold
+        default: `glass-press bg-primary font-semibold text-primary-foreground shadow-glass-accent hover:brightness-105 ${dim}`,
         // liquid: the control layer. Hover takes it to the content material's frost; the elevation is shadow-glass-1, computed here from primitives
         glass:
           "glass-liquid glass-illuminate glass-press-liquid [--glass-elevation:0_calc(var(--glass-shadow-y)*0.3)_calc(var(--glass-shadow-blur)*0.3)_color-mix(in_oklch,var(--glass-shadow-color)_var(--glass-shadow-opacity),transparent)] text-foreground hover:[--glass-liquid-opacity:var(--glass-opacity)] disabled:text-glass-label-tertiary aria-disabled:text-glass-label-tertiary",
         // tinted liquid glass, the accent's label colour on it; illuminates like glass
         prominent:
-          "glass-prominent glass-press-liquid [--glass-elevation:0_calc(var(--glass-shadow-y)*0.4)_calc(var(--glass-shadow-blur)*0.4)_color-mix(in_oklch,var(--primary)_30%,transparent)] hover:brightness-105 disabled:opacity-45 aria-disabled:opacity-45",
+          "glass-prominent glass-press-liquid font-semibold [--glass-elevation:0_calc(var(--glass-shadow-y)*0.3)_calc(var(--glass-shadow-blur)*0.3)_color-mix(in_oklch,var(--glass-shadow-color)_var(--glass-shadow-opacity),transparent)] hover:brightness-105 disabled:opacity-45 aria-disabled:opacity-45",
         tinted: `glass-press bg-primary/16 text-primary-ink hover:bg-primary/24 dark:bg-primary/22 ${dim}`,
         secondary: `glass-press bg-fill text-foreground hover:bg-fill-strong ${dim}`,
         outline: `glass-press border border-glass-border bg-transparent text-foreground hover:bg-fill ${dim}`,

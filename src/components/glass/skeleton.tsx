@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 /**
  * A placeholder while content loads: a fill with a soft shimmer sweeping across (logical, so it

@@ -1,41 +1,49 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui"
+import { GlassPortal } from "@/lib/glass-portal"
+import { GlassMorphContext, useGlassMorphRef, useGlassPresentation } from "@/lib/glass-transitions"
 import { CheckIcon, ChevronRightIcon } from "lucide-react"
 
-function DropdownMenu({ ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
-  return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />
+function DropdownMenu({ open, defaultOpen, onOpenChange, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
+  const presentation = useGlassPresentation({ open, defaultOpen, onOpenChange })
+  return <GlassMorphContext.Provider value={presentation}><DropdownMenuPrimitive.Root data-slot="dropdown-menu" open={presentation.open} onOpenChange={presentation.setOpen} {...props} /></GlassMorphContext.Provider>
 }
 
-function DropdownMenuPortal({ ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Portal>) {
-  return <DropdownMenuPrimitive.Portal data-slot="dropdown-menu-portal" {...props} />
+function DropdownMenuPortal({ container, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Portal>) {
+  return <GlassPortal container={container}>{(host) => <DropdownMenuPrimitive.Portal data-slot="dropdown-menu-portal" container={host} {...props} />}</GlassPortal>
 }
 
-function DropdownMenuTrigger({ ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Trigger>) {
-  return <DropdownMenuPrimitive.Trigger data-slot="dropdown-menu-trigger" {...props} />
+function DropdownMenuTrigger({ ref, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Trigger>) {
+  const source = useGlassMorphRef<HTMLButtonElement>("trigger", ref)
+  return <DropdownMenuPrimitive.Trigger ref={source} data-slot="dropdown-menu-trigger" {...props} />
 }
 
 /**
  * A liquid-glass panel (the control layer). Rows inside are fills, never more glass.
- * It materialises out of its trigger (glass-materialize + glass-morph-origin); reduced motion cross-fades.
+ * View Transitions carry it from its trigger; the fallback reveals and materialises it.
  */
 const menuSurface =
-  "glass-liquid z-50 min-w-44 overflow-x-hidden overflow-y-auto overscroll-contain rounded-surface-sm p-1.5 text-popover-foreground glass-materialize glass-morph-origin [--glass-morph-w:var(--radix-dropdown-menu-trigger-width)] [--glass-morph-h:var(--radix-dropdown-menu-trigger-height)] [--glass-morph-origin:var(--radix-dropdown-menu-content-transform-origin)]"
+  "glass-liquid z-50 min-w-44 overflow-x-hidden overflow-y-auto overscroll-contain rounded-surface-sm p-1.5 text-popover-foreground glass-materialize data-morphing:animate-none! data-morphing:[clip-path:none] data-morphing:transition-none glass-morph-origin [--glass-morph-w:var(--radix-dropdown-menu-trigger-width)] [--glass-morph-h:var(--radix-dropdown-menu-trigger-height)] [--glass-morph-origin:var(--radix-dropdown-menu-content-transform-origin)]"
 
-function DropdownMenuContent({ className, align = "start", sideOffset = 6, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
+function DropdownMenuContent({ className, ref, align = "start", sideOffset = 6, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
+  const morph = React.useContext(GlassMorphContext)
+  const target = useGlassMorphRef<HTMLDivElement>("content", ref)
   return (
-    <DropdownMenuPrimitive.Portal>
+    <DropdownMenuPortal>
       <DropdownMenuPrimitive.Content
+        ref={target}
         data-slot="dropdown-menu-content"
+        data-morphing={morph?.morphing || undefined}
         data-glass-motion=""
         sideOffset={sideOffset}
         align={align}
         className={cn(menuSurface, "max-h-(--radix-dropdown-menu-content-available-height)", className)}
         {...props}
       />
-    </DropdownMenuPrimitive.Portal>
+    </DropdownMenuPortal>
   )
 }
 
@@ -100,7 +108,7 @@ function DropdownMenuLabel({ className, inset, ...props }: React.ComponentProps<
     <DropdownMenuPrimitive.Label
       data-slot="dropdown-menu-label"
       data-inset={inset}
-      className={cn("px-2.5 pt-2 pb-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase data-inset:ps-8.5", className)}
+      className={cn("px-2.5 pt-2 pb-1 text-xs font-semibold text-muted-foreground data-inset:ps-8.5", className)}
       {...props}
     />
   )

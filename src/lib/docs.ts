@@ -27,7 +27,7 @@ export interface DocEntry {
 }
 
 const glassProps: PropRow[] = [
-  { name: "intensity", type: `"default" | "strong" | "subtle"`, default: `"default"`, description: "How much frost: the fill's opacity over the blur." },
+  { name: "intensity", type: `"ultraThin" | "thin" | "regular" | "thick" | "default" | "strong" | "subtle"`, default: `"default"`, description: "Four named standard materials; existing subtle/default/strong names map to ultraThin/thin/regular. Web values approximate native system materials." },
   { name: "tint", type: `"none" | "primary" | "destructive"`, default: `"none"`, description: "Mixes a colour into the frost via --glass-bg." },
   { name: "elevation", type: `"raised" | "flat"`, default: `"raised"`, description: "Drop shadow on or off (--glass-elevation)." },
 ]
@@ -41,6 +41,13 @@ const chartPresetProps: PropRow[] = [
 ]
 
 const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
+  "background-extension": {
+    props: [
+      { name: "src / alt", type: "string", description: "The image and its accessible description. Foreground children remain separate and render once." },
+      { name: "start / end", type: "number", default: "0", description: "Mirrored, softened image strips beneath leading/trailing chrome, in pixels. Logical directions follow RTL." },
+    ],
+    notes: ["Apply readable overlays after the image. This image-only browser/RN composition approximates backgroundExtensionEffect; it is not a claim that Expo exposes Apple's modifier."],
+  },
   aurora: {
     props: [
       { name: "speed", type: "number", default: "--aurora-speed (1)", description: "Drift speed multiplier. 0 holds it still." },
@@ -87,7 +94,7 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
       { name: "scheme", type: `"light" | "dark"`, description: "Force a scheme for this subtree (its values, shadcn's neutral colours and color-scheme); omit to follow the page's .dark." },
     ],
     notes: [
-      "Writes one sanitised, scoped <style> for its own subtree: only the groups you name, the light values plus the dark ones that differ. A theme prop writes every token. Portalled content (dialogs, menus, tooltips) renders outside it — wrap the portal target, or theme the page instead.",
+      "Writes one sanitised, scoped <style> for its own subtree: only the groups you name, the light values plus the dark ones that differ. A theme prop writes every token. Portaled content follows the scope through a body-mounted theme host; live primitive and scheme changes reach open overlays.",
       "A forced scheme keeps dark: utilities right only if your dark variant stops at a .light scope: @custom-variant dark (&:is(.dark, .dark *):not(:where(.dark .light, .dark .light *):not(:where(.dark .light .dark, .dark .light .dark *)))); — glass-style ships it.",
     ],
   },
@@ -97,6 +104,47 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
       ...glassProps,
       { name: "asChild", type: "boolean", default: "false", description: "Render the child element as the pane." },
     ],
+  },
+  "liquid-glass": {
+    props: [
+      { name: "variant", type: `"regular" | "clear"`, default: `"regular"`, description: "Regular diffuses content. Clear is for media; dim bright media behind it separately." },
+      { name: "optics (web)", type: "boolean", default: "true", description: "Enable Chromium edge displacement. Other engines keep the CSS material. Native uses the OS effect and has no optics prop." },
+      { name: "interactive", type: "boolean", default: "false", description: "Elastic press response. Put accessible buttons inside the surface or use asChild." },
+      { name: "followLight (web)", type: "boolean", default: "false", description: "Point the rim toward a fine pointer; disabled under reduced motion. Native illumination belongs to the OS." },
+    ],
+    notes: ["For the whole app, install glass-effects and render <GlassEffects /> once near the root. It enhances floating controls and newly opened portals. LiquidGlass installs the shared runtime automatically.", "The bounded convex-lens model is a glasscn web approximation. Apple does not publish its compositor shader or numeric material constants. Native uses regular or clear system glass untinted by default."],
+  },
+  "liquid-glass-01": {
+    props: [
+      { name: "scene", type: `"photos" | "music" | "maps" | "safari" | "mail" | "controls"`, default: `"photos"`, description: "Choose an interactive Apple-inspired example." },
+      { name: "photoBase", type: "string", description: "Directory serving alpine.jpg, coast.jpg and summit.jpg. Omit to use the public Unsplash images." },
+    ],
+    notes: ["Explore every scene at /showcase. Photos, names, messages and map geometry are illustrative. Apple references and the research catalogue are linked from the showcase.", "The native-liquid-glass-01 item uses the same scene names, native system controls and Liquid Glass. The system controls the material on iOS 27."],
+  },
+  "glass-cluster": {
+    props: [
+      { name: "spacing", type: "number", default: "12", description: "Visible gap between sibling controls, in pixels. Change it to separate or merge their contours." },
+      { name: "mergeDistance", type: "number", default: "24", description: "How close effects need to be to begin merging. Native maps this to the system container's spacing." },
+      { name: "trackGlassAnimation(animation) (web)", type: "Animation → Animation", description: "Register imperative Web Animations geometry motion after calling element.animate(). CSS transitions and animations are observed automatically." },
+    ],
+    notes: ["Use GlassClusterItem for each control. The web blends geometry in a mask on one backdrop; labels remain separate and sharp. This approximates the system's union, rather than reproducing Apple's shader.", "GlassGroup is a single shared capsule with an optional sliding selection. GlassCluster is for sibling shapes that join and separate."],
+  },
+  "glass-morph": {
+    props: [
+      { name: "value", type: "string | number | boolean", description: "A revision value for insertion, removal or reordering. Native uses it to animate stable effect identities." },
+      { name: "spacing", type: "number", default: "12", description: "The gap between sibling actions, in pixels/points." },
+      { name: "id (GlassMorphItem)", type: "string", description: "Unique, stable identity within this container. Keep React keys stable too." },
+      { name: "variant / tint / interactive (GlassMorphItem)", type: `"regular" | "clear" / string / boolean`, description: "Material and press response. A web container uses one common variant; separate regular and clear groups." },
+      { name: "onPress / accessibilityLabel (GlassMorphItem)", type: "() => void / string", description: "The action and its spoken name on both tracks." },
+    ],
+    notes: ["Web retains DOM identities and animates measured geometry, including the shared glass beneath departing actions. Reduce Motion ends owned transitions immediately without cancelling consumer animations.", "Native delegates identities and animation to SwiftUI Namespace, GlassEffectContainer and glassEffectId. Named glassEffectUnion and explicit GlassEffectTransition policies are not exposed by the installed Expo bridge."],
+  },
+  "liquid-glass-02": {
+    props: [
+      { name: "scene", type: `"landmarks" | "notes" | "search" | "materials"`, default: `"landmarks"`, description: "Choose extended imagery and badges, editable nonmodal inspector, search scope/tokens, or material comparisons." },
+      { name: "photoBase", type: "string", description: "Directory serving alpine.jpg, coast.jpg and summit.jpg. Omit to use public Unsplash images." },
+    ],
+    notes: ["Available at /showcase on web and under native-liquid-glass-02 for Expo. The official-example parity matrix distinguishes system rendering from custom compositions.", "Notes styles the whole note; it illustrates nonmodal editing rather than selected-range rich text formatting. Search now focuses immediately, while the Search destination starts with browsing."],
   },
   card: {
     props: [
@@ -108,7 +156,7 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
     notes: [
       "Parts: CardHeader, CardTitle, CardDescription, CardAction, CardContent, CardFooter — same as shadcn's Card — plus CardImage, a full-bleed hero at the top.",
       "Padding is --card-spacing (the card / card-sm spacing tokens, scaled by --glass-density). The card sets --glass-container-radius and --glass-container-pad, so tiles inside can use rounded-concentric.",
-      "Apple's widget sizes are the Widget item (Card's variant is the glass layer).",
+      "Use Widget for compact content tiles. Card is a content material and cannot opt into the liquid control layer.",
     ],
   },
   button: {
@@ -125,6 +173,7 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
       "Solid variants squash elastically when pressed (glass-press); glass and prominent grow and light up under the finger (glass-press-liquid, glass-illuminate). Reduced motion turns both off.",
       "PullDownButton adds a trailing chevron — wrap it in DropdownMenuTrigger asChild. SplitButton joins an action and a PullDownButton into one shape.",
       "default stays solid for shadcn compatibility; prefer prominent for the one key action in a floating bar.",
+      "Native plain system buttons use onAction={() => …}. onPress retains the React Native event and selects the custom path; unsupported loading/content/style props also select that path.",
     ],
   },
   badge: {
@@ -147,14 +196,15 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
   "glass-preferences": {
     props: [
       { name: "className", type: "string", description: "The panel is a plain grid — put it in a Popover, a Sheet or a settings Card." },
-      { name: "useGlassPreferences()", type: "{ preferences, customised, setPreferences, reset }", description: "The same state without the UI: preferences is { clarity: 0–1, reduceTransparency }; setPreferences takes a partial; reset() returns to the theme." },
+      { name: "useGlassPreferences()", type: "{ preferences, customised, setPreferences, reset }", description: "The same state without the UI: clarity (0–1), reduceTransparency, reduceHighlights and showBorders; setPreferences takes a partial; reset() returns to the theme." },
       { name: "<GlassPreferencesScript />", type: "from glass-preferences-script", description: "Render once in the root layout's <head> so a reload paints with the viewer's clarity (no flash)." },
     ],
     notes: [
       "Clarity is iOS 27's Liquid Glass slider for your app: 0 ultra clear, 0.5 the theme as designed, 1 fully tinted. It scales every frost — material and liquid — at once through --glass-clarity.",
       "It writes one style, :where(:root, [data-glass-scope]) { --glass-clarity: … !important }, so it reaches every ThemeScope and beats theme values, while the OS settings (prefers-reduced-transparency, prefers-contrast) still win. Nothing is written until the viewer changes something.",
-      "Reduce transparency floors clarity at 0.9 — the same frosts the prefers-reduced-transparency media query gives — and sets data-glass-reduce-transparency on <html> for your own styles. It matters most in Safari, which has no such media query.",
+      "The app's Reduce transparency option floors clarity at 0.9, disables optical displacement/highlights and sets data-glass-reduce-transparency on <html>. The OS media query separately forces fallback frost/blur values; their coefficients are distinct library approximations. The manual option also works where the browser has no OS signal.",
       "Persisted in localStorage under glass-preferences; every instance and every open tab stays in step. Add suppressHydrationWarning to <html> (next-themes asks for it too).",
+      "Show control borders strengthens interactive edges. Reduce highlights removes bright rim/illumination effects. These are app preferences, not claims of a native system-setting bridge.",
       "Web only: on iOS 26+ the system's own Liquid Glass clarity and Reduce Transparency already apply to native glass.",
     ],
   },
@@ -179,7 +229,7 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
       { name: "asChild (GlassGroupItem)", type: "boolean", default: "false", description: "A link as the item (aria-current=\"page\" selects it)." },
     ],
     notes: [
-      "Apple's GlassEffectContainer: one liquid backdrop for neighbouring controls, instead of a capsule each — glass can't sample glass. Items are transparent and take fills.",
+      "One liquid capsule for neighboring controls. Its items use fills; GlassCluster supplies the separate sibling shapes that merge and split like a system glass container.",
       "Used for toolbar groups, button clusters and steppers. Never inside another liquid surface.",
     ],
   },
@@ -219,17 +269,19 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
       { name: "minimize (Toolbar)", type: `"never" | "onScrollDown"`, default: `"never"`, description: "Shrink (and hide the title) while content scrolls down; it returns on scroll up, hover or focus." },
       { name: "prominent (ToolbarItem)", type: "boolean", default: "false", description: "The tinted standalone action (Done, Send) — put it outside any group." },
       { name: "variant (ToolbarSpacer)", type: `"flexible" | "fixed"`, default: `"flexible"`, description: "flexible pushes what follows to the far edge; fixed is a small gap between groups." },
+      { name: "commands (ToolbarCommands)", type: "{ id, label, icon?, onSelect, priority?, pinned?, disabled?, overflow? }[]", description: "Measured commands retain order; lower priorities move to More first. Pinned commands remain separately available. overflow=always explicitly puts a command in the menu. A command with an icon shows only the icon in the bar (label is its accessible name and its More menu text); one without shows its label." },
     ],
     notes: [
       "ToolbarGroup is one piece of liquid glass; its items are transparent — never glass on glass.",
       "role=toolbar: arrow keys, Home and End move between its controls (mirrored in RTL). Give icon-only items an aria-label.",
       "ToolbarOverflow is a \"More\" button with a glass menu; its children are DropdownMenu items.",
+      "ToolbarCommands handles width allocation on both tracks using one generated pure allocator. If pinned actions cannot all fit, their bounded group scrolls horizontally. It composes custom controls; it is not the system ToolbarItem allocation engine.",
     ],
   },
   "scroll-edge": {
     props: [
       { name: "edge", type: `"top" | "bottom"`, default: `"top"`, description: "Put a top edge first and a bottom edge last inside the scrolling content." },
-      { name: "variant", type: `"automatic" | "soft" | "hard"`, default: `"automatic"`, description: "soft: a progressive blur; hard: a near-opaque strip for dense text and pinned headers; automatic: soft on touch, hard with a fine pointer. (Apple's scrollEdgeEffectStyle — named variant here so it doesn't shadow the style prop.)" },
+      { name: "variant", type: `"automatic" | "soft" | "hard"`, default: `"automatic"`, description: "soft: a progressive blur; hard: a near-opaque strip for dense text and pinned headers; automatic: a continuous diffuse toolbar top that fades below the controls, following the 27 treatment. (Apple's scrollEdgeEffectStyle — named variant here so it doesn't shadow the style prop.)" },
     ],
     notes: [
       "A sentinel at the content's edge sets data-over-content on the bars at that edge (data-bar-edge) in the same scroll container — Toolbar, Dock, NavigationBar — so their shadows deepen while content is beneath (glass-shadow-adaptive).",
@@ -252,9 +304,9 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
       { name: "isActive (SidebarMenuButton)", type: "boolean", default: "false", description: "The current destination (aria-current)." },
     ],
     notes: [
-      "A floating, inset liquid panel; the content runs under it on narrow screens, where the trigger opens it over the page (Escape or the backdrop closes it).",
+      "Wide liquid sidebars meet their container edges. On narrow containers the trigger opens a modal overlay; Escape or the backdrop closes it.",
       "Two levels at most: SidebarMenu and one SidebarMenuSub.",
-      "BackgroundExtension wraps media (a hero image) so a mirrored, blurred copy fills the strip under the sidebar — SwiftUI's backgroundExtensionEffect().",
+      "BackgroundExtension takes an image src and optional start/end strip widths. Foreground children render once. Its mirrored blur approximates backgroundExtensionEffect; the installed native bridge does not expose that modifier.",
     ],
   },
   "search-field": {
@@ -265,14 +317,19 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
       { name: "placement", type: `"inline" | "bottom"`, default: `"inline"`, description: "bottom floats it fixed at the bottom edge and rides the on-screen keyboard (visualViewport)." },
       { name: "showCancel", type: `"auto" | "always" | "never"`, default: `"auto"`, description: "auto: while focused (or open from minimized). Cancel clears, blurs and folds." },
       { name: "suggestions / onSuggestionSelect", type: "(string | { value, label })[]", description: "A listbox under the field (over it at the bottom): ↑/↓ to move, Enter to pick. Filter them yourself." },
+      { name: "tokens / onTokenRemove", type: "readonly { id, label }[] / (id: string) => void", description: "Removable tokens inside the query field. Backspace on an empty query removes the last token. Supply filtering state in the parent." },
     ],
     notes: ["Escape clears the text, then cancels."],
   },
   "action-sheet": {
-    props: [{ name: "variant (ActionSheetAction)", type: `"default" | "destructive" | "preferred"`, default: `"default"`, description: "destructive for the risky choice; preferred sets it in bold." }],
+    props: [
+      { name: "variant (ActionSheetAction)", type: `"default" | "destructive" | "preferred"`, default: `"default"`, description: "destructive for the risky choice; preferred sets it in bold." },
+      { name: "native (native ActionSheet)", type: "boolean", default: "true", description: "Supported plain, uncontrolled iOS choices use the real source-attached ConfirmationDialog. false selects the custom sheet." },
+      { name: "onAction (native ActionSheetAction)", type: "() => void", description: "Eventless system selection. RN onPress selects the custom path and receives its event. A Cancel callback selects custom to distinguish explicit cancellation from passive dismissal." },
+    ],
     notes: [
-      "The choices share one liquid group; ActionSheetCancel (write it last) sits in its own capsule below. Tapping outside cancels; Escape too.",
-      "Bottom-anchored on phones, centred from sm. Built on the alert-dialog primitives: focus is trapped and Cancel takes it on open.",
+      "Web choices share one liquid group; ActionSheetCancel (write it last) sits in its own capsule below. Outside taps and Escape dismiss without calling Cancel's callback. Dialog semantics preserve focus trapping and return to the source.",
+      "The web/custom sheet is bottom-anchored on phones and centered on wider layouts. The iOS system owns anchored presentation and which Cancel/disabled choices are visible; controlled state, rich actions, preferred/custom styling and RN action events select the custom implementation.",
     ],
   },
   checkbox: {
@@ -643,6 +700,7 @@ const PROPS: Record<string, { props?: PropRow[]; notes?: string[] }> = {
       { name: "detent / defaultDetent / onDetentChange", type: "number", default: "0", description: "The current detent's index." },
       { name: "grabber (SheetContent)", type: "boolean", default: "true with detents", description: "The capsule at the top: a button — press, Enter or Space steps to the next detent, ↑/↓ step up or down; drag it to resize or, below the smallest detent, to dismiss." },
       { name: "onBeforeDismiss (SheetContent)", type: "() => boolean | Promise<boolean>", description: "Asked before a drag-to-dismiss closes the sheet; return false to keep it (\"Discard changes?\")." },
+      { name: "container (SheetContent)", type: "HTMLElement | null", description: "Present inside this element instead of the viewport: edges, detents and the full-height anchor are measured against it. Give it position: relative. The showcase scenes use it so a sheet stays inside its app frame." },
       { name: "modal (Sheet)", type: "boolean", default: "true", description: "false makes an inspector: no dimmed page, no focus trap, outside clicks don't close it." },
     ],
     notes: ["Put long content in SheetBody: it fills the space between SheetHeader and SheetFooter and scrolls."],

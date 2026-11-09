@@ -1,11 +1,13 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { Dialog as SheetPrimitive } from "radix-ui"
 import { XIcon } from "lucide-react"
 
 import { Button } from "@/components/glass/button"
+import { GlassPortal } from "@/lib/glass-portal"
+import { GlassMorphContext, useGlassMorphRef, useGlassPresentation } from "@/lib/glass-transitions"
 
 const SheetContext = React.createContext<{ modal: boolean; setOpen: (open: boolean) => void }>({ modal: true, setOpen: () => {} })
 
@@ -14,42 +16,39 @@ const SheetContext = React.createContext<{ modal: boolean; setOpen: (open: boole
  * stays usable and outside clicks don't close it.
  */
 function Sheet({ modal = true, open, defaultOpen, onOpenChange, ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
-  const [inner, setInner] = React.useState(defaultOpen ?? false)
-  const current = open ?? inner
-  const setOpen = React.useCallback(
-    (next: boolean) => {
-      setInner(next)
-      onOpenChange?.(next)
-    },
-    [onOpenChange]
-  )
+  const presentation = useGlassPresentation({ open, defaultOpen, onOpenChange })
+  const { setOpen } = presentation
   const ctx = React.useMemo(() => ({ modal, setOpen }), [modal, setOpen])
   return (
-    <SheetContext.Provider value={ctx}>
-      <SheetPrimitive.Root data-slot="sheet" modal={modal} open={current} onOpenChange={setOpen} {...props} />
-    </SheetContext.Provider>
+    <GlassMorphContext.Provider value={presentation}>
+      <SheetContext.Provider value={ctx}>
+        <SheetPrimitive.Root data-slot="sheet" modal={modal} open={presentation.open} onOpenChange={setOpen} {...props} />
+      </SheetContext.Provider>
+    </GlassMorphContext.Provider>
   )
 }
 
-function SheetTrigger({ ...props }: React.ComponentProps<typeof SheetPrimitive.Trigger>) {
-  return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />
+function SheetTrigger({ ref, ...props }: React.ComponentProps<typeof SheetPrimitive.Trigger>) {
+  const source = useGlassMorphRef<HTMLButtonElement>("trigger", ref)
+  return <SheetPrimitive.Trigger ref={source} data-slot="sheet-trigger" {...props} />
 }
 
 function SheetClose({ ...props }: React.ComponentProps<typeof SheetPrimitive.Close>) {
   return <SheetPrimitive.Close data-slot="sheet-close" {...props} />
 }
 
-function SheetPortal({ ...props }: React.ComponentProps<typeof SheetPrimitive.Portal>) {
-  return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />
+function SheetPortal({ container, ...props }: React.ComponentProps<typeof SheetPrimitive.Portal>) {
+  return <GlassPortal container={container}>{(host) => <SheetPrimitive.Portal data-slot="sheet-portal" container={host} {...props} />}</GlassPortal>
 }
 
-function SheetOverlay({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Overlay>) {
+function SheetOverlay({ className, contained = false, ...props }: React.ComponentProps<typeof SheetPrimitive.Overlay> & { contained?: boolean }) {
   return (
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
       data-glass-motion=""
       className={cn(
-        "fixed inset-0 z-50 bg-glass-dim duration-[calc(var(--glass-duration)*1.5)] ease-glass data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
+        contained ? "absolute" : "fixed",
+        "inset-0 z-50 bg-glass-dim duration-[calc(var(--glass-duration)*1.5)] ease-glass data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
         className
       )}
       {...props}
@@ -104,8 +103,10 @@ function SheetContent({
   onDetentChange,
   grabber,
   onBeforeDismiss,
+  container,
   style,
   onInteractOutside,
+  ref,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
   side?: SheetSide
@@ -120,25 +121,37 @@ function SheetContent({
   grabber?: boolean
   /** Asked before a drag-to-dismiss closes the sheet; return false (or a promise of false) to keep it — "Discard changes?". */
   onBeforeDismiss?: () => boolean | Promise<boolean>
+  /**
+   * Present inside this element instead of the viewport, like a sheet in one window or an
+   * app scene. The element needs `position: relative` (or any containing block); edges,
+   * detents and the full-height anchor are measured against it.
+   */
+  container?: HTMLElement | null
 }) {
   const { modal, setOpen } = React.useContext(SheetContext)
+  const contained = !!container
+  const morph = React.useContext(GlassMorphContext)
+  const setRef = useGlassMorphRef<HTMLDivElement>("content", ref)
   const sized = side === "bottom" && !!detents?.length
   const [innerDetent, setInnerDetent] = React.useState(defaultDetent ?? 0)
-  const index = Math.min(detent ?? innerDetent, (detents?.length ?? 1) - 1)
+  const index = Math.max(0, Math.min(detent ?? innerDetent, (detents?.length ?? 1) - 1))
   const setDetent = (i: number) => {
     setInnerDetent(i)
     onDetentChange?.(i)
   }
-  const drag = useSheetDrag({ enabled: sized, detents: detents ?? [], index, setDetent, setOpen, onBeforeDismiss })
+  const drag = useSheetDrag({ enabled: sized, detents: detents ?? [], index, setDetent, setOpen, onBeforeDismiss, container })
   const large = sized && detents?.[index] === "large"
   const showGrabber = grabber ?? sized
   return (
-    <SheetPortal>
-      {modal ? <SheetOverlay /> : null}
+    <SheetPortal container={container ?? undefined}>
+      {modal ? <SheetOverlay contained={contained} /> : null}
       <SheetPrimitive.Content
+        ref={setRef}
         data-slot="sheet-content"
+        data-morphing={morph?.morphing || undefined}
         data-side={side}
         data-modal={modal ? undefined : "false"}
+        data-contained={contained || undefined}
         data-detent={sized ? String(detents?.[index]) : undefined}
         data-dragging={drag.dragging ? "" : undefined}
         data-glass-motion=""
@@ -147,9 +160,15 @@ function SheetContent({
           // an inspector stays open while the page is used
           if (!modal) e.preventDefault()
         }}
-        style={sized ? { height: drag.height, ...style } : style}
+        style={{
+          ...(sized ? { height: drag.height } : {}),
+          ...(contained ? { maxHeight: "calc(100% - 1.5rem)" } : {}),
+          ...(large ? { bottom: 0, insetInline: 0, maxHeight: contained ? "100%" : "100dvh", maxWidth: "none", borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : {}),
+          ...style,
+        }}
         className={cn(
-          "glass-liquid fixed z-50 flex flex-col gap-4 overflow-y-auto overscroll-contain rounded-surface text-sm text-popover-foreground ease-glass data-open:animate-in data-open:fade-in-0 data-open:duration-[calc(var(--glass-duration)*1.5)] data-closed:animate-out data-closed:fade-out-0 data-closed:duration-(--glass-duration)",
+          contained ? "absolute" : "fixed",
+          "glass-liquid z-50 flex flex-col gap-4 overflow-y-auto overscroll-contain rounded-surface text-sm text-popover-foreground ease-glass data-morphing:animate-none! data-open:animate-in data-open:fade-in-0 data-open:duration-[calc(var(--glass-duration)*1.5)] data-closed:animate-out data-closed:fade-out-0 data-closed:duration-(--glass-duration)",
           // under reduced motion the slide is dropped — only the fade is left (and data-glass-motion stills even that)
           "motion-reduce:[--tw-enter-translate-x:0]! motion-reduce:[--tw-enter-translate-y:0]! motion-reduce:[--tw-exit-translate-x:0]! motion-reduce:[--tw-exit-translate-y:0]!",
           "data-[side=end]:inset-y-3 data-[side=left]:inset-y-3 data-[side=right]:inset-y-3 data-[side=start]:inset-y-3",
@@ -161,7 +180,7 @@ function SheetContent({
           "data-[side=top]:inset-x-3 data-[side=top]:top-[max(0.75rem,env(safe-area-inset-top))] data-[side=top]:max-h-[calc(100dvh-1.5rem-env(safe-area-inset-top))] data-[side=top]:data-open:slide-in-from-top data-[side=top]:data-closed:slide-out-to-top",
           "data-[side=bottom]:inset-x-3 data-[side=bottom]:bottom-[max(0.75rem,env(safe-area-inset-bottom))] data-[side=bottom]:max-h-[calc(100dvh-1.5rem-env(safe-area-inset-bottom))] data-[side=bottom]:data-open:slide-in-from-bottom data-[side=bottom]:data-closed:slide-out-to-bottom",
           // detents: height follows the drag, springs to rest; full height turns opaque (iOS)
-          "data-detent:overflow-hidden data-detent:transition-[height,background-color] data-detent:duration-[calc(var(--glass-duration)*1.5)] data-dragging:transition-none sm:data-detent:mx-auto sm:data-detent:max-w-xl motion-reduce:data-detent:transition-none",
+          "data-detent:overflow-hidden data-detent:transition-[height,background-color,bottom,inset-inline,border-radius] data-detent:duration-[calc(var(--glass-duration)*1.5)] data-dragging:transition-none sm:data-detent:mx-auto sm:data-detent:max-w-xl motion-reduce:data-detent:transition-none",
           "data-[detent=large]:bg-popover data-[detent=large]:[--glass-liquid-opacity:100%]",
           className
         )}
@@ -187,6 +206,21 @@ function subscribeResize(onChange: () => void) {
   return () => window.removeEventListener("resize", onChange)
 }
 
+/** The height detents are measured against: the viewport, or the presenting container. */
+function useBoundsHeight(container?: HTMLElement | null) {
+  const viewport = React.useSyncExternalStore(subscribeResize, () => window.innerHeight, () => 0)
+  const [inner, setInner] = React.useState(0)
+  React.useLayoutEffect(() => {
+    if (!container) return
+    const measure = () => setInner(container.clientHeight)
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [container])
+  return container ? inner : viewport
+}
+
 /** Drag the grabber (or header) to resize between detents; release below the smallest to dismiss. */
 function useSheetDrag({
   enabled,
@@ -195,6 +229,7 @@ function useSheetDrag({
   setDetent,
   setOpen,
   onBeforeDismiss,
+  container,
 }: {
   enabled: boolean
   detents: SheetDetent[]
@@ -202,11 +237,12 @@ function useSheetDrag({
   setDetent: (i: number) => void
   setOpen: (open: boolean) => void
   onBeforeDismiss?: () => boolean | Promise<boolean>
+  container?: HTMLElement | null
 }) {
-  const vh = React.useSyncExternalStore(subscribeResize, () => window.innerHeight, () => 0)
+  const vh = useBoundsHeight(container)
   const [dragHeight, setDragHeight] = React.useState<number | null>(null)
   // 0.75rem gap above and below, as the edges of an inset sheet
-  const heights = detents.map((d) => detentHeight(d, vh, 24))
+  const heights = detents.map((d) => detentHeight(d, vh, d === "large" ? 0 : 24))
   const height = !enabled || !vh ? undefined : (dragHeight ?? heights[index])
 
   const onPointerDown = (e: React.PointerEvent<HTMLElement>) => {

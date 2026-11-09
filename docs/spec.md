@@ -19,13 +19,13 @@ shadcn's standard is Tailwind v4 + CSS variables + Radix + `cn`, copied into the
 
 ## Theming
 
-See [`theming.md`](theming.md): 101 primitives in eleven groups, composable presets (12 palettes, 7 materials, 4 shapes, 4 motions, 3 densities, 8 type presets), 70 `registry:font` items ([`typography.md`](typography.md)), the theme engine (`glass-theme`), `ThemeScope`, and the Theme Studio at `/themes`. Agents: [`architecture.md`](architecture.md), [`rules/`](rules/README.md), `skills/`.
+See [`theming.md`](theming.md): 108 primitives in eleven groups, composable presets (12 palettes, 7 materials, 4 shapes, 4 motions, 3 densities, 8 type presets), 70 `registry:font` items ([`typography.md`](typography.md)), the theme engine (`glass-theme`), `ThemeScope`, and the Theme Studio at `/themes`. Agents: [`architecture.md`](architecture.md), [`rules/`](rules/README.md), `skills/`.
 
 ## Foundations (v1 notes)
 
 - `glass-style` (`registry:lib`): `lib/glass.ts` (the `glassVariants` cva shared by every surface) + CSS variables (light/dark) + `@utility glass | glass-strong | glass-subtle` + aurora keyframes + reduced-motion + a `@supports not (backdrop-filter)` fallback.
   - `--glass`, `--glass-strong`, `--glass-subtle`, `--glass-border`, `--glass-highlight`, `--glass-shadow`, `--glass-blur`, `--glass-saturate`, `--glass-fill`, `--aurora-base`, `--aurora-1..3`; Tailwind colours `bg-glass`, `bg-fill`, `border-glass-border`, `text-aurora-1`…
-- Palettes (`registry:theme`): `theme-dusk` (default), `theme-ocean`, `theme-rose`, `theme-sage`, `theme-amber`, `theme-graphite` set `--primary`, `--ring`, `--aurora-*`, `--chart-1..3` for light and dark.
+- Palettes (`registry:theme`): `theme-system` (default: Apple's system appearance), `theme-dusk`, `theme-ocean`, `theme-rose`, `theme-sage`, `theme-amber`, `theme-graphite` set `--primary`, `--ring`, `--aurora-*`, `--chart-1..3` for light and dark.
 
 ## Components (web)
 

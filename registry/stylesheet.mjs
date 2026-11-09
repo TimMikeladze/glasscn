@@ -10,7 +10,8 @@ const mixed = (colour, amount) => `color-mix(in oklch, ${colour} ${amount}, tran
 // --glass-tinted is the tint variant's hook (a colour mixed into the frost); it must not be
 // --glass-tint itself — a custom property that references itself is invalid and turns the pane clear.
 // --glass-clarity (0 ultra clear … 0.5 as designed … 1 fully tinted) scales every frost, like iOS 27's slider
-const clarity = (o) => `calc(var(${o}) * min(1, var(--glass-clarity) * 2) + (100% - var(${o})) * max(0, var(--glass-clarity) * 2 - 1))`
+// The clear end keeps half the frost: Apple's clearest look still diffuses enough for labels.
+const clarity = (o) => `calc(var(${o}) * (0.5 + 0.5 * min(1, var(--glass-clarity) * 2)) + (100% - var(${o})) * max(0, var(--glass-clarity) * 2 - 1))`
 const frost = (opacity) => mixed("var(--glass-tinted, var(--glass-tint))", clarity(opacity))
 const rim = mixed("var(--glass-border-color)", "var(--glass-border-opacity)")
 const highlight = mixed("var(--glass-highlight-color)", "var(--glass-highlight-opacity)")
@@ -70,8 +71,11 @@ export const themeTokens = {
   "color-destructive-foreground": "var(--destructive-foreground, oklch(0.985 0 0))",
   "color-destructive-ink": "color-mix(in oklch, var(--destructive) 30%, var(--glass-label))",
   "color-glass-dim": mixed("oklch(0 0 0)", "var(--glass-dim)"),
+  "color-glass-media-dim": mixed("oklch(0 0 0)", "var(--glass-liquid-clear-dim)"),
+  "color-glass-media-foreground": "var(--glass-highlight-color)",
   "shadow-glass-knob": `0 3px 8px ${mixed("var(--glass-shadow-color)", "calc(var(--glass-shadow-opacity) + 8%)")}, 0 1px 2px ${mixed("var(--glass-shadow-color)", "calc(var(--glass-shadow-opacity) + 4%)")}`,
-  "shadow-glass-accent": `0 8px 22px ${mixed("var(--primary)", "32%")}, inset 0 1px 0 ${mixed("oklch(1 0 0)", "30%")}`,
+  // Apple's filled buttons carry no coloured glow: a faint neutral lift and the top highlight
+  "shadow-glass-accent": `0 1px 3px ${mixed("var(--glass-shadow-color)", "calc(var(--glass-shadow-opacity) * 0.6)")}, inset 0 1px 0 ${mixed("oklch(1 0 0)", "30%")}`,
   "color-aurora-base": "var(--aurora-base)",
   "color-aurora-1": "var(--aurora-1)",
   "color-aurora-2": "var(--aurora-2)",
@@ -104,7 +108,8 @@ export const themeTokens = {
 }
 
 const materialFilter = "blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness))"
-const liquidFilter = "blur(var(--glass-liquid-blur)) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness))"
+const liquidFilter = "blur(calc(var(--glass-liquid-blur) + var(--glass-surface-depth, 0) * var(--glass-depth-blur))) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness)) var(--glass-optical-filter, blur(0px))"
+const clearFilter = "blur(var(--glass-liquid-clear-blur)) saturate(var(--glass-liquid-saturate)) brightness(var(--glass-brightness)) var(--glass-optical-filter, blur(0px))"
 const surface = (opacity, filter = materialFilter, { inset = true } = {}) => ({
   // text inside a pane uses the material's own label colours (a smoked pane in a light theme
   // needs light text), remapping shadcn's foreground tokens for everything inside it
@@ -128,6 +133,7 @@ const surface = (opacity, filter = materialFilter, { inset = true } = {}) => ({
  * The two-sided liquid rim (LG-04): a conic stroke from --glass-light-angle — specular on the lit
  * side, edge-shade opposite — masked to the border ring. Drawn in ::before so it follows the radius.
  */
+const activity = "calc(var(--glass-inactive-strength) + (1 - var(--glass-inactive-strength)) * var(--glass-window-active, 1))"
 const lightRim = {
   content: '""',
   position: "absolute",
@@ -135,7 +141,7 @@ const lightRim = {
   padding: "max(1px, var(--glass-border-width))",
   "border-radius": "inherit",
   "pointer-events": "none",
-  background: `conic-gradient(from var(--glass-light-angle), ${mixed("var(--glass-highlight-color)", "var(--glass-specular)")}, transparent 25%, ${mixed("oklch(0 0 0)", "var(--glass-edge-shade)")} 50%, transparent 75%, ${mixed("var(--glass-highlight-color)", "var(--glass-specular)")})`,
+  background: `conic-gradient(from var(--glass-light-angle), ${mixed("var(--glass-highlight-color)", `calc(var(--glass-specular) * ${activity})`)}, transparent 25%, ${mixed("oklch(0 0 0)", `calc(var(--glass-edge-shade) * ${activity})`)} 50%, transparent 75%, ${mixed("var(--glass-highlight-color)", `calc(var(--glass-specular) * ${activity})`)})`,
   "-webkit-mask": "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
   "-webkit-mask-composite": "xor",
   mask: "linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0)",
@@ -148,13 +154,23 @@ const illumination = {
     inset: "0",
     "border-radius": "inherit",
     background: `radial-gradient(circle at var(--glass-press-x, 50%) var(--glass-press-y, 50%), ${mixed("var(--glass-highlight-color)", "var(--glass-illumination)")}, transparent 60%)`,
+    "pointer-events": "none",
     "mix-blend-mode": "plus-lighter",
     opacity: "0",
     transition: "opacity calc(var(--glass-duration) * 2) ease-out",
   },
   "&:active::after, &[data-pressed]:not([data-pressed=false])::after": { opacity: "1", "transition-duration": "calc(var(--glass-duration) * 0.5)" },
 }
-const liquidSurface = (opacity) => ({ ...surface(opacity, liquidFilter, { inset: false }), isolation: "isolate", "&::before": lightRim })
+const liquidSurface = (opacity, filter = liquidFilter) => ({
+  ...surface(opacity, filter, { inset: false }),
+  "background-color": `var(--glass-bg, ${mixed("var(--glass-tinted, var(--glass-tint))", `min(100%, calc(${clarity(opacity)} + var(--glass-surface-depth, 0) * var(--glass-depth-opacity)))`)})`,
+  "box-shadow": `var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) ${mixed("var(--glass-shadow-color)", `calc(var(--glass-shadow-opacity) * ${activity})`)}), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) ${glow}`,
+  // no uniform stroke: Liquid Glass shows its edge through the two-sided rim (specular on the lit
+  // side, edge shade opposite). Increase Contrast, Show control borders and forced colours add a
+  // solid border back. The width stays so the box doesn't shift when they do.
+  "border-color": "transparent",
+  isolation: "isolate", "&::before": lightRim,
+})
 const springEase = "var(--glass-ease)"
 const pressTransition = `scale calc(var(--glass-duration) * 1.5) ${springEase}`
 
@@ -187,19 +203,27 @@ export const customVariants = Object.fromEntries([
   [`@custom-variant data-vertical (&:where([data-orientation="vertical"]))`, {}],
 ])
 
-/** Clear liquid glass: over media only, a dim beneath, bright text on top. */
-const clearSurface = () => {
-  const base = liquidSurface("--glass-liquid-clear-opacity")
+/** Clear liquid glass: bright labels over media. Dim bright media behind the controls separately. */
+const clearLabels = () => {
+  // Once clarity makes the material predominantly opaque, its own label palette
+  // supplies contrast. round() makes this an intentional switch, avoiding a gray
+  // midpoint where foreground and frost would have the same luminance.
+  const opaqueStep = "round(down, clamp(0, calc(var(--glass-clarity) + 0.35), 1), 1)"
+  const opaque = `calc(${opaqueStep} * 100%)`
+  const label = `color-mix(in oklch, var(--glass-label) ${opaque}, oklch(0.985 0 0))`
+  const secondary = `color-mix(in oklch, var(--glass-label) ${opaque}, oklch(0.9 0 0))`
   return {
-    ...base,
-    color: "oklch(0.985 0 0)",
-    "--foreground": "oklch(0.985 0 0)",
-    "--card-foreground": "oklch(0.985 0 0)",
-    "--popover-foreground": "oklch(0.985 0 0)",
-    "--muted-foreground": "oklch(0.9 0 0)",
-    "background-image": `linear-gradient(${mixed("oklch(0 0 0)", "var(--glass-liquid-clear-dim)")}, ${mixed("oklch(0 0 0)", "var(--glass-liquid-clear-dim)")}), ${base["background-image"]}`,
+    color: label,
+    "--foreground": label,
+    "--card-foreground": label,
+    "--popover-foreground": label,
+    "--muted-foreground": secondary,
   }
 }
+const clearSurface = () => ({
+  ...liquidSurface("--glass-liquid-clear-opacity", clearFilter), ...clearLabels(),
+  "background-color": `var(--glass-bg, ${mixed("var(--glass-tinted, var(--glass-tint))", `max(${clarity("--glass-liquid-clear-opacity")}, calc(round(down, clamp(0, calc(var(--glass-clarity) + 0.35), 1), 1) * 70%))`)})`,
+})
 
 /** Apple's text styles (iOS Dynamic Type at the default size), scaled by --glass-text-scale. */
 const textStyle = (px, leading, weight, heading = false) => ({
@@ -227,10 +251,11 @@ const focusOutline = { outline: "var(--glass-ring-width) solid var(--ring)" }
 const focusHalo = `0 0 0 2px ${mixed("var(--glass-tint)", "92%")}`
 // a closed overlay's shape: the trigger's size (centred) in a capsule
 const morphStart = "inset(calc((100% - var(--glass-morph-h, 100%)) / 2) calc((100% - var(--glass-morph-w, 100%)) / 2) round var(--glass-radius-button))"
-const panes = ".glass, .glass-strong, .glass-subtle, .glass-liquid, .glass-liquid-clear"
+const panes = ".glass, .glass-strong, .glass-subtle, .glass-thick, .glass-liquid, .glass-liquid-clear"
 const scopes = ":root, [data-glass-scope]"
 const darkScopes = `:is(:root, [data-glass-scope])${DARK}`
 const important = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, `${v} !important`]))
+const accessibleClear = { color: "var(--glass-label)", "--foreground": "var(--glass-label)", "--muted-foreground": "var(--glass-label-secondary)", "--popover-foreground": "var(--glass-label)" }
 
 /** Utilities, keyframes and fallbacks. */
 export const stylesheet = {
@@ -239,10 +264,12 @@ export const stylesheet = {
   "@utility glass": surface("--glass-opacity"),
   "@utility glass-strong": surface("--glass-opacity-strong"),
   "@utility glass-subtle": surface("--glass-opacity-subtle"),
+  "@utility glass-thick": surface("--glass-opacity-thick", "blur(calc(var(--glass-blur) * 1.5)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness))"),
   /** Liquid glass (regular): the control layer — toolbars, the dock, floating buttons, menus, sheets. */
   "@utility glass-liquid": liquidSurface("--glass-liquid-opacity"),
   /** Liquid glass (clear): over photos and video only; dims what's behind, text on it is bright. */
   "@utility glass-liquid-clear": clearSurface(),
+  "@utility glass-clear-label": clearLabels(),
   /** The two-sided light rim on its own (glass-liquid and glass-liquid-clear include it). Positions the element if it is static. */
   "@utility glass-light": { "&::before": lightRim },
   /** A glow from the pointer while pressed. Pair with useGlassPointer for the position (centre without it). */
@@ -250,7 +277,7 @@ export const stylesheet = {
   /** A deeper shadow while content scrolls under the bar (ScrollEdge sets data-over-content). */
   "@utility glass-shadow-adaptive": {
     transition: "box-shadow var(--glass-duration) ease-out",
-    "&[data-over-content]:not([data-over-content=false])": {
+    "&[data-over-content]:not([data-over-content=false]), [data-over-content]:not([data-over-content=false]) &": {
       "--glass-elevation": `0 calc(var(--glass-shadow-y) * var(--glass-shadow-over-content)) calc(var(--glass-shadow-blur) * var(--glass-shadow-over-content)) ${mixed("var(--glass-shadow-color)", "min(100%, calc(var(--glass-shadow-opacity) * var(--glass-shadow-over-content)))")}`,
     },
   },
@@ -287,7 +314,7 @@ export const stylesheet = {
    */
   "@utility glass-knob-lens": {
     "background-color": "var(--glass-knob)",
-    "&:is(:where(.group):active > *, [data-dragging]:not([data-dragging=false]), [data-dragging]:not([data-dragging=false]) *)": {
+    "&:is(:where(.group):active > *, [data-dragging]:not([data-dragging=false]), [data-dragging]:not([data-dragging=false]) *), :where([data-slot=switch], [data-slot=slider], [data-slot=segmented-control]):active &": {
       "background-color": mixed("var(--glass-knob)", "22%"),
       "-webkit-backdrop-filter": liquidFilter,
       "backdrop-filter": liquidFilter,
@@ -340,6 +367,14 @@ export const stylesheet = {
     },
   },
   /** A near-opaque material strip at a scroll edge (NAV-02): for dense text, pinned tables, macOS-style bars. */
+  "@utility scroll-edge-automatic": {
+    "pointer-events": "none",
+    "background-color": mixed("var(--glass-tint)", "max(var(--glass-opacity-strong), 86%)"),
+    "-webkit-backdrop-filter": materialFilter,
+    "backdrop-filter": materialFilter,
+    "-webkit-mask-image": "linear-gradient(to var(--glass-scroll-edge-to, bottom), #000 65%, transparent)",
+    "mask-image": "linear-gradient(to var(--glass-scroll-edge-to, bottom), #000 65%, transparent)",
+  },
   "@utility scroll-edge-hard": {
     "pointer-events": "none",
     "background-color": mixed("var(--glass-tint)", "max(var(--glass-opacity-strong), 88%)"),
@@ -358,7 +393,7 @@ export const stylesheet = {
   /** A tap area of at least 24px (fine pointers) or --glass-hit-min (touch), without changing the layout. */
   "@utility hit-area": {
     position: "relative",
-    "&::after": { content: '""', position: "absolute", top: "50%", left: "50%", width: "max(100%, 24px)", height: "max(100%, 24px)", translate: "-50% -50%" },
+    "&::after": { content: '""', position: "absolute", top: "50%", left: "50%", width: "max(100%, 24px)", height: "max(100%, 24px)", translate: "-50% -50%", "pointer-events": "auto" },
   },
   // top-level, not nested in the utility: the shadcn CLI mangles an @media nested inside @utility
   "@media (pointer: coarse)": { ".hit-area::after": { width: "max(100%, var(--glass-hit-min))", height: "max(100%, var(--glass-hit-min))" } },
@@ -419,6 +454,13 @@ export const stylesheet = {
   },
   // registered so it interpolates (an unregistered custom property flips at 50%)
   "@property --glass-materialize": { syntax: '"<number>"', inherits: "false", "initial-value": "1" },
+  "@property --glass-optical-filter": { syntax: '"*"', inherits: "false", "initial-value": "blur(0px)" },
+  "@property --glass-surface-depth": { syntax: '"<number>"', inherits: "false", "initial-value": "0" },
+  "@property --glass-window-active": { syntax: '"<number>"', inherits: "true", "initial-value": "1" },
+  ":where([data-glass-window-active=false])": { "--glass-window-active": "0" },
+  ":where([data-glass-window-active=true])": { "--glass-window-active": "1" },
+  ":where(.glass-liquid, .glass-prominent) :where(.text-primary-ink)": { color: "color-mix(in oklch, color-mix(in oklch, var(--primary) 30%, var(--glass-label)) calc(var(--glass-window-active, 1) * 100%), var(--glass-label-secondary))" },
+  ":where([data-glass-show-borders]) :is(.glass-liquid, .glass-liquid-clear, .glass-prominent, .glass-knob-lens)": { "border-color": "var(--glass-label-secondary)", "border-width": "max(1px, var(--glass-border-width))" },
   "@keyframes glass-materialize": {
     from: {
       "--glass-materialize": "0",
@@ -465,11 +507,13 @@ export const stylesheet = {
   // the rim and glow are absolutely positioned pseudo-elements: position static elements, at zero
   // specificity in the base layer so fixed / absolute / sticky (any utility) win
   "@layer base": {
-    ":where(.glass-liquid, .glass-liquid-clear, .glass-light, .glass-prominent, .glass-illuminate, .scroll-edge-soft)": { position: "relative" },
+    ":where(.glass-liquid, .glass-liquid-clear, .glass-light, .glass-prominent, .glass-illuminate, .scroll-edge-soft, .scroll-edge-automatic)": { position: "relative" },
     // default springs for the press and the lens; any transition-* utility on the element replaces them
     ":where(.glass-press, .glass-press-liquid)": { transition: pressTransition },
     ":where(.glass-knob-lens)": { transition: `${pressTransition}, background-color var(--glass-duration) ease-out, box-shadow var(--glass-duration) ease-out` },
   },
+  "::view-transition-group(.glass-presentation)": { "animation-duration": "calc(var(--glass-duration) * 2.5)", "animation-timing-function": "var(--glass-ease)" },
+  "::view-transition-image-pair(.glass-presentation)": { "border-radius": "inherit", overflow: "clip" },
   // first frame of an overlay that grows from its trigger (top level: an at-rule can't nest in @utility)
   "@starting-style": { ".glass-morph-origin:is([data-state=open], [data-state=delayed-open], [data-state=instant-open])": { "clip-path": morphStart } },
   // No backdrop-filter (old browsers, some WebViews): panes become nearly opaque.
@@ -488,24 +532,31 @@ export const stylesheet = {
     ".glass-morph-origin": { "clip-path": "none !important", transition: "none !important" },
   },
   "@media (prefers-reduced-transparency: reduce)": {
+    ".glass-liquid-clear": accessibleClear,
+    [panes]: important({ "--glass-clarity": "0.5", "--glass-opacity": "90%", "--glass-opacity-strong": "96%", "--glass-opacity-subtle": "84%", "--glass-liquid-opacity": "90%", "--glass-liquid-clear-opacity": "90%", "--glass-refraction": "0px" }),
     [scopes]: important({
       "--glass-opacity": "90%", "--glass-opacity-strong": "96%", "--glass-opacity-subtle": "84%",
       "--glass-liquid-opacity": "90%", "--glass-liquid-clear-opacity": "70%", "--glass-clarity": "0.5",
       "--glass-blur": "40px", "--glass-liquid-blur": "30px", "--glass-sheen": "0%", "--glass-texture": "none",
-      "--glass-specular": "0%", "--glass-illumination": "0%",
+      "--glass-specular": "0%", "--glass-illumination": "0%", "--glass-refraction": "0px",
     }),
   },
   "@media (prefers-contrast: more)": {
+    ".glass-liquid-clear": accessibleClear,
+    [panes]: important({ "--glass-clarity": "0.5", "--glass-opacity": "94%", "--glass-opacity-strong": "97%", "--glass-opacity-subtle": "90%", "--glass-liquid-opacity": "94%", "--glass-liquid-clear-opacity": "94%", "--glass-refraction": "0px" }),
     [scopes]: important({
       "--glass-opacity": "94%", "--glass-opacity-strong": "97%", "--glass-opacity-subtle": "90%",
       "--glass-liquid-opacity": "94%", "--glass-liquid-clear-opacity": "80%", "--glass-clarity": "0.5",
       "--glass-border-width": "1.5px", "--glass-border-opacity": "100%", "--glass-border-color": "oklch(0.25 0 0)",
       "--glass-highlight-opacity": "0%", "--glass-sheen": "0%", "--glass-glow": "0%", "--glass-texture": "none",
-      "--glass-specular": "0%", "--glass-edge-shade": "0%", "--glass-illumination": "0%", "--glass-press-stretch": "0", "--glass-press-grow": "1",
+      "--glass-specular": "0%", "--glass-edge-shade": "0%", "--glass-illumination": "0%", "--glass-press-stretch": "0", "--glass-press-grow": "1", "--glass-refraction": "0px",
       "--glass-label-secondary": "oklch(0.36 0.01 285)",
     }),
     [darkScopes]: important({ "--glass-border-color": "oklch(1 0 0)", "--glass-label-secondary": "oklch(0.93 0.01 285)" }),
+    ":is(.glass-liquid, .glass-liquid-clear, .glass-prominent)": { "border-color": rim },
   },
+  ":where([data-glass-reduce-transparency]) .glass-liquid-clear": accessibleClear,
+  ":where([data-glass-reduce-highlights]) :is(.glass-liquid, .glass-liquid-clear, .glass-light, .glass-illuminate, .glass-prominent)": important({ "--glass-specular": "0%", "--glass-illumination": "0%" }),
   "@media (forced-colors: active)": {
     [panes]: {
       "-webkit-backdrop-filter": "none", "backdrop-filter": "none", "background-color": "Canvas", "background-image": "none",
@@ -577,8 +628,8 @@ export const proseStylesheet = {
     "& :where(ol)": { "list-style-type": "decimal", "padding-inline-start": "1.4em", "font-variant-numeric": "var(--glass-numeric)" },
     "& :where(li)": { "margin-block": "0.3em" },
     "& :where(li)::marker": { color: "var(--primary)" },
+    // indented, no rail
     "& :where(blockquote)": {
-      "border-inline-start": "3px solid var(--primary)",
       "padding-inline-start": "1em",
       "font-family": fontChain.heading,
       "font-size": step(1),
@@ -637,16 +688,18 @@ export const proseStylesheet = {
     "& :where(sup > a[data-footnote-ref], a[data-footnote-ref])": { "text-decoration-line": "none", "font-variant-numeric": "var(--glass-numeric)" },
     "& :where(section[data-footnotes])": { "margin-top": "2.5em", "padding-top": "1em", "border-top": `1px solid ${rim10}`, "font-size": step(-1), color: "var(--muted-foreground)" },
     // GitHub alerts (> [!NOTE]) as rendered by remark-github-blockquote-alert / rehype-github-alerts
+    // a callout is a quiet full-surface fill, never an edge rail
     "& :where(.markdown-alert)": {
-      "border-inline-start": "3px solid var(--primary)",
-      "padding-inline-start": "1em",
+      "background-color": "color-mix(in oklch, var(--glass-fill-tint) var(--glass-fill-opacity), transparent)",
+      "border-radius": "var(--glass-radius-control)",
+      padding: "0.75em 1em",
       "font-family": "inherit",
       "font-size": "inherit",
       "line-height": "inherit",
       color: "inherit",
     },
     "& :where(.markdown-alert-title)": { "font-weight": "600", color: "var(--primary)", display: "flex", "align-items": "center", gap: "0.4em" },
-    "& :where(.markdown-alert-warning, .markdown-alert-caution)": { "border-inline-start-color": "var(--destructive)" },
+    "& :where(.markdown-alert-warning, .markdown-alert-caution) :where(.markdown-alert-title)": { color: "var(--destructive)" },
     "& :where(.markdown-alert-warning, .markdown-alert-caution) :where(.markdown-alert-title)": { color: "var(--destructive)" },
     "& :where(.markdown-alert-tip)": { "border-inline-start-color": "var(--success)" },
     "& :where(.markdown-alert-tip) :where(.markdown-alert-title)": { color: "var(--success)" },

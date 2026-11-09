@@ -17,6 +17,8 @@ const eslintConfig = defineConfig([
     ".verify/**",
     // prebuilt deployment output from `vercel build`
     ".vercel/**",
+    // review probe scripts kept as evidence, not shipped code
+    "docs/research/evidence/**",
   ]),
 ]);
 

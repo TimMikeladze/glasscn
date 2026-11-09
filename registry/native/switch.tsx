@@ -1,11 +1,13 @@
 import * as React from "react"
 import { I18nManager, Platform, Pressable, View, type PressableProps, type StyleProp, type ViewStyle } from "react-native"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
-import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
+import Animated, { interpolateColor, runOnJS, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
 import { Host, Switch as NativeSwitch } from "@expo/ui"
 
 import { hitSlop, useReducedMotion } from "@/components/glass/native/a11y"
+import { Glass } from "@/components/glass/native/glass"
 import { haptics } from "@/components/glass/native/press"
+import { nativeControlTheme, useGlassThemeOptions } from "@/components/glass/native/tokens"
 import { useUI, web } from "@/components/glass/native/ui"
 
 type SwitchProps = Omit<PressableProps, "style" | "children" | "onPress"> & {
@@ -41,9 +43,10 @@ function useChecked({ checked, defaultChecked = false, onCheckedChange }: Switch
 
 function SystemSwitch({ checked, defaultChecked, onCheckedChange, disabled, style, testID, accessibilityLabel, ...props }: SwitchProps) {
   const ui = useUI()
+  const appearance = nativeControlTheme(ui, useGlassThemeOptions())
   const [on, set] = useChecked({ checked, defaultChecked, onCheckedChange })
   return (
-    <Host matchContents colorScheme={ui.scheme} seedColor={ui.primary} accessibilityLabel={accessibilityLabel ?? props["aria-label"]} style={[{ alignSelf: "flex-start" }, style]}>
+    <Host matchContents {...appearance} accessibilityLabel={accessibilityLabel ?? props["aria-label"]} style={[{ alignSelf: "flex-start" }, style]}>
       <NativeSwitch value={on} onValueChange={set} disabled={!!disabled} testID={testID} />
     </Host>
   )
@@ -57,6 +60,7 @@ function GlassSwitch({ checked, defaultChecked, onCheckedChange, size = "default
   const spring = ui.motion.springConfig
   const pos = useSharedValue(on ? 1 : 0)
   const held = useSharedValue(0)
+  const [touching, setTouching] = React.useState(false)
   // gesture scratch: shared values, read from the gesture callbacks (not render)
   const dragged = useSharedValue(false)
 
@@ -66,43 +70,48 @@ function GlassSwitch({ checked, defaultChecked, onCheckedChange, size = "default
 
   const hold = (to: number) => {
     held.set(reduced ? 0 : withSpring(to, spring))
+    setTouching(to > 0)
   }
   const toggle = (next: boolean) => {
     if (next !== on) haptics.selection()
     set(next)
+    if (checked !== undefined) pos.set(reduced ? (on ? 1 : 0) : withSpring(on ? 1 : 0, spring))
   }
 
   // drag-to-toggle: horizontal only, so a switch inside a ScrollView still scrolls (NAT-30)
   const dir = I18nManager.isRTL ? -1 : 1
+  const endHold = () => {
+    setTouching(false)
+    // Pressable's release follows the pan finalizer.
+    setTimeout(() => dragged.set(false), 0)
+  }
   const pan = Gesture.Pan()
-    .runOnJS(true)
     .enabled(!disabled)
     .activeOffsetX([-6, 6])
     .failOffsetY([-8, 8])
     .onStart(() => {
       dragged.set(true)
-      hold(1)
+      held.set(reduced ? 0 : withSpring(1, spring))
+      runOnJS(setTouching)(true)
     })
     .onUpdate((e) => {
       pos.set(Math.min(1, Math.max(0, (on ? 1 : 0) + (dir * e.translationX) / travel)))
     })
     .onEnd(() => {
       const next = pos.get() > 0.5
-      if (next === on) pos.set(reduced ? (on ? 1 : 0) : withSpring(on ? 1 : 0, spring))
-      toggle(next)
+      pos.set(reduced ? (next ? 1 : 0) : withSpring(next ? 1 : 0, spring))
+      runOnJS(toggle)(next)
     })
-    .onFinalize(() => {
-      hold(0)
-      // the Pressable's onPress follows the release; let it see the drag first
-      setTimeout(() => dragged.set(false), 0)
+    .onFinalize((_e, success) => {
+      held.set(reduced ? 0 : withSpring(0, spring))
+      if (!success) pos.set(reduced ? (on ? 1 : 0) : withSpring(on ? 1 : 0, spring))
+      runOnJS(endHold)()
     })
 
   const track = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(pos.value, [0, 1], [ui.fillStrong, ui.primary]) }))
   const lens = ui.motion.knobLensScale
   const knobStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: dir * pos.value * travel }, { scaleX: 1 + held.value * (lens - 1) * 1.3 }, { scaleY: 1 + held.value * (lens - 1) * 0.6 }],
-    // while held the knob is a lens: it clears towards the glass knob colour
-    backgroundColor: interpolateColor(held.value, [0, 1], ["#FFFFFF", ui.knob]),
   }))
 
   return (
@@ -126,10 +135,12 @@ function GlassSwitch({ checked, defaultChecked, onCheckedChange, size = "default
           <View style={{ width: knobW, height: knob }} pointerEvents="none">
             <Animated.View
               style={[
-                { width: knobW, height: knob, borderRadius: knob / 2, shadowColor: "#000", shadowOpacity: 0.15, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
+                { width: knobW, height: knob, borderRadius: knob / 2 },
                 knobStyle,
               ]}
-            />
+            >
+              {touching && !disabled ? <Glass variant="liquid" interactive radius={knob / 2} style={{ flex: 1 }} /> : <View style={{ flex: 1, borderRadius: knob / 2, backgroundColor: ui.thumb, shadowColor: "#000", shadowOpacity: 0.15, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 2 }} />}
+            </Animated.View>
           </View>
         </Animated.View>
       </Pressable>

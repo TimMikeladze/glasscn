@@ -309,7 +309,7 @@ function Project() {
                 </div>
                 <DialogFooter>
                   <DialogClose asChild>
-                    <Button variant="glass">Cancel</Button>
+                    <Button variant="secondary">Cancel</Button>
                   </DialogClose>
                   <DialogClose asChild>
                     <Button onClick={() => toast.success("Invite sent")}>

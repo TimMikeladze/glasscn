@@ -1,4 +1,4 @@
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 /** A small glass lens with the accent ring — the glasscn mark. */
 export function Logo({ className }: { className?: string }) {

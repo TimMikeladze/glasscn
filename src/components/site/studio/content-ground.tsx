@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 
 /** A stand-in photo painted from the theme's chart colours, so it changes with the palette. */
 const photo = (sky: number, sun: number, hill: number, at: number): React.CSSProperties => ({

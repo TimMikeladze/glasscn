@@ -1,0 +1,46 @@
+import { chromium, shot } from "./lib.mjs"
+import { sceneSetup, status } from "./scene.mjs"
+const b = await chromium.launch()
+const log = (...a) => console.log(...a)
+const fi = (p) => p.evaluate(() => { const a = document.activeElement; return a === document.body ? "BODY" : (a.getAttribute("aria-label") || a.textContent.trim().slice(0,20) || a.tagName) })
+{
+  const { c, p, scene } = await sceneSetup(b, "Mail")
+  await scene.getByRole("button", { name: /Jordan Lee/ }).click(); await p.waitForTimeout(300)
+  log("opened", await scene.getByRole("region", { name: "Message", exact: true }).locator("h2").textContent())
+  await scene.getByRole("button", { name: "Flag message" }).click(); await p.waitForTimeout(200)
+  log("flag pressed", await scene.getByRole("button", { name: "Unflag message" }).getAttribute("aria-pressed"))
+  await scene.getByRole("button", { name: /^Flagged/ }).click(); await p.waitForTimeout(300)
+  log("Flagged folder list", await scene.locator("ul button").allInnerTexts().then(a => a.map(s => s.split("\n")[0])))
+  await scene.getByRole("button", { name: /^Inbox/ }).click(); await p.waitForTimeout(300)
+  await scene.getByRole("button", { name: /Sam Rivera/ }).click(); await p.waitForTimeout(300)
+  await scene.getByRole("button", { name: "Archive message" }).click(); await p.waitForTimeout(300)
+  log("archive status", await status(p), "focus", await fi(p), "message pane", await scene.getByRole("region", { name: "Message", exact: true }).innerText().then(s => s.slice(0, 60)))
+  await shot(p, "mail-after-archive", { clip: await scene.boundingBox() })
+  // compose
+  const compose = scene.getByRole("button", { name: "New message" })
+  await compose.click(); await p.waitForTimeout(600)
+  const d = p.getByRole("dialog")
+  log("compose", await d.locator("h2").textContent(), "focus", await fi(p), "send disabled", await d.getByRole("button", { name: "Send" }).isDisabled())
+  await shot(p, "mail-compose", { clip: await scene.boundingBox() })
+  await d.getByRole("textbox").first().fill("pat@example.org"); await d.locator("textarea").fill("Draft body")
+  // Cancel -> reopen: is draft kept despite "Cancel discards it"?
+  log("desc", await d.locator('[data-slot="sheet-description"]').textContent().catch(() => "?"))
+  await d.getByRole("button", { name: "Cancel" }).click(); await p.waitForTimeout(500)
+  log("after cancel focus", await fi(p), "dialogs", await p.getByRole("dialog").count())
+  await compose.click(); await p.waitForTimeout(600)
+  log("reopen To value", await p.getByRole("dialog").getByRole("textbox").first().inputValue(), "body", await p.getByRole("dialog").locator("textarea").inputValue())
+  await p.keyboard.press("Escape"); await p.waitForTimeout(500)
+  log("Escape with draft: dialogs", await p.getByRole("dialog").count(), "focus", await fi(p))
+  // modal? try clicking list behind while open
+  await compose.click(); await p.waitForTimeout(600)
+  const inert = await p.evaluate(() => { const l = document.querySelector('[data-testid="liquid-glass-scene"] ul'); return { inert: l.closest("[inert]") ? true : false, ariaHidden: !!l.closest("[aria-hidden=true]") } })
+  log("behind compose", JSON.stringify(inert))
+  await p.getByRole("dialog").getByRole("button", { name: "Send" }).click(); await p.waitForTimeout(500)
+  log("send status", await status(p), "focus", await fi(p))
+  // sidebar trigger
+  await scene.getByRole("button", { name: /Toggle Sidebar|sidebar/i }).first().click(); await p.waitForTimeout(500)
+  await shot(p, "mail-sidebar-toggled", { clip: await scene.boundingBox() })
+  log("errors", p._errs)
+  await c.close()
+}
+await b.close()

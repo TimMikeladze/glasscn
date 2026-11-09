@@ -1,12 +1,12 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import { Slot, ToggleGroup as ToggleGroupPrimitive } from "radix-ui"
 
 import { useGlassPointer } from "@/hooks/use-glass-pointer"
 import { slidingIndicatorClass, useSlidingIndicator } from "@/hooks/use-sliding-indicator"
-import { useScrollMinimized } from "@/components/glass/scroll-edge"
+import { useScrollMinimized, useScrollOverContent } from "@/components/glass/scroll-edge"
 import { SearchField, type SearchFieldProps } from "@/components/glass/search-field"
 
 /**
@@ -57,6 +57,7 @@ function Dock({ className, position = "fixed", minimizeBehavior = "never", layou
   React.useImperativeHandle(forwardedRef, () => ref.current as HTMLDivElement)
   useDockInset(ref, position === "fixed")
   const scrolled = useScrollMinimized(ref, minimizeBehavior === "onScrollDown")
+  const over = useScrollOverContent(ref, position === "fixed" ? "bottom" : null)
   const [searching, setSearching] = React.useState(false)
   const minimized = scrolled || searching
   const ctx = React.useMemo<DockCtx>(() => ({ minimized, placement: minimized ? "inline" : "expanded", setSearching }), [minimized])
@@ -69,6 +70,7 @@ function Dock({ className, position = "fixed", minimizeBehavior = "never", layou
         data-layout={layout}
         data-bar-edge={position === "fixed" ? "bottom" : undefined}
         data-minimized={minimized ? "" : undefined}
+        data-over-content={over ? "" : undefined}
         className={cn(
           "group/dock pointer-events-none z-40 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 px-3 data-[position=fixed]:fixed data-[position=fixed]:inset-x-0 data-[position=fixed]:bottom-[max(1rem,env(safe-area-inset-bottom))] *:pointer-events-auto",
           "data-minimized:flex-nowrap",
@@ -113,8 +115,17 @@ const itemSelector = '[data-slot="dock-item"]'
  */
 function useScrub(onPick: (item: HTMLElement, done: boolean) => void) {
   const [dragging, setDragging] = React.useState(false)
+  const pick = React.useRef(onPick)
+  React.useLayoutEffect(() => { pick.current = onPick }, [onPick])
+  const stop = React.useRef<() => void>(() => {})
+  const suppressClick = React.useRef(false)
+  const clickTimer = React.useRef<number | null>(null)
+  React.useEffect(() => () => { stop.current(); if (clickTimer.current !== null) window.clearTimeout(clickTimer.current) }, [])
   const onPointerDown = (e: React.PointerEvent<HTMLElement>) => {
-    if (e.button !== 0) return
+    if (e.button !== 0 || e.isPrimary === false) return
+    stop.current()
+    if (clickTimer.current !== null) window.clearTimeout(clickTimer.current)
+    suppressClick.current = false
     const bar = e.currentTarget
     const start = e.clientX
     let moved = false
@@ -132,23 +143,35 @@ function useScrub(onPick: (item: HTMLElement, done: boolean) => void) {
       const item = at(ev.clientX, ev.clientY)
       if (item && item !== last) {
         last = item
-        onPick(item, false)
+        pick.current(item, false)
       }
     }
-    const up = () => {
+    const detach = () => {
       window.removeEventListener("pointermove", move)
       window.removeEventListener("pointerup", up)
       window.removeEventListener("pointercancel", up)
+    }
+    const up = (event: PointerEvent) => {
+      detach()
       if (!moved) return
       setDragging(false)
-      if (last) onPick(last, true)
-      // the click that follows a drag lands on the bar, not an item; nothing to cancel
+      if (event.type !== "pointerup") return
+      if (last) pick.current(last, true)
+      suppressClick.current = true
+      clickTimer.current = window.setTimeout(() => { suppressClick.current = false }, 0)
     }
+    stop.current = detach
     window.addEventListener("pointermove", move)
     window.addEventListener("pointerup", up)
     window.addEventListener("pointercancel", up)
   }
-  return { dragging, onPointerDown }
+  const onClickCapture = (event: React.MouseEvent<HTMLElement>) => {
+    if (!suppressClick.current || event.detail === 0) return
+    suppressClick.current = false
+    event.preventDefault()
+    event.stopPropagation()
+  }
+  return { dragging, onPointerDown, onClickCapture }
 }
 
 type DockBarProps = Omit<React.ComponentProps<typeof ToggleGroupPrimitive.Root>, "type" | "value" | "defaultValue" | "onValueChange"> & {
@@ -173,7 +196,7 @@ const itemClass = cn(
   // compact: icon and label side by side, a shorter bar
   "group-data-[layout=compact]/dock:h-control group-data-[layout=compact]/dock:flex-row group-data-[layout=compact]/dock:gap-1.5 group-data-[layout=compact]/dock:px-pad-sm group-data-[layout=compact]/dock:text-xs group-data-[layout=compact]/dock:[&_svg:not([class*='size-'])]:size-[1.1rem]",
   // minimized: only the current item, glyph only
-  "group-data-minimized/dock:min-w-control-lg group-data-minimized/dock:gap-0 group-data-minimized/dock:px-0 group-data-minimized/dock:text-[0px] group-data-minimized/dock:data-[state=off]:hidden"
+  "group-data-minimized/dock:min-w-control-lg group-data-minimized/dock:gap-0 group-data-minimized/dock:px-0 group-data-minimized/dock:text-[0px] group-data-minimized/dock:data-[state=off]:not-data-prominent:hidden"
 )
 
 /** A count on an item: "3" reads as "3 new" to assistive tech. */
@@ -191,7 +214,7 @@ function DockBadge({ children }: { children: React.ReactNode }) {
 }
 
 /** In-page views: one choice at a time (radio semantics). For routes use DockNav. */
-function DockBar({ className, value, defaultValue, onValueChange, children, onPointerDown, ref: forwardedRef, ...props }: DockBarProps) {
+function DockBar({ className, value, defaultValue, onValueChange, children, onPointerDown, onClickCapture, ref: forwardedRef, ...props }: DockBarProps) {
   const [inner, setInner] = React.useState(defaultValue ?? "")
   const current = value ?? inner
   const ref = useSlidingIndicator<HTMLDivElement>('[data-slot="dock-item"][data-state="on"]', forwardedRef)
@@ -212,8 +235,9 @@ function DockBar({ className, value, defaultValue, onValueChange, children, onPo
       onValueChange={select}
       onPointerDown={(e: React.PointerEvent<HTMLDivElement>) => {
         onPointerDown?.(e)
-        scrub.onPointerDown(e)
+        if (!e.defaultPrevented) scrub.onPointerDown(e)
       }}
+      onClickCapture={(event) => { scrub.onClickCapture(event); if (!event.defaultPrevented) onClickCapture?.(event) }}
       className={cn(barClass, className)}
       {...props}
     >
@@ -224,7 +248,7 @@ function DockBar({ className, value, defaultValue, onValueChange, children, onPo
 }
 
 /** Route navigation: a `nav` landmark of DockLinks. Drag across it and release to open the link under your finger. */
-function DockNav({ className, children, onPointerDown, ref: forwardedRef, ...props }: React.ComponentProps<"nav">) {
+function DockNav({ className, children, onPointerDown, onClickCapture, ref: forwardedRef, ...props }: React.ComponentProps<"nav">) {
   const ref = useSlidingIndicator<HTMLElement>('[data-slot="dock-item"][data-state="on"]', forwardedRef)
   const scrub = useScrub((item, done) => {
     if (done && item.getAttribute("aria-current") !== "page") item.click()
@@ -237,8 +261,9 @@ function DockNav({ className, children, onPointerDown, ref: forwardedRef, ...pro
       aria-label="Main"
       onPointerDown={(e) => {
         onPointerDown?.(e)
-        scrub.onPointerDown(e)
+        if (!e.defaultPrevented) scrub.onPointerDown(e)
       }}
+      onClickCapture={(event) => { scrub.onClickCapture(event); if (!event.defaultPrevented) onClickCapture?.(event) }}
       className={cn(barClass, className)}
       {...props}
     >

@@ -1,4 +1,10 @@
 import type { ComponentType } from "react"
+import LiquidGlass from "./liquid-glass"
+import LiquidGlass01 from "./liquid-glass-01"
+import LiquidGlass02 from "./liquid-glass-02"
+import GlassCluster from "./glass-cluster"
+import BackgroundExtension from "./background-extension"
+import GlassMorph from "./glass-morph"
 
 import ActivityRings from "./activity-rings"
 import Analytics01 from "./analytics-01"
@@ -91,6 +97,12 @@ import ItemDemo from "./item"
 import EmptyDemo from "./empty"
 /** One live example per documented item. Their source is the "Usage" on each page. */
 export const demos: Record<string, ComponentType> = {
+  "liquid-glass": LiquidGlass,
+  "liquid-glass-01": LiquidGlass01,
+  "liquid-glass-02": LiquidGlass02,
+  "glass-cluster": GlassCluster,
+  "background-extension": BackgroundExtension,
+  "glass-morph": GlassMorph,
   aurora: Aurora,
   glass: Glass,
   card: Card,

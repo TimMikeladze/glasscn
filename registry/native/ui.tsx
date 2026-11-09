@@ -1,8 +1,8 @@
 import * as React from "react"
-import { Platform, Text as RNText, type TextProps, type TextStyle } from "react-native"
+import { DynamicColorIOS, Platform, PlatformColor, StyleSheet, Text as RNText, type ColorValue, type TextProps, type TextStyle } from "react-native"
 
-import { MAX_FONT_SCALE } from "@/components/glass/native/a11y"
-import { useGlassTheme, type GlassTheme } from "@/components/glass/native/tokens"
+import { MAX_FONT_SCALE, useBoldText } from "@/components/glass/native/a11y"
+import { buildGlassTheme, NativeGlassLabelsContext, useGlassTheme, useGlassThemeOptions, type GlassTheme } from "@/components/glass/native/tokens"
 
 /**
  * The React Native port of glasscn's CSS variables (glass-theme.ts TOKENS) as plain
@@ -46,7 +46,12 @@ export function buildUI(t: GlassTheme): UI {
     muted: t.labelTertiary,
     control: { xs: Math.round(28 * d), sm: Math.round(32 * d), default: Math.round(40 * d), lg: Math.round(48 * d) },
     pad: { xs: Math.round(10 * d), sm: Math.round(12 * d), default: Math.round(16 * d), lg: Math.round(22 * d) },
-    text: { xs: Math.round(12 * t.type.scale), sm: step(-1) < 14 ? Math.round(14 * t.type.scale) : step(-1), base: step(0), lg: step(1), xl: step(2), "2xl": step(3), "3xl": step(4), "4xl": step(5), "5xl": step(6) },
+    // iOS sizes are Apple's default text-style sizes for the ramp each step maps to (Caption 1,
+    // Subheadline, Body, Title 3, Title 2, Title 1, Large Title); other platforms keep the web's
+    // modular scale. Both follow the type preset's scale.
+    text: Platform.OS === "ios"
+      ? { xs: Math.round(12 * t.type.scale), sm: Math.round(15 * t.type.scale), base: Math.round(17 * t.type.scale), lg: Math.round(20 * t.type.scale), xl: Math.round(22 * t.type.scale), "2xl": Math.round(28 * t.type.scale), "3xl": Math.round(34 * t.type.scale), "4xl": Math.max(Math.round(40 * t.type.scale), step(5)), "5xl": Math.max(Math.round(48 * t.type.scale), step(6)) }
+      : { xs: Math.round(12 * t.type.scale), sm: step(-1) < 14 ? Math.round(14 * t.type.scale) : step(-1), base: step(0), lg: step(1), xl: step(2), "2xl": step(3), "3xl": step(4), "4xl": step(5), "5xl": step(6) },
     fonts: { sans: t.fonts.sans, heading: t.fonts.heading ?? t.fonts.sans, display: t.fonts.display ?? t.fonts.heading ?? SYSTEM_FONTS.display, mono: t.fonts.mono ?? SYSTEM_FONTS.mono },
     weight: { body: weight(t.type.bodyWeight), heading: weight(t.type.headingWeight), display: weight(t.type.displayWeight) },
     motion: {
@@ -74,8 +79,44 @@ export function alpha(color: string, a: number): string {
 /** Web-only style keys (boxShadow, backdropFilter, cursor…) typed loosely so RN accepts them. */
 export const web = (s: Record<string, unknown>) => (Platform.OS === "web" ? (s as object) : {})
 
+/** Dynamic colors let UIKit apply the glass contentView's contrast and vibrancy. */
+export function useGlassForeground(color?: ColorValue): ColorValue {
+  const theme = useGlassTheme()
+  const options = useGlassThemeOptions()
+  const dynamic = React.useContext(NativeGlassLabelsContext)
+  const accent = React.useMemo(() => Platform.OS === "ios" ? DynamicColorIOS({
+    light: buildGlassTheme("light", theme.palette).primary,
+    dark: buildGlassTheme("dark", theme.palette).primary,
+    highContrastLight: buildGlassTheme("light", theme.palette, { highContrast: true }).primary,
+    highContrastDark: buildGlassTheme("dark", theme.palette, { highContrast: true }).primary,
+  }) : theme.primary, [theme.palette, theme.primary])
+  const requested = color ?? theme.foreground
+  if (!dynamic || Platform.OS !== "ios") return requested
+  if (requested === theme.foreground || requested === theme.label || requested === dynamic.foreground || requested === dynamic.label) return PlatformColor("label")
+  if (requested === theme.labelSecondary || requested === theme.mutedForeground || requested === dynamic.labelSecondary || requested === dynamic.mutedForeground) return PlatformColor("secondaryLabel")
+  if (requested === theme.labelTertiary || requested === dynamic.labelTertiary) return PlatformColor("tertiaryLabel")
+  if (requested === theme.labelQuaternary || requested === dynamic.labelQuaternary) return PlatformColor("quaternaryLabel")
+  if (requested === theme.primary && options.tokens?.primary === undefined) return accent
+  return requested
+}
+
+export function GIcon({ children, color, size }: { children: React.ReactElement<{ color?: ColorValue; size?: number }>; color?: ColorValue; size?: number }) {
+  const foreground = useGlassForeground(children.props.color ?? color)
+  return React.cloneElement(children, { color: foreground, size: children.props.size ?? size })
+}
 
 export type TextSize = keyof UI["text"]
+const TYPE_RAMPS: Record<TextSize, TextProps["dynamicTypeRamp"]> = {
+  xs: "caption1",
+  sm: "subheadline",
+  base: "body",
+  lg: "title3",
+  xl: "title2",
+  "2xl": "title1",
+  "3xl": "largeTitle",
+  "4xl": "largeTitle",
+  "5xl": "largeTitle",
+}
 export type TextTone = "default" | "muted" | "subtle" | "primary" | "destructive" | "onPrimary"
 export type TextFont = "sans" | "heading" | "display" | "mono"
 
@@ -107,13 +148,18 @@ export function toneColor(ui: UI, tone: TextTone = "default") {
 }
 
 /** The base text every ported glasscn component sets type with. */
-export function GText({ size = "base", tone = "default", font = "sans", weight, color, align, style, maxFontSizeMultiplier, ...rest }: GTextProps) {
+export function GText({ size = "base", tone = "default", font = "sans", weight, color, align, style, maxFontSizeMultiplier, dynamicTypeRamp, ...rest }: GTextProps) {
   const ui = useUI()
+  const bold = useBoldText()
   const fontSize = ui.text[size]
   const fontWeight = weight ?? (font === "heading" ? ui.weight.heading : font === "display" ? ui.weight.display : ui.weight.body)
+  const restingWeight = StyleSheet.flatten(style)?.fontWeight ?? fontWeight
+  const numericWeight = Number(restingWeight) || (restingWeight === "bold" ? 700 : 400)
+  const accessibleWeight = String(Math.min(900, Math.max(600, numericWeight + 100))) as TextStyle["fontWeight"]
+  const foreground = useGlassForeground(StyleSheet.flatten(style)?.color ?? color ?? toneColor(ui, tone))
   return (
     <RNText
-      // big type grows less under large Dynamic Type (NAT-23)
+      dynamicTypeRamp={dynamicTypeRamp ?? (Platform.OS === "ios" ? TYPE_RAMPS[size] : undefined)}
       maxFontSizeMultiplier={maxFontSizeMultiplier ?? (font === "display" || fontSize >= 31 ? MAX_FONT_SCALE.display : font === "heading" ? MAX_FONT_SCALE.heading : MAX_FONT_SCALE.body)}
       style={[
         {
@@ -127,6 +173,8 @@ export function GText({ size = "base", tone = "default", font = "sans", weight, 
           textAlign: align,
         },
         style,
+        bold ? { fontWeight: accessibleWeight } : null,
+        { color: foreground },
       ]}
       {...rest}
     />

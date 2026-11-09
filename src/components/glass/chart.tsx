@@ -14,7 +14,7 @@
  * `ChartSummary`) for people who can't see the plot.
  */
 import * as React from "react"
-import { cn } from "cn"
+import { cn } from "@/lib/glass-cn"
 import type { ChartAxisPresentationOptions, ChartPoint, ChartTooltipContent, ChartTooltipContentContext, ChartValue } from "@tanstack/charts"
 import { motion } from "@tanstack/charts/motion"
 import { Chart, type ChartProps } from "@tanstack/charts/react/core"
