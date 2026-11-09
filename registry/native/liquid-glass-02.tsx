@@ -1,6 +1,7 @@
 import * as React from "react"
 import { Image, ScrollView, Share, StyleSheet, TextInput, View, useWindowDimensions, type ViewProps } from "react-native"
-import { CheckIcon, ChevronRightIcon, FolderPlusIcon, HeartIcon, HistoryIcon, MountainIcon, PinIcon, Redo2Icon, SearchIcon, ShareIcon, Undo2Icon, XIcon } from "lucide-react-native"
+import { CheckIcon, ChevronRightIcon, FolderPlusIcon, HeartIcon, HistoryIcon, MountainIcon, PinIcon, PinOffIcon, Redo2Icon, SearchIcon, ShareIcon, Undo2Icon, XIcon } from "lucide-react-native"
+import { announce } from "@/components/glass/native/a11y"
 import { BackgroundExtension } from "@/components/glass/native/background-extension"
 import { Backdrop } from "@/components/glass/native/backdrop"
 import { Button } from "@/components/glass/native/button"
@@ -63,7 +64,7 @@ function Landmarks({ width, photoBase }: { width: number; photoBase?: string }) 
       </BackgroundExtension>
     </View>
     <ScrollView horizontal accessibilityLabel="Saved places" showsHorizontalScrollIndicator contentContainerStyle={{ paddingTop: 20, paddingBottom: 12, paddingLeft: ui.pad.default + (wide ? 160 : 0), paddingRight: ui.pad.default + (wide ? 192 : 0), gap: 12 }}>
-      {PLACES.map((entry, index) => <Press key={entry.id} accessibilityRole="button" accessibilityLabel={`Select ${entry.title}`} aria-pressed={selection === index} onPress={() => setSelection(index)} style={{ width: Math.max(180, width * 0.25), padding: ui.pad.sm, gap: 10, borderRadius: ui.radius.control, borderWidth: 1, borderColor: ui.glassBorder, backgroundColor: selection === index ? ui.fillStrong : ui.fill }}><Image alt="" source={{ uri: image(index, photoBase) }} accessible={false} style={{ width: "100%", aspectRatio: 16 / 9, borderRadius: ui.radius.control }} /><GText font="heading" size="sm">{entry.title}</GText></Press>)}
+      {PLACES.map((entry, index) => <Press key={entry.id} accessibilityRole="button" accessibilityLabel={`Select ${entry.title}`} aria-pressed={selection === index} onPress={() => setSelection(index)} style={{ width: Math.max(180, width * 0.25), padding: ui.pad.sm, gap: 10, borderRadius: ui.radius.control, borderWidth: 2, borderColor: selection === index ? ui.primary : ui.glassBorder, backgroundColor: selection === index ? ui.fillStrong : ui.fill }}><Image alt="" source={{ uri: image(index, photoBase) }} accessible={false} style={{ width: "100%", aspectRatio: 16 / 9, borderRadius: ui.radius.control }} /><GText font="heading" size="sm">{entry.title}</GText></Press>)}
     </ScrollView>
     {wide ? <Glass variant="liquid" style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 160, borderRadius: 0, padding: ui.pad.default, gap: 16 }}><GText font="heading">Collections</GText>{([["places", "Saved places"], ["badges", "Activity badges"]] as const).map(([id, label]) => <Button key={id} variant={section === id ? "secondary" : "ghost"} accessibilityState={{ selected: section === id }} onPress={() => { setSection(id); setMessage(id === "places" ? "Showing saved places." : "Showing activity badges.") }}>{label}</Button>)}</Glass> : null}
     {wide ? <Glass variant="liquid" style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 192, borderRadius: 0 }}>{inspector}</Glass> : inspector}
@@ -76,49 +77,84 @@ function Landmarks({ width, photoBase }: { width: number; photoBase?: string }) 
 }
 
 const NOTE_STYLES = ["Title", "Heading", "Body", "Monostyled"] as const
+type NoteStyle = (typeof NOTE_STYLES)[number]
+type NoteState = { text: string; format: NoteStyle }
+/** Typing within this many milliseconds of the last keystroke joins the same undo step. */
+const UNDO_PAUSE = 1000
+
+/**
+ * Undo history for the note: a run of typing is one step, as in UITextView, and a format change
+ * is its own step. `typedAt` is the last keystroke; a format change or an undo ends the run.
+ */
+type NoteHistory = { past: NoteState[]; current: NoteState; future: NoteState[]; typedAt: number }
+function noteHistory(history: NoteHistory, change: { text: string } | { format: NoteStyle }, now: number): NoteHistory {
+  if ("format" in change) {
+    if (change.format === history.current.format) return history
+    return { past: [...history.past, history.current], current: { ...history.current, format: change.format }, future: [], typedAt: 0 }
+  }
+  const run = history.typedAt > 0 && now - history.typedAt < UNDO_PAUSE
+  return { past: run ? history.past : [...history.past, history.current], current: { ...history.current, text: change.text }, future: [], typedAt: now }
+}
 
 // Notes: icon-only bar items with a tinted Done, a plain document, a bottom Checklist/Aa group,
 // and a nonmodal system Format sheet that leaves the note editable behind it.
 // https://developer.apple.com/videos/play/wwdc2026/269/?time=375
 function Notes() {
   const ui = useUI()
-  const [history, setHistory] = React.useState({ past: [] as string[], text: initialNote, future: [] as string[] })
-  const [saved, setSaved] = React.useState(initialNote)
-  const [format, setFormat] = React.useState<(typeof NOTE_STYLES)[number]>("Body")
-  const [savedFormat, setSavedFormat] = React.useState<(typeof NOTE_STYLES)[number]>("Body")
+  const accessible = useWindowDimensions().fontScale >= 1.7
+  const [history, setHistory] = React.useState<NoteHistory>({ past: [], current: { text: initialNote, format: "Body" }, future: [], typedAt: 0 })
+  const [saved, setSaved] = React.useState<NoteState>(history.current)
   const [pinned, setPinned] = React.useState(false)
   const [open, setOpen] = React.useState(false)
-  const [message, setMessage] = React.useState("")
+  const [status, setStatus] = React.useState({ text: "", id: 0 })
   const editor = React.useRef<TextInput>(null)
-  const edit = (text: string) => setHistory(current => ({ past: [...current.past, current.text], text, future: [] }))
-  const save = () => { setSaved(history.text); setSavedFormat(format); setMessage("Note saved."); setOpen(false); editor.current?.blur() }
-  const share = async () => { try { const result = await Share.share({ message: history.text }); if (result.action === Share.sharedAction) setMessage("Note shared.") } catch { setMessage("Sharing closed. Your note is still here.") } }
+  const { text, format } = history.current
+  const notify = (message: string) => setStatus(current => ({ text: message, id: current.id + 1 }))
+  // results show on screen for a moment and are spoken; the message then clears
+  React.useEffect(() => {
+    if (!status.text) return
+    announce(status.text)
+    const timer = setTimeout(() => setStatus(current => current.id === status.id ? { ...current, text: "" } : current), 3000)
+    return () => clearTimeout(timer)
+  }, [status])
+  const edit = (next: string) => setHistory(current => noteHistory(current, { text: next }, Date.now()))
+  const setFormat = (next: NoteStyle) => setHistory(current => noteHistory(current, { format: next }, Date.now()))
+  const undo = () => setHistory(current => current.past.length ? { past: current.past.slice(0, -1), current: current.past.at(-1)!, future: [current.current, ...current.future], typedAt: 0 } : current)
+  const redo = () => setHistory(current => current.future.length ? { past: [...current.past, current.current], current: current.future[0], future: current.future.slice(1), typedAt: 0 } : current)
+  const save = () => { setSaved(history.current); notify("Note saved."); setOpen(false); editor.current?.blur() }
+  // closing Format would otherwise raise the keyboard over Aa: the editor took focus without it
+  const changeOpen = (next: boolean) => { setOpen(next); if (!next) editor.current?.blur() }
+  const share = async () => { try { const result = await Share.share({ message: text }); if (result.action === Share.sharedAction) notify("Note shared.") } catch { notify("Sharing closed. Your note is still here.") } }
   const type = format === "Title" ? { fontSize: ui.text["3xl"], fontWeight: "700" as const } : format === "Heading" ? { fontSize: ui.text.xl, fontWeight: "700" as const } : format === "Monostyled" ? { fontSize: ui.text.base, fontFamily: ui.fonts.mono } : { fontSize: ui.text.base }
-  return <Sheet open={open} onOpenChange={setOpen}>
+  return <Sheet open={open} onOpenChange={changeOpen}>
     <View style={{ flex: 1, minHeight: 620 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 12, paddingTop: 12 }}>
         <ToolbarCommands style={{ flex: 1 }} accessibilityLabel="Note actions" overflowLabel="More note actions" commands={[
-          { id: "undo", label: "Undo", icon: <Undo2Icon />, priority: 20, disabled: !history.past.length, onSelect: () => setHistory(current => current.past.length ? { past: current.past.slice(0, -1), text: current.past.at(-1)!, future: [current.text, ...current.future] } : current) },
-          { id: "redo", label: "Redo", icon: <Redo2Icon />, priority: 20, disabled: !history.future.length, onSelect: () => setHistory(current => current.future.length ? { past: [...current.past, current.text], text: current.future[0], future: current.future.slice(1) } : current) },
-          { id: "pin", label: pinned ? "Unpin note" : "Pin note", icon: <PinIcon />, priority: 1, onSelect: () => { setPinned(!pinned); setMessage(pinned ? "Note unpinned." : "Note pinned.") } },
-          { id: "word-count", label: "Word count", overflow: "always", onSelect: () => setMessage(`${history.text.trim().split(/\s+/).filter(Boolean).length} words`) },
+          { id: "undo", label: "Undo", icon: <Undo2Icon />, priority: 20, disabled: !history.past.length, onSelect: undo },
+          { id: "redo", label: "Redo", icon: <Redo2Icon />, priority: 20, disabled: !history.future.length, onSelect: redo },
+          { id: "pin", label: pinned ? "Unpin note" : "Pin note", icon: pinned ? <PinOffIcon /> : <PinIcon />, priority: 1, onSelect: () => { setPinned(!pinned); notify(pinned ? "Note unpinned." : "Note pinned.") } },
+          { id: "word-count", label: "Word count", overflow: "always", onSelect: () => { const words = text.trim().split(/\s+/).filter(Boolean).length; notify(`${words} ${words === 1 ? "word" : "words"}`) } },
           { id: "share", label: "Share", icon: <ShareIcon />, pinned: true, onSelect: () => { void share() } },
         ]} />
         <ToolbarItem prominent accessibilityLabel="Done" onPress={save}><CheckIcon /></ToolbarItem>
       </View>
       <View style={{ flex: 1, paddingHorizontal: ui.pad.lg, paddingTop: 12, paddingBottom: 96, gap: 4 }}>
-        <GText size="xs" tone="muted" align="center">November 10, 2026 at 9:41 AM</GText>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", justifyContent: "center", columnGap: 6 }}>
+          {pinned ? <View accessible accessibilityLabel="Pinned" style={{ flexDirection: "row", alignItems: "center", gap: 4 }}><GIcon><PinIcon size={12} color={ui.primary} fill={ui.primary} /></GIcon><GText size="xs" weight="600" color={ui.primary}>Pinned</GText></View> : null}
+          <GText size="xs" tone="muted" align="center">November 10, 2026 at 9:41 AM</GText>
+        </View>
+        {status.text ? <GText testID="note-status" size="xs" weight="600" align="center" style={{ alignSelf: "center", marginTop: 6, paddingHorizontal: 10, paddingVertical: 4, borderRadius: ui.radius.badge, backgroundColor: ui.fillStrong, overflow: "hidden" }}>{status.text}</GText> : null}
         <GText font="heading" size="3xl" weight="700" accessibilityRole="header" style={{ marginTop: 8 }}>A day by the lake</GText>
-        <TextInput ref={editor} accessibilityLabel="Note text" multiline scrollEnabled={false} showSoftInputOnFocus={!open} textAlignVertical="top" value={history.text} onChangeText={edit} selectionColor={ui.primary} style={[{ minHeight: 200, color: ui.foreground, fontFamily: ui.fonts.sans, padding: 0 }, type, { lineHeight: Math.round(type.fontSize * (format === "Title" || format === "Heading" ? 1.2 : 1.4)) }]} />
+        <TextInput ref={editor} accessibilityLabel="Note text" multiline scrollEnabled={false} showSoftInputOnFocus={!open} textAlignVertical="top" value={text} onChangeText={edit} selectionColor={ui.primary} style={[{ minHeight: 200, color: ui.foreground, fontFamily: ui.fonts.sans, padding: 0 }, type, { lineHeight: Math.round(type.fontSize * (format === "Title" || format === "Heading" ? 1.2 : 1.4)) }]} />
       </View>
       <View style={{ position: "absolute", left: 0, right: 0, bottom: 16, alignItems: "center" }}>
-        <SheetContent side="bottom" modal={false} detents={[0.3, "medium"]} anchor={<Button variant="glass" onAction={() => setOpen(true)} testID="notes-format" accessibilityLabel="Format note">Aa</Button>} style={{ padding: ui.pad.default }}>
-          <SheetHeader style={{ paddingHorizontal: 0 }}><SheetTitle>Format</SheetTitle><SheetDescription>Formatting applies to this note. You can keep editing above.</SheetDescription></SheetHeader>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>{NOTE_STYLES.map(item => <Button key={item} variant={format === item ? "default" : "secondary"} aria-pressed={format === item} accessibilityState={{ selected: format === item }} onPress={() => setFormat(item)}>{item}</Button>)}</ScrollView>
+        {/* accessibility sizes open taller, so every format shows without scrolling */}
+        <SheetContent side="bottom" modal={false} detents={accessible ? ["medium", "large"] : [0.3, "medium"]} anchor={<Button variant="glass" onAction={() => setOpen(true)} testID="notes-format" accessibilityLabel="Format note">Aa</Button>} style={{ padding: ui.pad.default }}>
+          <SheetHeader style={{ paddingHorizontal: 0 }}><SheetTitle>Format</SheetTitle><SheetDescription>Applies to this note.</SheetDescription></SheetHeader>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>{NOTE_STYLES.map(item => <Button key={item} variant={format === item ? "default" : "secondary"} aria-pressed={format === item} accessibilityState={{ selected: format === item }} onPress={() => setFormat(item)}>{item}</Button>)}</View>
         </SheetContent>
       </View>
-      <GText style={{ position: "absolute", width: 1, height: 1, opacity: 0 }} accessibilityLiveRegion="polite">{saved === history.text && savedFormat === format ? "Saved" : "Draft"}</GText>
-      {message ? <GText style={{ position: "absolute", width: 1, height: 1, opacity: 0 }} accessibilityLiveRegion="polite">{message}</GText> : null}
+      <GText style={{ position: "absolute", width: 1, height: 1, opacity: 0 }} accessibilityLiveRegion="polite">{saved.text === text && saved.format === format ? "Saved" : "Draft"}</GText>
     </View>
   </Sheet>
 }
@@ -160,7 +196,7 @@ function Search({ width }: { width: number }) {
     {current ? <View accessibilityLabel="Selected result" style={{ padding: ui.pad.default, borderRadius: ui.radius.control, backgroundColor: ui.fill, gap: 6 }}><GText tone="muted" size="sm">{current.kind}</GText><GText size="lg" weight="700">{current.title}</GText><GText>{current.text}</GText></View> : null}
   </View>
   return <View style={{ padding: ui.pad.lg, gap: 16 }}>
-    <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 8 }}><GText font="heading" size="3xl" weight="700" accessibilityRole="header">Collections</GText><View style={{ flexDirection: "row", gap: 8 }}><Button variant="secondary" size="sm" accessibilityLabel="Search destination" aria-pressed={mode === "destination"} onPress={() => { setMode("destination"); setQuery("") }}>Browse</Button><Button variant="secondary" size="sm" testID="search-now" accessibilityLabel="Search now" onPress={() => setMode("prominent")}>Search now</Button></View></View>
+    <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 8 }}><GText font="heading" size="3xl" weight="700" accessibilityRole="header">Collections</GText><View style={{ flexDirection: "row", flexWrap: "wrap", flexShrink: 1, gap: 8 }}><Button variant={mode === "destination" ? "secondary" : "ghost"} size="sm" accessibilityLabel="Search destination" aria-pressed={mode === "destination"} accessibilityState={{ selected: mode === "destination" }} onPress={() => { setMode("destination"); setQuery("") }}>Browse</Button><Button variant={mode === "prominent" ? "secondary" : "ghost"} size="sm" testID="search-now" accessibilityLabel="Search now" aria-pressed={mode === "prominent"} accessibilityState={{ selected: mode === "prominent" }} onPress={() => setMode("prominent")}>Search now</Button></View></View>
     <SearchField key={mode} accessibilityLabel="Search all collections" placeholder="Search all collections" value={query} onValueChange={setQuery} tokens={scope === "All" ? [] : [{ id: "scope", label: scope }]} onTokenRemove={() => setScope("All")} onSubmit={submit} autoFocus={mode === "prominent"} suggestions={suggestions} onSuggestionSelect={submit} onCancel={() => setMode("destination")} />
     {wide ? <View style={{ flexDirection: "row", gap: 20 }}>
       <View style={{ width: 170, gap: 8 }}><GText tone="muted" size="sm">Folders</GText><Input accessibilityLabel="Search folders" placeholder="Find a folder" value={folderQuery} onChangeText={setFolderQuery} />{scopeBar}</View>
@@ -194,6 +230,7 @@ function Materials({ width, photoBase }: { width: number; photoBase?: string }) 
 function MediaCase({ index, label, playing, onToggle, photoBase }: { index: number; label: string; playing: boolean; onToggle: () => void; photoBase?: string }) {
   const ui = useUI()
   return <View style={{ flex: 1, minHeight: 160, padding: ui.pad.sm, gap: 24, justifyContent: "space-between", borderRadius: ui.radius.surface, overflow: "hidden", backgroundColor: ui.auroraBase }}>
-    {index !== 1 ? <Backdrop variant="image" src={image(index === 0 ? 1 : 0, photoBase)} dim={index === 0 ? 0.35 : 0.65} /> : null}<GText size="sm">{label}</GText><Glass variant="liquid-clear" style={{ alignSelf: "flex-start", borderRadius: ui.radius.button }}><Button variant="ghost" accessibilityLabel={`${playing ? "Hide details" : "Show details"} ${label.toLowerCase()}`} onPress={onToggle}>{playing ? "Hide details" : "Details"}</Button></Glass>{playing ? <GText size="sm">{index === 1 ? "Night recording · 21:45" : "Field recording · 06:30"}</GText> : null}
+    {/* dark media is dark content of its own, not a dimmed photo: a deep colour field */}
+    {index === 1 ? <Backdrop variant="mesh" dim={0.6} /> : <Backdrop variant="image" src={image(index === 0 ? 1 : 0, photoBase)} dim={index === 0 ? 0.35 : 0.65} />}<GText size="sm">{label}</GText><Glass variant="liquid-clear" style={{ alignSelf: "flex-start", borderRadius: ui.radius.button }}><Button variant="ghost" accessibilityLabel={`${playing ? "Hide details" : "Show details"} ${label.toLowerCase()}`} onPress={onToggle}>{playing ? "Hide details" : "Details"}</Button></Glass>{playing ? <GText size="sm">{index === 1 ? "Night recording · 21:45" : "Field recording · 06:30"}</GText> : null}
   </View>
 }

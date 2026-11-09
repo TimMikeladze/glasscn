@@ -32,7 +32,7 @@ export function Screen({ children, picker = true }: { children: React.ReactNode;
   )
 }
 
-/** Palette chips and a light/dark toggle — drives every screen. */
+/** Palette chips and a system/light/dark choice; drives every screen. */
 export function ThemePicker() {
   const { palette, scheme, setPalette, setScheme } = useSandboxTheme()
   const t = useGlassTheme()
@@ -44,10 +44,11 @@ export function ThemePicker() {
         ))}
       </View>
       <View style={styles.row}>
+        <Chip label="system" active={scheme === "system"} onPress={() => setScheme("system")} />
         <Chip label="light" active={scheme === "light"} onPress={() => setScheme("light")} />
         <Chip label="dark" active={scheme === "dark"} onPress={() => setScheme("dark")} />
         <Body style={{ marginLeft: "auto", color: t.mutedForeground }}>
-          {palette} · {scheme}
+          {palette} · {scheme === "system" ? `system (${t.scheme})` : scheme}
         </Body>
       </View>
     </Glass>

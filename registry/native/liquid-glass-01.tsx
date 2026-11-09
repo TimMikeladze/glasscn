@@ -1,19 +1,18 @@
 import * as React from "react"
 import { Image, Platform, ScrollView, Share, StyleSheet, TextInput, View, useWindowDimensions, type StyleProp, type TextInputProps, type ViewStyle } from "react-native"
 import { KeyboardStickyView } from "react-native-keyboard-controller"
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
-import { ArchiveIcon, BookmarkIcon, CheckIcon, ChevronLeftIcon, ChevronRightIcon, CoffeeIcon, CropIcon, EllipsisIcon, FileIcon, FlagIcon, HeartIcon, HouseIcon, InboxIcon, InfoIcon, LayersIcon, LibraryIcon, ListFilterIcon, NavigationIcon, PanelLeftIcon, PauseIcon, PlayIcon, RadioIcon, RotateCcwIcon, RotateCwIcon, ShareIcon, SkipForwardIcon, SlidersHorizontalIcon, SquarePenIcon, SunIcon, ThermometerIcon, Trash2Icon, TreesIcon, WavesIcon, XIcon, type LucideIcon } from "lucide-react-native"
+import { ArchiveIcon, BookOpenTextIcon, CheckIcon, ChevronLeftIcon, ChevronRightIcon, CoffeeIcon, CropIcon, EllipsisIcon, FileIcon, FlagIcon, HeartIcon, HouseIcon, InboxIcon, InfoIcon, LayersIcon, LibraryIcon, ListFilterIcon, NavigationIcon, PanelLeftIcon, PauseIcon, PlayIcon, RadioIcon, RotateCcwIcon, RotateCwIcon, ShareIcon, SkipForwardIcon, SlidersHorizontalIcon, SquarePenIcon, SunIcon, ThermometerIcon, Trash2Icon, TreesIcon, WavesIcon, XIcon, type LucideIcon } from "lucide-react-native"
 import Svg, { Circle, Defs, LinearGradient, Path, Rect, Stop } from "react-native-svg"
 
-import { useReducedMotion } from "@/components/glass/native/a11y"
 import { Backdrop } from "@/components/glass/native/backdrop"
 import { ActionSheet, ActionSheetAction, ActionSheetContent, ActionSheetTrigger } from "@/components/glass/native/action-sheet"
 import { Button } from "@/components/glass/native/button"
 import { Dock, DockAccessory, DockBar, DockItem, DockSearch, usePlacement } from "@/components/glass/native/dock"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/glass/native/dropdown-menu"
 import { Glass, GlassEffectGroup } from "@/components/glass/native/glass"
+import { GlassMorph, GlassMorphItem } from "@/components/glass/native/glass-morph"
 import { Input } from "@/components/glass/native/input"
-import { Press } from "@/components/glass/native/press"
+import { Press, haptics } from "@/components/glass/native/press"
 import { ScrollEdge, ScrollEdgeProvider, useScrollEdges } from "@/components/glass/native/scroll-edge"
 import { SearchField } from "@/components/glass/native/search-field"
 import { SegmentedControl, SegmentedControlItem } from "@/components/glass/native/segmented-control"
@@ -78,10 +77,10 @@ function PlainIcon({ icon: Icon, label, onPress, active, disabled }: { icon: Luc
   )
 }
 
-function InfoSheet({ open, onOpenChange, title, description, children }: { open: boolean; onOpenChange: (open: boolean) => void; title: string; description: string; children?: React.ReactNode }) {
+function InfoSheet({ open, onOpenChange, title, description, modal = true, children }: { open: boolean; onOpenChange: (open: boolean) => void; title: string; description: string; modal?: boolean; children?: React.ReactNode }) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" detents={["medium", "large"]} style={{ paddingHorizontal: 20, gap: 16 }}>
+      <SheetContent side="bottom" detents={["medium", "large"]} modal={modal} style={{ paddingHorizontal: 20, gap: 16 }}>
         <SheetHeader style={{ paddingHorizontal: 0 }}><SheetTitle>{title}</SheetTitle><SheetDescription>{description}</SheetDescription></SheetHeader>
         {children}
       </SheetContent>
@@ -190,7 +189,8 @@ function MiniPlayer({ track, playing, toggle, next, photoBase }: { track: number
   return (
     <DockAccessory style={{ minHeight: 56, height: undefined, gap: 8 }}>
       <Image source={{ uri: pictureURI(song.picture, photoBase) }} alt={`${song.title} artwork`} accessibilityLabel={`${song.title} artwork`} style={{ width: 36, height: 36, borderRadius: ui.radius.control }} />
-      <View style={{ flex: 1 }}><GText size="sm" weight="600" numberOfLines={1}>{song.title}</GText>{placement === "expanded" ? <GText size="xs" tone="muted">{song.artist}</GText> : null}</View>
+      {/* bar text: it grows only to the largest standard size, so the accessory stays one row */}
+      <View style={{ flex: 1 }}><GText size="sm" weight="600" numberOfLines={1} maxFontSizeMultiplier={1.35}>{song.title}</GText>{placement === "expanded" ? <GText size="xs" tone="muted" numberOfLines={1} maxFontSizeMultiplier={1.35}>{song.artist}</GText> : null}</View>
       <PlainIcon icon={playing ? PauseIcon : PlayIcon} label={playing ? "Pause music" : "Play music"} onPress={toggle} />
       {placement === "expanded" ? <PlainIcon icon={SkipForwardIcon} label="Next track" onPress={next} /> : null}
     </DockAccessory>
@@ -199,14 +199,24 @@ function MiniPlayer({ track, playing, toggle, next, photoBase }: { track: number
 
 function MusicScene({ photoBase }: { photoBase?: string }) {
   const ui = useUI()
-  const { fontScale } = useWindowDimensions()
+  // accessibility text sizes (AX1 is 1.786): the bar starts folded to the current tab and Search,
+  // and songs become rows, so the list fills the scene rather than the chrome
+  const accessible = useWindowDimensions().fontScale >= 1.7
   const edges = useScrollEdges()
   const scroll = React.useRef<ScrollView>(null)
   const [tab, setTab] = React.useState("home")
+  const [tabsOpen, setTabsOpen] = React.useState(false)
   const [track, setTrack] = React.useState(0)
   const [playing, setPlaying] = React.useState(false)
   const [query, setQuery] = React.useState("")
   const tracks = TRACKS.map((song, i) => ({ ...song, i })).filter((song) => `${song.title} ${song.artist}`.toLowerCase().includes(query.toLowerCase()))
+  const folded = accessible && !tabsOpen
+  // folded, the one tab opens the bar; choosing a tab folds it again
+  const chooseTab = (value: string) => {
+    if (folded) return setTabsOpen(true)
+    setTab(value)
+    setTabsOpen(false)
+  }
   return (
     <ScrollEdgeProvider value={edges}>
       <ScrollView ref={scroll} onScroll={edges.onScroll} scrollEventThrottle={16} nestedScrollEnabled keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: 24, paddingBottom: 180, gap: 24 }}>
@@ -214,8 +224,8 @@ function MusicScene({ photoBase }: { photoBase?: string }) {
         {tab === "radio" ? <GText tone="muted">A station for the road ahead.</GText> : null}
         {!query ? tracks.map((song) => (
           <Press key={song.title} accessibilityRole="button" accessibilityLabel={`Play ${song.title} by ${song.artist}`} onPress={() => { setTrack(song.i); setPlaying(true) }} style={{ gap: 10 }}>
-            <Image source={{ uri: pictureURI(song.picture, photoBase) }} alt={`${song.title} artwork`} accessibilityLabel={`${song.title} artwork`} style={{ width: "100%", height: tab === "library" ? 132 : 220, borderRadius: ui.radius.surface }} />
-            <View style={[row, { justifyContent: "space-between" }]}><View style={{ flex: 1, gap: 3 }}><GText size="lg" font="heading">{song.title}</GText><GText size="sm" tone="muted">{tab === "library" ? song.artist : song.subtitle}</GText></View><PlayIcon size={22} color={ui.primary} /></View>
+            <Image source={{ uri: pictureURI(song.picture, photoBase) }} alt={`${song.title} artwork`} accessibilityLabel={`${song.title} artwork`} style={accessible ? { width: 88, height: 88, borderRadius: ui.radius.control } : { width: "100%", height: tab === "library" ? 132 : 220, borderRadius: ui.radius.surface }} />
+            <View style={[row, { justifyContent: "space-between" }]}><View style={{ flex: 1, gap: 3 }}><GText size={accessible ? "base" : "lg"} font="heading">{song.title}</GText><GText size="sm" tone="muted">{tab === "library" ? song.artist : song.subtitle}</GText></View>{accessible ? null : <PlayIcon size={22} color={ui.primary} />}</View>
           </Press>
         )) : null}
       </ScrollView>
@@ -227,27 +237,16 @@ function MusicScene({ photoBase }: { photoBase?: string }) {
           </ScrollView>
         </View>
       ) : null}
-      <Dock minimizeBehavior="onScrollDown" style={{ bottom: 16 }}>
+      <Dock minimizeBehavior="onScrollDown" minimized={accessible ? folded : undefined} style={{ bottom: 16 }}>
         <MiniPlayer track={track} playing={playing} toggle={() => setPlaying((v) => !v)} next={() => setTrack((v) => (v + 1) % TRACKS.length)} photoBase={photoBase} />
-        {fontScale >= 1.8 ? <AccessibleMusicNavigation value={tab} onValueChange={setTab} /> : <DockBar value={tab} onValueChange={setTab} accessibilityLabel="Music sections">
-          <DockItem value="home"><HouseIcon />Home</DockItem>
-          <DockItem value="library"><LibraryIcon />Library</DockItem>
-          <DockItem value="radio"><RadioIcon />Radio</DockItem>
-        </DockBar>}
+        <DockBar value={tab} onValueChange={chooseTab} accessibilityLabel="Music sections">
+          {[{ value: "home", label: "Home", icon: HouseIcon }, { value: "library", label: "Library", icon: LibraryIcon }, { value: "radio", label: "Radio", icon: RadioIcon }].map(({ value, label, icon: Icon }) => (
+            <DockItem key={value} value={value} accessibilityHint={folded ? "Shows all sections" : undefined}><Icon />{label}</DockItem>
+          ))}
+        </DockBar>
         <DockSearch value={query} onValueChange={(value) => { setQuery(value); scroll.current?.scrollTo({ y: 0, animated: false }) }} placeholder="Search music" accessibilityLabel="Search music" />
       </Dock>
     </ScrollEdgeProvider>
-  )
-}
-
-function AccessibleMusicNavigation({ value, onValueChange }: { value: string; onValueChange: (value: string) => void }) {
-  const ui = useUI()
-  const placement = usePlacement()
-  if (placement === "inline") return null
-  return (
-    <Glass variant="liquid" radius={ui.radius.surface} accessibilityRole="tablist" accessibilityLabel="Music sections" style={{ width: "100%", padding: 8, gap: 4 }}>
-      {[{ value: "home", label: "Home", icon: HouseIcon }, { value: "library", label: "Library", icon: LibraryIcon }, { value: "radio", label: "Radio", icon: RadioIcon }].map(({ value: item, label, icon: Icon }) => <Press key={item} haptic accessibilityRole="tab" accessibilityLabel={label} accessibilityState={{ selected: value === item }} onPress={() => onValueChange(item)} style={[row, { minHeight: 48, padding: 12, borderRadius: ui.radius.control, backgroundColor: value === item ? ui.fill : "transparent" }]}><GIcon><Icon size={22} color={value === item ? ui.primary : ui.foreground} /></GIcon><GText weight="600" style={{ flex: 1 }}>{label}</GText></Press>)}
-    </Glass>
   )
 }
 
@@ -284,6 +283,7 @@ function MapsScene() {
   const [selected, setSelected] = React.useState(0)
   const [open, setOpen] = React.useState(false)
   const [route, setRoute] = React.useState(false)
+  const [searching, setSearching] = React.useState(false)
   const place = PLACES[selected]
   const places = PLACES.map((p, i) => ({ ...p, i })).filter((p) => (category === "all" || p.category === category) && p.name.toLowerCase().includes(query.toLowerCase()))
   const show = (i: number) => { setSelected(i); setOpen(true); setRoute(false) }
@@ -301,14 +301,15 @@ function MapsScene() {
         <PlainIcon icon={LayersIcon} label="Map style" onPress={() => setCategory("all")} />
         <PlainIcon icon={NavigationIcon} label="Current location" onPress={() => { setQuery(""); setRoute(false) }} />
       </Glass>
-      {/* the search card rides the keyboard, as Maps' does, so the field, Cancel and results stay above it */}
-      <KeyboardStickyView style={{ position: "absolute", left: 12, right: 12, bottom: 12 }}>
+      {/* the search card rides the keyboard, as Maps' does, so the field, Cancel and results stay above it.
+          At rest it holds only the field and categories, clear of the pins; a place's sheet replaces it */}
+      {open ? null : <KeyboardStickyView style={{ position: "absolute", left: 12, right: 12, bottom: 12 }}>
       <Glass variant="liquid" radius={ui.radius.surface} style={{ padding: 14, gap: 12 }}>
-        <SearchField value={query} onValueChange={setQuery} placeholder="Search Maps" accessibilityLabel="Search nearby places" />
+        <SearchField value={query} onValueChange={setQuery} onFocus={() => setSearching(true)} onBlur={() => setSearching(false)} placeholder="Search Maps" accessibilityLabel="Search nearby places" />
         <SegmentedControl value={category} onValueChange={setCategory} accessibilityLabel="Place categories">
           <SegmentedControlItem value="all">All</SegmentedControlItem><SegmentedControlItem value="food">Food</SegmentedControlItem><SegmentedControlItem value="parks">Outdoors</SegmentedControlItem>
         </SegmentedControl>
-        {places.length ? places.map((p) => {
+        {!searching && !query ? null : places.length ? places.map((p) => {
           const Icon = p.icon
           return <Press key={p.name} accessibilityRole="button" accessibilityLabel={`Open ${p.name}`} onPress={() => show(p.i)} style={[row, { minHeight: 48 }]}>
             <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: ui[p.tone], alignItems: "center", justifyContent: "center" }}><Icon size={16} color="#ffffff" /></View>
@@ -317,8 +318,9 @@ function MapsScene() {
           </Press>
         }) : <View style={{ gap: 4, paddingVertical: 8 }}><GText weight="600">No places found</GText><GText size="sm" tone="muted">Try another search for “{query}”.</GText></View>}
       </Glass>
-      </KeyboardStickyView>
-      <InfoSheet open={open} onOpenChange={setOpen} title={place.name} description={place.detail}>
+      </KeyboardStickyView>}
+      {/* nonmodal, as Maps' place card is: the map and the route stay bright and the pins stay tappable */}
+      <InfoSheet open={open} onOpenChange={setOpen} modal={false} title={place.name} description={place.detail}>
         <Button onPress={() => setRoute((v) => !v)}><NavigationIcon />{route ? "Hide route" : "Directions"}</Button>
         <GText>{route ? `The walking route to ${place.name} is highlighted on the map.` : place.description}</GText>
       </InfoSheet>
@@ -345,6 +347,7 @@ function SafariScene({ photoBase }: { photoBase?: string }) {
   const [editing, setEditing] = React.useState(false)
   const [tabs, setTabs] = React.useState(false)
   const [saved, setSaved] = React.useState(false)
+  const [reader, setReader] = React.useState(false)
   const input = React.useRef<TextInput>(null)
   const scroll = React.useRef<ScrollView>(null)
   const article = ARTICLES[page]
@@ -354,32 +357,40 @@ function SafariScene({ photoBase }: { photoBase?: string }) {
   return (
     <ScrollEdgeProvider value={edges}>
       <ScrollView ref={scroll} nestedScrollEnabled keyboardShouldPersistTaps="handled" onScroll={edges.onScroll} scrollEventThrottle={16} contentContainerStyle={{ paddingBottom: 168 }}>
-        <Image source={{ uri: pictureURI(article.picture, photoBase) }} alt={PICTURES[article.picture].description} accessibilityLabel={PICTURES[article.picture].description} style={{ height: 270, width: "100%" }} />
-        <View style={{ padding: 28, gap: 22 }}>
-          <GText size="sm" weight="600">Field Notes</GText><GText size="3xl" font="display" accessibilityRole="header">{article.title}</GText><GText size="lg" tone="muted">{article.subtitle}</GText>
-          {article.paragraphs.map((p) => <GText key={p} selectable>{p}</GText>)}
+        {reader ? null : <Image source={{ uri: pictureURI(article.picture, photoBase) }} alt={PICTURES[article.picture].description} accessibilityLabel={PICTURES[article.picture].description} style={{ height: 270, width: "100%" }} />}
+        <View style={{ padding: 28, paddingTop: reader ? 40 : 28, gap: 22 }}>
+          <GText size="sm" weight="600">{reader ? "Reader · Field Notes" : "Field Notes"}</GText><GText size="3xl" font="display" accessibilityRole="header">{article.title}</GText><GText size="lg" tone="muted">{article.subtitle}</GText>
+          {article.paragraphs.map((p) => <GText key={p} size={reader ? "lg" : "base"} selectable>{p}</GText>)}
           <GText size="sm" tone="muted">{saved ? "Saved to Reading List" : "From the weekend journal"}</GText>
         </View>
       </ScrollView>
       <ScrollEdge edge="bottom" variant="automatic" visible size={collapsed ? 74 : 140} />
-      {/* iOS 27 Safari compact bar: Back, the address capsule (domain only, centred), More; scrolling folds it to a small pill */}
+      {/* iOS 27 Safari compact bar: Back, the address capsule (Reader, the domain centred, Reload), More.
+          Scrolling folds it to a small pill; editing widens the field across the bar */}
       <View style={[row, { position: "absolute", left: 16, right: 16, bottom: 16, justifyContent: "center", gap: 8 }]}>
-        {!collapsed ? <FloatingIcon icon={ChevronLeftIcon} label="Previous article" disabled={page === 0} onPress={() => navigate(0)} /> : null}
-        <Glass variant="liquid" interactive radius={ui.radius.button} style={{ flex: collapsed ? 0 : 1, minWidth: collapsed ? 150 : 0, minHeight: collapsed ? 36 : 48, paddingHorizontal: collapsed ? 14 : 6, flexDirection: "row", alignItems: "center", gap: 4 }}>
-          {collapsed ? <Press accessibilityRole="button" accessibilityLabel="Expand address bar" onPress={() => setEditing(true)} style={{ flex: 1, minHeight: 36, justifyContent: "center" }}><GText size="xs" align="center" numberOfLines={1}>{article.address.split("/")[0]}</GText></Press> : <>
-            <PlainIcon icon={BookmarkIcon} label={saved ? "Remove from Reading List" : "Save to Reading List"} active={saved} onPress={() => setSaved((v) => !v)} />
+        {!collapsed && !editing ? <FloatingIcon icon={ChevronLeftIcon} label="Previous article" disabled={page === 0} onPress={() => navigate(0)} /> : null}
+        <Glass variant="liquid" interactive radius={ui.radius.button} style={{ flex: collapsed ? 0 : 1, minWidth: collapsed ? 150 : 0, minHeight: collapsed ? 36 : 48, paddingHorizontal: collapsed || editing ? 14 : 2, flexDirection: "row", alignItems: "center", gap: collapsed || editing ? 4 : 0 }}>
+          {collapsed ? <Press accessibilityRole="button" accessibilityLabel="Expand address bar" onPress={() => setEditing(true)} style={{ flex: 1, minHeight: 36, justifyContent: "center" }}><GText size="xs" align="center" numberOfLines={1}>{article.address.split("/")[0]}</GText></Press> : editing ? (
+            // the whole address, selected, on a URL keyboard with no autocorrection
+            <SafariAddressInput inputRef={input} accessibilityLabel="Website address" value={address} onChangeText={setAddress} onBlur={() => setEditing(false)} onSubmitEditing={() => navigate(address.toLowerCase().includes("coast") ? 1 : 0)} keyboardType="url" textContentType="URL" autoCapitalize="none" autoCorrect={false} spellCheck={false} clearButtonMode="while-editing" returnKeyType="go" selectTextOnFocus />
+          ) : <>
+            <PlainIcon icon={BookOpenTextIcon} label={reader ? "Hide Reader" : "Show Reader"} active={reader} onPress={() => setReader((v) => !v)} />
             {/* at rest the domain is one line of text; the field only exists while editing */}
-            {editing ? (
-              <SafariAddressInput inputRef={input} accessibilityLabel="Website address" value={address} onChangeText={setAddress} onBlur={() => setEditing(false)} onSubmitEditing={() => navigate(address.toLowerCase().includes("coast") ? 1 : 0)} autoCapitalize="none" returnKeyType="go" selectTextOnFocus textAlign="center" />
-            ) : (
-              <Press accessibilityRole="button" accessibilityLabel={`Website address, ${article.address.split("/")[0]}`} accessibilityHint="Edits the address" onPress={() => { setAddress(article.address); setEditing(true) }} style={{ flex: 1, minHeight: 48, justifyContent: "center" }}>
-                <GText size="sm" align="center" numberOfLines={1} ellipsizeMode="middle">{article.address.split("/")[0]}</GText>
-              </Press>
-            )}
+            <Press accessibilityRole="button" accessibilityLabel={`Website address, ${article.address.split("/")[0]}`} accessibilityHint="Edits the address" onPress={() => { setAddress(article.address); setEditing(true) }} style={{ flex: 1, minHeight: 48, justifyContent: "center" }}>
+              <GText size="sm" align="center" numberOfLines={1} ellipsizeMode="middle" adjustsFontSizeToFit minimumFontScale={0.85}>{article.address.split("/")[0]}</GText>
+            </Press>
             <PlainIcon icon={RotateCwIcon} label="Reload article" onPress={() => scroll.current?.scrollTo({ y: 0, animated: false })} />
           </>}
         </Glass>
-        {!collapsed ? <FloatingIcon icon={EllipsisIcon} label="Show open tabs" onPress={() => setTabs(true)} /> : null}
+        {!collapsed && !editing ? <DropdownMenu>
+          <DropdownMenuTrigger accessibilityLabel="More">
+            <Glass variant="liquid" interactive radius={ui.radius.button} style={{ minWidth: 48, minHeight: 48, alignItems: "center", justifyContent: "center" }}><GIcon><EllipsisIcon size={21} color={ui.foreground} /></GIcon></Glass>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem systemImage="square.on.square" onSelect={() => setTabs(true)}>Show Open Tabs</DropdownMenuItem>
+            <DropdownMenuItem systemImage="eyeglasses" onSelect={() => setSaved((v) => !v)}>{saved ? "Remove from Reading List" : "Add to Reading List"}</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu> : null}
       </View>
       <InfoSheet open={tabs} onOpenChange={setTabs} title="Open Tabs" description="Two places to explore.">
         {ARTICLES.map((item, i) => <Press key={item.title} accessibilityRole="button" accessibilityLabel={`Open ${item.title}`} onPress={() => { navigate(i); setTabs(false) }} style={[row, { minHeight: 64, paddingVertical: 8 }]}><Image source={{ uri: pictureURI(item.picture, photoBase) }} alt={item.title} accessibilityLabel={item.title} style={{ width: 72, height: 54, borderRadius: ui.radius.control }} /><View style={{ flex: 1 }}><GText weight="600">{item.title}</GText><GText size="sm" tone="muted">{item.address}</GText></View>{page === i ? <CheckIcon size={20} color={ui.primary} /> : null}</Press>)}
@@ -397,6 +408,8 @@ const MESSAGES = [
 
 function MailScene({ width }: { width: number }) {
   const ui = useUI()
+  // large text: the sender takes its own line instead of truncating beside the time
+  const large = useWindowDimensions().fontScale >= 1.35
   const edges = useScrollEdges()
   const [mailbox, setMailbox] = React.useState("Inbox")
   const [sidebar, setSidebar] = React.useState(false)
@@ -425,7 +438,7 @@ function MailScene({ width }: { width: number }) {
             {message ? <View style={{ padding: 24, gap: 16 }}><GText size="2xl" font="heading">{message.subject}</GText><GText weight="600">{message.from}</GText><GText size="sm" tone="muted">To you · {message.time}</GText><GText selectable>{message.body}</GText><GText selectable>See you soon.</GText></View> : mailbox === "Drafts" ? <View style={{ padding: 24, gap: 16 }}><GText size="2xl" font="heading">Drafts</GText>{drafts.length ? drafts.map((item, i) => <Press key={`${item.subject}-${i}`} accessibilityRole="button" accessibilityLabel={`Edit draft ${item.subject}`} onPress={() => { setSubject(item.subject); setDraft(item.body); setEditingDraft(i); setCompose(true) }} style={{ gap: 6, paddingVertical: 10 }}><GText weight="600">{item.subject}</GText><GText size="sm" tone="muted" numberOfLines={2}>{item.body}</GText></Press>) : <GText tone="muted">Your saved drafts appear here.</GText>}</View> : <View><GText size="3xl" font="heading" weight="700" accessibilityRole="header" style={{ paddingHorizontal: 20, paddingBottom: 8 }}>{mailbox}</GText>{MESSAGES.map((m, i) => ({ ...m, i })).filter((m) => (mailbox === "Archive" ? archived.includes(m.i) : !archived.includes(m.i)) && (mailbox !== "Flagged" || flagged.includes(m.i))).map((m) => <Press key={m.subject} accessibilityRole="button" accessibilityLabel={`Read ${m.subject} from ${m.from}${read.includes(m.i) ? "" : ", unread"}${flagged.includes(m.i) ? ", flagged" : ""}`} onPress={() => { setSelected(m.i); setRead((v) => v.includes(m.i) ? v : [...v, m.i]) }} style={{ flexDirection: "row", paddingLeft: 8 }}>
               <View style={{ width: 20, alignItems: "center", paddingTop: 18 }}>{!read.includes(m.i) ? <View accessibilityLabel="Unread" style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: ui.primary }} /> : flagged.includes(m.i) ? <FlagIcon size={10} color={ui.warning} fill={ui.warning} /> : null}</View>
               <View style={{ flex: 1, paddingVertical: 11, paddingRight: 20, gap: 2, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: ui.separator }}>
-                <View style={[row, { gap: 8 }]}><GText weight="600" numberOfLines={1} style={{ flex: 1 }}>{m.from}</GText><GText size="sm" tone="muted">{m.time}</GText><GIcon><ChevronRightIcon size={14} color={ui.labelTertiary} /></GIcon></View>
+                <View style={[row, { gap: 8, flexWrap: large ? "wrap" : "nowrap" }]}><GText weight="600" numberOfLines={large ? 2 : 1} style={large ? { flexBasis: "100%" } : { flex: 1 }}>{m.from}</GText><GText size="sm" tone="muted" style={large ? { flex: 1 } : null}>{m.time}</GText><GIcon><ChevronRightIcon size={14} color={ui.labelTertiary} /></GIcon></View>
                 <GText size="sm" numberOfLines={1}>{m.subject}</GText><GText size="sm" tone="muted" numberOfLines={2}>{m.preview} {m.body}</GText>
               </View>
             </Press>)}</View>}
@@ -439,11 +452,13 @@ function MailScene({ width }: { width: number }) {
               <PlainIcon icon={ArchiveIcon} label={archived.includes(selected!) ? "Move message to Inbox" : "Archive message"} onPress={() => { setArchived((v) => v.includes(selected!) ? v.filter((i) => i !== selected) : [...v, selected!]); setSelected(null) }} />
             </Glass> : null}
           </GlassEffectGroup>
-          <ScrollEdge edge="bottom" variant="automatic" visible size={104} />
+          {/* a hard edge under the toolbar: its status is text with no glass behind it (T08) */}
+          <ScrollEdge edge="bottom" variant="hard" visible size={104} />
           {/* the bottom toolbar: filter, status, compose */}
           <View style={[row, { position: "absolute", left: 16, right: 16, bottom: 16, justifyContent: "space-between" }]}>
             <FloatingIcon icon={ListFilterIcon} label={mailbox === "Inbox" ? "Filter unread" : "Filter"} onPress={() => setMailbox("Inbox")} />
-            <GText size="xs" tone="muted" align="center" style={{ flex: 1 }}>Updated Just Now</GText>
+            {/* bar text keeps its size, like the bar's own labels, so it stays on the edge */}
+            <GText size="xs" tone="muted" align="center" numberOfLines={1} maxFontSizeMultiplier={1} style={{ flex: 1 }}>Updated Just Now</GText>
             <FloatingIcon icon={SquarePenIcon} label="Compose message" onPress={() => { setEditingDraft(null); setSubject(""); setDraft(""); setCompose(true) }} />
           </View>
         </View>
@@ -462,21 +477,6 @@ function MailScene({ width }: { width: number }) {
   )
 }
 
-function MergeAction({ icon: Icon, label, offset, expanded, active = false, onPress }: { icon: LucideIcon; label: string; offset: number; expanded: boolean; active?: boolean; onPress: () => void }) {
-  const ui = useUI()
-  const reduced = useReducedMotion()
-  const x = useSharedValue(0)
-  React.useEffect(() => { x.set(reduced ? (expanded ? offset : 0) : withSpring(expanded ? offset : 0, ui.motion.springConfig)) }, [expanded, offset, reduced, ui.motion.springConfig, x])
-  const movement = useAnimatedStyle(() => ({ transform: [{ translateX: x.get() }] }))
-  return (
-    <Animated.View pointerEvents={expanded ? "auto" : "none"} accessibilityElementsHidden={!expanded} importantForAccessibility={expanded ? "auto" : "no-hide-descendants"} style={[{ position: "absolute", left: "50%", marginLeft: -24 }, movement]}>
-      <Glass variant="liquid" materialized={expanded} interactive radius={ui.radius.button}>
-        <Press haptic accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ selected: active }} onPress={onPress} style={{ minWidth: 48, minHeight: 48, alignItems: "center", justifyContent: "center" }}><GIcon><Icon size={21} color={active ? ui.primary : ui.foreground} style={{ opacity: expanded ? 1 : 0 }} /></GIcon></Press>
-      </Glass>
-    </Animated.View>
-  )
-}
-
 function ControlsScene({ width, photoBase }: { width: number; photoBase?: string }) {
   const ui = useUI()
   const { fontScale } = useWindowDimensions()
@@ -487,6 +487,15 @@ function ControlsScene({ width, photoBase }: { width: number; photoBase?: string
   const [cropped, setCropped] = React.useState(false)
   const step = Math.max(44, (width - 80) / 4)
   const choose = (name: string) => { setTool(name); setExpanded(false) }
+  const gap = Math.max(8, step - 48)
+  // one SwiftUI glass container with an identity per tool, as GlassMorph builds it: each tool comes
+  // and goes with its own glass, so no glyph shows before its surface, and the container merges
+  // what it can. Expo UI inserts hosted children without a transition, so the tools appear in place
+  const toolButton = (id: string, Icon: LucideIcon, label: string, onPress: () => void, active?: boolean) => (
+    <GlassMorphItem key={id} id={id} accessibilityLabel={label} accessibilityState={active === undefined ? undefined : { selected: active }} onPress={() => { haptics.selection(); onPress() }} style={{ minWidth: 48, minHeight: 48, paddingHorizontal: 0 }}>
+      <GIcon><Icon size={21} color={active ? ui.primary : ui.foreground} /></GIcon>
+    </GlassMorphItem>
+  )
   return (
     <View style={{ flex: 1 }}>
       {/* the edit itself changes the photo: 50 is the original, no scrim over the asset */}
@@ -497,13 +506,13 @@ function ControlsScene({ width, photoBase }: { width: number; photoBase?: string
         <View style={[row, fontScale >= 1.8 ? { flexDirection: "column", alignItems: "stretch" } : { justifyContent: "space-between" }]}><GText size="lg" weight="600" style={{ flexShrink: 1 }}>{tool}</GText><GText size="sm" style={{ fontVariant: ["tabular-nums"] }}>{tool === "Warmth" ? warmth : brightness}</GText></View>
         <Slider value={[tool === "Warmth" ? warmth : brightness]} onValueChange={([v]) => tool === "Warmth" ? setWarmth(v) : setBrightness(v)} min={0} max={100} accessibilityLabel={tool} />
       </View>
-      <GlassEffectGroup merge spacing={24} style={{ position: "absolute", left: 0, right: 0, bottom: 28, height: 52 }}>
-        <MergeAction icon={SunIcon} label="Adjust brightness" offset={-2 * step} expanded={expanded} active={tool === "Brightness"} onPress={() => choose("Brightness")} />
-        <MergeAction icon={ThermometerIcon} label="Adjust warmth" offset={-step} expanded={expanded} active={tool === "Warmth"} onPress={() => choose("Warmth")} />
-        <MergeAction icon={CropIcon} label={cropped ? "Remove crop" : "Crop photo"} offset={step} expanded={expanded} onPress={() => { setCropped((v) => !v); setExpanded(false) }} />
-        <MergeAction icon={RotateCcwIcon} label="Reset photo edits" offset={2 * step} expanded={expanded} onPress={() => { setBrightness(50); setWarmth(0); setCropped(false); choose("Brightness") }} />
-        <View style={{ position: "absolute", left: "50%", marginLeft: -24 }}><Press haptic liquid accessibilityRole="button" accessibilityLabel={expanded ? "Close photo tools" : "Open photo tools"} aria-expanded={expanded} onPress={() => setExpanded((v) => !v)}><Glass variant="liquid" interactive radius={ui.radius.button} style={{ minWidth: 48, minHeight: 48, alignItems: "center", justifyContent: "center" }}><GIcon>{expanded ? <XIcon size={22} color={ui.foreground} /> : <SlidersHorizontalIcon size={22} color={ui.foreground} />}</GIcon></Glass></Press></View>
-      </GlassEffectGroup>
+      <GlassMorph value={expanded} spacing={gap} style={{ position: "absolute", left: 0, right: 0, bottom: 28, justifyContent: "center" }}>
+        {[
+          ...(expanded ? [toolButton("brightness", SunIcon, "Adjust brightness", () => choose("Brightness"), tool === "Brightness"), toolButton("warmth", ThermometerIcon, "Adjust warmth", () => choose("Warmth"), tool === "Warmth")] : []),
+          toolButton("tools", expanded ? XIcon : SlidersHorizontalIcon, expanded ? "Close photo tools" : "Open photo tools", () => setExpanded((v) => !v)),
+          ...(expanded ? [toolButton("crop", CropIcon, cropped ? "Remove crop" : "Crop photo", () => { setCropped((v) => !v); setExpanded(false) }), toolButton("reset", RotateCcwIcon, "Reset photo edits", () => { setBrightness(50); setWarmth(0); setCropped(false); choose("Brightness") })] : []),
+        ]}
+      </GlassMorph>
     </View>
   )
 }

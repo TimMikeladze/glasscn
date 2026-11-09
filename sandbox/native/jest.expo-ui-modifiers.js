@@ -13,6 +13,7 @@ const supported = {
   controlSize: (size) => modifier("controlSize", { size }),
   disabled: (disabled = true) => modifier("disabled", { disabled }),
   accessibilityLabel: (label) => modifier("accessibilityLabel", { label }),
+  accessibilityAddTraits: (traits) => modifier("accessibilityAddTraits", { traits }),
   glassEffectId: (id, namespaceId) => modifier("glassEffectId", { id, namespaceId }),
   animation: (animation, animatedValue) => modifier("animation", { animation, animatedValue }),
   Animation: { spring: (params) => ({ type: "spring", ...params }) },

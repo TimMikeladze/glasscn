@@ -1,5 +1,6 @@
 import * as React from "react"
-import { fireEvent, screen } from "@testing-library/react-native"
+import * as RN from "react-native"
+import { act, fireEvent, screen } from "@testing-library/react-native"
 
 import { LiquidGlass01, type LiquidGlassScene } from "@/components/glass/native/liquid-glass-01"
 import { demos } from "@/sandbox/demos/liquid-glass"
@@ -31,6 +32,11 @@ it("favorites a photo, advances the collection, and opens system details", async
   expect(screen.getByTestId("expo-ui-BottomSheet").props.isPresented).toBe(true)
 })
 
+afterEach(() => jest.restoreAllMocks())
+
+/** A SwiftUI button from GlassMorphItem, found by the label it carries as a modifier. */
+const swiftButton = (label: string) => screen.getAllByTestId("expo-ui-Button").find((node) => node.props.modifiers?.some((m: { $type: string; label?: string }) => m.$type === "accessibilityLabel" && m.label === label))
+
 it("chooses a music track and pauses playback", async () => {
   await renderThemed(<LiquidGlass01 scene="music" />)
   await fireEvent.press(screen.getByLabelText("Play Wide open by The Long Way"))
@@ -44,14 +50,39 @@ it("chooses a music track and pauses playback", async () => {
   expect(screen.getByLabelText("Pause music")).toBeTruthy()
 })
 
-it("filters map pins and opens a native sheet from a place", async () => {
+it("starts the Music bar folded at accessibility sizes and opens the tabs from the one tab (UX3-N03)", async () => {
+  jest.spyOn(RN.Dimensions, "get").mockReturnValue({ width: 393, height: 852, scale: 3, fontScale: 3.571 })
+  await renderThemed(<LiquidGlass01 scene="music" />)
+  // the current tab and Search, not a vertical tab list over the songs
+  expect(screen.getAllByRole("tab")).toHaveLength(1)
+  const home = screen.getByRole("tab", { name: "Home" })
+  expect(home.props.accessibilityHint).toBe("Shows all sections")
+  await fireEvent.press(home)
+  expect(screen.getAllByRole("tab")).toHaveLength(3)
+  // bar labels keep their size and show the Large Content Viewer on a long press
+  const library = screen.getByRole("tab", { name: "Library" })
+  expect(library.props.accessibilityShowsLargeContentViewer).toBe(true)
+  expect(screen.getByText("Library").props.maxFontSizeMultiplier).toBe(1)
+  await fireEvent.press(library)
+  expect(screen.getAllByRole("tab")).toHaveLength(1)
+  expect(screen.getByRole("tab", { name: "Library" })).toBeTruthy()
+})
+
+it("filters map pins and opens a nonmodal place sheet in place of the search card (UX3-N11)", async () => {
   await renderThemed(<LiquidGlass01 scene="maps" />)
+  // at rest the card holds the field and categories, clear of the pins
+  expect(screen.queryByLabelText("Open Ocean Beach")).toBeNull()
   await fireEvent.changeText(screen.getByLabelText("Search nearby places"), "coffee")
   expect(screen.queryByLabelText("Show Ocean Beach")).toBeNull()
+  expect(screen.getByLabelText("Open Sunset Coffee")).toBeTruthy()
   await fireEvent.press(screen.getByLabelText("Show Sunset Coffee"))
   const sheet = screen.getByTestId("expo-ui-BottomSheet")
   expect(sheet.props.isPresented).toBe(true)
   expect(sheet.props.fitToContents).toBe(false)
+  // the route stays bright and the pins stay tappable; one sheet at a time
+  expect(screen.getByTestId("expo-ui-Group").props.modifiers).toContainEqual(expect.objectContaining({ $type: "presentationBackgroundInteraction", interactionType: "enabled" }))
+  expect(screen.queryByLabelText("Search nearby places")).toBeNull()
+  await act(() => sheet.props.onIsPresentedChange(false))
   await fireEvent.changeText(screen.getByLabelText("Search nearby places"), "nowhere")
   expect(screen.getByText("No places found")).toBeTruthy()
 })
@@ -61,7 +92,10 @@ it("navigates the browser articles through its address field", async () => {
   // at rest the capsule is one line of text (UX3-N04); tapping it opens the field
   await fireEvent.press(screen.getByLabelText("Website address, fieldnotes.example"))
   const address = screen.getByLabelText("Website address")
-  expect(address.props.multiline).toBe(false)
+  // a URL keyboard, no autocorrection, the whole address selected, the field across the bar (UX3-N10)
+  expect(address.props).toMatchObject({ multiline: false, keyboardType: "url", autoCorrect: false, selectTextOnFocus: true })
+  expect(screen.queryByLabelText("Previous article")).toBeNull()
+  expect(screen.queryByLabelText("More")).toBeNull()
   await fireEvent.changeText(address, "fieldnotes.example/coast")
   await fireEvent(address, "submitEditing")
   expect(screen.getAllByText("An open afternoon").length).toBeGreaterThan(0)
@@ -70,6 +104,17 @@ it("navigates the browser articles through its address field", async () => {
   // at rest the capsule shows the domain only, as Safari does
   expect(screen.getByLabelText("Website address, fieldnotes.example")).toBeTruthy()
   expect(screen.queryByLabelText("Website address")).toBeNull()
+})
+
+it("reads an article in Reader and keeps tabs in the More menu (UX3-N09)", async () => {
+  await renderThemed(<LiquidGlass01 scene="safari" />)
+  expect(screen.getByLabelText("Mountain peaks reflected in a still alpine lake")).toBeTruthy()
+  await fireEvent.press(screen.getByLabelText("Show Reader"))
+  expect(screen.queryByLabelText("Mountain peaks reflected in a still alpine lake")).toBeNull()
+  expect(screen.getByLabelText("Hide Reader").props.accessibilityState?.selected).toBe(true)
+  // More is a menu: Show Open Tabs and Reading List, not the tabs sheet itself
+  expect(screen.getByLabelText("More")).toBeTruthy()
+  expect(screen.queryByLabelText("Show open tabs")).toBeNull()
 })
 
 it("archives a message and saves a composed draft", async () => {
@@ -86,17 +131,22 @@ it("archives a message and saves a composed draft", async () => {
   expect(screen.getByLabelText("Message body").props.value).toBe("Bring a notebook.")
 })
 
-it("expands sibling glass tools and adjusts the native slider", async () => {
+it("expands the photo tools out of one glass container and adjusts the native slider (UX3-N08)", async () => {
   await renderThemed(<LiquidGlass01 scene="controls" />)
-  await fireEvent.press(screen.getByLabelText("Open photo tools"))
-  expect(screen.getByLabelText("Close photo tools").props.accessibilityState?.expanded).toBe(true)
-  await fireEvent.press(screen.getByLabelText("Adjust warmth"))
-  expect(screen.getByLabelText("Open photo tools")).toBeTruthy()
+  const identities = () => screen.getAllByTestId("expo-ui-Button").flatMap((node) => (node.props.modifiers ?? []).filter((m: { $type: string }) => m.$type === "glassEffectId").map((m: { id: string }) => m.id))
+  expect(identities()).toEqual(["tools"])
+  await fireEvent(swiftButton("Open photo tools")!, "press")
+  // one SwiftUI container and namespace: the tools emerge from the toggle and merge back into it
+  expect(identities()).toEqual(["brightness", "warmth", "tools", "crop", "reset"])
+  expect(screen.getAllByTestId("expo-ui-GlassEffectContainer")).toHaveLength(1)
+  expect(swiftButton("Adjust brightness")!.props.modifiers).toContainEqual({ $type: "accessibilityAddTraits", traits: ["isSelected"] })
+  await fireEvent(swiftButton("Adjust warmth")!, "press")
+  expect(identities()).toEqual(["tools"])
   const slider = screen.getByTestId("expo-ui-Slider")
   await fireEvent(slider, "valueChange", 35)
   expect(screen.getByTestId("expo-ui-Slider").props.value).toBe(35)
-  await fireEvent.press(screen.getByLabelText("Open photo tools"))
-  await fireEvent.press(screen.getByLabelText("Reset photo edits"))
+  await fireEvent(swiftButton("Open photo tools")!, "press")
+  await fireEvent(swiftButton("Reset photo edits")!, "press")
   // 50 is the unedited photo
   expect(screen.getByTestId("expo-ui-Slider").props.value).toBe(50)
 })

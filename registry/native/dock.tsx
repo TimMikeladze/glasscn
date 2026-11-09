@@ -254,6 +254,9 @@ export function DockItem({ value, disabled, badge, prominent = false, style, chi
       accessibilityState={{ selected: ctx.value === value, disabled: !!disabled }}
       aria-selected={ctx.value === value}
       aria-disabled={disabled}
+      // a tab bar keeps its size at accessibility text sizes; a long press shows the item large (iOS)
+      accessibilityShowsLargeContentViewer
+      accessibilityLargeContentTitle={label || undefined}
       style={[
         outer.compact
           ? { minHeight: ui.control.default, flexDirection: "row", gap: 6, paddingVertical: 6, paddingHorizontal: ui.pad.sm }
@@ -264,7 +267,7 @@ export function DockItem({ value, disabled, badge, prominent = false, style, chi
       ]}
       {...props}
     >
-      {withGlyphs(glyphsOnly, { color, size: outer.compact ? 18 : 21.6, text: "xs", weight: "600" })}
+      {withGlyphs(glyphsOnly, { color, size: outer.compact ? 18 : 21.6, text: "xs", weight: "600", maxFontSizeMultiplier: 1 })}
       {count !== null ? (
         <View pointerEvents="none" style={{ position: "absolute", top: 0, left: "50%", marginLeft: outer.minimized ? 8 : 6, minWidth: 18, height: 18, paddingHorizontal: 4, borderRadius: ui.radius.badge, backgroundColor: ui.destructive, alignItems: "center", justifyContent: "center" }}>
           <GText size="xs" weight="600" maxFontSizeMultiplier={1.2} style={{ color: ui.destructiveForeground, fontSize: 10.4, lineHeight: 13, fontVariant: ["tabular-nums"] }}>

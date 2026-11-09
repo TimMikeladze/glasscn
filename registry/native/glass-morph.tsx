@@ -52,6 +52,8 @@ export type GlassMorphItemProps = {
   children?: React.ReactNode
   onPress?: () => void
   accessibilityLabel?: string
+  /** `selected` marks the current choice in a set of tools (the selected trait on iOS). */
+  accessibilityState?: { selected?: boolean }
   style?: StyleProp<ViewStyle>
   variant?: "regular" | "clear"
   tint?: string
@@ -59,7 +61,7 @@ export type GlassMorphItemProps = {
 }
 
 /** RN content enters SwiftUI through RNHostView; the outer SwiftUI view owns its glass identity. */
-export function GlassMorphItem({ id, children, onPress, accessibilityLabel, style, variant = "regular", tint, interactive = !!onPress }: GlassMorphItemProps) {
+export function GlassMorphItem({ id, children, onPress, accessibilityLabel, accessibilityState, style, variant = "regular", tint, interactive = !!onPress }: GlassMorphItemProps) {
   const context = React.useContext(MorphContext)
   const ui = useUI()
   const options = useGlassThemeOptions()
@@ -67,7 +69,7 @@ export function GlassMorphItem({ id, children, onPress, accessibilityLabel, styl
   const content = <View style={[{ alignSelf: "flex-start", minHeight: Math.max(44, ui.control.default), paddingHorizontal: ui.pad.default, alignItems: "center", justifyContent: "center", flexDirection: "row", gap: 8 }, style]}>{React.Children.map(children, (child) => typeof child === "string" || typeof child === "number" ? <GText>{child}</GText> : child)}</View>
   if (!context.system) {
     const surface = <Glass variant={variant === "clear" ? "liquid-clear" : "liquid"} tint={tint} interactive={interactive} radius={ui.radius.button} accessible={!onPress && !!accessibilityLabel} accessibilityLabel={onPress ? undefined : accessibilityLabel}>{content}</Glass>
-    return onPress ? <Press onPress={onPress} liquid haptic accessibilityRole="button" accessibilityLabel={accessibilityLabel}>{surface}</Press> : surface
+    return onPress ? <Press onPress={onPress} liquid haptic accessibilityRole="button" accessibilityLabel={accessibilityLabel} accessibilityState={accessibilityState} aria-selected={accessibilityState?.selected}>{surface}</Press> : surface
   }
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const SwiftUI = require("@expo/ui/swift-ui") as typeof import("@expo/ui/swift-ui")
@@ -75,6 +77,6 @@ export function GlassMorphItem({ id, children, onPress, accessibilityLabel, styl
   const modifiers = require("@expo/ui/swift-ui/modifiers") as typeof import("@expo/ui/swift-ui/modifiers")
   const labels = variant === "clear" ? CLEAR_MEDIA_LABELS : nativeGlassLabels(ui, options.tokens)
   const hosted = <SwiftUI.RNHostView matchContents><GlassThemeProvider tokens={labels}><NativeGlassLabelsContext.Provider value={variant === "regular" && !tint ? ui : null}>{content}</NativeGlassLabelsContext.Provider></GlassThemeProvider></SwiftUI.RNHostView>
-  const effect = [modifiers.glassEffect({ glass: { variant, tint, interactive }, shape: "capsule" }), modifiers.glassEffectId(id, context.namespaceId), ...(accessibilityLabel ? [modifiers.accessibilityLabel(accessibilityLabel)] : [])]
+  const effect = [modifiers.glassEffect({ glass: { variant, tint, interactive }, shape: "capsule" }), modifiers.glassEffectId(id, context.namespaceId), ...(accessibilityLabel ? [modifiers.accessibilityLabel(accessibilityLabel)] : []), ...(accessibilityState?.selected ? [modifiers.accessibilityAddTraits(["isSelected"])] : [])]
   return onPress ? <SwiftUI.Button onPress={onPress} modifiers={[modifiers.buttonStyle("plain"), ...effect]}>{hosted}</SwiftUI.Button> : <SwiftUI.VStack modifiers={effect}>{hosted}</SwiftUI.VStack>
 }

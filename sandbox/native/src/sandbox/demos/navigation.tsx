@@ -389,6 +389,7 @@ function SearchFieldDemo() {
 }
 
 function ActionSheetDemo() {
+  const [open, setOpen] = React.useState(false)
   return (
     <>
     <Section title="System choices" note="Plain onAction choices use the source-attached iOS system dialog. Cancel placement and visibility belong to the system; other platforms use the custom sheet.">
@@ -402,7 +403,7 @@ function ActionSheetDemo() {
         </ActionSheetContent>
       </ActionSheet>
     </Section>
-    <Section title="Custom choices" note="Rich content, preferred styling and RN press callbacks use the custom bottom group with its separate Cancel capsule.">
+    <Section title="Custom choices" note="Rich content, preferred styling and RN press callbacks use the custom sheet. Like the system dialog it opens beside its trigger with no Cancel; tapping outside closes it.">
       <ActionSheet>
         <ActionSheetTrigger>
           <Face>Share night</Face>
@@ -423,6 +424,16 @@ function ActionSheetDemo() {
             <Trash2Icon />
             Delete
           </ActionSheetAction>
+          <ActionSheetCancel />
+        </ActionSheetContent>
+      </ActionSheet>
+    </Section>
+    <Section title="Opened in code" note="With no trigger to attach to, the custom sheet rises from the bottom edge with its Cancel capsule.">
+      <Button variant="secondary" onPress={() => setOpen(true)}>Delete night</Button>
+      <ActionSheet open={open} onOpenChange={setOpen}>
+        <ActionSheetContent>
+          <ActionSheetHeader><ActionSheetTitle>Delete Night 311?</ActionSheetTitle></ActionSheetHeader>
+          <ActionSheetAction variant="destructive" onAction={() => toast.error("Deleted")}>Delete</ActionSheetAction>
           <ActionSheetCancel />
         </ActionSheetContent>
       </ActionSheet>

@@ -20,7 +20,7 @@ An Expo app in `sandbox/native/` that renders every `native-*` item, so the nati
 | `/aurora` | Full-screen aurora per palette; reduced motion note |
 | `/press` | `Press` with haptic, custom squash, hover, disabled |
 | `/c/<name>` | Every ported component and block (`native-<name>`), every prop and variant: demos in `src/sandbox/demos/<group>.tsx` (basics, controls, forms, overlays, navigation, data, composite), keyed by registry name. Later groups win a key: `navigation` holds the M4 `dock` and `tabs` demos. Bar demos (dock, toolbar, navigation-bar, scroll-edge) run in a short scrolling stage wrapped in `ScrollEdgeProvider`, so minimize-on-scroll shows inside the page |
-| `/tabs-layout` | The `native-tabs-layout` recipe as a real route group (`app/tabs-layout/`): NativeTabs with minimize on scroll, a bottom accessory reading its placement, a badge and a `role="search"` tab |
+| `/tabs-layout` | The `native-tabs-layout` recipe as a real route group (`app/tabs-layout/`): NativeTabs with `minimizeBehavior="onScrollDown"` (the recipe's `automatic` default never folded this pushed screen's bar), a bottom accessory reading its placement, a badge and a `role="search"` tab |
 
 ## Commands
 
@@ -33,7 +33,7 @@ npm test           # jest-expo component tests (docs/testing.md#native)
 pnpm verify:native # from the repo root: install-from-registry check
 ```
 
-The theme picker lists all 13 generated palettes, System first. A deep link's `?palette=ocean&scheme=dark` query sets them on launch (Maestro's screenshot flow uses it). `still=1` forces Reduce Motion and `force=reduceTransparency,highContrast` forces those settings on; the next deep link that leaves one out releases it, so a screenshot run doesn't still the motion checks that follow. Settings turned on from the `/tokens` chips stay until you turn them off there.
+The theme picker lists all 13 generated palettes, System first, and the scheme as system, light or dark. `system` is the default: it leaves the scheme to the OS, so an appearance change applies live and `GlassEffectGroup` keeps merging (its system container only takes the window's appearance). Light and dark force the scheme on glasscn surfaces; system sheets, menus and bars keep the OS's. A deep link's `?palette=ocean&scheme=dark` query sets them on launch (Maestro's screenshot flow uses it); `scheme=system` goes back to the OS. `still=1` forces Reduce Motion and `force=reduceTransparency,highContrast` forces those settings on; the next deep link that leaves one out releases it, so a screenshot run doesn't still the motion checks that follow. Settings turned on from the `/tokens` chips stay until you turn them off there.
 
 Expo Go draws a floating tools button over the top-right corner of the app. It sits on top of the Close and toolbar buttons of large-detent sheets, and a tap there opens the developer menu instead. Drag it to another edge before testing those buttons.
 
