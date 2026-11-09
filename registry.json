@@ -7940,6 +7940,7 @@
         "lucide-react-native"
       ],
       "registryDependencies": [
+        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-background-extension.json",
         "{REGISTRY_URL}/r/native-backdrop.json",
         "{REGISTRY_URL}/r/native-button.json",
@@ -8064,18 +8065,17 @@
       ],
       "dependencies": [
         "react-native-keyboard-controller",
-        "react-native-reanimated",
         "lucide-react-native",
         "react-native-svg"
       ],
       "registryDependencies": [
-        "{REGISTRY_URL}/r/native-a11y.json",
         "{REGISTRY_URL}/r/native-backdrop.json",
         "{REGISTRY_URL}/r/native-action-sheet.json",
         "{REGISTRY_URL}/r/native-button.json",
         "{REGISTRY_URL}/r/native-dock.json",
         "{REGISTRY_URL}/r/native-dropdown-menu.json",
         "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-glass-morph.json",
         "{REGISTRY_URL}/r/native-input.json",
         "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-scroll-edge.json",
@@ -8850,6 +8850,7 @@
       "registryDependencies": [
         "{REGISTRY_URL}/r/native-dialog.json",
         "{REGISTRY_URL}/r/native-glass.json",
+        "{REGISTRY_URL}/r/native-popover.json",
         "{REGISTRY_URL}/r/native-press.json",
         "{REGISTRY_URL}/r/native-segmented-control.json",
         "{REGISTRY_URL}/r/native-ui.json",

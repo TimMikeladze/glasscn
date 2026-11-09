@@ -40,21 +40,21 @@ function SwitchDemo() {
       <Section title="Glass (native={false})" note="Drag the knob to either side; it swells into a lens while held.">
         <View style={row}>
           <Switch native={false} checked={on} onCheckedChange={setOn} accessibilityLabel="Reminders glass" />
-          <Switch native={false} defaultChecked />
-          <Switch native={false} />
+          <Switch native={false} defaultChecked accessibilityLabel="Glass, on" />
+          <Switch native={false} accessibilityLabel="Glass, off" />
         </View>
       </Section>
       <Section title="Uncontrolled">
         <View style={row}>
-          <Switch defaultChecked />
-          <Switch />
+          <Switch defaultChecked accessibilityLabel="System, on" />
+          <Switch accessibilityLabel="System, off" />
         </View>
       </Section>
       <Section title="Disabled">
         <View style={row}>
-          <Switch disabled defaultChecked />
-          <Switch disabled size="sm" />
-          <Switch native={false} disabled defaultChecked />
+          <Switch disabled defaultChecked accessibilityLabel="Disabled, on" />
+          <Switch disabled size="sm" accessibilityLabel="Disabled small, off" />
+          <Switch native={false} disabled defaultChecked accessibilityLabel="Glass disabled, on" />
         </View>
       </Section>
     </>
