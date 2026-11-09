@@ -169,6 +169,7 @@ describe("colour maths", () => {
           if (r.prominentLabel < 4.5) failures.push(`${id} prominent label ${r.prominentLabel}`)
           if (r.tintedLabel < 4.5) failures.push(`${id} tinted button label ${r.tintedLabel}`)
           if (r.destructiveLabel < 4.5) failures.push(`${id} destructive button label ${r.destructiveLabel}`)
+          if (r.destructiveText < 4.5) failures.push(`${id} destructive menu choice ${r.destructiveText}`)
         }
     expect(failures).toEqual([])
   })

@@ -1,5 +1,6 @@
 import * as React from "react"
 import { Image, Platform, ScrollView, Share, StyleSheet, TextInput, View, useWindowDimensions, type StyleProp, type TextInputProps, type ViewStyle } from "react-native"
+import { KeyboardStickyView } from "react-native-keyboard-controller"
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated"
 import { ArchiveIcon, BookmarkIcon, CheckIcon, ChevronLeftIcon, ChevronRightIcon, CoffeeIcon, CropIcon, EllipsisIcon, FileIcon, FlagIcon, HeartIcon, HouseIcon, InboxIcon, InfoIcon, LayersIcon, LibraryIcon, ListFilterIcon, NavigationIcon, PanelLeftIcon, PauseIcon, PlayIcon, RadioIcon, RotateCcwIcon, RotateCwIcon, ShareIcon, SkipForwardIcon, SlidersHorizontalIcon, SquarePenIcon, SunIcon, ThermometerIcon, Trash2Icon, TreesIcon, WavesIcon, XIcon, type LucideIcon } from "lucide-react-native"
 import Svg, { Circle, Defs, LinearGradient, Path, Rect, Stop } from "react-native-svg"
@@ -300,7 +301,9 @@ function MapsScene() {
         <PlainIcon icon={LayersIcon} label="Map style" onPress={() => setCategory("all")} />
         <PlainIcon icon={NavigationIcon} label="Current location" onPress={() => { setQuery(""); setRoute(false) }} />
       </Glass>
-      <Glass variant="liquid" radius={ui.radius.surface} style={{ position: "absolute", left: 12, right: 12, bottom: 12, padding: 14, gap: 12 }}>
+      {/* the search card rides the keyboard, as Maps' does, so the field, Cancel and results stay above it */}
+      <KeyboardStickyView style={{ position: "absolute", left: 12, right: 12, bottom: 12 }}>
+      <Glass variant="liquid" radius={ui.radius.surface} style={{ padding: 14, gap: 12 }}>
         <SearchField value={query} onValueChange={setQuery} placeholder="Search Maps" accessibilityLabel="Search nearby places" />
         <SegmentedControl value={category} onValueChange={setCategory} accessibilityLabel="Place categories">
           <SegmentedControlItem value="all">All</SegmentedControlItem><SegmentedControlItem value="food">Food</SegmentedControlItem><SegmentedControlItem value="parks">Outdoors</SegmentedControlItem>
@@ -314,6 +317,7 @@ function MapsScene() {
           </Press>
         }) : <View style={{ gap: 4, paddingVertical: 8 }}><GText weight="600">No places found</GText><GText size="sm" tone="muted">Try another search for “{query}”.</GText></View>}
       </Glass>
+      </KeyboardStickyView>
       <InfoSheet open={open} onOpenChange={setOpen} title={place.name} description={place.detail}>
         <Button onPress={() => setRoute((v) => !v)}><NavigationIcon />{route ? "Hide route" : "Directions"}</Button>
         <GText>{route ? `The walking route to ${place.name} is highlighted on the map.` : place.description}</GText>
@@ -330,7 +334,7 @@ const ARTICLES = [
 function SafariAddressInput({ inputRef, style, ...props }: TextInputProps & { inputRef: React.Ref<TextInput> }) {
   const ui = useUI()
   const color = useGlassForeground()
-  return <TextInput ref={inputRef} {...props} style={[{ flex: 1, minHeight: 48, color, fontSize: ui.text.sm }, style]} />
+  return <TextInput ref={inputRef} multiline={false} numberOfLines={1} {...props} style={[{ flex: 1, minHeight: 48, color, fontSize: ui.text.sm }, style]} />
 }
 
 function SafariScene({ photoBase }: { photoBase?: string }) {
@@ -364,7 +368,14 @@ function SafariScene({ photoBase }: { photoBase?: string }) {
         <Glass variant="liquid" interactive radius={ui.radius.button} style={{ flex: collapsed ? 0 : 1, minWidth: collapsed ? 150 : 0, minHeight: collapsed ? 36 : 48, paddingHorizontal: collapsed ? 14 : 6, flexDirection: "row", alignItems: "center", gap: 4 }}>
           {collapsed ? <Press accessibilityRole="button" accessibilityLabel="Expand address bar" onPress={() => setEditing(true)} style={{ flex: 1, minHeight: 36, justifyContent: "center" }}><GText size="xs" align="center" numberOfLines={1}>{article.address.split("/")[0]}</GText></Press> : <>
             <PlainIcon icon={BookmarkIcon} label={saved ? "Remove from Reading List" : "Save to Reading List"} active={saved} onPress={() => setSaved((v) => !v)} />
-            <SafariAddressInput inputRef={input} accessibilityLabel="Website address" value={editing ? address : article.address.split("/")[0]} onChangeText={setAddress} onFocus={() => { setAddress(article.address); setEditing(true) }} onBlur={() => setEditing(false)} onSubmitEditing={() => navigate(address.toLowerCase().includes("coast") ? 1 : 0)} autoCapitalize="none" returnKeyType="go" selectTextOnFocus textAlign="center" />
+            {/* at rest the domain is one line of text; the field only exists while editing */}
+            {editing ? (
+              <SafariAddressInput inputRef={input} accessibilityLabel="Website address" value={address} onChangeText={setAddress} onBlur={() => setEditing(false)} onSubmitEditing={() => navigate(address.toLowerCase().includes("coast") ? 1 : 0)} autoCapitalize="none" returnKeyType="go" selectTextOnFocus textAlign="center" />
+            ) : (
+              <Press accessibilityRole="button" accessibilityLabel={`Website address, ${article.address.split("/")[0]}`} accessibilityHint="Edits the address" onPress={() => { setAddress(article.address); setEditing(true) }} style={{ flex: 1, minHeight: 48, justifyContent: "center" }}>
+                <GText size="sm" align="center" numberOfLines={1} ellipsizeMode="middle">{article.address.split("/")[0]}</GText>
+              </Press>
+            )}
             <PlainIcon icon={RotateCwIcon} label="Reload article" onPress={() => scroll.current?.scrollTo({ y: 0, animated: false })} />
           </>}
         </Glass>

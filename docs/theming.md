@@ -6,12 +6,12 @@ Everything visual in glasscn is a primitive CSS variable, grouped into eleven di
 
 Primitives live on `:root` / `.dark` (or any element). **Derived values never do.** Colours like the frost, rim and shadow are computed from the primitives inside the utilities and `@theme inline` tokens, so they're evaluated on the element that uses them. That's what lets you override a primitive on any subtree and re-theme just that subtree. A `--glass: color-mix(…var(--glass-opacity)…)` declared on `:root` would be computed once at `:root` and ignore overrides on children.
 
-## Dimensions (108 primitives)
+## Dimensions (109 primitives)
 
 | Group | Primitives |
 |---|---|
 | Colour | `primary` `primary-foreground` `ring` `chart-1..5` `success` `warning` `info` (+ `-foreground`) `aurora-1..3` `aurora-base` |
-| Material | `glass-tint` `glass-opacity` `-strong` `-subtle` `glass-blur` `glass-saturate` `glass-brightness` `glass-sheen` `glass-sheen-angle` `glass-texture` `glass-fill-tint` `glass-fill-opacity` `-strong` `glass-thumb` `glass-knob` `glass-clarity` `glass-label` `glass-label-secondary` `-tertiary` `-quaternary` `glass-separator-opacity` |
+| Material | `glass-tint` `glass-opacity` `-strong` `-subtle` `glass-blur` `glass-saturate` `glass-brightness` `glass-sheen` `glass-sheen-angle` `glass-texture` `glass-fill-tint` `glass-fill-opacity` `-strong` `glass-thumb` `glass-knob` `glass-clarity` `glass-label` `glass-label-secondary` `-tertiary` `-quaternary` `glass-destructive-strength` `glass-separator-opacity` |
 | Liquid | `glass-liquid-opacity` `glass-liquid-clear-opacity` `glass-liquid-clear-dim` `glass-liquid-blur` `glass-liquid-clear-blur` `glass-liquid-saturate` `glass-refraction` `glass-bezel` |
 | Rim | `glass-border-color` `glass-border-opacity` `glass-border-width` `glass-highlight-opacity` `glass-highlight-color` `glass-light-angle` `glass-specular` `glass-edge-shade` `glass-illumination` |
 | Depth | `glass-shadow-color` `glass-shadow-opacity` `glass-shadow-y` `glass-shadow-blur` `glass-shadow-over-content` `glass-glow` `glass-dim` |

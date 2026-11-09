@@ -72,6 +72,9 @@ export const themeTokens = {
   // shadcn v4 has no destructive-foreground: white unless the app sets one
   "color-destructive-foreground": "var(--destructive-foreground, oklch(0.985 0 0))",
   "color-destructive-ink": "color-mix(in oklch, var(--destructive) 30%, var(--glass-label))",
+  // a destructive choice in a menu or action sheet reads as red on plain glass; the share holds
+  // 4.5:1 on liquid glass for every palette × material (legibilityReport.destructiveText)
+  "color-destructive-label": "color-mix(in oklch, var(--destructive) var(--glass-destructive-strength), var(--glass-label))",
   "color-glass-dim": mixed("oklch(0 0 0)", "var(--glass-dim)"),
   "color-glass-media-dim": mixed("oklch(0 0 0)", "var(--glass-liquid-clear-dim)"),
   "color-glass-media-foreground": "var(--glass-highlight-color)",
@@ -568,6 +571,20 @@ export const stylesheet = {
     ":is(.glass-liquid, .glass-liquid-clear, .glass-light, .glass-prominent)::before": { display: "none" },
     // not display:none — the same ::after may be a hit-area
     ":is(.glass-illuminate, .glass-prominent)::after": { background: "none" },
+    // Controls drawn only with fills (switch, segmented control, tabs, slider) would vanish when
+    // the system repaints backgrounds: give them system-colour edges and a Highlight state
+    ":is([data-slot=switch], [data-slot=segmented-control], [data-slot=tabs-list], [data-slot=slider-track], [data-slot=slider-thumb])": important({ "forced-color-adjust": "none", "background-color": "Canvas", "background-image": "none", color: "ButtonText", "border": "1px solid ButtonText", "box-shadow": "none", "-webkit-backdrop-filter": "none", "backdrop-filter": "none" }),
+    "[data-slot=switch][data-state=checked]": important({ "background-color": "Highlight", "border-color": "Highlight" }),
+    ":is([data-slot=switch-thumb], [data-slot=segmented-control-thumb], [data-slot=tabs-indicator])": important({ "forced-color-adjust": "none", "background-color": "ButtonText", "background-image": "none", "box-shadow": "none", "-webkit-backdrop-filter": "none", "backdrop-filter": "none" }),
+    "[data-slot=switch][data-state=checked] [data-slot=switch-thumb]": important({ "background-color": "HighlightText" }),
+    ":is([data-slot=segmented-control-thumb], [data-slot=tabs-indicator], [data-slot=slider-range])": important({ "forced-color-adjust": "none", "background-color": "Highlight" }),
+    ":is([data-slot=segmented-control-item], [data-slot=tabs-trigger])": important({ color: "ButtonText" }),
+    ":is([data-slot=segmented-control-item][data-state=on], [data-slot=tabs-trigger][data-state=active])": important({ color: "HighlightText" }),
+    // the line variant underlines instead of filling, so its label sits on Canvas
+    "[data-slot=tabs-list][data-variant=line]": important({ border: "none" }),
+    "[data-slot=tabs-list][data-variant=line] [data-slot=tabs-trigger][data-state=active]": important({ color: "Highlight" }),
+    "[data-slot=slider-thumb]": important({ "background-color": "ButtonFace", "border-width": "2px" }),
+    ":is([data-slot=switch], [data-slot=segmented-control-item], [data-slot=tabs-trigger], [data-slot=slider-thumb]):is(:disabled, [data-disabled])": important({ color: "GrayText", "border-color": "GrayText" }),
   },
 }
 

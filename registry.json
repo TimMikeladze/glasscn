@@ -74,6 +74,7 @@
           "color-primary-ink": "color-mix(in oklch, color-mix(in oklch, var(--primary) 30%, var(--glass-label)) calc(var(--glass-ink-active, 1) * 100%), var(--glass-label-secondary))",
           "color-destructive-foreground": "var(--destructive-foreground, oklch(0.985 0 0))",
           "color-destructive-ink": "color-mix(in oklch, var(--destructive) 30%, var(--glass-label))",
+          "color-destructive-label": "color-mix(in oklch, var(--destructive) var(--glass-destructive-strength), var(--glass-label))",
           "color-glass-dim": "color-mix(in oklch, oklch(0 0 0) var(--glass-dim), transparent)",
           "color-glass-media-dim": "color-mix(in oklch, oklch(0 0 0) var(--glass-liquid-clear-dim), transparent)",
           "color-glass-media-foreground": "var(--glass-highlight-color)",
@@ -140,6 +141,7 @@
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.37 0.012 286)",
           "glass-label-tertiary": "oklch(0.52 0.01 286)",
+          "glass-destructive-strength": "75%",
           "glass-label-quaternary": "oklch(0.76 0.005 285)",
           "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
@@ -235,6 +237,7 @@
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.88 0.01 285)",
           "glass-label-tertiary": "oklch(0.66 0.01 285)",
+          "glass-destructive-strength": "60%",
           "glass-label-quaternary": "oklch(0.45 0.01 285)",
           "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
@@ -1061,6 +1064,55 @@
           },
           ":is(.glass-illuminate, .glass-prominent)::after": {
             "background": "none"
+          },
+          ":is([data-slot=switch], [data-slot=segmented-control], [data-slot=tabs-list], [data-slot=slider-track], [data-slot=slider-thumb])": {
+            "forced-color-adjust": "none !important",
+            "background-color": "Canvas !important",
+            "background-image": "none !important",
+            "color": "ButtonText !important",
+            "border": "1px solid ButtonText !important",
+            "box-shadow": "none !important",
+            "-webkit-backdrop-filter": "none !important",
+            "backdrop-filter": "none !important"
+          },
+          "[data-slot=switch][data-state=checked]": {
+            "background-color": "Highlight !important",
+            "border-color": "Highlight !important"
+          },
+          ":is([data-slot=switch-thumb], [data-slot=segmented-control-thumb], [data-slot=tabs-indicator])": {
+            "forced-color-adjust": "none !important",
+            "background-color": "ButtonText !important",
+            "background-image": "none !important",
+            "box-shadow": "none !important",
+            "-webkit-backdrop-filter": "none !important",
+            "backdrop-filter": "none !important"
+          },
+          "[data-slot=switch][data-state=checked] [data-slot=switch-thumb]": {
+            "background-color": "HighlightText !important"
+          },
+          ":is([data-slot=segmented-control-thumb], [data-slot=tabs-indicator], [data-slot=slider-range])": {
+            "forced-color-adjust": "none !important",
+            "background-color": "Highlight !important"
+          },
+          ":is([data-slot=segmented-control-item], [data-slot=tabs-trigger])": {
+            "color": "ButtonText !important"
+          },
+          ":is([data-slot=segmented-control-item][data-state=on], [data-slot=tabs-trigger][data-state=active])": {
+            "color": "HighlightText !important"
+          },
+          "[data-slot=tabs-list][data-variant=line]": {
+            "border": "none !important"
+          },
+          "[data-slot=tabs-list][data-variant=line] [data-slot=tabs-trigger][data-state=active]": {
+            "color": "Highlight !important"
+          },
+          "[data-slot=slider-thumb]": {
+            "background-color": "ButtonFace !important",
+            "border-width": "2px !important"
+          },
+          ":is([data-slot=switch], [data-slot=segmented-control-item], [data-slot=tabs-trigger], [data-slot=slider-thumb]):is(:disabled, [data-disabled])": {
+            "color": "GrayText !important",
+            "border-color": "GrayText !important"
           }
         }
       }
@@ -1995,6 +2047,7 @@
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.37 0.012 286)",
           "glass-label-tertiary": "oklch(0.52 0.01 286)",
+          "glass-destructive-strength": "75%",
           "glass-label-quaternary": "oklch(0.76 0.005 285)",
           "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
@@ -2046,6 +2099,7 @@
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.88 0.01 285)",
           "glass-label-tertiary": "oklch(0.66 0.01 285)",
+          "glass-destructive-strength": "60%",
           "glass-label-quaternary": "oklch(0.45 0.01 285)",
           "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
@@ -2109,6 +2163,7 @@
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.37 0.012 286)",
           "glass-label-tertiary": "oklch(0.52 0.01 286)",
+          "glass-destructive-strength": "75%",
           "glass-label-quaternary": "oklch(0.76 0.005 285)",
           "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
@@ -2160,6 +2215,7 @@
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.88 0.01 285)",
           "glass-label-tertiary": "oklch(0.66 0.01 285)",
+          "glass-destructive-strength": "60%",
           "glass-label-quaternary": "oklch(0.45 0.01 285)",
           "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
@@ -2223,6 +2279,7 @@
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.37 0.012 286)",
           "glass-label-tertiary": "oklch(0.52 0.01 286)",
+          "glass-destructive-strength": "75%",
           "glass-label-quaternary": "oklch(0.76 0.005 285)",
           "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
@@ -2274,6 +2331,7 @@
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.88 0.01 285)",
           "glass-label-tertiary": "oklch(0.66 0.01 285)",
+          "glass-destructive-strength": "60%",
           "glass-label-quaternary": "oklch(0.45 0.01 285)",
           "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
@@ -2337,6 +2395,7 @@
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.88 0.01 270)",
           "glass-label-tertiary": "oklch(0.52 0.01 286)",
+          "glass-destructive-strength": "30%",
           "glass-label-quaternary": "oklch(0.76 0.005 285)",
           "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
@@ -2388,6 +2447,7 @@
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.88 0.01 285)",
           "glass-label-tertiary": "oklch(0.66 0.01 285)",
+          "glass-destructive-strength": "60%",
           "glass-label-quaternary": "oklch(0.45 0.01 285)",
           "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
@@ -2451,6 +2511,7 @@
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.37 0.012 286)",
           "glass-label-tertiary": "oklch(0.52 0.01 286)",
+          "glass-destructive-strength": "75%",
           "glass-label-quaternary": "oklch(0.76 0.005 285)",
           "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
@@ -2502,6 +2563,7 @@
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.88 0.01 285)",
           "glass-label-tertiary": "oklch(0.66 0.01 285)",
+          "glass-destructive-strength": "60%",
           "glass-label-quaternary": "oklch(0.45 0.01 285)",
           "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
@@ -2565,6 +2627,7 @@
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.37 0.012 286)",
           "glass-label-tertiary": "oklch(0.52 0.01 286)",
+          "glass-destructive-strength": "75%",
           "glass-label-quaternary": "oklch(0.76 0.005 285)",
           "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
@@ -2616,6 +2679,7 @@
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.88 0.01 285)",
           "glass-label-tertiary": "oklch(0.66 0.01 285)",
+          "glass-destructive-strength": "60%",
           "glass-label-quaternary": "oklch(0.45 0.01 285)",
           "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
@@ -2679,6 +2743,7 @@
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.37 0.012 286)",
           "glass-label-tertiary": "oklch(0.52 0.01 286)",
+          "glass-destructive-strength": "75%",
           "glass-label-quaternary": "oklch(0.76 0.005 285)",
           "glass-separator-opacity": "12%",
           "glass-knob": "oklch(1 0 0)",
@@ -2730,6 +2795,7 @@
           "glass-clarity": "0.5",
           "glass-label-secondary": "oklch(0.88 0.01 285)",
           "glass-label-tertiary": "oklch(0.66 0.01 285)",
+          "glass-destructive-strength": "60%",
           "glass-label-quaternary": "oklch(0.45 0.01 285)",
           "glass-separator-opacity": "16%",
           "glass-knob": "oklch(1 0 0)",
@@ -7996,6 +8062,7 @@
         "native"
       ],
       "dependencies": [
+        "react-native-keyboard-controller",
         "react-native-reanimated",
         "lucide-react-native",
         "react-native-svg"

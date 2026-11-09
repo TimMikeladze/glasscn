@@ -154,7 +154,7 @@ function ActionSheetAction({ className, variant = "default", ...props }: React.C
     <DialogPrimitive.Close
       data-slot="action-sheet-action"
       data-variant={variant}
-      className={cn(row, "data-[variant=destructive]:text-destructive-ink data-[variant=preferred]:font-semibold", className)}
+      className={cn(row, "data-[variant=destructive]:text-destructive-label data-[variant=preferred]:font-semibold", className)}
       {...props}
     />
   )

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { I18nManager, Platform, View, type LayoutChangeEvent, type StyleProp, type ViewStyle } from "react-native"
+import { I18nManager, Platform, View, type AccessibilityActionEvent, type LayoutChangeEvent, type StyleProp, type ViewStyle } from "react-native"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring, type SharedValue } from "react-native-reanimated"
 import { Host, Slider as NativeSlider } from "@expo/ui"
@@ -318,18 +318,31 @@ function Knob({
     scale.set(reduced ? to : withSpring(to, ui.motion.springConfig))
   }, [pressed, disabled, reduced, scale, ui.motion.knobLensScale, ui.motion.springConfig])
   const anim = useAnimatedStyle(() => ({ transform: [{ translateX: position(live.value[index]) }, { scale: scale.value }] }))
+  const a11y = {
+    accessible: true,
+    accessibilityRole: "adjustable" as const,
+    accessibilityLabel: label,
+    "aria-disabled": disabled,
+    accessibilityValue: { min, max, now: value, text: text ?? String(value) },
+    accessibilityActions: [{ name: "increment" }, { name: "decrement" }],
+    onAccessibilityAction: (e: AccessibilityActionEvent) => onNudge(e.nativeEvent.actionName === "increment" ? 1 : -1),
+  }
+  if (hidden)
+    // thumbless (progress): the adjustable element covers the whole slider, since iOS drops
+    // zero-size elements from the accessibility tree; the zero-size knob only carries the bubble
+    return (
+      <>
+        <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }} {...a11y} />
+        <Animated.View pointerEvents="none" style={[{ position: "absolute", left: 0, width: 0, height: 0 }, anim]}>
+          {bubble != null ? <Bubble bubble={bubble} /> : null}
+        </Animated.View>
+      </>
+    )
   return (
     <Animated.View
       pointerEvents="none"
-      accessible
-      accessibilityRole="adjustable"
-      accessibilityLabel={label}
-      aria-disabled={disabled}
-      accessibilityValue={{ min, max, now: value, text: text ?? String(value) }}
-      accessibilityActions={[{ name: "increment" }, { name: "decrement" }]}
-      onAccessibilityAction={(e) => onNudge(e.nativeEvent.actionName === "increment" ? 1 : -1)}
-      // never faded: a thumbless (progress) knob is sized away, not hidden by opacity
-      style={[{ position: "absolute", left: 0, width: hidden ? 0 : KNOB, height: hidden ? 0 : KNOB, borderRadius: KNOB / 2 }, anim]}
+      {...a11y}
+      style={[{ position: "absolute", left: 0, width: KNOB, height: KNOB, borderRadius: KNOB / 2 }, anim]}
     >
       {pressed && !disabled ? (
         // while dragged the knob is glass over the track
@@ -337,19 +350,25 @@ function Knob({
       ) : (
         <View style={{ flex: 1, borderRadius: KNOB / 2, backgroundColor: "#FFFFFF", borderWidth: 1, borderColor: ui.glassBorder, shadowColor: "#000", shadowOpacity: 0.18, shadowRadius: 10, shadowOffset: { width: 0, height: 3 }, elevation: 3 }} />
       )}
-      {bubble != null ? (
-        <View style={{ position: "absolute", bottom: KNOB + 10, left: KNOB / 2 - 40, width: 80, alignItems: "center" }}>
-          <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: ui.foreground }}>
-            {typeof bubble === "string" ? (
-              <GText size="xs" weight="600" color={ui.scheme === "dark" ? "#000000" : "#FFFFFF"} style={{ fontVariant: ["tabular-nums"] }}>
-                {bubble}
-              </GText>
-            ) : (
-              bubble
-            )}
-          </View>
-        </View>
-      ) : null}
+      {bubble != null ? <Bubble bubble={bubble} /> : null}
     </Animated.View>
+  )
+}
+
+/** The value shown above a held knob. */
+function Bubble({ bubble }: { bubble: React.ReactNode }) {
+  const ui = useUI()
+  return (
+    <View style={{ position: "absolute", bottom: KNOB + 10, left: KNOB / 2 - 40, width: 80, alignItems: "center" }}>
+      <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: ui.foreground }}>
+        {typeof bubble === "string" ? (
+          <GText size="xs" weight="600" color={ui.scheme === "dark" ? "#000000" : "#FFFFFF"} style={{ fontVariant: ["tabular-nums"] }}>
+            {bubble}
+          </GText>
+        ) : (
+          bubble
+        )}
+      </View>
+    </View>
   )
 }

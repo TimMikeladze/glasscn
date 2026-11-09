@@ -23,6 +23,11 @@ function EntrySheet({ placement = "sheet" }: { placement?: "sheet" | "source" })
           <ActionSheetTitle>Day 401</ActionSheetTitle>
           <ActionSheetDescription>Slept by eleven. No screens after nine.</ActionSheetDescription>
         </ActionSheetHeader>
+        {/* Apple puts the destructive choice first */}
+        <ActionSheetAction variant="destructive">
+          <TrashIcon />
+          Delete entry
+        </ActionSheetAction>
         <ActionSheetAction>
           <ShareIcon />
           Share
@@ -30,10 +35,6 @@ function EntrySheet({ placement = "sheet" }: { placement?: "sheet" | "source" })
         <ActionSheetAction>
           <ArchiveIcon />
           Archive
-        </ActionSheetAction>
-        <ActionSheetAction variant="destructive">
-          <TrashIcon />
-          Delete entry
         </ActionSheetAction>
         <ActionSheetCancel />
       </ActionSheetContent>

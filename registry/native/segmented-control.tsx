@@ -230,6 +230,20 @@ export function SegmentedControl({ value, defaultValue, onValueChange, size = "d
   const items = native && !momentary && shape === undefined && appearance.seedColor === undefined && Platform.OS !== "web" ? plainItems(children) : null
   if (items) {
     const index = items.findIndex((i) => i.value === current)
+    const label = props.accessibilityLabel ?? props["aria-label"]
+    if (Platform.OS === "ios")
+      return (
+        <SystemSegmented
+          labels={items.map((i) => i.label)}
+          index={index < 0 ? undefined : index}
+          onSelect={(i) => select(items[i]?.value ?? "")}
+          disabled={!!disabled}
+          scheme={appearance.colorScheme}
+          label={label}
+          style={[{ minHeight: height, alignSelf: "stretch" }, style as StyleProp<ViewStyle>]}
+          testID={props.testID}
+        />
+      )
     return (
       <NativeSegmented
         values={items.map((i) => i.label)}
@@ -312,5 +326,28 @@ export function SegmentedControlItem({
     >
       {withGlyphs(children, { color, size: 16, text: ctx.size === "lg" ? "base" : ctx.size === "sm" ? "xs" : "sm", weight: on ? "600" : "500" })}
     </Press>
+  )
+}
+
+/**
+ * The iOS segmented control as a SwiftUI segmented Picker. The Picker's label is hidden by the
+ * segmented style but named for VoiceOver, which the community wrapper leaves empty.
+ */
+function SystemSegmented({ labels, index, onSelect, disabled, scheme, label, style, testID }: { labels: string[]; index?: number; onSelect: (index: number) => void; disabled: boolean; scheme?: "light" | "dark"; label?: string; style?: StyleProp<ViewStyle>; testID?: string }) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const swift = require("@expo/ui/swift-ui") as typeof import("@expo/ui/swift-ui")
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const m = require("@expo/ui/swift-ui/modifiers") as typeof import("@expo/ui/swift-ui/modifiers")
+  const modifiers = [m.pickerStyle("segmented"), ...(disabled ? [m.disabled()] : []), ...(scheme ? [m.environment("colorScheme", scheme)] : []), ...(label ? [m.accessibilityLabel(label)] : [])]
+  return (
+    <swift.Host matchContents={{ vertical: true }} style={style} ignoreSafeArea="all">
+      <swift.Picker selection={index} onSelectionChange={(i: number) => onSelect(i)} modifiers={modifiers} label={label ?? ""} testID={testID}>
+        {labels.map((text, i) => (
+          <swift.Text key={i} modifiers={[m.tag(i)]}>
+            {text}
+          </swift.Text>
+        ))}
+      </swift.Picker>
+    </swift.Host>
   )
 }

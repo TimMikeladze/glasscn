@@ -67,7 +67,7 @@ function DropdownMenuItem({
       data-slot="dropdown-menu-item"
       data-inset={inset}
       data-variant={variant}
-      className={cn(itemClass, "data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/12 data-[variant=destructive]:*:[svg]:text-destructive!", className)}
+      className={cn(itemClass, "data-[variant=destructive]:text-destructive-label data-[variant=destructive]:focus:bg-destructive/12 data-[variant=destructive]:*:[svg]:text-destructive-label!", className)}
       {...props}
     />
   )

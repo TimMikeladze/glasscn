@@ -1,5 +1,6 @@
 import * as React from "react"
 import { act, fireEvent, screen } from "@testing-library/react-native"
+import { StyleSheet } from "react-native"
 import { State, type PanGesture } from "react-native-gesture-handler"
 import { fireGestureHandler, getByGestureTestId } from "react-native-gesture-handler/jest-utils"
 
@@ -133,3 +134,27 @@ describe("SegmentedControl", () => {
 })
 
 void act
+
+describe("system controls name the element VoiceOver reads (UX3-N01, UX3-N16)", () => {
+  it("puts a system switch's label on the SwiftUI toggle", async () => {
+    await renderThemed(<Switch accessibilityLabel="Reminders" />)
+    expect(screen.getByTestId("expo-ui-Switch").props.modifiers).toContainEqual({ $type: "accessibilityLabel", label: "Reminders" })
+  })
+  it("names the system segmented control through its Picker", async () => {
+    await renderThemed(
+      <SegmentedControl accessibilityLabel="Place categories" defaultValue="food">
+        <SegmentedControlItem value="food">Food</SegmentedControlItem>
+        <SegmentedControlItem value="parks">Parks</SegmentedControlItem>
+      </SegmentedControl>
+    )
+    const picker = screen.getByTestId("expo-ui-Picker")
+    expect(picker.props.label).toBe("Place categories")
+    expect(picker.props.modifiers).toContainEqual({ $type: "accessibilityLabel", label: "Place categories" })
+  })
+  it("keeps a thumbless progress slider adjustable and full width", async () => {
+    await renderThemed(<Slider native={false} variant="progress" aria-label="Playback progress" defaultValue={[35]} />)
+    const slider = screen.getByRole("adjustable")
+    expect(slider.props.accessibilityLabel).toBe("Playback progress")
+    expect(StyleSheet.flatten(slider.props.style)).toMatchObject({ left: 0, right: 0, top: 0, bottom: 0 })
+  })
+})

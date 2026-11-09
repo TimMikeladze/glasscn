@@ -27,7 +27,7 @@ Render `<GlassEffects />` once near the web app root to enhance floating control
 
 | | Items |
 |---|---|
-| Foundation | `glass-style` (108 primitives, `glass` / `glass-strong` / `glass-subtle` and the liquid-layer utilities, theme tokens, keyframes, fallbacks, `glassVariants`); `glass-theme` (the theme engine); `glass-charts`; `use-sliding-indicator`; `use-glass-pointer` |
+| Foundation | `glass-style` (109 primitives, `glass` / `glass-strong` / `glass-subtle` and the liquid-layer utilities, theme tokens, keyframes, fallbacks, `glassVariants`); `glass-theme` (the theme engine); `glass-charts`; `use-sliding-indicator`; `use-glass-pointer` |
 | Palettes (13) | `theme-system` (default) `theme-dusk` `-ocean` `-rose` `-sage` `-amber` `-graphite` `-lavender` `-mint` `-cherry` `-lagoon` `-sand` `-midnight` |
 | Materials (7) | `material-frosted` `-vivid` `-crystal` `-smoked` `-matte` `-vapor` `-neon` |
 | Shape · Motion · Density | `shape-round` `-soft` `-sharp` `-square` · `motion-spring` `-smooth` `-snappy` `-still` · `density-compact` `-default` `-comfortable` |
@@ -44,7 +44,7 @@ Render `<GlassEffects />` once near the web app root to enhance floating control
 
 Components that shadcn also has (Button, Card, Dialog, Tabs and so on) keep shadcn's props and parts, so switching is an import change from `@/components/ui/x` to `@/components/glass/x`. Files land in `components/glass/`, next to shadcn's, and never overwrite them.
 
-The theme is 108 primitives in eleven groups: colour, material (frost, blur, saturation, brightness, sheen, grain), liquid optics, rim, depth (shadow, inner glow), shape, density, motion, aurora, fonts and type. Presets compose. You can override any primitive on any element (`[--glass-blur:8px]`), and `ThemeScope` re-themes a subtree at runtime.
+The theme is 109 primitives in eleven groups: colour, material (frost, blur, saturation, brightness, sheen, grain), liquid optics, rim, depth (shadow, inner glow), shape, density, motion, aurora, fonts and type. Presets compose. You can override any primitive on any element (`[--glass-blur:8px]`), and `ThemeScope` re-themes a subtree at runtime.
 
 The Theme Studio at `/themes` has a control for every primitive, a hue-harmony palette generator, randomise, a scoped live preview with its own scheme and a legibility estimate. It exports a one-line `npx shadcn add` command, CSS, a shadcn theme item, TypeScript or a share link, and can apply the theme to the whole site.
 

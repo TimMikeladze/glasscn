@@ -45,9 +45,17 @@ function SystemSwitch({ checked, defaultChecked, onCheckedChange, disabled, styl
   const ui = useUI()
   const appearance = nativeControlTheme(ui, useGlassThemeOptions())
   const [on, set] = useChecked({ checked, defaultChecked, onCheckedChange })
+  const label = accessibilityLabel ?? props["aria-label"]
+  // VoiceOver reads the SwiftUI toggle, not the Host: the name has to be a modifier on the toggle
+  const modifiers = React.useMemo(() => {
+    if (Platform.OS !== "ios" || !label) return undefined
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const m = require("@expo/ui/swift-ui/modifiers") as typeof import("@expo/ui/swift-ui/modifiers")
+    return [m.accessibilityLabel(label)]
+  }, [label])
   return (
-    <Host matchContents {...appearance} accessibilityLabel={accessibilityLabel ?? props["aria-label"]} style={[{ alignSelf: "flex-start" }, style]}>
-      <NativeSwitch value={on} onValueChange={set} disabled={!!disabled} testID={testID} />
+    <Host matchContents {...appearance} accessibilityLabel={label} style={[{ alignSelf: "flex-start" }, style]}>
+      <NativeSwitch value={on} onValueChange={set} disabled={!!disabled} testID={testID} modifiers={modifiers} />
     </Host>
   )
 }

@@ -58,14 +58,18 @@ it("filters map pins and opens a native sheet from a place", async () => {
 
 it("navigates the browser articles through its address field", async () => {
   await renderThemed(<LiquidGlass01 scene="safari" />)
+  // at rest the capsule is one line of text (UX3-N04); tapping it opens the field
+  await fireEvent.press(screen.getByLabelText("Website address, fieldnotes.example"))
   const address = screen.getByLabelText("Website address")
+  expect(address.props.multiline).toBe(false)
   await fireEvent.changeText(address, "fieldnotes.example/coast")
   await fireEvent(address, "submitEditing")
   expect(screen.getAllByText("An open afternoon").length).toBeGreaterThan(0)
   await fireEvent.press(screen.getByLabelText("Previous article"))
   expect(screen.getAllByText("Take the slower road").length).toBeGreaterThan(0)
   // at rest the capsule shows the domain only, as Safari does
-  expect(screen.getByLabelText("Website address").props.value).toBe("fieldnotes.example")
+  expect(screen.getByLabelText("Website address, fieldnotes.example")).toBeTruthy()
+  expect(screen.queryByLabelText("Website address")).toBeNull()
 })
 
 it("archives a message and saves a composed draft", async () => {
