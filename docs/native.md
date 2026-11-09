@@ -43,7 +43,7 @@ Supported switches, single-value sliders, plain-text segmented controls, date pi
 
 An isolated system control keeps its OS accent and appearance. A provider only changes its accent when a coloured `palette` or raw `tokens.primary` is specified, and only forces appearance when `scheme` is specified. The default `system` palette is the OS's own appearance, so system controls keep their native tints under it (a green iOS switch, the user's accent elsewhere). Other presets never seed a system control's accent.
 
-Use `GlassTabs` from `native-tabs-layout` for app-level tabs. It wraps Expo Router `NativeTabs` and leaves `minimizeBehavior="automatic"` to the OS. Pass `"onScrollDown"` explicitly when that behavior suits the screen. Search tabs and the bottom accessory remain system components. Use `Dock` for controls inside a screen.
+Use `GlassTabs` from `native-tabs-layout` for app-level tabs. It wraps Expo Router `NativeTabs` and leaves `minimizeBehavior="automatic"` to the OS. Pass `"onScrollDown"` explicitly when that behavior suits the screen. Search tabs and the bottom accessory remain system components. For iOS's bottom search field, give the `role="search"` tab its own `Stack` and set `headerSearchBarOptions` on its screen (see `sandbox/native/src/app/tabs-layout/search/`). Use `Dock` for controls inside a screen.
 
 An inline `DockAccessory` takes the space left beside the collapsed destination and search button. Expanded `DockSearch` takes the row and temporarily hides the accessory, destination bar and action; Cancel restores them. Its `expanded` / `onExpandedChange` props work as a controlled pair.
 

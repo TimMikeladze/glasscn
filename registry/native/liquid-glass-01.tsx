@@ -2,14 +2,16 @@ import * as React from "react"
 import { Image, Platform, ScrollView, Share, StyleSheet, TextInput, View, useWindowDimensions, type StyleProp, type TextInputProps, type ViewStyle } from "react-native"
 import { KeyboardStickyView } from "react-native-keyboard-controller"
 import { ArchiveIcon, BookOpenTextIcon, CheckIcon, ChevronLeftIcon, ChevronRightIcon, CoffeeIcon, CropIcon, EllipsisIcon, FileIcon, FlagIcon, HeartIcon, HouseIcon, InboxIcon, InfoIcon, LayersIcon, LibraryIcon, ListFilterIcon, NavigationIcon, PanelLeftIcon, PauseIcon, PlayIcon, RadioIcon, RotateCcwIcon, RotateCwIcon, ShareIcon, SkipForwardIcon, SlidersHorizontalIcon, SquarePenIcon, SunIcon, ThermometerIcon, Trash2Icon, TreesIcon, WavesIcon, XIcon, type LucideIcon } from "lucide-react-native"
+import type { ImageProps as SwiftImageProps } from "@expo/ui/swift-ui"
 import Svg, { Circle, Defs, LinearGradient, Path, Rect, Stop } from "react-native-svg"
 
+import { useReducedMotion, useReduceTransparency } from "@/components/glass/native/a11y"
 import { Backdrop } from "@/components/glass/native/backdrop"
 import { ActionSheet, ActionSheetAction, ActionSheetContent, ActionSheetTrigger } from "@/components/glass/native/action-sheet"
 import { Button } from "@/components/glass/native/button"
 import { Dock, DockAccessory, DockBar, DockItem, DockSearch, usePlacement } from "@/components/glass/native/dock"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/glass/native/dropdown-menu"
-import { Glass, GlassEffectGroup } from "@/components/glass/native/glass"
+import { Glass, GlassEffectGroup, hasLiquidGlass } from "@/components/glass/native/glass"
 import { GlassMorph, GlassMorphItem } from "@/components/glass/native/glass-morph"
 import { Input } from "@/components/glass/native/input"
 import { Press, haptics } from "@/components/glass/native/press"
@@ -18,7 +20,7 @@ import { SearchField } from "@/components/glass/native/search-field"
 import { SegmentedControl, SegmentedControlItem } from "@/components/glass/native/segmented-control"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/glass/native/sheet"
 import { Slider } from "@/components/glass/native/slider"
-import { GlassThemeProvider } from "@/components/glass/native/tokens"
+import { GlassThemeProvider, nativeControlTheme, useGlassThemeOptions } from "@/components/glass/native/tokens"
 import { GIcon, GText, alpha, useGlassForeground, useUI } from "@/components/glass/native/ui"
 
 export type LiquidGlassScene = "photos" | "music" | "maps" | "safari" | "mail" | "controls"
@@ -144,14 +146,20 @@ function PhotosScene({ photoBase, presentationScheme, width }: { photoBase?: str
           <PlainIcon icon={HeartIcon} label={favorite ? "Remove favorite" : "Favorite photo"} active={favorite} onPress={() => setFavorites((v) => favorite ? v.filter((n) => n !== id) : [...v, id])} />
           <PlainIcon icon={InfoIcon} label="Show photo details" onPress={() => setInfo(true)} />
         </Glass>
-        <View style={{ width: 48 }} />
+        {/* Delete's glass and glyph belong to the group, so they render and merge like Share's; the
+            press goes to the trigger below, which sits over it outside the group */}
+        {photos.length > 1 ? (
+          <View pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+            <Glass variant="liquid-clear" interactive radius={ui.radius.button} style={{ minWidth: 48, minHeight: 48, alignItems: "center", justifyContent: "center" }}><GIcon><Trash2Icon size={21} color={ui.foreground} /></GIcon></Glass>
+          </View>
+        ) : <View style={{ width: 48 }} />}
       </GlassEffectGroup>
-      {/* outside the clear-glass group: a system dialog anchored inside a glass container renders
-          translucent and loses its source placement */}
+      {/* the trigger stays outside the clear-glass group: a system dialog anchored inside a glass
+          container renders translucent and loses its source placement */}
       {photos.length > 1 ? <View style={{ position: "absolute", right: 16, bottom: 24 }}>
         <ActionSheet>
           <ActionSheetTrigger accessibilityLabel="Delete photo">
-            <Glass variant="liquid-clear" interactive radius={ui.radius.button} style={{ minWidth: 48, minHeight: 48, alignItems: "center", justifyContent: "center" }}><GIcon><Trash2Icon size={21} color={ui.foreground} /></GIcon></Glass>
+            <View testID="photos-delete-anchor" style={{ width: 48, height: 48 }} />
           </ActionSheetTrigger>
           <ActionSheetContent><ActionSheetAction variant="destructive" onAction={remove}>Delete Photo</ActionSheetAction></ActionSheetContent>
         </ActionSheet>
@@ -477,6 +485,79 @@ function MailScene({ width }: { width: number }) {
   )
 }
 
+type ClusterTool = { id: string; symbol: NonNullable<SwiftImageProps["systemName"]>; icon: LucideIcon; label: string; onPress: () => void; active?: boolean; toggle?: boolean }
+
+/**
+ * Photos' edit tools. With system glass every tool stays mounted in one SwiftUI glass container:
+ * closed, the tools sit under the toggle, small and transparent, so their glass is the toggle's;
+ * opening springs them out to their slots and the container pulls their glass out of the toggle.
+ * (Mounting them on open would pop them in place: Expo UI inserts views outside the animation.)
+ * Elsewhere the tools are separate glass siblings that appear when open.
+ */
+function ToolCluster({ tools, expanded, gap, style }: { tools: ClusterTool[]; expanded: boolean; gap: number; style?: StyleProp<ViewStyle> }) {
+  const ui = useUI()
+  const options = useGlassThemeOptions()
+  const reduced = useReducedMotion() || ui.motion.duration === 0
+  const solid = useReduceTransparency() || (ui.blur === 0 && ui.liquidBlur === 0 && ui.clearBlur === 0)
+  const namespaceId = React.useId()
+  const [revision, setRevision] = React.useState({ expanded, n: 0 })
+  if (revision.expanded !== expanded) setRevision({ expanded, n: revision.n + 1 })
+  const SIZE = 48
+  if (!hasLiquidGlass() || solid)
+    return (
+      <GlassMorph value={expanded} spacing={gap} style={[{ justifyContent: "center" }, style]}>
+        {tools.filter((t) => t.toggle || expanded).map((t) => (
+          <GlassMorphItem key={t.id} id={t.id} accessibilityLabel={t.label} accessibilityState={t.active === undefined ? undefined : { selected: t.active }} onPress={() => { haptics.selection(); t.onPress() }} style={{ minWidth: SIZE, minHeight: SIZE, paddingHorizontal: 0 }}>
+            <GIcon><t.icon size={21} color={t.active ? ui.primary : ui.foreground} /></GIcon>
+          </GlassMorphItem>
+        ))}
+      </GlassMorph>
+    )
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const SwiftUI = require("@expo/ui/swift-ui") as typeof import("@expo/ui/swift-ui")
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const m = require("@expo/ui/swift-ui/modifiers") as typeof import("@expo/ui/swift-ui/modifiers")
+  const center = tools.findIndex((t) => t.toggle)
+  return (
+    <View style={style}>
+      <SwiftUI.Host matchContents={{ vertical: true }} {...nativeControlTheme(ui, options)} style={{ width: "100%" }}>
+        <SwiftUI.Namespace id={namespaceId}>
+          <SwiftUI.GlassEffectContainer spacing={gap}>
+            <SwiftUI.ZStack modifiers={reduced ? [] : [m.animation(m.Animation.spring({ duration: (ui.motion.duration * 1.5) / 1000 }), revision.n)]}>
+              {tools.map((t, i) => {
+                const shown = expanded || !!t.toggle
+                return (
+                  <SwiftUI.Button
+                    key={t.id}
+                    onPress={() => { haptics.selection(); t.onPress() }}
+                    modifiers={[
+                      m.buttonStyle("plain"),
+                      m.frame({ width: SIZE, height: SIZE }),
+                      m.glassEffect({ glass: { variant: "regular", interactive: true }, shape: "capsule" }),
+                      m.glassEffectId(t.id, namespaceId),
+                      m.offset({ x: shown ? (i - center) * (SIZE + gap) : 0 }),
+                      m.scaleEffect(shown ? 1 : 0.5),
+                      m.zIndex(t.toggle ? 1 : 0),
+                      m.disabled(!shown),
+                      m.accessibilityHidden(!shown),
+                      m.accessibilityLabel(t.label),
+                      ...(t.active ? [m.accessibilityAddTraits(["isSelected"])] : []),
+                    ]}
+                  >
+                    {/* the glass container draws content above every surface, so the glyph fades itself: in
+                        once its glass has left the toggle, out before it gets back, so glyphs never pile up */}
+                    <SwiftUI.Image systemName={t.symbol} size={20} color={t.active ? ui.primary : ui.foreground} modifiers={[m.opacity(shown ? 1 : 0), ...(reduced || t.toggle ? [] : [m.animation(expanded ? m.Animation.easeOut({ duration: 0.18 }).delay(0.12) : m.Animation.easeIn({ duration: 0.1 }), revision.n)])]} />
+                  </SwiftUI.Button>
+                )
+              })}
+            </SwiftUI.ZStack>
+          </SwiftUI.GlassEffectContainer>
+        </SwiftUI.Namespace>
+      </SwiftUI.Host>
+    </View>
+  )
+}
+
 function ControlsScene({ width, photoBase }: { width: number; photoBase?: string }) {
   const ui = useUI()
   const { fontScale } = useWindowDimensions()
@@ -488,14 +569,13 @@ function ControlsScene({ width, photoBase }: { width: number; photoBase?: string
   const step = Math.max(44, (width - 80) / 4)
   const choose = (name: string) => { setTool(name); setExpanded(false) }
   const gap = Math.max(8, step - 48)
-  // one SwiftUI glass container with an identity per tool, as GlassMorph builds it: each tool comes
-  // and goes with its own glass, so no glyph shows before its surface, and the container merges
-  // what it can. Expo UI inserts hosted children without a transition, so the tools appear in place
-  const toolButton = (id: string, Icon: LucideIcon, label: string, onPress: () => void, active?: boolean) => (
-    <GlassMorphItem key={id} id={id} accessibilityLabel={label} accessibilityState={active === undefined ? undefined : { selected: active }} onPress={() => { haptics.selection(); onPress() }} style={{ minWidth: 48, minHeight: 48, paddingHorizontal: 0 }}>
-      <GIcon><Icon size={21} color={active ? ui.primary : ui.foreground} /></GIcon>
-    </GlassMorphItem>
-  )
+  const tools: ClusterTool[] = [
+    { id: "brightness", symbol: "sun.max", icon: SunIcon, label: "Adjust brightness", onPress: () => choose("Brightness"), active: tool === "Brightness" },
+    { id: "warmth", symbol: "thermometer.medium", icon: ThermometerIcon, label: "Adjust warmth", onPress: () => choose("Warmth"), active: tool === "Warmth" },
+    { id: "tools", symbol: expanded ? "xmark" : "slider.horizontal.3", icon: expanded ? XIcon : SlidersHorizontalIcon, label: expanded ? "Close photo tools" : "Open photo tools", onPress: () => setExpanded((v) => !v), toggle: true },
+    { id: "crop", symbol: "crop", icon: CropIcon, label: cropped ? "Remove crop" : "Crop photo", onPress: () => { setCropped((v) => !v); setExpanded(false) } },
+    { id: "reset", symbol: "arrow.counterclockwise", icon: RotateCcwIcon, label: "Reset photo edits", onPress: () => { setBrightness(50); setWarmth(0); setCropped(false); choose("Brightness") } },
+  ]
   return (
     <View style={{ flex: 1 }}>
       {/* the edit itself changes the photo: 50 is the original, no scrim over the asset */}
@@ -506,13 +586,7 @@ function ControlsScene({ width, photoBase }: { width: number; photoBase?: string
         <View style={[row, fontScale >= 1.8 ? { flexDirection: "column", alignItems: "stretch" } : { justifyContent: "space-between" }]}><GText size="lg" weight="600" style={{ flexShrink: 1 }}>{tool}</GText><GText size="sm" style={{ fontVariant: ["tabular-nums"] }}>{tool === "Warmth" ? warmth : brightness}</GText></View>
         <Slider value={[tool === "Warmth" ? warmth : brightness]} onValueChange={([v]) => tool === "Warmth" ? setWarmth(v) : setBrightness(v)} min={0} max={100} accessibilityLabel={tool} />
       </View>
-      <GlassMorph value={expanded} spacing={gap} style={{ position: "absolute", left: 0, right: 0, bottom: 28, justifyContent: "center" }}>
-        {[
-          ...(expanded ? [toolButton("brightness", SunIcon, "Adjust brightness", () => choose("Brightness"), tool === "Brightness"), toolButton("warmth", ThermometerIcon, "Adjust warmth", () => choose("Warmth"), tool === "Warmth")] : []),
-          toolButton("tools", expanded ? XIcon : SlidersHorizontalIcon, expanded ? "Close photo tools" : "Open photo tools", () => setExpanded((v) => !v)),
-          ...(expanded ? [toolButton("crop", CropIcon, cropped ? "Remove crop" : "Crop photo", () => { setCropped((v) => !v); setExpanded(false) }), toolButton("reset", RotateCcwIcon, "Reset photo edits", () => { setBrightness(50); setWarmth(0); setCropped(false); choose("Brightness") })] : []),
-        ]}
-      </GlassMorph>
+      <ToolCluster tools={tools} expanded={expanded} gap={gap} style={{ position: "absolute", left: 0, right: 0, bottom: 28 }} />
     </View>
   )
 }

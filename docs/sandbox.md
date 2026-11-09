@@ -20,7 +20,7 @@ An Expo app in `sandbox/native/` that renders every `native-*` item, so the nati
 | `/aurora` | Full-screen aurora per palette; reduced motion note |
 | `/press` | `Press` with haptic, custom squash, hover, disabled |
 | `/c/<name>` | Every ported component and block (`native-<name>`), every prop and variant: demos in `src/sandbox/demos/<group>.tsx` (basics, controls, forms, overlays, navigation, data, composite), keyed by registry name. Later groups win a key: `navigation` holds the M4 `dock` and `tabs` demos. Bar demos (dock, toolbar, navigation-bar, scroll-edge) run in a short scrolling stage wrapped in `ScrollEdgeProvider`, so minimize-on-scroll shows inside the page |
-| `/tabs-layout` | The `native-tabs-layout` recipe as a real route group (`app/tabs-layout/`): NativeTabs with `minimizeBehavior="onScrollDown"` (the recipe's `automatic` default never folded this pushed screen's bar), a bottom accessory reading its placement, a badge and a `role="search"` tab |
+| `/tabs-layout` | The `native-tabs-layout` recipe as a real route group (`app/tabs-layout/`): NativeTabs with `minimizeBehavior="onScrollDown"` (the recipe's `automatic` default never folded this pushed screen's bar), a bottom accessory reading its placement, a badge and a `role="search"` tab whose own stack (`app/tabs-layout/search/`) carries a system search bar, which iOS puts at the bottom in place of the tab bar |
 
 ## Commands
 

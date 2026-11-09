@@ -16,7 +16,10 @@ const supported = {
   accessibilityAddTraits: (traits) => modifier("accessibilityAddTraits", { traits }),
   glassEffectId: (id, namespaceId) => modifier("glassEffectId", { id, namespaceId }),
   animation: (animation, animatedValue) => modifier("animation", { animation, animatedValue }),
-  Animation: { spring: (params) => ({ type: "spring", ...params }) },
+  Animation: Object.fromEntries(["spring", "easeIn", "easeOut", "easeInOut", "linear"].map((type) => [type, (params) => {
+    const animation = { type, ...params }
+    return Object.assign(animation, { delay: (delay) => ({ ...animation, delay }) })
+  }])),
 }
 module.exports = new Proxy({}, {
   get: (_, name) => name === "__esModule" ? true : supported[name] ?? ((value, second) => modifier(name, typeof value === "object" && value !== null ? value : { value, second })),

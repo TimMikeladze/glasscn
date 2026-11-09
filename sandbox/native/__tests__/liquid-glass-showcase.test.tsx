@@ -131,17 +131,26 @@ it("archives a message and saves a composed draft", async () => {
   expect(screen.getByLabelText("Message body").props.value).toBe("Bring a notebook.")
 })
 
-it("expands the photo tools out of one glass container and adjusts the native slider (UX3-N08)", async () => {
+it("springs the photo tools out of the toggle in one glass container and adjusts the native slider (UX3-N08)", async () => {
   await renderThemed(<LiquidGlass01 scene="controls" />)
-  const identities = () => screen.getAllByTestId("expo-ui-Button").flatMap((node) => (node.props.modifiers ?? []).filter((m: { $type: string }) => m.$type === "glassEffectId").map((m: { id: string }) => m.id))
-  expect(identities()).toEqual(["tools"])
-  await fireEvent(swiftButton("Open photo tools")!, "press")
-  // one SwiftUI container and namespace: the tools emerge from the toggle and merge back into it
-  expect(identities()).toEqual(["brightness", "warmth", "tools", "crop", "reset"])
+  type Modifier = { $type: string; id?: string; value?: unknown; x?: number }
+  const buttons = () => screen.getAllByTestId("expo-ui-Button").filter((node) => (node.props.modifiers ?? []).some((m: Modifier) => m.$type === "glassEffectId"))
+  const mod = (node: { props: { modifiers?: Modifier[] } }, type: string) => node.props.modifiers?.find((m) => m.$type === type)
+  const shown = () => buttons().filter((node) => !mod(node, "accessibilityHidden")?.value).map((node) => mod(node, "glassEffectId")!.id)
+  // every tool stays mounted in the one container, so opening animates it out instead of inserting it
+  expect(buttons().map((node) => mod(node, "glassEffectId")!.id)).toEqual(["brightness", "warmth", "tools", "crop", "reset"])
   expect(screen.getAllByTestId("expo-ui-GlassEffectContainer")).toHaveLength(1)
+  expect(shown()).toEqual(["tools"])
+  // closed, the tools sit under the toggle (no offset) and can't be pressed
+  expect(mod(buttons()[0], "offset")).toMatchObject({ x: 0 })
+  expect(mod(buttons()[0], "disabled")).toMatchObject({ disabled: true })
+  await fireEvent(swiftButton("Open photo tools")!, "press")
+  expect(shown()).toEqual(["brightness", "warmth", "tools", "crop", "reset"])
+  expect(mod(buttons()[0], "offset")!.x).toBeLessThan(0)
+  expect(mod(buttons()[4], "offset")!.x).toBeGreaterThan(0)
   expect(swiftButton("Adjust brightness")!.props.modifiers).toContainEqual({ $type: "accessibilityAddTraits", traits: ["isSelected"] })
   await fireEvent(swiftButton("Adjust warmth")!, "press")
-  expect(identities()).toEqual(["tools"])
+  expect(shown()).toEqual(["tools"])
   const slider = screen.getByTestId("expo-ui-Slider")
   await fireEvent(slider, "valueChange", 35)
   expect(screen.getByTestId("expo-ui-Slider").props.value).toBe(35)
