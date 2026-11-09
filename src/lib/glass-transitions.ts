@@ -96,7 +96,7 @@ export function useGlassPresentation({ open: controlled, defaultOpen = false, on
       // end those animations before the next frame paints.
       // the morph target can sit inside the animated content (the action sheet's choice group)
       const presented = content.current?.closest<HTMLElement>("[data-glass-motion]") ?? content.current
-      if (next) for (const animation of presented?.getAnimations({ subtree: true }) ?? []) {
+      if (next && typeof presented?.getAnimations === "function") for (const animation of presented.getAnimations({ subtree: true })) {
         if (typeof CSSAnimation !== "undefined" && animation instanceof CSSAnimation && Number.isFinite(animation.effect?.getComputedTiming().endTime ?? Infinity) && (animation.pending || (Number(animation.currentTime) || 0) < 50)) animation.finish()
       }
     })
