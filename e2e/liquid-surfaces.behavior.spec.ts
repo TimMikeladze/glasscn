@@ -97,20 +97,34 @@ test.describe("source motion", () => {
       const doc = document as unknown as { startViewTransition?: (update: () => void) => { ready: Promise<void>; finished: Promise<void> } }
       if (typeof doc.startViewTransition !== "function") return false
       const native = doc.startViewTransition.bind(doc)
-      const state = window as Window & { __glassMorphs?: { from: string; to: string; slot?: string; ready: boolean }[] }
+      const state = window as Window & { __glassMorphs?: { from: string; to: string; slot?: string; ready: boolean; lowest?: number }[] }
       state.__glassMorphs = []
       const named = () => [...document.querySelectorAll<HTMLElement>("*")].find((element) => element.style.viewTransitionName?.startsWith("glass-presentation-"))
       doc.startViewTransition = (update) => {
         const from = named()?.style.viewTransitionName ?? ""
-        const record = { from, to: "", slot: "", ready: false }
+        const record: { from: string; to: string; slot: string; ready: boolean; lowest?: number } = { from, to: "", slot: "", ready: false }
         state.__glassMorphs?.push(record)
+        let presented: HTMLElement | undefined
         const transition = native(() => {
           update()
-          const panel = named()
-          record.to = panel?.style.viewTransitionName ?? ""
-          record.slot = panel?.dataset.slot ?? ""
+          presented = named()
+          record.to = presented?.style.viewTransitionName ?? ""
+          record.slot = presented?.dataset.slot ?? ""
         })
         void transition.ready.then(() => { record.ready = true }).catch(() => {})
+        // once the morph hands over, the presented surface must stay shown, not replay its entry
+        void transition.finished.then(() => {
+          const root = presented?.closest<HTMLElement>("[data-glass-motion]") ?? presented
+          if (!root?.isConnected) return
+          let lowest = 1
+          const start = performance.now()
+          const tick = () => {
+            if (root.isConnected) lowest = Math.min(lowest, Number(getComputedStyle(root).opacity))
+            if (performance.now() - start < 400) requestAnimationFrame(tick)
+            else record.lowest = lowest
+          }
+          tick()
+        }).catch(() => {})
         return transition
       }
       return true
@@ -124,6 +138,7 @@ test.describe("source motion", () => {
     expect(transition?.from).toMatch(/^glass-presentation-/)
     expect(transition?.to).toBe(transition?.from)
     expect(transition?.slot).toBe(slot)
+    await expect.poll(() => page.evaluate(() => (window as Window & { __glassMorphs?: { lowest?: number }[] }).__glassMorphs?.[0]?.lowest), { timeout: 5000 }).toBeGreaterThan(0.95)
     await page.keyboard.press("Escape")
     await expect(panel).toHaveCount(0)
     await expect.poll(() => page.evaluate(() => (window as Window & { __glassMorphs?: { ready: boolean }[] }).__glassMorphs?.[1]?.ready)).toBe(true)

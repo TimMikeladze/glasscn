@@ -56,16 +56,16 @@ test("a cluster follows a child-only transform without a container resize", asyn
   await cluster.scrollIntoViewIfNeeded()
   const surface = cluster.locator('[data-slot="glass-cluster-surface"]')
   await expect(surface).toBeVisible()
-  const initial = await surface.getAttribute("style")
+  const initial = await surface.getAttribute("data-shapes")
   const item = cluster.locator('[data-slot="glass-cluster-item"]').first()
   await item.evaluate((el) => { (el as HTMLElement).style.transition = "transform 150ms linear" })
   await item.evaluate((el) => { (el as HTMLElement).style.transform = "translateX(20px)" })
-  await expect.poll(() => surface.getAttribute("style")).not.toBe(initial)
+  await expect.poll(() => surface.getAttribute("data-shapes")).not.toBe(initial)
   await expect.poll(() => item.evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m41)).toBeCloseTo(20, 1)
   const geometry = await cluster.evaluate((el) => {
     const left = el.getBoundingClientRect().left
-    const mask = decodeURIComponent((el.querySelector('[data-slot="glass-cluster-surface"]') as HTMLElement).style.maskImage)
-    return { mask: Number(mask.match(/<rect x="([\d.]+)"/)?.[1]), item: el.querySelector('[data-slot="glass-cluster-item"]')!.getBoundingClientRect().left - left }
+    const shapes = (el.querySelector('[data-slot="glass-cluster-surface"]') as HTMLElement).dataset.shapes ?? ""
+    return { mask: Number(shapes.split(",")[0]), item: el.querySelector('[data-slot="glass-cluster-item"]')!.getBoundingClientRect().left - left }
   })
   expect(geometry.mask).toBeCloseTo(geometry.item, 0)
 })

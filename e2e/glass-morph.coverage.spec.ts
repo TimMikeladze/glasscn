@@ -104,3 +104,32 @@ test("enabling Reduce Motion stops owned morphs and preserves consumer animation
   expect(await morph.evaluate((el) => el.getAnimations({ subtree: true }).find((a) => a.id === "consumer-opacity")?.playState)).toBe("running")
   await expect(morph.locator('[data-slot="glass-cluster-item"][aria-hidden="true"]')).toHaveCount(0)
 })
+
+test("the shared glass covers every badge in every frame of a reorder", async ({ page }) => {
+  const morph = page.locator('[data-slot="glass-morph"]').first()
+  await morph.getByRole("button", { name: "Show badges" }).click()
+  await expect.poll(() => morph.evaluate((el) => el.getAnimations({ subtree: true }).filter((a) => a.playState === "running").length)).toBe(0)
+  await morph.evaluate((el) => {
+    const w = window as unknown as { samples: number[] }
+    w.samples = []
+    const surface = el.querySelector<HTMLElement>('[data-slot="glass-cluster-surface"]')!
+    const path = document.getElementById(surface.style.maskImage.match(/#([\w-]+)/)![1])!.querySelector("path")!
+    const start = performance.now()
+    const tick = () => {
+      const s = surface.getBoundingClientRect()
+      let outside = 0
+      for (const item of el.querySelectorAll('[data-slot="glass-cluster-item"]')) {
+        const r = item.getBoundingClientRect()
+        for (const [fx, fy] of [[0.5, 0.5], [0.25, 0.5], [0.75, 0.5], [0.5, 0.25], [0.5, 0.75]]) if (!path.isPointInFill(new DOMPoint(r.left + r.width * fx - s.left, r.top + r.height * fy - s.top))) outside++
+      }
+      w.samples.push(outside)
+      if (performance.now() - start < 900) requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  })
+  await page.getByRole("button", { name: "Reorder badges" }).click()
+  await expect.poll(() => page.evaluate(() => (window as unknown as { samples: number[] }).samples.length), { timeout: 5000 }).toBeGreaterThan(20)
+  await page.waitForTimeout(950)
+  const samples = await page.evaluate(() => (window as unknown as { samples: number[] }).samples)
+  expect(samples.filter(Boolean)).toEqual([])
+})

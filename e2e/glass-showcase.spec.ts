@@ -74,10 +74,10 @@ test("sibling controls split and merge without moving their labels into a filter
   const cluster = page.locator('[data-slot="glass-cluster"]')
   await cluster.scrollIntoViewIfNeeded()
   await expect(cluster.locator('[data-slot="glass-cluster-surface"]')).toBeVisible()
-  const initial = await cluster.locator('[data-slot="glass-cluster-surface"]').getAttribute("style")
+  const initial = await cluster.locator('[data-slot="glass-cluster-surface"]').getAttribute("data-shapes")
   await page.getByRole("button", { name: "Bring together", exact: true }).click()
   await expect(cluster.getByRole("button", { name: "Separate controls" })).toBeVisible()
-  await expect.poll(() => cluster.locator('[data-slot="glass-cluster-surface"]').getAttribute("style")).not.toBe(initial)
+  await expect.poll(() => cluster.locator('[data-slot="glass-cluster-surface"]').getAttribute("data-shapes")).not.toBe(initial)
   await expect(cluster.getByRole("button", { name: "Save landscape" })).toHaveCSS("filter", "none")
 })
 
@@ -91,8 +91,8 @@ test("a fixed-width cluster tracks moving item positions throughout a merge", as
   await expect(cluster).toHaveCSS("column-gap", "0px")
   const geometry = await cluster.evaluate((el) => {
     const rect = el.getBoundingClientRect()
-    const mask = decodeURIComponent((el.querySelector('[data-slot="glass-cluster-surface"]') as HTMLElement).style.maskImage)
-    return { mask: [...mask.matchAll(/<rect x="([\d.]+)"/g)].map((m) => Number(m[1])), items: [...el.querySelectorAll('[data-slot="glass-cluster-item"]')].map((item) => item.getBoundingClientRect().left - rect.left) }
+    const shapes = (el.querySelector('[data-slot="glass-cluster-surface"]') as HTMLElement).dataset.shapes ?? ""
+    return { mask: shapes.split(" ").map((shape) => Number(shape.split(",")[0])), items: [...el.querySelectorAll('[data-slot="glass-cluster-item"]')].map((item) => item.getBoundingClientRect().left - rect.left) }
   })
   expect(geometry.mask).toHaveLength(3)
   geometry.mask.forEach((x, i) => expect(x).toBeCloseTo(geometry.items[i], 0))

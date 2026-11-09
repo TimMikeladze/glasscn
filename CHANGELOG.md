@@ -29,6 +29,8 @@ Registry items are copied into your app, so re-run `npx shadcn add @glasscn-app/
 
 ### Fixed
 
+- Menus, popovers, selects, dialogs, alert dialogs, sheets, action sheets and confirmation popovers seemed to open twice: after the morph from the trigger finished, clearing `data-morphing` restarted the content's CSS entry animation from opacity 0. `useGlassPresentation` now ends those animations before the next frame.
+- `GlassCluster`'s shared glass trailed moving items by a frame or more (Landmarks badges, `GlassMorph` reorders): the union was a data-URL SVG mask set through React state, which decodes asynchronously. The outline is now traced in script and written into inline SVG masks in the frame it is measured. The surface's `data-shapes` attribute lists the measured item boxes.
 - Destructive action-sheet rows rendered in the accent ink on liquid glass: the inactive-window rule for `text-primary-ink` was unlayered CSS and beat every utility. The dimming now lives in `--color-primary-ink` (through `--glass-ink-active`, set only on glass), so `text-destructive-ink` and other overrides apply again.
 - Radix parts on the docs site (tabs, sliders, menus) follow `<html dir>`; Music's tabs mirror in right-to-left.
 - Native sandbox: a deep link's forced Reduce Motion or Reduce Transparency no longer survives later links that omit it; the preset rows' reset chip is "unset", so density and type no longer show two "default" chips.
