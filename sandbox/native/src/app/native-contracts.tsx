@@ -45,7 +45,7 @@ export default function NativeContracts() {
       </View>
     </Section> : null}
     {part !== "buttons" && part !== "morph" ? <Section title="Controlled system inspector" note="Drag to large twice while rejection is on; accepted index stays 0 and each request is counted. Background note remains editable at the small detent.">
-      <Button onPress={() => setReject((value) => !value)}>Reject large: {String(reject)}</Button>
+      <Button onPress={() => setReject((value) => !value)}>{`Reject large: ${reject ? "on" : "off"}`}</Button>
       <Body>Accepted detent: {detent} · requests: {requests.join(",") || "none"}</Body>
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent native={part !== "custom"} side="bottom" modal={false} detents={[0.32, "large"]} detent={detent} onDetentChange={(index) => { setRequests((values) => [...values, index]); if (!reject) setDetent(index) }} anchor={<Button variant="glass" onAction={() => setOpen(true)}>Open system inspector</Button>}>

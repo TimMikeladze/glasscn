@@ -56,7 +56,7 @@ export default function Tokens() {
   const t = useGlassTheme()
   return (
     <Screen>
-      <Section title="Presets + accessibility" note="Applies to every screen. Accessibility chips force the setting on; tap again to follow the OS.">
+      <Section title="Presets + accessibility" note="Applies to glasscn components on every screen. Accessibility chips force the setting on for glasscn components only; system sheets, menus, tab bars and the navigation header keep following the OS setting. Tap a chip again to follow the OS.">
         <Presets />
       </Section>
       <Section title="Colours">

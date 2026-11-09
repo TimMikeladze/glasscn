@@ -20,7 +20,9 @@ function NowPlaying() {
 /** The native-tabs-layout recipe: NativeTabs themed from glasscn tokens. */
 export default function TabsLayout() {
   return (
-    <GlassTabs>
+    // `automatic` (the recipe's default) leaves minimizing to the system, which never folded this
+    // pushed screen's bar on iOS 27; the demo asks for it so scrolling down shows the folded bar
+    <GlassTabs minimizeBehavior="onScrollDown">
       <GlassTabs.BottomAccessory>
         <NowPlaying />
       </GlassTabs.BottomAccessory>

@@ -1,5 +1,4 @@
 import * as React from "react"
-import { useColorScheme } from "react-native"
 import * as Linking from "expo-linking"
 
 import { forceA11y, type A11ySetting } from "@/components/glass/native/a11y"
@@ -22,14 +21,17 @@ type Presets = { material?: MaterialName; shape?: ShapeName; motion?: MotionName
 
 export const A11Y_SETTINGS: A11ySetting[] = ["reduceMotion", "reduceTransparency", "highContrast", "boldText"]
 
+/** `system` follows the OS appearance live; light or dark forces it on every glasscn surface. */
+export type SandboxScheme = Scheme | "system"
+
 type SandboxTheme = {
   palette: PaletteName
-  scheme: Scheme
+  scheme: SandboxScheme
   presets: Presets
   /** Settings forced on via `forceA11y` (unset = follow the OS). */
   a11y: Partial<Record<A11ySetting, boolean>>
   setPalette: (p: PaletteName) => void
-  setScheme: (s: Scheme) => void
+  setScheme: (s: SandboxScheme) => void
   setPreset: <G extends PresetGroup>(group: G, name: Presets[G] | undefined) => void
   setA11y: (setting: A11ySetting, on: boolean | null) => void
 }
@@ -37,15 +39,15 @@ type SandboxTheme = {
 const Ctx = React.createContext<SandboxTheme | null>(null)
 
 /**
- * The palette, scheme, presets and forced a11y settings every screen renders in;
- * starts on the system scheme. A deep link's `?palette=…&scheme=…&still=1` query (Maestro's
- * screenshot flows use it) picks them on launch.
+ * The palette, scheme, presets and forced a11y settings every screen renders in. The scheme
+ * starts on `system`, which leaves it to the OS: an appearance change applies live, and system
+ * glass containers keep merging (they only take the window's appearance). A deep link's
+ * `?palette=…&scheme=light|dark|system&still=1` query (Maestro's screenshot flows use it) picks them.
  */
 export function SandboxThemeProvider({ children }: { children: React.ReactNode }) {
-  const system = useColorScheme()
   const url = Linking.useLinkingURL()
   const [palette, setPalette] = React.useState<PaletteName>("system")
-  const [scheme, setScheme] = React.useState<Scheme>(system === "dark" ? "dark" : "light")
+  const [scheme, setScheme] = React.useState<SandboxScheme>("system")
   const [presets, setPresets] = React.useState<Presets>({})
   const [a11y, setA11yState] = React.useState<Partial<Record<A11ySetting, boolean>>>({})
   // settings a deep link forced: the next link that doesn't ask for one releases it, so a
@@ -56,7 +58,7 @@ export function SandboxThemeProvider({ children }: { children: React.ReactNode }
     if (!url) return
     const q = Linking.parse(url).queryParams ?? {}
     if (typeof q.palette === "string" && PALETTES.includes(q.palette as PaletteName)) setPalette(q.palette as PaletteName)
-    if (q.scheme === "light" || q.scheme === "dark") setScheme(q.scheme)
+    if (q.scheme === "light" || q.scheme === "dark" || q.scheme === "system") setScheme(q.scheme)
     // ?still=1 forces Reduce Motion: the aurora freezes, so screenshots are stable baselines
     // ?force=reduceTransparency,highContrast forces settings on, like the /tokens chips
     const forced = [...(q.still === "1" ? ["reduceMotion"] : []), ...(typeof q.force === "string" ? q.force.split(",") : [])].filter((k): k is A11ySetting =>
@@ -96,7 +98,7 @@ export function SandboxThemeProvider({ children }: { children: React.ReactNode }
   )
   return (
     <Ctx.Provider value={value}>
-      <GlassThemeProvider palette={palette} scheme={scheme} {...presets}>
+      <GlassThemeProvider palette={palette} scheme={scheme === "system" ? undefined : scheme} {...presets}>
         {children}
       </GlassThemeProvider>
     </Ctx.Provider>

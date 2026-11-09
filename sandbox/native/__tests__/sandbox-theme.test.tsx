@@ -2,6 +2,7 @@ import * as React from "react"
 import { Text } from "react-native"
 import { act, render, screen } from "@testing-library/react-native"
 
+import { useGlassThemeOptions } from "@/components/glass/native/tokens"
 import { SandboxThemeProvider, useSandboxTheme } from "@/sandbox/theme"
 
 let mockUrl: string | null = null
@@ -54,4 +55,24 @@ test("a setting turned on from the chips survives deep links", async () => {
   mockUrl = "exp://127.0.0.1:8083/--/c/sheet"
   await view.rerender(tree())
   expect(screen.getByTestId("forced")).toHaveTextContent("highContrast")
+})
+
+test("the scheme follows the OS until a link or the picker forces one (UX3-N18)", async () => {
+  function Scheme() {
+    return <Text testID="scheme">{useGlassThemeOptions().scheme ?? "os"}</Text>
+  }
+  const tree = () => (
+    <SandboxThemeProvider>
+      <Scheme />
+    </SandboxThemeProvider>
+  )
+  mockUrl = "exp://127.0.0.1:8083/--/c/glass"
+  const view = await render(tree())
+  expect(screen.getByTestId("scheme")).toHaveTextContent("os")
+  mockUrl = "exp://127.0.0.1:8083/--/c/glass?scheme=dark"
+  await view.rerender(tree())
+  expect(screen.getByTestId("scheme")).toHaveTextContent("dark")
+  mockUrl = "exp://127.0.0.1:8083/--/c/glass?scheme=system"
+  await view.rerender(tree())
+  expect(screen.getByTestId("scheme")).toHaveTextContent("os")
 })

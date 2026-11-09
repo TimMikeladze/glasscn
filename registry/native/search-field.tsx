@@ -99,6 +99,78 @@ function SearchField({
   }
   // the capsule morphs between the round button and the field (a layout spring, never a fade)
   const morph = reduced ? undefined : LinearTransition.springify().duration(ui.motion.duration * 2.2).dampingRatio(0.8)
+  const list =
+    focused && suggestions.length ? (
+      <Glass key="suggestions" variant="liquid" role="list" radius={ui.radius.surface} style={{ padding: 6 }}>
+        {suggestions.map((s) => (
+          <Press
+            key={suggestionValue(s)}
+            accessibilityRole="button"
+            onPress={() => {
+              haptics.selection()
+              setText(suggestionValue(s))
+              onSuggestionSelect?.(suggestionValue(s))
+            }}
+            style={[{ minHeight: 44, justifyContent: "center", paddingHorizontal: ui.pad.sm, borderRadius: ui.radius.control }, web({ cursor: "pointer" })]}
+          >
+            {typeof suggestionLabel(s) === "string" ? <GText size="sm">{suggestionLabel(s)}</GText> : suggestionLabel(s)}
+          </Press>
+        ))}
+      </Glass>
+    ) : null
+  const bar = (
+    <View key="field" style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+      <Animated.View layout={morph} style={{ flex: 1 }}>
+        <Glass variant="liquid" interactive radius={ui.radius.button} style={{ minHeight: ui.control.lg, flexDirection: "row", alignItems: "center", gap: 8, paddingVertical: 6, paddingLeft: 14, paddingRight: 6 }}>
+          <GIcon><SearchIcon size={18} color={ui.mutedForeground} /></GIcon>
+          {tokens.length ? <ScrollView horizontal accessibilityLabel="Search filters" showsHorizontalScrollIndicator={false} style={{ flexGrow: 0, flexShrink: 1, maxWidth: "50%" }} contentContainerStyle={{ alignItems: "center", gap: 4 }}>
+            {tokens.map(token => <View key={token.id} style={{ flexDirection: "row", alignItems: "center", gap: 4, borderRadius: ui.radius.badge, backgroundColor: ui.fill, paddingLeft: 8 }}><GText size="sm" dynamicTypeRamp="subheadline">{token.label}</GText>{onTokenRemove ? <Press accessibilityRole="button" accessibilityLabel={`Remove ${token.label} filter`} onPress={() => { onTokenRemove(token.id); input.current?.focus() }} hitSlop={8} style={{ minWidth: ui.control.xs, minHeight: ui.control.xs, alignItems: "center", justifyContent: "center", borderRadius: ui.radius.button }}><GIcon><XIcon size={14} color={ui.mutedForeground} /></GIcon></Press> : null}</View>)}
+          </ScrollView> : null}
+          <SearchInput
+            ref={input}
+            value={text}
+            onChangeText={setText}
+            onKeyPress={event => {
+              onKeyPress?.(event)
+              if (!event.isDefaultPrevented() && event.nativeEvent.key === "Backspace" && !text && tokens.length) onTokenRemove?.(tokens[tokens.length - 1].id)
+            }}
+            placeholder={placeholder}
+            placeholderTextColor={ui.mutedForeground}
+            selectionColor={ui.primary}
+            cursorColor={ui.primary}
+            returnKeyType="search"
+            enterKeyHint="search"
+            accessibilityRole="search"
+            accessibilityLabel={props.accessibilityLabel ?? placeholder}
+            onSubmitEditing={() => onSubmit?.(text)}
+            onFocus={(e) => {
+              setFocused(true)
+              onFocus?.(e)
+            }}
+            onBlur={(e) => {
+              setFocused(false)
+              if (minimized && !text) setOpen(false)
+              onBlur?.(e)
+            }}
+            style={[{ flex: 1, minHeight: ui.control.lg - 12, paddingVertical: 0, fontSize: ui.text.base, color: ui.foreground }, web({ outlineStyle: "none" })]}
+            {...props}
+          />
+          {text ? (
+            <Press accessibilityRole="button" accessibilityLabel="Clear" hitSlop={8} onPress={() => setText("")} style={{ width: ui.control.xs, height: ui.control.xs, borderRadius: ui.radius.button, alignItems: "center", justifyContent: "center", backgroundColor: ui.fill }}>
+              <GIcon><XIcon size={14} color={ui.mutedForeground} /></GIcon>
+            </Press>
+          ) : null}
+        </Glass>
+      </Animated.View>
+      {cancel ? (
+        <Press accessibilityRole="button" onPress={finish} hitSlop={8} style={{ minHeight: 44, justifyContent: "center" }}>
+          <GText size="sm" tone="primary" weight="500">
+            {cancelLabel}
+          </GText>
+        </Press>
+      ) : null}
+    </View>
+  )
   const field = !open ? (
     <Press haptic liquid accessibilityRole="search" accessibilityLabel={placeholder} accessibilityHint="Opens the search field" onPress={() => (setOpen(true), setTimeout(() => input.current?.focus(), 0))}>
       <Animated.View layout={morph}>
@@ -108,77 +180,9 @@ function SearchField({
       </Animated.View>
     </Press>
   ) : (
-    <View style={{ gap: 8 }}>
-      {focused && suggestions.length ? (
-        <Glass variant="liquid" role="list" radius={ui.radius.surface} style={{ padding: 6, order: placement === "bottom" ? 0 : 2 } as ViewStyle}>
-          {suggestions.map((s) => (
-            <Press
-              key={suggestionValue(s)}
-              accessibilityRole="button"
-              onPress={() => {
-                haptics.selection()
-                setText(suggestionValue(s))
-                onSuggestionSelect?.(suggestionValue(s))
-              }}
-              style={[{ minHeight: 44, justifyContent: "center", paddingHorizontal: ui.pad.sm, borderRadius: ui.radius.control }, web({ cursor: "pointer" })]}
-            >
-              {typeof suggestionLabel(s) === "string" ? <GText size="sm">{suggestionLabel(s)}</GText> : suggestionLabel(s)}
-            </Press>
-          ))}
-        </Glass>
-      ) : null}
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 8, order: 1 } as ViewStyle}>
-        <Animated.View layout={morph} style={{ flex: 1 }}>
-          <Glass variant="liquid" interactive radius={ui.radius.button} style={{ minHeight: ui.control.lg, flexDirection: "row", alignItems: "center", gap: 8, paddingVertical: 6, paddingLeft: 14, paddingRight: 6 }}>
-            <GIcon><SearchIcon size={18} color={ui.mutedForeground} /></GIcon>
-            {tokens.length ? <ScrollView horizontal accessibilityLabel="Search filters" showsHorizontalScrollIndicator={false} style={{ flexGrow: 0, flexShrink: 1, maxWidth: "50%" }} contentContainerStyle={{ alignItems: "center", gap: 4 }}>
-              {tokens.map(token => <View key={token.id} style={{ flexDirection: "row", alignItems: "center", gap: 4, borderRadius: ui.radius.badge, backgroundColor: ui.fill, paddingLeft: 8 }}><GText size="sm" dynamicTypeRamp="subheadline">{token.label}</GText>{onTokenRemove ? <Press accessibilityRole="button" accessibilityLabel={`Remove ${token.label} filter`} onPress={() => { onTokenRemove(token.id); input.current?.focus() }} hitSlop={8} style={{ minWidth: ui.control.xs, minHeight: ui.control.xs, alignItems: "center", justifyContent: "center", borderRadius: ui.radius.button }}><GIcon><XIcon size={14} color={ui.mutedForeground} /></GIcon></Press> : null}</View>)}
-            </ScrollView> : null}
-            <SearchInput
-              ref={input}
-              value={text}
-              onChangeText={setText}
-              onKeyPress={event => {
-                onKeyPress?.(event)
-                if (!event.isDefaultPrevented() && event.nativeEvent.key === "Backspace" && !text && tokens.length) onTokenRemove?.(tokens[tokens.length - 1].id)
-              }}
-              placeholder={placeholder}
-              placeholderTextColor={ui.mutedForeground}
-              selectionColor={ui.primary}
-              cursorColor={ui.primary}
-              returnKeyType="search"
-              enterKeyHint="search"
-              accessibilityRole="search"
-              accessibilityLabel={props.accessibilityLabel ?? placeholder}
-              onSubmitEditing={() => onSubmit?.(text)}
-              onFocus={(e) => {
-                setFocused(true)
-                onFocus?.(e)
-              }}
-              onBlur={(e) => {
-                setFocused(false)
-                if (minimized && !text) setOpen(false)
-                onBlur?.(e)
-              }}
-              style={[{ flex: 1, minHeight: ui.control.lg - 12, paddingVertical: 0, fontSize: ui.text.base, color: ui.foreground }, web({ outlineStyle: "none" })]}
-              {...props}
-            />
-            {text ? (
-              <Press accessibilityRole="button" accessibilityLabel="Clear" hitSlop={8} onPress={() => setText("")} style={{ width: ui.control.xs, height: ui.control.xs, borderRadius: ui.radius.button, alignItems: "center", justifyContent: "center", backgroundColor: ui.fill }}>
-                <GIcon><XIcon size={14} color={ui.mutedForeground} /></GIcon>
-              </Press>
-            ) : null}
-          </Glass>
-        </Animated.View>
-        {cancel ? (
-          <Press accessibilityRole="button" onPress={finish} hitSlop={8} style={{ minHeight: 44, justifyContent: "center" }}>
-            <GText size="sm" tone="primary" weight="500">
-              {cancelLabel}
-            </GText>
-          </Press>
-        ) : null}
-      </View>
-    </View>
+    // Yoga has no CSS `order`: the list sits under an inline field and over a bottom one by its
+    // place in this keyed array, so the field never moves or remounts while suggestions change
+    <View style={{ gap: 8 }}>{placement === "bottom" ? [list, bar] : [bar, list]}</View>
   )
   if (placement === "bottom") {
     const pinned: ViewStyle = { position: "absolute", left: 12, right: 12, bottom: 12, zIndex: 40 }

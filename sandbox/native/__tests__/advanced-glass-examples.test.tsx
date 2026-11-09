@@ -56,11 +56,57 @@ it("lets the parent note change under its system nonmodal formatter and saves on
   expect(screen.getByLabelText("Note text").props.value).toBe("Bring the field guide.")
 })
 
+async function layoutNoteToolbar() {
+  await fireEvent(screen.getByLabelText("Note actions"), "layout", layout(360))
+  for (const id of ["undo", "redo", "pin", "word-count", "share"]) await fireEvent(screen.getByTestId(`toolbar-measure-${id}`, { includeHiddenElements: true }), "layout", layout(44))
+  await fireEvent(screen.getByTestId("toolbar-measure-overflow", { includeHiddenElements: true }), "layout", layout(44))
+}
+
+it("undoes a run of typing as one step and a format change as another (UX3-N12)", async () => {
+  const now = jest.spyOn(Date, "now")
+  try {
+    await render(<LiquidGlass02 scene="notes" />)
+    await layoutNoteToolbar()
+    const note = () => screen.getByLabelText("Note text")
+    const original = note().props.value
+    for (const [at, text] of [[10_000, "B"], [10_400, "Br"], [10_800, "Bri"], [13_000, "Bring"]] as const) {
+      now.mockReturnValue(at)
+      await fireEvent.changeText(note(), text)
+    }
+    await fireEvent.press(screen.getByRole("button", { name: "Title" }))
+    expect(screen.getByRole("button", { name: "Title" }).props.accessibilityState?.selected).toBe(true)
+    await fireEvent.press(screen.getByTestId("toolbar-command-undo"))
+    expect(screen.getByRole("button", { name: "Body" }).props.accessibilityState?.selected).toBe(true)
+    expect(note().props.value).toBe("Bring")
+    // the pause before "Bring" ended the first run
+    await fireEvent.press(screen.getByTestId("toolbar-command-undo"))
+    expect(note().props.value).toBe("Bri")
+    await fireEvent.press(screen.getByTestId("toolbar-command-undo"))
+    expect(note().props.value).toBe(original)
+  } finally {
+    now.mockRestore()
+  }
+})
+
+it("shows Pin and Done results on screen (UX3-N05)", async () => {
+  await render(<LiquidGlass02 scene="notes" />)
+  await layoutNoteToolbar()
+  await fireEvent.press(screen.getByTestId("toolbar-command-pin"))
+  expect(screen.getByTestId("note-status")).toHaveTextContent("Note pinned.")
+  expect(screen.getByLabelText("Pinned")).toBeTruthy()
+  expect(screen.getByTestId("toolbar-command-pin").props.accessibilityLabel).toBe("Unpin note")
+  await fireEvent.press(screen.getByLabelText("Done"))
+  expect(screen.getByTestId("note-status")).toHaveTextContent("Note saved.")
+})
+
 it("keeps landing search unfocused and requests focus only for immediate search", async () => {
   await render(<LiquidGlass02 scene="search" />)
   expect(screen.getByLabelText("Search all collections").props.autoFocus).toBe(false)
+  expect(screen.getByLabelText("Search destination").props.accessibilityState?.selected).toBe(true)
   await fireEvent(screen.getByTestId("search-now"), "press")
   expect(screen.getByLabelText("Search all collections").props.autoFocus).toBe(true)
+  // the two entry points read as a pair: the current one is selected (UX3-N17)
+  expect(screen.getByLabelText("Search now").props.accessibilityState?.selected).toBe(true)
   await fireEvent.changeText(screen.getByLabelText("Search all collections"), "no such landmark")
   expect(screen.getByText(/No results for/)).toBeTruthy()
 })

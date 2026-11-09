@@ -88,11 +88,11 @@ export function useSlidingSelection(current: string | undefined, { radius, liveF
 }
 
 /** Wraps string children in GText and tints/sizes bare icon elements (lucide-react-native). */
-export function withGlyphs(children: React.ReactNode, { color, size, text = "sm", weight }: { color: string; size: number; text?: TextSize; weight?: "400" | "500" | "600" | "700" }) {
+export function withGlyphs(children: React.ReactNode, { color, size, text = "sm", weight, maxFontSizeMultiplier }: { color: string; size: number; text?: TextSize; weight?: "400" | "500" | "600" | "700"; maxFontSizeMultiplier?: number }) {
   return React.Children.map(children, (child) => {
     if (typeof child === "string" || typeof child === "number") {
       return (
-        <GText size={text} weight={weight} color={color} numberOfLines={1} style={{ flexShrink: 1 }}>
+        <GText size={text} weight={weight} color={color} numberOfLines={1} maxFontSizeMultiplier={maxFontSizeMultiplier} style={{ flexShrink: 1 }}>
           {child}
         </GText>
       )

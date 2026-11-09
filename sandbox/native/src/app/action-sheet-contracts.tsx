@@ -11,19 +11,30 @@ export default function ActionSheetContracts() {
   const [sourcePresses, setSourcePresses] = React.useState(0)
   return <Screen picker={false}>
     <Stack.Screen options={{ title: "Action sheet contracts" }} />
-    <Section title="System source presentation" note="Plain uncontrolled actions use SwiftUI ConfirmationDialog. The system decides the layout and Cancel visibility.">
+    <Section title="System source presentation" note="Plain, uncontrolled, enabled actions use SwiftUI ConfirmationDialog. The system decides the layout and Cancel visibility.">
       <ActionSheet onOpenChange={(open) => setChanges((values) => [...values, open])}>
         <ActionSheetTrigger asChild onPress={() => setSourcePresses((value) => value + 1)}><Button variant="glass" accessibilityLabel="Entry options">Entry options</Button></ActionSheetTrigger>
         <ActionSheetContent>
           <ActionSheetHeader><ActionSheetTitle>Night 311</ActionSheetTitle><ActionSheetDescription>Choose what to do with this entry.</ActionSheetDescription></ActionSheetHeader>
           <ActionSheetAction onAction={() => setActions((value) => value + 1)}>Archive entry</ActionSheetAction>
-          <ActionSheetAction variant="destructive" disabled>Delete entry</ActionSheetAction>
+          <ActionSheetAction variant="destructive" onAction={() => setActions((value) => value + 1)}>Delete entry</ActionSheetAction>
           <ActionSheetCancel />
         </ActionSheetContent>
       </ActionSheet>
       <Body>Actions: {actions} · source presses: {sourcePresses}</Body>
       <Body>Open changes: {changes.map(String).join(", ") || "none"}</Body>
       <Button variant="secondary" accessibilityLabel="Following action">Following action</Button>
+    </Section>
+    <Section title="Disabled choice" note="SwiftUI's dialog leaves disabled actions out, so a disabled choice selects the custom sheet: attached to its trigger, the choice visible and inert.">
+      <ActionSheet>
+        <ActionSheetTrigger asChild><Button variant="glass" accessibilityLabel="Locked entry options">Locked entry options</Button></ActionSheetTrigger>
+        <ActionSheetContent>
+          <ActionSheetHeader><ActionSheetTitle>Night 312</ActionSheetTitle><ActionSheetDescription>This entry is shared and can't be deleted.</ActionSheetDescription></ActionSheetHeader>
+          <ActionSheetAction onAction={() => setActions((value) => value + 1)}>Archive entry</ActionSheetAction>
+          <ActionSheetAction variant="destructive" disabled>Delete entry</ActionSheetAction>
+          <ActionSheetCancel />
+        </ActionSheetContent>
+      </ActionSheet>
     </Section>
   </Screen>
 }

@@ -5,6 +5,7 @@ import { State, type PanGesture } from "react-native-gesture-handler"
 import { fireGestureHandler, getByGestureTestId } from "react-native-gesture-handler/jest-utils"
 
 import { Checkbox } from "@/components/glass/native/checkbox"
+import { SearchField } from "@/components/glass/native/search-field"
 import { SegmentedControl, SegmentedControlItem } from "@/components/glass/native/segmented-control"
 import { Slider } from "@/components/glass/native/slider"
 import { Switch } from "@/components/glass/native/switch"
@@ -156,5 +157,21 @@ describe("system controls name the element VoiceOver reads (UX3-N01, UX3-N16)", 
     const slider = screen.getByRole("adjustable")
     expect(slider.props.accessibilityLabel).toBe("Playback progress")
     expect(StyleSheet.flatten(slider.props.style)).toMatchObject({ left: 0, right: 0, top: 0, bottom: 0 })
+  })
+})
+
+describe("SearchField suggestions follow the field's placement (UX3-N13)", () => {
+  // depth-first position of a node in the rendered tree
+  const position = (target: ReturnType<typeof screen.getByText>) => {
+    const order: unknown[] = []
+    const walk = (node: typeof target) => { order.push(node); for (const child of node.children) if (typeof child !== "string") walk(child) }
+    walk(screen.root!)
+    return order.indexOf(target)
+  }
+  it.each([["inline", true], ["bottom", false]] as const)("%s: suggestions after the field is %s", async (placement, after) => {
+    await renderThemed(<SearchField placement={placement} accessibilityLabel="Find a night" defaultValue="R" suggestions={["Rain", "Rowing"]} />)
+    const input = screen.getByLabelText("Find a night")
+    await fireEvent(input, "focus")
+    expect(position(screen.getByText("Rain")) > position(screen.getByLabelText("Find a night"))).toBe(after)
   })
 })
