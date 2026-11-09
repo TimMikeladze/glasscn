@@ -1,7 +1,7 @@
 /**
- * The share card every page uses: a frosted pane over an aurora drawn from a
- * real palette, with a small glass control cluster on the right.
- * Satori rules apply — every multi-child div is `display: flex`, colours are hex.
+ * The share card every page uses: a showcase photograph, a scrimmed text column on
+ * the left and a scene of glass parts on the right (see docs/og-images.md).
+ * Satori rules apply: every multi-child div is `display: flex`, colours are hex or rgba.
  */
 import { readFile } from "node:fs/promises"
 import { join } from "node:path"
@@ -9,30 +9,34 @@ import { cacheLife } from "next/cache"
 import { ImageResponse } from "next/og"
 import sharp from "sharp"
 
-import { ogColors, type OgColors } from "@/lib/og/colors"
+import { ogColors } from "@/lib/og/colors"
+import { Scene, type OgPhoto, type OgScene, type SceneProps } from "@/lib/og/scenes"
 import { site } from "@/lib/site"
 
+export type { OgPhoto, OgScene } from "@/lib/og/scenes"
+
 export const ogSize = { width: 1200, height: 630 }
-/**
- * JPEG, not PNG: the aurora's gradients make a ~570 KB PNG, over WhatsApp's
- * ~600 KB unfurl limit on a bad day; as JPEG it is a fraction of that.
- */
+/** JPEG: a photo card as PNG is over 1 MB, past WhatsApp's ~600 KB unfurl limit. */
 export const ogContentType = "image/jpeg"
 
 export interface OgCard {
   title: string
   description?: string
-  /** Small pill above the title — a section or group. */
+  /** Small pill above the title: a section or group. */
   eyebrow?: string
-  /** Footer left: a command shown in mono, e.g. `npx shadcn add @glasscn-app/button`. */
+  /** Footer: a command shown in mono, e.g. `npx shadcn add @glasscn-app/button`. */
   command?: string
   /** The page this card is for, e.g. `/docs/button` (used by page metadata). */
   path?: string
-  /** A key of PALETTES. */
-  palette?: string
+  photo?: OgPhoto
+  scene?: OgScene
 }
 
 const FONT_DIR = join(process.cwd(), "src/lib/og/fonts")
+const PHOTO_DIR = join(process.cwd(), "public/showcase")
+/** How far each photo's frost is dimmed so white labels hold contrast; summit's sky is bright. */
+const FROST_BRIGHTNESS: Record<OgPhoto, number> = { alpine: 0.82, coast: 0.8, summit: 0.6 }
+
 type Fonts = NonNullable<NonNullable<ConstructorParameters<typeof ImageResponse>[1]>["fonts"]>
 let fonts: Promise<Fonts> | undefined
 const loadFonts = () =>
@@ -46,14 +50,30 @@ const loadFonts = () =>
     { name: "Geist Mono", data: mono, weight: 500 as const, style: "normal" as const },
   ]))
 
+const dataUri = (buf: Buffer) => `data:image/jpeg;base64,${buf.toString("base64")}`
+
+/** The photo at card size, and a blurred copy the glass panes clip from. */
+async function loadPhoto(photo: OgPhoto): Promise<{ sharp: string; blurred: string }> {
+  const base = sharp(await readFile(join(PHOTO_DIR, `${photo}.jpg`))).resize(ogSize.width, ogSize.height, { fit: "cover" })
+  const full = await base.clone().jpeg({ quality: 90 }).toBuffer()
+  // blurred at quarter size and scaled back up by Satori: same look, a 20th of the bytes
+  const blurred = await sharp(full)
+    .resize(300, 158)
+    .blur(7)
+    .modulate({ brightness: FROST_BRIGHTNESS[photo], saturation: 1.35 })
+    .jpeg({ quality: 80 })
+    .toBuffer()
+  return { sharp: dataUri(full), blurred: dataUri(blurred) }
+}
+
 /** Shorter titles get bigger type; long ones wrap to two lines at most. */
 export function titleSize(title: string): number {
   const n = title.length
-  if (n <= 10) return 112
-  if (n <= 16) return 96
-  if (n <= 24) return 80
-  if (n <= 36) return 66
-  return 56
+  if (n <= 10) return 104
+  if (n <= 16) return 88
+  if (n <= 24) return 74
+  if (n <= 36) return 62
+  return 52
 }
 
 const host = new URL(site.url).host
@@ -62,118 +82,104 @@ export async function renderOg(card: OgCard): Promise<Response> {
   return new Response(await renderJpeg(card), { headers: { "content-type": ogContentType } })
 }
 
-/** Cached so cards prerender at build time — reading the fonts would otherwise make each route dynamic. */
+/** Cached so cards prerender at build time; reading files would otherwise make each route dynamic. */
 async function renderJpeg(card: OgCard): Promise<Uint8Array<ArrayBuffer>> {
   "use cache"
   cacheLife("max")
-  const png = await new ImageResponse(<Card {...card} colors={ogColors(card.palette)} />, { ...ogSize, fonts: await loadFonts() }).arrayBuffer()
-  const jpeg = await sharp(Buffer.from(png)).jpeg({ quality: 88, mozjpeg: true, chromaSubsampling: "4:4:4" }).toBuffer()
+  const photo = await loadPhoto(card.photo ?? "alpine")
+  const png = await new ImageResponse(<Card {...card} photoSrc={photo.sharp} blurred={photo.blurred} />, { ...ogSize, fonts: await loadFonts() }).arrayBuffer()
+  const jpeg = await sharp(Buffer.from(png)).jpeg({ quality: 86, mozjpeg: true, chromaSubsampling: "4:4:4" }).toBuffer()
   return new Uint8Array(jpeg)
 }
 
-function Card({ title, description, eyebrow, command, colors: c }: OgCard & { colors: OgColors }) {
+/** Left edge of the scene column; the text column stops short of it. */
+export const SCENE_X = 724
+
+function Card({ title, description, eyebrow, command, scene = "showcase", photoSrc, blurred }: OgCard & { photoSrc: string; blurred: string }) {
+  const c = ogColors()
+  const props: SceneProps = { c, bg: blurred, photo: photoSrc }
   return (
-    <div style={{ width: "100%", height: "100%", display: "flex", position: "relative", background: c.ground, fontFamily: "Geist", color: "#fff" }}>
-      <Aurora c={c} />
-      {/* the pane */}
+    <div style={{ width: "100%", height: "100%", display: "flex", position: "relative", background: "#000", fontFamily: "Geist", color: "#fff" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- Satori draws <img>, not next/image */}
+      <img src={photoSrc} width={ogSize.width} height={ogSize.height} alt="" style={{ position: "absolute", left: 0, top: 0 }} />
       <div
         style={{
           position: "absolute",
-          top: 48,
-          left: 48,
-          width: ogSize.width - 96,
-          height: ogSize.height - 96,
+          left: 0,
+          top: 0,
+          width: "100%",
+          height: "100%",
           display: "flex",
-          borderRadius: 44,
-          background: "linear-gradient(135deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.07) 55%, rgba(255,255,255,0.10) 100%)",
-          border: "1.5px solid rgba(255,255,255,0.22)",
-          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.35), 0 30px 80px rgba(0,0,0,0.35)",
-          padding: "52px 56px 44px",
+          backgroundImage:
+            "linear-gradient(90deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.62) 42%, rgba(0,0,0,0.22) 62%, rgba(0,0,0,0.08) 100%), linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.35) 100%)",
         }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <Mark c={c} />
-            <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: "-0.03em" }}>{site.name}</div>
-            {eyebrow ? (
-              <div
-                style={{
-                  display: "flex",
-                  marginLeft: 8,
-                  padding: "6px 18px",
-                  borderRadius: 999,
-                  fontSize: 22,
-                  color: "rgba(255,255,255,0.92)",
-                  background: `${c.primary}33`,
-                  border: `1.5px solid ${c.primary}88`,
-                }}
-              >
-                {eyebrow}
-              </div>
-            ) : null}
-          </div>
+      />
 
-          <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "center", gap: 18, paddingRight: 24 }}>
-            <div style={{ display: "flex", fontSize: titleSize(title), fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.02, lineClamp: 2 }}>{title}</div>
-            {description ? (
-              <div style={{ display: "block", fontSize: 30, lineHeight: 1.35, color: "rgba(255,255,255,0.74)", lineClamp: 2, maxWidth: 680 }}>{description}</div>
-            ) : null}
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24 }}>
-            {command ? (
-              <div
-                style={{
-                  display: "flex",
-                  fontFamily: "Geist Mono",
-                  fontSize: 22,
-                  padding: "10px 18px",
-                  borderRadius: 14,
-                  background: "rgba(0,0,0,0.28)",
-                  border: "1px solid rgba(255,255,255,0.14)",
-                  color: "rgba(255,255,255,0.9)",
-                }}
-              >
-                <div style={{ display: "flex", color: c.primary, marginRight: 14 }}>$</div>
-                <div style={{ display: "flex" }}>{command}</div>
-              </div>
-            ) : (
-              <div style={{ display: "flex", fontSize: 24, color: "rgba(255,255,255,0.7)" }}>{site.tagline}</div>
-            )}
-            <div style={{ display: "flex", flexShrink: 0, fontSize: 22, color: "rgba(255,255,255,0.6)" }}>{host}</div>
-          </div>
+      <div style={{ position: "absolute", left: 64, top: 60, bottom: 56, width: SCENE_X - 64 - 40, display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <Mark accent={c.accent} />
+          <div style={{ fontSize: 32, fontWeight: 700, letterSpacing: "-0.03em" }}>{site.name}</div>
+          {eyebrow ? <Pill>{eyebrow}</Pill> : null}
         </div>
-        <Controls c={c} />
+
+        <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "center", gap: 18 }}>
+          <div style={{ display: "flex", fontSize: titleSize(title), fontWeight: 700, letterSpacing: "-0.045em", lineHeight: 1.02, lineClamp: 2 }}>{title}</div>
+          {description ? (
+            <div style={{ display: "block", fontSize: 27, lineHeight: 1.38, color: "rgba(255,255,255,0.78)", lineClamp: 2 }}>{description}</div>
+          ) : null}
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center" }}>
+          {command ? (
+            <div
+              style={{
+                display: "flex",
+                fontFamily: "Geist Mono",
+                fontSize: 21,
+                padding: "11px 20px",
+                borderRadius: 999,
+                background: "rgba(255,255,255,0.12)",
+                border: "1.5px solid rgba(255,255,255,0.22)",
+                color: "rgba(255,255,255,0.92)",
+              }}
+            >
+              <div style={{ display: "flex", color: "rgba(255,255,255,0.5)", marginRight: 12 }}>$</div>
+              <div style={{ display: "flex" }}>{command}</div>
+            </div>
+          ) : (
+            <div style={{ display: "flex", fontSize: 24, color: "rgba(255,255,255,0.72)" }}>{site.tagline}</div>
+          )}
+        </div>
       </div>
+
+      <Scene scene={scene} {...props} />
+
+      <div style={{ position: "absolute", right: 64, bottom: 30, display: "flex", fontSize: 20, color: "rgba(255,255,255,0.78)" }}>{host}</div>
     </div>
   )
 }
 
-/** Layered radial glows on one element — separate off-canvas blobs clip into hard bands in Satori. */
-function Aurora({ c }: { c: OgColors }) {
-  const glow = (color: string, alpha: string, at: string, reach: string) => `radial-gradient(circle at ${at}, ${color}${alpha} 0%, ${color}00 ${reach})`
+function Pill({ children }: { children: string }) {
   return (
     <div
       style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
         display: "flex",
-        backgroundImage: [
-          glow(c.primary, "99", "88% 92%", "42%"),
-          glow(c.aurora[0], "cc", "92% 6%", "58%"),
-          glow(c.aurora[1], "cc", "8% 10%", "60%"),
-          glow(c.aurora[2], "aa", "45% 105%", "55%"),
-        ].join(", "),
+        marginLeft: 6,
+        padding: "6px 16px",
+        borderRadius: 999,
+        fontSize: 20,
+        color: "rgba(255,255,255,0.92)",
+        background: "rgba(255,255,255,0.14)",
+        border: "1.5px solid rgba(255,255,255,0.24)",
       }}
-    />
+    >
+      {children}
+    </div>
   )
 }
 
-/** The glasscn mark: a lens with the accent ring. */
-function Mark({ c, size = 52 }: { c: OgColors; size?: number }) {
+/** The glasscn mark: a glass lens with the accent ring, as in the site header. */
+function Mark({ accent, size = 48 }: { accent: string; size?: number }) {
   return (
     <div
       style={{
@@ -183,7 +189,7 @@ function Mark({ c, size = 52 }: { c: OgColors; size?: number }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "rgba(255,255,255,0.18)",
+        background: "rgba(255,255,255,0.16)",
         border: "1.5px solid rgba(255,255,255,0.4)",
       }}
     >
@@ -195,80 +201,10 @@ function Mark({ c, size = 52 }: { c: OgColors; size?: number }) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: `linear-gradient(200deg, ${c.aurora[0]}, ${c.aurora[1]}, ${c.primary}, ${c.aurora[2]})`,
+          background: `linear-gradient(200deg, #1c1c1e, ${accent}, #64d2ff, #1c1c1e)`,
         }}
       >
-        <div style={{ width: size - 30, height: size - 30, borderRadius: 999, background: "rgba(255,255,255,0.55)" }} />
-      </div>
-    </div>
-  )
-}
-
-/** A small stack of glass controls — a hint of what the library looks like. */
-function Controls({ c }: { c: OgColors }) {
-  const pane = {
-    display: "flex",
-    borderRadius: 22,
-    background: "rgba(255,255,255,0.12)",
-    border: "1.5px solid rgba(255,255,255,0.22)",
-    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3), 0 12px 30px rgba(0,0,0,0.25)",
-  } as const
-  return (
-    <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 18, width: 272, flexShrink: 0 }}>
-      {/* segmented control */}
-      <div style={{ ...pane, padding: 6, gap: 6 }}>
-        {["Day", "Week", "Month"].map((l, i) => (
-          <div
-            key={l}
-            style={{
-              display: "flex",
-              flex: 1,
-              justifyContent: "center",
-              padding: "10px 0",
-              borderRadius: 16,
-              fontSize: 20,
-              color: i === 1 ? "#fff" : "rgba(255,255,255,0.65)",
-              background: i === 1 ? "rgba(255,255,255,0.22)" : "transparent",
-            }}
-          >
-            {l}
-          </div>
-        ))}
-      </div>
-      {/* switch + slider */}
-      <div style={{ ...pane, flexDirection: "column", padding: "18px 20px", gap: 18 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", fontSize: 20, color: "rgba(255,255,255,0.85)" }}>Frost</div>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", width: 64, height: 36, borderRadius: 999, background: c.primary, padding: 3 }}>
-            <div style={{ width: 30, height: 30, borderRadius: 999, background: "#fff", boxShadow: "0 2px 6px rgba(0,0,0,0.3)" }} />
-          </div>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", height: 24, position: "relative" }}>
-          <div style={{ display: "flex", width: "100%", height: 8, borderRadius: 999, background: "rgba(255,255,255,0.2)" }}>
-            <div style={{ width: "64%", height: 8, borderRadius: 999, background: `linear-gradient(90deg, ${c.ring}, ${c.primary})` }} />
-          </div>
-          <div style={{ position: "absolute", left: "58%", width: 24, height: 24, borderRadius: 999, background: "#fff", boxShadow: "0 2px 6px rgba(0,0,0,0.3)" }} />
-        </div>
-      </div>
-      {/* buttons */}
-      <div style={{ display: "flex", gap: 12 }}>
-        <div style={{ ...pane, flex: 1, justifyContent: "center", padding: "14px 0", fontSize: 20, color: "rgba(255,255,255,0.9)", borderRadius: 999 }}>Cancel</div>
-        <div
-          style={{
-            display: "flex",
-            flex: 1,
-            justifyContent: "center",
-            padding: "14px 0",
-            fontSize: 20,
-            fontWeight: 700,
-            borderRadius: 999,
-            color: "#fff",
-            background: c.primary,
-            boxShadow: `0 10px 26px ${c.primary}66, inset 0 1px 0 rgba(255,255,255,0.35)`,
-          }}
-        >
-          Save
-        </div>
+        <div style={{ width: size - 30, height: size - 30, borderRadius: 999, background: "rgba(255,255,255,0.4)" }} />
       </div>
     </div>
   )

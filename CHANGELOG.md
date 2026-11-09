@@ -20,6 +20,7 @@ Registry items are copied into your app, so re-run `npx shadcn add @glasscn-app/
 
 ### Added
 
+- Share cards redrawn for the new look: a showcase photo behind frosted Liquid Glass panes, Apple's web blue, and a scene per docs section (player, controls, chart, chat, menu, navigation, type scale, card, Studio sliders, phone). `/showcase` gets its own card. The site tagline is now "Liquid Glass, for shadcn." ([og-images](docs/og-images.md))
 - `GlassEffects`, `LiquidGlass` and `GlassCluster`: bounded Chromium edge refraction, pointer illumination and sibling split/merge, with complete CSS materials in Safari/Firefox. Native uses the actual OS glass renderer and sibling effect container (LG-14/16).
 - Installable `liquid-glass-01` / `native-liquid-glass-01` with Photos, Music, Maps, Safari, Mail and expandable controls; the source-linked `/showcase` includes material and merging labs. [Research and audits](docs/research/apple-liquid-glass-2026-11.md) distinguish Apple requirements from glasscn tuning.
 - Separate clear-blur, refraction and bezel primitives; Reduce bright effects preference; direct-surface transparency/contrast overrides that remain effective inside scoped themes.

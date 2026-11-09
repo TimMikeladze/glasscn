@@ -1,7 +1,7 @@
-// Next hashes only this file into the image URL (?hash), so X keeps a stale card when render.tsx or pages.ts change. Bump on visual changes: og-v2
+// Next hashes only this file into the image URL (?hash), so X keeps a stale card when render.tsx or pages.ts change. Bump on visual changes: og-v3
 import { docBySlug, docs } from "@/lib/docs"
-import { GROUP_PALETTE } from "@/lib/og/colors"
 import { ogContentType, ogSize, renderOg } from "@/lib/og/render"
+import { GROUP_CARD } from "@/lib/og/scenes"
 import { registryNamespace } from "@/lib/site"
 
 export function generateStaticParams() {
@@ -23,6 +23,6 @@ export default async function Image({ params }: { params: Promise<{ slug: string
     eyebrow: doc.group,
     command: `npx shadcn add ${registryNamespace}/${slug}`,
     path: `/docs/${slug}`,
-    palette: GROUP_PALETTE[doc.group],
+    ...GROUP_CARD[doc.group],
   })
 }

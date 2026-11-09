@@ -12,7 +12,7 @@ export const metadata = pageMetadata(PAGES.docs)
 export default function DocsIndex() {
   return (
     <>
-      <PageHeader eyebrow="Introduction" title="glasscn" description="Glassmorphic components for shadcn — frosted surfaces over a living aurora, built on Radix and Tailwind v4, installed as source." />
+      <PageHeader eyebrow="Introduction" title="glasscn" description="Liquid Glass components for shadcn: Apple-inspired controls and system materials, built on Radix and Tailwind v4, installed as source." />
       <P>
         glasscn is a <Link className="text-primary hover:underline" href="https://ui.shadcn.com/docs/registry">shadcn registry</Link>. You don’t install a package: the shadcn CLI copies each component into
         your project, where it’s yours to read and change. Components keep shadcn’s APIs where one exists, so <C>@/components/ui/button</C> becomes <C>@/components/glass/button</C> and nothing else

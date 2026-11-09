@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest"
 
+import { existsSync } from "node:fs"
+import { join } from "node:path"
+
 import { GROUPS } from "@/lib/docs"
-import { PALETTES } from "@/lib/glass-theme"
 import { pageMetadata, rootMetadata } from "@/lib/metadata"
-import { GROUP_PALETTE, ogColors, oklchToHex } from "@/lib/og/colors"
+import { ogColors, oklchToHex } from "@/lib/og/colors"
 import { PAGES } from "@/lib/og/pages"
+import { GROUP_CARD, OG_PHOTOS, OG_SCENES } from "@/lib/og/scenes"
 
 const HEX = /^#[0-9a-f]{6}$/
 
@@ -16,16 +19,22 @@ describe("share cards", () => {
     expect(oklchToHex("#123456")).toBe("#123456")
   })
 
-  it("gives every palette hex colours Satori can draw", () => {
-    for (const key of Object.keys(PALETTES)) {
-      const c = ogColors(key)
-      for (const v of [c.ground, c.primary, c.ring, ...c.aurora]) expect(v, key).toMatch(HEX)
-    }
+  it("draws in hex Satori can read, with Apple's web blue as the accent", () => {
+    const c = ogColors()
+    for (const [k, v] of Object.entries(c)) expect(v, k).toMatch(HEX)
+    expect(c.accent).not.toBe("#000000")
   })
 
-  it("maps every docs group and page to a real palette", () => {
-    for (const g of GROUPS) expect(PALETTES[GROUP_PALETTE[g]], g).toBeDefined()
-    for (const [key, p] of Object.entries(PAGES)) expect(PALETTES[p.palette], key).toBeDefined()
+  it("gives every docs group and page a shipped photo and a known scene", () => {
+    for (const photo of OG_PHOTOS) expect(existsSync(join(process.cwd(), "public/showcase", `${photo}.jpg`)), photo).toBe(true)
+    for (const g of GROUPS) {
+      expect(OG_PHOTOS, g).toContain(GROUP_CARD[g].photo)
+      expect(OG_SCENES, g).toContain(GROUP_CARD[g].scene)
+    }
+    for (const [key, p] of Object.entries(PAGES)) {
+      expect(OG_PHOTOS, key).toContain(p.photo)
+      expect(OG_SCENES, key).toContain(p.scene)
+    }
   })
 })
 

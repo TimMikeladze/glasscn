@@ -19,9 +19,9 @@ export const site = {
     linkedin: "https://www.linkedin.com/in/tim-mikeladze",
     portfolio: "https://linesofcode.dev",
   },
-  tagline: "Glass components for shadcn.",
+  tagline: "Liquid Glass, for shadcn.",
   description:
-    "A shadcn registry of glassmorphic components — frosted surfaces over a living aurora, iOS-grade controls and data pieces — installed as source and themed with CSS variables.",
+    "A shadcn registry of Liquid Glass components: Apple-inspired controls, system materials, data and chat parts, installed as source and themed with CSS variables.",
 }
 
 /**

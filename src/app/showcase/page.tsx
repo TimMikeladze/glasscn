@@ -1,11 +1,8 @@
-import type { Metadata } from "next"
-
 import { LiquidGlassShowcase } from "@/components/site/liquid-glass-showcase"
+import { pageMetadata } from "@/lib/metadata"
+import { PAGES } from "@/lib/og/pages"
 
-export const metadata: Metadata = {
-  title: "Liquid Glass showcase",
-  description: "Apple-inspired Photos, Music, Maps, Safari, Mail, Controls, Landmarks, Notes, Search and Materials examples, with native system Liquid Glass.",
-}
+export const metadata = pageMetadata(PAGES.showcase)
 
 export default function ShowcasePage() {
   return <LiquidGlassShowcase />
