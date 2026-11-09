@@ -62,7 +62,7 @@
     "typescript": "^5",
     "vitest": "^4.1.11"
   },
-  "packageManager": "pnpm@11.24.0",
+  "packageManager": "pnpm@12.18.0",
   "type": "module",
   "description": "Glass, for shadcn. A shadcn registry of glassmorphic React components with a CSS-variable theme engine.",
   "homepage": "https://glasscn.app",
