@@ -150,3 +150,20 @@ for (const scheme of ["light", "dark"] as const) {
     }
   })
 }
+
+test("Notes groups a typing run into one undo step and undoes a format change", async ({ page }) => {
+  await page.goto("/showcase", { waitUntil: "networkidle" })
+  await page.getByRole("tab", { name: "Notes", exact: true }).click()
+  const note = page.getByLabel("Note text")
+  const original = await note.inputValue()
+  await note.click()
+  await note.press("End")
+  await note.pressSequentially(" Bring tea.")
+  await page.getByRole("button", { name: "Undo", exact: true }).click()
+  await expect(note).toHaveValue(original)
+  await page.getByRole("button", { name: "Format note" }).click()
+  await page.getByRole("button", { name: "Title", exact: true }).click()
+  await expect(note).toHaveClass(/type-title-1/)
+  await page.getByRole("button", { name: "Undo", exact: true }).click()
+  await expect(note).not.toHaveClass(/type-title-1/)
+})

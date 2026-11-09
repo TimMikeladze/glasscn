@@ -40,7 +40,7 @@ export default function Home() {
   return (
     <main className="mx-auto flex min-w-0 w-full max-w-6xl flex-col gap-24 px-4 pt-16 sm:px-6 sm:pt-24">
       <section className="flex flex-col items-center gap-6 text-center">
-        <Badge variant="glass" className="h-7 px-3">
+        <Badge variant="glass" className="h-auto min-h-7 max-w-full shrink whitespace-normal px-3 py-1 text-center">
           shadcn registry · {count} components & blocks
         </Badge>
         <h1 className="max-w-3xl font-glass-heading text-5xl leading-[1.02] font-bold tracking-tight text-balance sm:text-7xl">
@@ -51,12 +51,13 @@ export default function Home() {
         </p>
         <InstallCommand className="w-full max-w-2xl text-left" args={`add ${itemUrl("glass-style")} ${itemUrl("glass-effects")} ${itemUrl("theme-dusk")}`} />
         <div className="flex flex-wrap justify-center gap-3">
-          <Button asChild size="lg">
+          {/* enlarged text wraps the label instead of pushing the page sideways */}
+          <Button asChild size="lg" className="h-auto min-h-control-lg max-w-full whitespace-normal py-2 text-center">
             <Link href="/showcase">
               Explore the glass <ArrowRightIcon data-icon="inline-end" />
             </Link>
           </Button>
-          <Button asChild size="lg" variant="glass">
+          <Button asChild size="lg" variant="glass" className="h-auto min-h-control-lg max-w-full whitespace-normal py-2 text-center">
             <Link href="/themes">Make it yours</Link>
           </Button>
         </div>

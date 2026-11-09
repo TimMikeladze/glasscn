@@ -415,7 +415,7 @@ function Pricing() {
   const [yearly, setYearly] = React.useState(true)
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-center gap-3 text-sm">
+      <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
         <Label htmlFor="home-billing">Monthly</Label>
         <Switch id="home-billing" checked={yearly} onCheckedChange={setYearly} aria-label="Bill yearly" />
         <Label htmlFor="home-billing">Yearly</Label>

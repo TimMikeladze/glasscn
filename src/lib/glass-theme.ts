@@ -236,7 +236,7 @@ export const TOKENS: TokenDef[] = [
   { name: "glass-clarity", group: "Material", label: "Clarity", description: "0 ultra clear → 1 fully tinted, like iOS 27's Liquid Glass slider. Scales every frost.", light: "0.5", dark: "0.5", control: range(0, 1, 0.01, "") },
   { name: "glass-label-secondary", group: "Material", label: "Secondary text", description: "Muted text inside panes (remaps --muted-foreground there).", light: "oklch(0.37 0.012 286)", dark: "oklch(0.88 0.01 285)", control: colour },
   { name: "glass-label-tertiary", group: "Material", label: "Tertiary text", description: "Placeholders and unavailable items inside panes.", light: "oklch(0.52 0.01 286)", dark: "oklch(0.66 0.01 285)", control: colour },
-  { name: "glass-destructive-strength", group: "Material", label: "Destructive text", description: "How much of the destructive colour a red choice in a menu or action sheet carries; the rest is the label colour. Dark glass needs less to stay legible.", light: "75%", dark: "60%", control: range(0, 100, 1, "%") },
+  { name: "glass-ink-strength", group: "Material", label: "Tinted text", description: "How much of the accent or destructive colour plain tinted text on glass carries (text buttons, links, destructive menu choices); the rest is the label colour. Dark glass needs less to stay legible.", light: "75%", dark: "60%", control: range(0, 100, 1, "%") },
   { name: "glass-label-quaternary", group: "Material", label: "Quaternary text", description: "Watermarks inside panes.", light: "oklch(0.76 0.005 285)", dark: "oklch(0.45 0.01 285)", control: colour },
   { name: "glass-separator-opacity", group: "Material", label: "Separator", description: "Hairlines between rows, inside panes.", light: "12%", dark: "16%", control: range(0, 60, 1, "%") },
   { name: "glass-knob", group: "Material", label: "Knob", description: "Switch and slider knobs.", light: "oklch(1 0 0)", dark: "oklch(1 0 0)", control: colour },
@@ -616,7 +616,7 @@ export const MATERIALS: Record<string, PresetDef> = {
     // dark panes in the light scheme too: text, fills and thumbs inside them follow the dark scheme
     light: {
       "glass-opacity": "72%", "glass-opacity-strong": "86%", "glass-opacity-subtle": "68%", "glass-opacity-thick": "94%", "glass-border-opacity": "16%", "glass-highlight-opacity": "18%", "glass-shadow-opacity": "30%",
-      "glass-label": "oklch(0.985 0 0)", "glass-label-secondary": "oklch(0.88 0.01 270)", "glass-liquid-opacity": "72%", "glass-destructive-strength": "30%",
+      "glass-label": "oklch(0.985 0 0)", "glass-label-secondary": "oklch(0.88 0.01 270)", "glass-liquid-opacity": "72%", "glass-ink-strength": "20%",
       "glass-fill-tint": "oklch(0.6 0.01 285)", "glass-fill-opacity": "24%", "glass-fill-opacity-strong": "36%", "glass-thumb": "oklch(1 0 0 / 20%)",
     },
     dark: { "glass-opacity": "60%", "glass-opacity-strong": "84%", "glass-opacity-thick": "92%" },
@@ -1096,6 +1096,8 @@ export interface LegibilityReport {
   destructiveLabel: number
   /** Destructive choices in menus and action sheets: destructive-label text on liquid glass. */
   destructiveText: number
+  /** Text buttons and links: primary-label text on liquid glass. */
+  primaryText: number
 }
 
 /** How much accent the *-ink text colours carry (the rest is the label colour) — must match stylesheet.mjs. */
@@ -1163,6 +1165,7 @@ export function legibilityReport(theme: GlassTheme, scheme: Scheme, { clarity }:
     return round(Math.min(...backdrops.map((b) => contrastRatio(ink, luminanceOfGamma(over(gammaRgb(fill), b, alpha))))), 2)
   }
   const destructive = col(t.destructive || DESTRUCTIVE[scheme])
+  const inkStrength = parseFloat(get("glass-ink-strength") ?? "75") / 100
   return {
     text: Object.fromEntries(tiers.map((k) => [k, worst(label, k)])) as Record<Tier, number>,
     secondary: Object.fromEntries(tiers.map((k) => [k, worst(secondary, k)])) as Record<Tier, number>,
@@ -1175,7 +1178,8 @@ export function legibilityReport(theme: GlassTheme, scheme: Scheme, { clarity }:
     // Button: tinted bg-primary/16 (dark /22), destructive bg-destructive/14
     tintedLabel: tintLabel(primary, scheme === "dark" ? 0.22 : 0.16),
     destructiveLabel: tintLabel(destructive, 0.14),
-    destructiveText: destructive ? worst(`oklch(${mixOklch(destructive, labelColour, parseFloat(get("glass-destructive-strength") ?? "75") / 100).slice(0, 3).join(" ")})`, "liquid") : 21,
+    destructiveText: destructive ? worst(`oklch(${mixOklch(destructive, labelColour, inkStrength).slice(0, 3).join(" ")})`, "liquid") : 21,
+    primaryText: primary ? worst(`oklch(${mixOklch(primary, labelColour, inkStrength).slice(0, 3).join(" ")})`, "liquid") : 21,
   }
 }
 

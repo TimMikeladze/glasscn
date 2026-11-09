@@ -32,8 +32,10 @@ const NAV = [
 
 // Every trailing control is the same 32px circle with a 16px glyph in the same tone.
 const headerIcon = "size-8 text-foreground/70 hover:text-foreground"
+// The header collapses by its own width in rem, so enlarged text (which grows every part) collapses it
+// too (content-box widths): nav 59rem, social links 29rem, Get started 22rem, palette and glass 15rem, wordmark 11rem
 const socialLink =
-  "glass-focus hidden h-8 min-w-8 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-fill hover:text-foreground sm:inline-flex [&_svg]:size-4"
+  "glass-focus hidden h-8 min-w-8 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-fill hover:text-foreground @min-[29rem]/header:inline-flex [&_svg]:size-4"
 
 export function PaletteSwatch({ palette, className }: { palette: Palette; className?: string }) {
   return (
@@ -52,10 +54,10 @@ export function SiteHeader({ stars, nav }: { stars: number | null; nav: NavSecti
   const [menu, setMenu] = React.useState(false)
   return (
     <header className="sticky top-0 z-40 min-w-0 w-full px-3 pt-3">
-      <div className="glass-strong mx-auto flex h-14 min-w-0 w-full max-w-6xl items-center gap-2 rounded-full pr-2 pl-4">
+      <div className="glass-strong @container/header mx-auto flex h-14 min-w-0 w-full max-w-6xl items-center gap-2 rounded-full pr-2 pl-4">
         <Sheet open={menu} onOpenChange={setMenu}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon-sm" className="xl:hidden" aria-label="Menu">
+            <Button variant="ghost" size="icon-sm" className="@min-[59rem]/header:hidden" aria-label="Menu">
               <MenuIcon />
             </Button>
           </SheetTrigger>
@@ -67,15 +69,26 @@ export function SiteHeader({ stars, nav }: { stars: number | null; nav: NavSecti
               <nav aria-label="Site navigation" className="mb-5 grid gap-1 border-b border-glass-border pb-4">
                 {NAV.map((item) => <Link key={item.href} href={item.href} onClick={() => setMenu(false)} className="glass-focus rounded-control px-pad-sm py-2 text-sm font-medium hover:bg-fill">{item.label}</Link>)}
               </nav>
+              {/* palette and glass leave the bar first when it's narrow, so they're here too */}
+              <section aria-label="Palette" className="mb-5 border-b border-glass-border pb-4">
+                <p className="mb-2 px-pad-sm text-xs font-medium text-muted-foreground">Palette</p>
+                <div className="grid grid-cols-2 gap-1">
+                  {palettes.map((p) => <Button key={p} variant={palette === p ? "secondary" : "ghost"} size="sm" aria-pressed={palette === p} className="justify-start capitalize" onClick={() => setPalette(p as Palette)}><PaletteSwatch palette={p} />{p}</Button>)}
+                </div>
+              </section>
+              <section aria-label="Glass" className="mb-5 grid gap-3 border-b border-glass-border pb-4 px-pad-sm">
+                <p className="text-xs font-medium text-muted-foreground">Glass</p>
+                <GlassPreferences />
+              </section>
               <DocsNav sections={nav} onNavigate={() => setMenu(false)} />
             </div>
           </SheetContent>
         </Sheet>
         <Link href="/" aria-label="glasscn" className="flex shrink-0 items-center gap-2 font-semibold tracking-tight">
           <Logo className="shrink-0" />
-          <span className="hidden min-[360px]:inline">glasscn</span>
+          <span className="hidden @min-[11rem]/header:inline">glasscn</span>
         </Link>
-        <nav aria-label="Primary navigation" className="ml-4 hidden shrink-0 items-center gap-1 xl:flex">
+        <nav aria-label="Primary navigation" className="ml-4 hidden shrink-0 items-center gap-1 @min-[59rem]/header:flex">
           {NAV.map((n) => {
             const on = n.href === "/docs" ? pathname === "/docs" || pathname === "/docs/installation" : pathname.startsWith(n.href)
             return (
@@ -94,7 +107,7 @@ export function SiteHeader({ stars, nav }: { stars: number | null; nav: NavSecti
             <Tooltip>
               <TooltipTrigger asChild>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon-sm" className={headerIcon} aria-label="Palette">
+                  <Button variant="ghost" size="icon-sm" className={cn(headerIcon, "hidden @min-[15rem]/header:inline-flex")} aria-label="Palette">
                     <PaletteIcon className="size-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -117,8 +130,8 @@ export function SiteHeader({ stars, nav }: { stars: number | null; nav: NavSecti
             <Tooltip>
               <TooltipTrigger asChild>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon-sm" className={headerIcon} aria-label="Glass preferences">
-                    <SlidersHorizontalIcon className="size-4" />
+                  <Button variant="ghost" size="icon-sm" className={cn(headerIcon, "hidden @min-[15rem]/header:inline-flex")} aria-label="Glass preferences">
+                    <SlidersHorizontalIcon className="size-[17.5px]" />
                   </Button>
                 </PopoverTrigger>
               </TooltipTrigger>
@@ -148,7 +161,8 @@ export function SiteHeader({ stars, nav }: { stars: number | null; nav: NavSecti
             aria-label={stars ? `glasscn on GitHub — ${stars} stars` : "glasscn on GitHub"}
             className={cn(socialLink, stars ? "gap-1 px-2" : null)}
           >
-            <GitHubIcon />
+            {/* brand marks fill their box; lucide glyphs leave ~2px, so each mark is sized to the same ~14.7px of ink */}
+            <GitHubIcon className="size-[15px]!" />
             {/* Omitted when unknown or zero — a lone "0" reads as broken, not humble. */}
             {stars ? (
               <span className="flex items-center gap-1 text-xs font-medium tabular-nums">
@@ -158,12 +172,12 @@ export function SiteHeader({ stars, nav }: { stars: number | null; nav: NavSecti
             ) : null}
           </a>
           <a href={site.author.twitter} target="_blank" rel="noreferrer" aria-label="Author on X" className={socialLink}>
-            <XIcon />
+            <XIcon className="size-[18px]!" />
           </a>
           <a href={site.author.linkedin} target="_blank" rel="noreferrer" aria-label="Author on LinkedIn" className={socialLink}>
-            <LinkedInIcon />
+            <LinkedInIcon className="size-[17.5px]!" />
           </a>
-          <Button asChild size="sm" className="ml-2 hidden sm:inline-flex">
+          <Button asChild size="sm" className="ml-2 hidden @min-[22rem]/header:inline-flex">
             <Link href="/docs/installation">Get started</Link>
           </Button>
         </div>

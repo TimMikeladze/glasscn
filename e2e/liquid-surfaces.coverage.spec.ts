@@ -87,6 +87,8 @@ test("window focus events quiet glass and restore its active treatment", async (
   await page.goto("/showcase")
   const pane = page.getByTestId("optical-lens")
   await pane.scrollIntoViewIfNeeded()
+  // GlassEffects measures the pane's size-dependent depth (which deepens its shadow) after load
+  await expect.poll(() => pane.evaluate((el) => getComputedStyle(el).getPropertyValue("--glass-surface-depth").trim())).not.toBe("0")
   const active = await pane.evaluate((el) => getComputedStyle(el).boxShadow)
   // Headless engines keep every automation page focused; deliver the same browser
   // event with a controlled document focus state, then check the rendered material.

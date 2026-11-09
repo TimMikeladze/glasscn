@@ -26,8 +26,9 @@ export function BackgroundExtension({ src, alt = "", start = 0, end = 0, classNa
   }, [])
   const extent = (value: number) => Number.isFinite(value) ? Math.max(0, value) : 0
   const mirror = (side: "start" | "end", width: number) => width > 0 ? <div key={side} data-slot="background-extension-mirror" data-side={side} aria-hidden inert className="pointer-events-none absolute inset-y-0 -z-10 overflow-hidden" style={{ width, [side === "start" ? "insetInlineEnd" : "insetInlineStart"]: "100%" }}>
+    {/* a light blur: the chrome above is glass and diffuses it again, so a full blur here washes it out */}
     {/* eslint-disable-next-line @next/next/no-img-element */}
-    <img src={src} alt="" className="absolute inset-y-0 h-full max-w-none -scale-x-100 object-cover blur-(--glass-blur)" style={{ width: "var(--glass-extension-width)", [side === "start" ? "insetInlineEnd" : "insetInlineStart"]: 0 }} />
+    <img src={src} alt="" className="absolute inset-y-0 h-full max-w-none -scale-x-100 object-cover blur-[calc(var(--glass-blur)/3)]" style={{ width: "var(--glass-extension-width)", [side === "start" ? "insetInlineEnd" : "insetInlineStart"]: 0 }} />
   </div> : null
   return <div ref={root} data-slot="background-extension" className={cn("relative isolate w-full", className)} style={{ aspectRatio: "16 / 9", ...style }} {...props}>
     {mirror("start", extent(start))}{mirror("end", extent(end))}

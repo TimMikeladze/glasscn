@@ -27,7 +27,7 @@ const fmt = (n: number, step: number) => String(Number(n.toFixed(decimals(step))
 /** One primitive, edited with the control its schema asks for. */
 export function TokenControl({ def, value, changed, onChange, onReset }: { def: TokenDef; value: string; changed: boolean; onChange: (v: string) => void; onReset: () => void }) {
   return (
-    <div className="grid gap-2" data-token={def.name}>
+    <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-2" data-token={def.name}>
       <div className="flex items-center justify-between gap-2">
         <label className="flex min-w-0 items-center gap-1.5 text-sm font-medium" title={def.description}>
           <span className="truncate">{def.label}</span>

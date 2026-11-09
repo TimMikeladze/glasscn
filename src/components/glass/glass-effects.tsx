@@ -115,7 +115,8 @@ function createRuntime(doc: Document): Runtime {
     const ready = el.dataset.slot !== "liquid-glass" || el.hasAttribute("data-glass-ready")
     const regular = el.classList.contains("glass-liquid") && !parentLiquid
     const depth = ready && regular && !preferences.some((q) => q.matches) && !doc.documentElement.hasAttribute("data-glass-reduce-transparency") && parseFloat(style.getPropertyValue("--glass-liquid-blur")) > 0
-      ? Math.min(1, Math.max(0, (Math.min(width, height) - 96) / 224)) : 0
+      // depth starts above a large control (56px) and is full at 280px, the size of a panel
+      ? Math.min(1, Math.max(0, (Math.min(width, height) - 56) / 224)) : 0
     if (depth > 0) {
       const value = depth.toFixed(3)
       if (!depths.has(el)) depths.set(el, { previous: el.style.getPropertyValue("--glass-surface-depth"), value })

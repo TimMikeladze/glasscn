@@ -72,9 +72,10 @@ export const themeTokens = {
   // shadcn v4 has no destructive-foreground: white unless the app sets one
   "color-destructive-foreground": "var(--destructive-foreground, oklch(0.985 0 0))",
   "color-destructive-ink": "color-mix(in oklch, var(--destructive) 30%, var(--glass-label))",
-  // a destructive choice in a menu or action sheet reads as red on plain glass; the share holds
-  // 4.5:1 on liquid glass for every palette × material (legibilityReport.destructiveText)
-  "color-destructive-label": "color-mix(in oklch, var(--destructive) var(--glass-destructive-strength), var(--glass-label))",
+  // tinted text on plain glass (text buttons, links, destructive menu choices) reads as the accent or
+  // red; the share holds 4.5:1 on liquid glass for every palette × material (legibilityReport)
+  "color-destructive-label": "color-mix(in oklch, var(--destructive) var(--glass-ink-strength), var(--glass-label))",
+  "color-primary-label": "color-mix(in oklch, color-mix(in oklch, var(--primary) var(--glass-ink-strength), var(--glass-label)) calc(var(--glass-ink-active, 1) * 100%), var(--glass-label-secondary))",
   "color-glass-dim": mixed("oklch(0 0 0)", "var(--glass-dim)"),
   "color-glass-media-dim": mixed("oklch(0 0 0)", "var(--glass-liquid-clear-dim)"),
   "color-glass-media-foreground": "var(--glass-highlight-color)",
@@ -169,7 +170,8 @@ const illumination = {
 const liquidSurface = (opacity, filter = liquidFilter) => ({
   ...surface(opacity, filter, { inset: false }),
   "background-color": `var(--glass-bg, ${mixed("var(--glass-tinted, var(--glass-tint))", `min(100%, calc(${clarity(opacity)} + var(--glass-surface-depth, 0) * var(--glass-depth-opacity)))`)})`,
-  "box-shadow": `var(--glass-elevation, 0 var(--glass-shadow-y) var(--glass-shadow-blur) ${mixed("var(--glass-shadow-color)", `calc(var(--glass-shadow-opacity) * ${activity})`)}), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) ${glow}`,
+  // larger regular glass casts a deeper shadow (WWDC25 219), driven by the same measured depth as its frost
+  "box-shadow": `var(--glass-elevation, 0 calc(var(--glass-shadow-y) * (1 + var(--glass-surface-depth, 0))) calc(var(--glass-shadow-blur) * (1 + var(--glass-surface-depth, 0) * 1.5)) ${mixed("var(--glass-shadow-color)", `calc(var(--glass-shadow-opacity) * ${activity})`)}), inset 0 0 calc(var(--glass-shadow-blur) * 0.8) ${glow}`,
   // no uniform stroke: Liquid Glass shows its edge through the two-sided rim (specular on the lit
   // side, edge shade opposite). Increase Contrast, Show control borders and forced colours add a
   // solid border back. The width stays so the box doesn't shift when they do.
@@ -227,7 +229,9 @@ const clearLabels = () => {
 }
 const clearSurface = () => ({
   ...liquidSurface("--glass-liquid-clear-opacity", clearFilter), ...clearLabels(),
-  "background-color": `var(--glass-bg, ${mixed("var(--glass-tinted, var(--glass-tint))", `max(${clarity("--glass-liquid-clear-opacity")}, calc(round(down, clamp(0, calc(var(--glass-clarity) + 0.35), 1), 1) * 70%))`)})`,
+  // the fill rises with the slider from 0.5 to 0.75 (Apple's look slider is continuous); only the
+  // label palette switches, at 0.65, where the fill is already about 42%
+  "background-color": `var(--glass-bg, ${mixed("var(--glass-tinted, var(--glass-tint))", `max(${clarity("--glass-liquid-clear-opacity")}, calc(clamp(0, (var(--glass-clarity) - 0.5) / 0.25, 1) * 70%))`)})`,
 })
 
 /** Apple's text styles (iOS Dynamic Type at the default size), scaled by --glass-text-scale. */

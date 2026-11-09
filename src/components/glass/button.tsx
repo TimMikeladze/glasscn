@@ -35,7 +35,7 @@ const buttonVariants = cva(
         outline: `glass-press border border-glass-border bg-transparent text-foreground hover:bg-fill ${dim}`,
         ghost: `glass-press text-foreground hover:bg-fill ${dim}`,
         destructive: `glass-press bg-destructive/14 text-destructive-ink hover:bg-destructive/22 ${dim}`,
-        link: `text-primary-ink underline-offset-4 hover:underline ${dim}`,
+        link: `text-primary-label underline-offset-4 hover:underline ${dim}`,
       },
       size: {
         default: "h-control gap-2 px-pad text-sm has-data-[icon=inline-end]:pe-4 has-data-[icon=inline-start]:ps-4",

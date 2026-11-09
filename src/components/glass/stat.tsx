@@ -131,7 +131,7 @@ function StatTrend({
       data-direction={direction}
       data-sentiment={sentiment ?? SENTIMENT[direction]}
       className={cn(
-        "inline-flex w-fit items-center gap-0.5 rounded-badge px-1.5 py-0.5 text-xs font-semibold numeric-glass",
+        "inline-flex w-fit max-w-full flex-wrap items-center gap-0.5 rounded-badge px-1.5 py-0.5 text-xs font-semibold numeric-glass",
         "data-[sentiment=positive]:bg-success/14 data-[sentiment=positive]:text-success-ink",
         "data-[sentiment=negative]:bg-destructive/12 data-[sentiment=negative]:text-destructive-ink",
         "data-[sentiment=neutral]:bg-fill data-[sentiment=neutral]:text-muted-foreground",

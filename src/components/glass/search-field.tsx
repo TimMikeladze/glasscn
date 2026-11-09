@@ -234,7 +234,7 @@ function SearchField({
           // keep focus in the field until the click lands
           onMouseDown={(e) => e.preventDefault()}
           onClick={finish}
-          className="glass-focus shrink-0 rounded-button px-1 text-sm font-medium text-primary-ink"
+          className="glass-focus shrink-0 rounded-button px-1 text-sm font-medium text-primary-label"
         >
           {cancelLabel}
         </button>
@@ -245,7 +245,8 @@ function SearchField({
           role="listbox"
           data-slot="search-field-suggestions"
           aria-label="Suggestions"
-          className="glass-liquid absolute inset-x-0 z-50 grid max-h-72 gap-0.5 overflow-y-auto rounded-surface p-1.5 in-data-[placement=bottom]:bottom-full in-data-[placement=bottom]:mb-2 in-data-[placement=inline]:top-full in-data-[placement=inline]:mt-2"
+          // over text, the predictions take the thick tier so labels underneath don't ghost through
+          className="glass-liquid [--glass-liquid-opacity:var(--glass-opacity-thick)] absolute inset-x-0 z-50 grid max-h-72 gap-0.5 overflow-y-auto rounded-surface p-1.5 in-data-[placement=bottom]:bottom-full in-data-[placement=bottom]:mb-2 in-data-[placement=inline]:top-full in-data-[placement=inline]:mt-2"
         >
           {suggestions.map((s, i) => (
             <li

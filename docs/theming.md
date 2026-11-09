@@ -11,7 +11,7 @@ Primitives live on `:root` / `.dark` (or any element). **Derived values never do
 | Group | Primitives |
 |---|---|
 | Colour | `primary` `primary-foreground` `ring` `chart-1..5` `success` `warning` `info` (+ `-foreground`) `aurora-1..3` `aurora-base` |
-| Material | `glass-tint` `glass-opacity` `-strong` `-subtle` `glass-blur` `glass-saturate` `glass-brightness` `glass-sheen` `glass-sheen-angle` `glass-texture` `glass-fill-tint` `glass-fill-opacity` `-strong` `glass-thumb` `glass-knob` `glass-clarity` `glass-label` `glass-label-secondary` `-tertiary` `-quaternary` `glass-destructive-strength` `glass-separator-opacity` |
+| Material | `glass-tint` `glass-opacity` `-strong` `-subtle` `glass-blur` `glass-saturate` `glass-brightness` `glass-sheen` `glass-sheen-angle` `glass-texture` `glass-fill-tint` `glass-fill-opacity` `-strong` `glass-thumb` `glass-knob` `glass-clarity` `glass-label` `glass-label-secondary` `-tertiary` `-quaternary` `glass-ink-strength` `glass-separator-opacity` |
 | Liquid | `glass-liquid-opacity` `glass-liquid-clear-opacity` `glass-liquid-clear-dim` `glass-liquid-blur` `glass-liquid-clear-blur` `glass-liquid-saturate` `glass-refraction` `glass-bezel` |
 | Rim | `glass-border-color` `glass-border-opacity` `glass-border-width` `glass-highlight-opacity` `glass-highlight-color` `glass-light-angle` `glass-specular` `glass-edge-shade` `glass-illumination` |
 | Depth | `glass-shadow-color` `glass-shadow-opacity` `glass-shadow-y` `glass-shadow-blur` `glass-shadow-over-content` `glass-glow` `glass-dim` |

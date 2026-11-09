@@ -5,7 +5,7 @@ import { cn } from "@/lib/glass-cn"
 import { Tabs as TabsPrimitive } from "radix-ui"
 import {
   ArchiveIcon, ArrowUpIcon, ChevronLeftIcon, ChevronRightIcon, FileTextIcon, FlagIcon, SquarePenIcon,
-  CompassIcon, EllipsisIcon, HeartIcon, HouseIcon, InboxIcon, InfoIcon, LayersIcon, LayoutGridIcon, ListMusicIcon,
+  CompassIcon, EllipsisIcon, EraserIcon, MousePointer2Icon, PencilIcon, HeartIcon, HouseIcon, InboxIcon, InfoIcon, LayersIcon, LayoutGridIcon, ListMusicIcon,
   MapPinIcon, NavigationIcon, PauseIcon,
   PlayIcon, PlusIcon, SearchIcon, SendIcon, ShareIcon, SkipForwardIcon,
   StarIcon, Trash2Icon, Volume2Icon, XIcon,
@@ -30,7 +30,7 @@ const SceneFrame = React.createContext<HTMLElement | null>(null)
 const PHOTO_DATA = [
   { file: "alpine.jpg", id: "photo-1470770841072-f978cf4d019e", title: "Alpine lake", place: "Sierra Nevada", date: "June 14 · 7:24 AM" },
   { file: "coast.jpg", id: "photo-1500530855697-b586d89ba3ee", title: "Coast at golden hour", place: "The coast", date: "June 15 · 6:42 PM" },
-  { file: "summit.jpg", id: "photo-1464822759023-fed622ff2c3b", title: "Mountain summit", place: "Above the clouds", date: "June 16 · 9:16 AM" },
+  { file: "summit.jpg", id: "photo-1464822759023-fed622ff2c3b", title: "Mountain summit", place: "Cascade Range", date: "June 16 · 9:16 AM" },
 ]
 const photo = (index: number, base?: string) => base ? `${base}/${PHOTO_DATA[index % PHOTO_DATA.length].file}` : `https://images.unsplash.com/${PHOTO_DATA[index % PHOTO_DATA.length].id}?auto=format&fit=crop&w=1200&q=85`
 
@@ -77,7 +77,7 @@ function PhotosScene({ photoBase }: SceneProps) {
         <LiquidGlass variant="clear" className="absolute start-3 top-1/2 -translate-y-1/2 rounded-button p-0.5 text-glass-media-foreground" interactive><IconButton aria-label="Previous photo" onClick={() => setIndex((index + photos.length - 1) % photos.length)}><ChevronLeftIcon className="rtl:-scale-x-100" /></IconButton></LiquidGlass>
         <LiquidGlass variant="clear" className="absolute end-3 top-1/2 -translate-y-1/2 rounded-button p-0.5 text-glass-media-foreground" interactive><IconButton aria-label="Next photo" onClick={() => setIndex((index + 1) % photos.length)}><ChevronRightIcon className="rtl:-scale-x-100" /></IconButton></LiquidGlass>
       </> : null}
-      <div className="absolute inset-x-4 bottom-5 flex items-center justify-between gap-3 text-glass-media-foreground">
+      <div className="absolute inset-x-4 bottom-5 flex flex-wrap items-center justify-between gap-3 text-glass-media-foreground">
         <LiquidGlass variant="clear" className="flex items-center rounded-button p-1" interactive>
           <IconButton aria-label="Share photo" onClick={() => setStatus(`${selected.title} ready to share.`)}><ShareIcon /></IconButton>
         </LiquidGlass>
@@ -113,9 +113,25 @@ function useSceneMinimize() {
   return { compact, setCompact, onScroll }
 }
 
+/** True while the scene frame is narrower than `rem` root ems: on a phone that means enlarged text. */
+function useNarrowFrame(rem: number) {
+  const frame = React.useContext(SceneFrame)
+  const [narrow, setNarrow] = React.useState(false)
+  React.useEffect(() => {
+    if (!frame) return
+    const check = () => setNarrow(frame.clientWidth / (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16) < rem)
+    check()
+    const observer = new ResizeObserver(check)
+    observer.observe(frame)
+    return () => observer.disconnect()
+  }, [frame, rem])
+  return narrow
+}
+
 const MUSIC_TABS = [[HouseIcon, "Home"], [LayoutGridIcon, "New"], [ListMusicIcon, "Library"]] as const
 const MUSIC_TAB_GLYPHS = MUSIC_TABS.map(([Icon]) => <Icon key="glyph" className="size-6" />)
-const GENRES = ["Chill", "Acoustic", "Focus", "Jazz", "Classical", "Ambient"]
+// each browse category leads to its own tracks (indexes into TRACKS)
+const GENRES: Record<string, number[]> = { Chill: [0, 5], Acoustic: [1, 3], Focus: [2, 4], Jazz: [5, 6], Classical: [3, 7], Ambient: [6, 7] }
 
 // iOS 27 Music: a tab capsule at the leading edge, Search as its own trailing tab and the
 // MiniPlayer accessory above both. Scrolling down collapses the tabs to the selected icon and
@@ -129,8 +145,10 @@ function MusicScene({ photoBase }: SceneProps) {
   const [query, setQuery] = React.useState("")
   const { compact: scrolled, setCompact, onScroll } = useSceneMinimize()
   const searching = tab === "Search"
-  // the search tab owns the bottom bar: its field replaces the tab capsule, which collapses
-  const compact = scrolled || searching
+  const narrow = useNarrowFrame(15)
+  // the search tab owns the bottom bar: its field replaces the tab capsule, which collapses; enlarged
+  // text collapses it too, since bar items don't grow with Dynamic Type on iOS
+  const compact = scrolled || searching || narrow
   const heading = React.useRef<HTMLHeadingElement>(null)
   const field = React.useRef<HTMLInputElement>(null)
   const select = (value: string) => {
@@ -140,12 +158,13 @@ function MusicScene({ photoBase }: SceneProps) {
     setTab(value)
     setCompact(false)
   }
-  const tracks = TRACKS.filter((name) => name.toLowerCase().includes(query.toLowerCase()))
+  const genre = Object.keys(GENRES).find((g) => g.toLowerCase() === query.trim().toLowerCase())
+  const tracks = TRACKS.filter((name, i) => (genre ? GENRES[genre].includes(i) : name.toLowerCase().includes(query.toLowerCase())))
   const list = <div className="divide-y divide-separator">{tracks.map((name) => {
     const n = TRACKS.indexOf(name)
     return <button key={name} type="button" className="glass-focus flex w-full items-center gap-3 py-2.5 text-start" onClick={() => { setTrack(n); setPlaying(true) }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={photo(n, photoBase)} alt="" className="size-12 rounded-control-sm object-cover" /><span className="min-w-0 flex-1"><span className="block truncate text-base">{name}</span><span className="block truncate text-sm text-muted-foreground">Northbound · {n % 2 ? "Open water" : "Daybreak"}</span></span>{track === n && playing ? <Volume2Icon aria-label="Now playing" className="size-4 text-primary" /> : <EllipsisIcon aria-hidden className="size-4 text-muted-foreground" />}
+      <img src={photo(n, photoBase)} alt="" className="size-12 rounded-control-sm object-cover" /><span className="min-w-0 flex-1"><span className="block truncate text-base">{name}</span><span className="block truncate text-sm text-muted-foreground">Northbound · {n % 2 ? "Open water" : "Daybreak"}</span></span>{track === n && playing ? <Volume2Icon aria-label="Now playing" className="size-4 text-primary" /> : null}
     </button>
   })}</div>
   const content = (
@@ -153,7 +172,7 @@ function MusicScene({ photoBase }: SceneProps) {
         <div className="mb-5 flex items-center justify-between"><h2 ref={heading} tabIndex={-1} className="type-large-title glass-focus rounded-control-sm font-bold">{tab}</h2><span aria-label="Account" role="img" className="flex size-control items-center justify-center rounded-button bg-fill-strong text-sm font-semibold">JD</span></div>
         {searching ? (query ? <>{list}{tracks.length === 0 ? <p role="status" className="py-8 text-center text-base text-muted-foreground">No results for “{query}”</p> : null}</> : <>
           <h3 className="type-title-3 mb-3 font-bold">Browse categories</h3>
-          <div className="grid grid-cols-2 gap-3 @lg:grid-cols-3">{GENRES.map((genre, i) => <button key={genre} type="button" onClick={() => setQuery(genre === "Chill" ? "morning" : genre === "Ambient" ? "hours" : "")} className="glass-focus relative isolate aspect-[3/2] overflow-hidden rounded-control text-start">
+          <div className="grid grid-cols-2 gap-3 @lg:grid-cols-3">{Object.keys(GENRES).map((genre, i) => <button key={genre} type="button" onClick={() => setQuery(genre)} className="glass-focus relative isolate aspect-[3/2] overflow-hidden rounded-control text-start">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={photo(i, photoBase)} alt="" className="absolute inset-0 -z-10 size-full object-cover" /><span className="absolute inset-0 -z-10 bg-linear-to-t from-glass-dim to-transparent" /><span className="absolute bottom-2.5 left-3 text-base font-semibold text-glass-media-foreground">{genre}</span>
           </button>)}</div>
@@ -172,8 +191,8 @@ function MusicScene({ photoBase }: SceneProps) {
   return (
     <TabsPrimitive.Root value={tab} onValueChange={select} className="contents">
       {[...MUSIC_TABS.map(([, name]) => name), "Search"].map((value) => <TabsPrimitive.Content key={value} value={value} className="h-full min-h-0 focus-visible:outline-hidden">{tab === value ? content : null}</TabsPrimitive.Content>)}
-      <div className="pointer-events-none absolute inset-x-3 bottom-4 mx-auto grid max-w-xl gap-2">
-        {!compact ? <MiniPlayer className="w-full" photoBase={photoBase} track={track} playing={playing} setPlaying={setPlaying} next={() => setTrack((track + 1) % TRACKS.length)} /> : null}
+      <div className="pointer-events-none absolute inset-x-3 bottom-4 mx-auto grid max-w-xl grid-cols-[minmax(0,1fr)] gap-2">
+        {!compact || (narrow && !searching) ? <MiniPlayer art={!narrow} className="w-full" photoBase={photoBase} track={track} playing={playing} setPlaying={setPlaying} next={() => setTrack((track + 1) % TRACKS.length)} /> : null}
         <div className="flex items-center gap-2">
           {/* one tablist for keyboard order; the accessory sits between its pieces visually */}
           <TabsPrimitive.List aria-label="Music sections" className="contents" onFocus={() => { if (!searching) setCompact(false) }}>
@@ -185,7 +204,7 @@ function MusicScene({ photoBase }: SceneProps) {
               <TabsPrimitive.Trigger value="Search" aria-label="Search" className="glass-focus-inset flex size-control-lg items-center justify-center rounded-button"><SearchIcon className="size-6" /></TabsPrimitive.Trigger>
             </LiquidGlass> : null}
           </TabsPrimitive.List>
-          {compact && !searching ? <MiniPlayer className="order-2 min-w-0 flex-1" photoBase={photoBase} track={track} playing={playing} setPlaying={setPlaying} /> : null}
+          {compact && !searching && !narrow ? <MiniPlayer className="order-2 min-w-0 flex-1" photoBase={photoBase} track={track} playing={playing} setPlaying={setPlaying} /> : null}
           {searching ? <LiquidGlass className="pointer-events-auto order-3 flex h-control-lg min-w-0 flex-1 items-center gap-2 rounded-button px-pad-sm">
             <SearchIcon aria-hidden className="size-5 shrink-0 text-muted-foreground" />
             <label htmlFor={`${fieldId}-search`} className="sr-only">Search music</label>
@@ -198,10 +217,10 @@ function MusicScene({ photoBase }: SceneProps) {
   )
 }
 
-function MiniPlayer({ className, photoBase, track, playing, setPlaying, next }: { className?: string; photoBase?: string; track: number; playing: boolean; setPlaying: (playing: boolean) => void; next?: () => void }) {
+function MiniPlayer({ className, photoBase, track, playing, setPlaying, next, art = true }: { className?: string; photoBase?: string; track: number; playing: boolean; setPlaying: (playing: boolean) => void; next?: () => void; art?: boolean }) {
   return <LiquidGlass className={cn("pointer-events-auto flex h-control-lg items-center gap-3 rounded-button ps-2 pe-1", className)}>
     {/* eslint-disable-next-line @next/next/no-img-element */}
-    <img src={photo(track, photoBase)} alt="" className="size-9 rounded-control-sm object-cover" /><p className="min-w-0 flex-1 truncate text-sm font-medium">{TRACKS[track]}</p>
+    {art ? <img src={photo(track, photoBase)} alt="" className="size-9 rounded-control-sm object-cover" /> : null}<p className="min-w-0 flex-1 truncate text-sm font-medium">{TRACKS[track]}</p>
     <IconButton aria-label={playing ? "Pause playback" : "Play music"} onClick={() => setPlaying(!playing)}>{playing ? <PauseIcon className="fill-current" /> : <PlayIcon className="fill-current" />}</IconButton>
     {next ? <IconButton aria-label="Next track" onClick={next}><SkipForwardIcon className="fill-current" /></IconButton> : null}
   </LiquidGlass>
@@ -252,7 +271,7 @@ function MapsScene() {
       {matches.length === 0 ? <p role="status" className="py-6 text-sm text-muted-foreground">No places match “{query}”.</p> : null}
     </LiquidGlass>
     <Sheet open={selected !== null} onOpenChange={(open) => { if (!open) setSelected(null) }} modal={false}>
-      <SheetContent container={frame} side="bottom" detents={["medium", "large"]} detent={detent} onDetentChange={setDetent} className="@xl:inset-x-auto! @xl:left-4! @xl:mx-0! @xl:w-80! @xl:max-w-80! @xl:rounded-b-surface!" onCloseAutoFocus={(e) => { e.preventDefault(); opener.current?.focus() }}>
+      <SheetContent container={frame} side="bottom" detents={["medium", "large"]} detent={detent} onDetentChange={setDetent} className="@xl:inset-x-auto! @xl:left-4! @xl:mx-0! @xl:w-80! @xl:max-w-80! @xl:rounded-b-surface! @xl:bottom-4! @xl:max-h-[calc(100%-2rem)]!" onCloseAutoFocus={(e) => { e.preventDefault(); opener.current?.focus() }}>
         <SheetHeader><SheetTitle>{selected}</SheetTitle><SheetDescription>Portland, Oregon · Open today</SheetDescription></SheetHeader>
         <div className="grid gap-6 overflow-y-auto px-6 pb-10"><p className="max-w-prose text-sm leading-relaxed">Follow the trails through old-growth forest, stop at the overlook, or find a quiet place for the afternoon. Choose a route before you head out.</p><Button onClick={() => setSelected(null)}><NavigationIcon />Start walking route</Button><h3 className="type-headline">About this place</h3><p className="max-w-prose text-sm leading-relaxed">Walking paths connect the neighborhood to the park. Allow extra time for the climb and bring water for the trail.</p></div>
       </SheetContent>
@@ -306,6 +325,8 @@ function MailScene() {
   const list = React.useRef<HTMLElement>(null)
   const reading = React.useRef<HTMLHeadingElement>(null)
   const composeButton = React.useRef<HTMLButtonElement>(null)
+  // Mail opens a new message with the cursor in To
+  const toField = React.useRef<HTMLInputElement>(null)
   // focus follows the action: the message on a compact push, its row going back, the next row after archive
   const later = (fn: () => void) => requestAnimationFrame(() => requestAnimationFrame(fn))
   const row = (id?: number) => list.current?.querySelector<HTMLElement>(id === undefined ? "button[data-letter]" : `button[data-letter="${id}"]`)
@@ -362,7 +383,7 @@ function MailScene() {
     </SidebarInset>
     {/* Escape keeps a started draft, as Mail does when compose is dismissed; Cancel asks */}
     <Sheet open={composing} onOpenChange={(next) => next ? setComposing(true) : closeCompose(true)}>
-      <SheetContent container={frame} side="bottom" detents={["large"]} grabber={false} showCloseButton={false} className="gap-0" onCloseAutoFocus={(e) => { e.preventDefault(); composeButton.current?.focus() }}>
+      <SheetContent container={frame} side="bottom" detents={["large"]} grabber={false} showCloseButton={false} className="gap-0" onOpenAutoFocus={(e) => { e.preventDefault(); toField.current?.focus() }} onCloseAutoFocus={(e) => { e.preventDefault(); composeButton.current?.focus() }}>
         <SheetHeader className="grid grid-cols-[auto_1fr_auto] items-center gap-3 p-3">
           {dirty ? <DropdownMenu>
             <DropdownMenuTrigger asChild><Button variant="glass" size="icon" aria-label="Cancel"><XIcon /></Button></DropdownMenuTrigger>
@@ -373,7 +394,7 @@ function MailScene() {
         </SheetHeader>
         <SheetDescription className="sr-only">Write a message. Cancel asks whether to keep a started draft.</SheetDescription>
         <div className="grid border-y border-separator px-5 text-[0.9375rem]">
-          <label className="flex items-center gap-2 border-b border-separator py-2.5"><span className="text-muted-foreground">To:</span><input value={draft.to} onChange={(e) => setDraft({ ...draft, to: e.target.value })} className="glass-focus min-w-0 flex-1 bg-transparent" autoComplete="off" /></label>
+          <label className="flex items-center gap-2 border-b border-separator py-2.5"><span className="text-muted-foreground">To:</span><input ref={toField} value={draft.to} onChange={(e) => setDraft({ ...draft, to: e.target.value })} className="glass-focus min-w-0 flex-1 bg-transparent" autoComplete="off" /></label>
           <label className="flex items-center gap-2 py-2.5"><span className="text-muted-foreground">Subject:</span><input value={draft.subject} onChange={(e) => setDraft({ ...draft, subject: e.target.value })} className="glass-focus min-w-0 flex-1 bg-transparent" /></label>
         </div>
         <label className="sr-only" htmlFor="mail-compose-body">Message</label>
@@ -383,8 +404,12 @@ function MailScene() {
   </SidebarProvider>
 }
 
+// enlarged text shows the tools as symbols, so the control keeps its size
+const TOOLS = [["draw", "Draw", PencilIcon], ["erase", "Erase", EraserIcon], ["select", "Select", MousePointer2Icon]] as const
+
 function ControlsScene({ photoBase }: SceneProps) {
   const fieldId = React.useId()
+  const narrow = useNarrowFrame(15)
   const [expanded, setExpanded] = React.useState(false)
   const [volume, setVolume] = React.useState([48])
   const [notifications, setNotifications] = React.useState(true)
@@ -392,10 +417,10 @@ function ControlsScene({ photoBase }: SceneProps) {
   return <>
     {/* eslint-disable-next-line @next/next/no-img-element */}
     <img src={photo(0, photoBase)} alt="Lake and mountains behind floating controls" className="absolute inset-0 size-full object-cover" />
-    <div className="absolute inset-x-5 top-5 flex items-start justify-between gap-3"><LiquidGlass className="rounded-button px-5 py-3 text-sm font-semibold">Mountain study</LiquidGlass><LiquidGlass interactive className="rounded-button p-1"><IconButton aria-label={expanded ? "Collapse tools" : "Expand tools"} aria-expanded={expanded} onClick={() => setExpanded(!expanded)}><PlusIcon className={cn("transition-transform duration-(--glass-duration) ease-glass", expanded && "rotate-45")} /></IconButton></LiquidGlass></div>
-    <div className="absolute right-5 bottom-5 left-5 mx-auto grid max-w-sm gap-3">
+    <div className="absolute inset-x-5 top-5 flex flex-wrap items-start justify-between gap-3"><LiquidGlass className="rounded-button px-5 py-3 text-sm font-semibold">Mountain study</LiquidGlass><LiquidGlass interactive className="rounded-button p-1"><IconButton aria-label={expanded ? "Collapse tools" : "Expand tools"} aria-expanded={expanded} onClick={() => setExpanded(!expanded)}><PlusIcon className={cn("transition-transform duration-(--glass-duration) ease-glass", expanded && "rotate-45")} /></IconButton></LiquidGlass></div>
+    <div className="absolute right-5 bottom-5 left-5 mx-auto grid max-w-sm grid-cols-[minmax(0,1fr)] gap-3">
       {expanded ? <LiquidGlass className="grid gap-5 rounded-surface p-5"><div className="flex items-center justify-between gap-3"><label htmlFor={`${fieldId}-notifications`} className="text-sm font-medium">Notifications</label><Switch id={`${fieldId}-notifications`} checked={notifications} onCheckedChange={setNotifications} /></div><div className="grid gap-3"><label htmlFor={`${fieldId}-volume`} className="flex items-center gap-2 text-sm font-medium"><Volume2Icon className="size-4" />Volume<span className="numeric-glass ms-auto">{volume[0]}%</span></label><Slider id={`${fieldId}-volume`} aria-label="Volume" value={volume} onValueChange={setVolume} /></div></LiquidGlass> : null}
-      <LiquidGlass className="flex w-fit items-center justify-self-center rounded-button p-1"><SegmentedControl value={tool} onValueChange={setTool} aria-label="Drawing tool"><SegmentedControlItem value="draw">Draw</SegmentedControlItem><SegmentedControlItem value="erase">Erase</SegmentedControlItem><SegmentedControlItem value="select">Select</SegmentedControlItem></SegmentedControl></LiquidGlass>
+      <LiquidGlass className="flex w-fit items-center justify-self-center rounded-button p-1"><SegmentedControl value={tool} onValueChange={setTool} aria-label="Drawing tool">{TOOLS.map(([value, label, Icon]) => <SegmentedControlItem key={value} value={value} aria-label={narrow ? label : undefined}>{narrow ? <Icon aria-hidden className="size-4" /> : label}</SegmentedControlItem>)}</SegmentedControl></LiquidGlass>
     </div>
   </>
 }

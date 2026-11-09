@@ -179,6 +179,8 @@ function Studio({ initialCode, initialApplied }: { initialCode: string; initialA
   const legible = legibility(theme, scheme)
   const liquidText = legibilityReport(theme, scheme).text.liquid
   const changedCount = new Set([...Object.keys(overrides.light), ...Object.keys(overrides.dark)]).size
+  // presets count as changes too: picking Smoked or Compact is an edit, even with no token touched
+  const presetCount = (Object.keys(START) as (keyof Recipe)[]).filter((k) => recipe[k] !== START[k]).length
 
   return (
     <div className="mx-auto grid min-w-0 w-full max-w-[1400px] gap-5 px-4 pt-8 pb-12 *:min-w-0 sm:px-6 lg:grid-cols-[400px_minmax(0,1fr)]">
@@ -188,7 +190,7 @@ function Studio({ initialCode, initialApplied }: { initialCode: string; initialA
             <div className="min-w-0 flex-1">
               <h1 className="type-glass-heading text-xl">Theme Studio</h1>
               <p className="text-xs text-muted-foreground">
-                {TOKENS.length} primitives · {changedCount} edited{initialCode ? " · loaded from a link" : ""}
+                {TOKENS.length} primitives · {presetCount} {presetCount === 1 ? "preset" : "presets"} changed · {changedCount} {changedCount === 1 ? "token" : "tokens"} edited{initialCode ? " · loaded from a link" : ""}
               </p>
             </div>
             <Tooltip>
@@ -269,8 +271,8 @@ function Studio({ initialCode, initialApplied }: { initialCode: string; initialA
               <Label>Density</Label>
               <SegmentedControl size="sm" value={String(recipe.density)} onValueChange={(v) => choose("density", Number(v), OWNS.density)} className="w-full" aria-label="Density">
                 {Object.entries(DENSITIES).map(([k, v]) => (
-                  <SegmentedControlItem key={k} value={String(v)} className="capitalize">
-                    {k}
+                  <SegmentedControlItem key={k} value={String(v)}>
+                    {k[0].toUpperCase() + k.slice(1)}
                   </SegmentedControlItem>
                 ))}
               </SegmentedControl>
@@ -322,8 +324,8 @@ function Studio({ initialCode, initialApplied }: { initialCode: string; initialA
         </Glass>
       </aside>
 
-      <section className="grid content-start gap-4">
-        <Glass intensity="subtle" elevation="flat" className="flex flex-wrap items-center gap-3 rounded-button p-2 pl-4">
+      <section className="grid min-w-0 grid-cols-[minmax(0,1fr)] content-start gap-4">
+        <Glass intensity="subtle" elevation="flat" className="flex max-w-full flex-wrap items-center gap-3 rounded-button p-2 pl-4">
           <SegmentedControl size="sm" value={scheme} onValueChange={(v) => setPreview(v as Scheme)} aria-label="Preview scheme">
             <SegmentedControlItem value="light" aria-label="Light preview">
               <SunIcon /> Light

@@ -369,3 +369,32 @@ This review ran against `cb84c33` (plus `381656b`). Two later commits on `main` 
 | --- | --- | --- |
 | `a122309` | UX3-W02, flaky morph test | Destructive rows take `destructive-ink` instead of the accent ink: an unlayered `text-primary-ink` rule had overridden it. The ink is still 70% label, so the row reads dark red rather than system red, and Delete still sits last. `glass-morph.coverage.spec.ts` waits for `networkidle` before clicking. |
 | `6e2f54e` | G02 (badge motion), every web overlay | The cluster glass is traced in script and written into inline SVG masks in the frame it is measured, so it no longer trails reordering badges. Overlays no longer replay their entry animation after the morph from their trigger finishes. |
+
+## Web dispositions
+
+Fixed on `main` after this review. Checks ran against the worktree dev server with Playwright (Chromium unless noted).
+
+| ID | Status | What changed | Check |
+| --- | --- | --- | --- |
+| UX3-W01 | Fixed | Forced-colours rules give switch, segmented control, tabs and slider `ButtonText` edges and a `Highlight` state | `e2e/a11y.spec.ts` "forced colours"; screenshots light and dark |
+| UX3-W02 | Fixed | `text-destructive-label` from the `glass-ink-strength` primitive; Delete first | Delete row `oklch(0.43 0.18 29)` light, `oklch(0.80 0.13 25)` dark; matrix test holds 4.5:1 for every palette × material |
+| UX3-W03 | Fixed | Sidebar at the inspector's stacking level | Cards pass under both panels |
+| UX3-W04 | Fixed | Regular glass on both panels, primary-label inspector text, lighter mirror blur, demo chrome | Visual |
+| UX3-W05 | Fixed | Note tools hidden while Format is open | Visual |
+| UX3-W06 | Fixed | Each category filters its own tracks | |
+| UX3-W07 | Fixed | Dark-content tiles render in a dark `ThemeScope` | Visual |
+| UX3-W08 | Fixed | Header collapses by container width in rem; page CTAs, hero badge and stat trend wrap; scene bars stay inside their frame | `e2e/site-width.spec.ts`: no sideways scroll on `/`, `/showcase`, `/themes` at 390px with text at 200%; scene probe finds no clipped control except Landmarks' scrolling card row |
+| UX3-W09 | Fixed | Depth ramps from 56px; default shadow offset and blur grow with depth | |
+| UX3-W10 | Fixed | Row ellipsis removed | |
+| UX3-W11 | Fixed | Compose focuses To | |
+| UX3-W12 | Fixed | Typing runs coalesce; format changes are in the history | `e2e/glass-showcase.spec.ts` "typing run" |
+| UX3-W13 | Fixed earlier | `ActionSheet placement="source"` (`a122309`) | |
+| UX3-W14 | Fixed | `text-primary-label` for link buttons, SearchField Cancel and Search's Clear buttons | Same matrix test (`primaryText`) |
+| UX3-W15 | Fixed | Nav shows from 59rem of bar content width (1024px at default text) | `e2e/site-width.spec.ts` "shows at 1024px" |
+| UX3-W16 | Fixed earlier | Site `Direction.Provider` follows `<html dir>` (`a122309`) | |
+| UX3-W17 | Fixed | Fill ramps 0.5 to 0.75; labels switch at 0.65 over a ~42% fill | Clarity strip 0.5 to 1 |
+| UX3-W18 | Fixed | Third photo's place is "Cascade Range" | |
+| UX3-W19 | Fixed | Predictions on the thick tier | |
+| UX3-W20 | Fixed | Leading sheet inset 16px on all sides at `@xl` | |
+| UX3-H01 | Fixed earlier | Morph spec waits for `networkidle` (`a122309`) | |
+| UX3-H02 | Fixed | Title-case density; counter reports presets and tokens | |

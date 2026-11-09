@@ -22,3 +22,23 @@ test("compact desktop navigation keeps every top-level destination available", a
   const navigation = page.getByRole("navigation", { name: "Site navigation" })
   for (const name of ["Showcase", "Docs", "Components", "Studio", "Theming", "Native"]) await expect(navigation.getByRole("link", { name, exact: true })).toBeVisible()
 })
+
+// UX3-W08 / W15: the header collapses by its own width in rem, so enlarged text collapses it too
+for (const path of ["/", "/showcase", "/themes"]) test(`${path} has no sideways scroll at 390px with text at 200%`, async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 900 })
+  await page.goto(path, { waitUntil: "networkidle" })
+  await page.addStyleTag({ content: "html { font-size: 200% !important }" })
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390)
+  const outside = await page.getByRole("banner").evaluate((header) => {
+    const pane = header.firstElementChild!.getBoundingClientRect()
+    return [...header.querySelectorAll<HTMLElement>("a,button")].filter((el) => { const r = el.getBoundingClientRect(); return r.width > 0 && (r.right > pane.right + 1 || r.left < pane.left - 1) }).map((el) => el.getAttribute("aria-label") || el.textContent)
+  })
+  expect(outside).toEqual([])
+})
+
+test("the primary navigation shows at 1024px once it fits", async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 900 })
+  await page.goto("/", { waitUntil: "networkidle" })
+  await expect(page.getByRole("navigation", { name: "Primary navigation" })).toBeVisible()
+  await expect(page.getByRole("button", { name: "Menu", exact: true })).toBeHidden()
+})
