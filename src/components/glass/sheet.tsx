@@ -48,7 +48,7 @@ function SheetOverlay({ className, contained = false, ...props }: React.Componen
       data-glass-motion=""
       className={cn(
         contained ? "absolute" : "fixed",
-        "inset-0 z-50 bg-glass-dim duration-[calc(var(--glass-duration)*1.5)] ease-glass data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
+        "inset-0 z-50 bg-glass-dim transition-none duration-[calc(var(--glass-duration)*1.5)] ease-glass data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
         className
       )}
       {...props}
@@ -168,7 +168,7 @@ function SheetContent({
         }}
         className={cn(
           contained ? "absolute" : "fixed",
-          "glass-liquid z-50 flex flex-col gap-4 overflow-y-auto overscroll-contain rounded-surface text-sm text-popover-foreground ease-glass data-morphing:animate-none! data-open:animate-in data-open:fade-in-0 data-open:duration-[calc(var(--glass-duration)*1.5)] data-closed:animate-out data-closed:fade-out-0 data-closed:duration-(--glass-duration)",
+          "glass-liquid z-50 flex flex-col gap-4 overflow-y-auto overscroll-contain rounded-surface text-sm text-popover-foreground transition-none ease-glass data-morphing:animate-none! data-open:animate-in data-open:fade-in-0 data-open:duration-[calc(var(--glass-duration)*1.5)] data-closed:animate-out data-closed:fade-out-0 data-closed:duration-(--glass-duration)",
           // under reduced motion the slide is dropped — only the fade is left (and data-glass-motion stills even that)
           "motion-reduce:[--tw-enter-translate-x:0]! motion-reduce:[--tw-enter-translate-y:0]! motion-reduce:[--tw-exit-translate-x:0]! motion-reduce:[--tw-exit-translate-y:0]!",
           "data-[side=end]:inset-y-3 data-[side=left]:inset-y-3 data-[side=right]:inset-y-3 data-[side=start]:inset-y-3",

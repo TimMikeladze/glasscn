@@ -105,7 +105,7 @@ function Combobox(props: ComboboxProps) {
                   <button
                     type="button"
                     aria-label={`Remove ${byValue.get(v)?.label ?? v}`}
-                    className="glass-focus inline-flex size-5 items-center justify-center rounded-badge hover:bg-primary/16"
+                    className="glass-focus inline-flex size-5 items-center justify-center rounded-badge hover:bg-primary/16 transition-colors duration-(--glass-duration) ease-out"
                     onPointerDown={(e) => e.stopPropagation()}
                     onClick={(e) => {
                       e.stopPropagation()

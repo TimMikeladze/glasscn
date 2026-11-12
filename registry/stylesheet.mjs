@@ -523,6 +523,13 @@ export const stylesheet = {
   },
   "::view-transition-group(.glass-presentation)": { "animation-duration": "calc(var(--glass-duration) * 2.5)", "animation-timing-function": "var(--glass-ease)" },
   "::view-transition-image-pair(.glass-presentation)": { "border-radius": "inherit", overflow: "clip" },
+  // The trigger's snapshot keeps its own size (the default stretches its label to the panel's width)
+  // and the two snapshots fade in sequence instead of on top of each other for the whole morph.
+  "::view-transition-old(.glass-presentation-open), ::view-transition-new(.glass-presentation-close)": { width: "100%", height: "100%", "object-fit": "none" },
+  "::view-transition-old(.glass-presentation-open)": { "animation-duration": "var(--glass-duration)", "animation-timing-function": "ease-out" },
+  "::view-transition-new(.glass-presentation-open)": { "animation-delay": "calc(var(--glass-duration) * 0.5)", "animation-duration": "calc(var(--glass-duration) * 1.5)", "animation-timing-function": "ease-out" },
+  "::view-transition-old(.glass-presentation-close)": { "animation-duration": "calc(var(--glass-duration) * 1.25)", "animation-timing-function": "ease-out" },
+  "::view-transition-new(.glass-presentation-close)": { "animation-delay": "calc(var(--glass-duration) * 0.5)", "animation-duration": "calc(var(--glass-duration) * 1.5)", "animation-timing-function": "ease-out" },
   // first frame of an overlay that grows from its trigger (top level: an at-rule can't nest in @utility)
   "@starting-style": { ".glass-morph-origin:is([data-state=open], [data-state=delayed-open], [data-state=instant-open])": { "clip-path": morphStart } },
   // No backdrop-filter (old browsers, some WebViews): panes become nearly opaque.

@@ -293,7 +293,7 @@ function ChartState({
         <div className="relative flex flex-col items-center gap-2 rounded-control bg-background/70 px-pad py-2 text-center">
           <span>{state === "empty" ? (labels?.empty ?? "No data for this range") : (labels?.error ?? "Couldn't load this chart")}</span>
           {state === "error" && onRetry ? (
-            <button type="button" onClick={onRetry} className="glass-focus rounded-button px-pad-sm py-1 text-sm font-medium text-primary hover:bg-fill">
+            <button type="button" onClick={onRetry} className="glass-focus rounded-button px-pad-sm py-1 text-sm font-medium text-primary hover:bg-fill transition-colors duration-(--glass-duration) ease-out">
               {labels?.retry ?? "Retry"}
             </button>
           ) : null}

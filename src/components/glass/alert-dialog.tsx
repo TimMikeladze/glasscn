@@ -36,7 +36,7 @@ function AlertDialogOverlay({ className, ...props }: React.ComponentProps<typeof
       data-slot="alert-dialog-overlay"
       data-glass-motion=""
       className={cn(
-        "fixed inset-0 isolate z-50 bg-glass-dim duration-(--glass-duration) ease-glass data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
+        "fixed inset-0 isolate z-50 bg-glass-dim transition-none duration-(--glass-duration) ease-glass data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
         className
       )}
       {...props}

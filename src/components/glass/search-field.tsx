@@ -220,7 +220,7 @@ function SearchField({
                 setText("")
                 input.current?.focus()
               }}
-              className="glass-focus hit-area inline-flex size-control-xs shrink-0 items-center justify-center rounded-button bg-fill text-muted-foreground hover:bg-fill-strong [&_svg]:size-3.5"
+              className="glass-focus hit-area inline-flex size-control-xs shrink-0 items-center justify-center rounded-button bg-fill text-muted-foreground hover:bg-fill-strong [&_svg]:size-3.5 transition-colors duration-(--glass-duration) ease-out"
             >
               <XIcon />
             </button>

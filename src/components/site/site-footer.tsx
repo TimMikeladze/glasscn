@@ -29,9 +29,9 @@ export function SiteFooter() {
         </a>
       </span>
       <span className="flex gap-4">
-        <Link href="/docs" className="hover:text-foreground">Docs</Link>
-        <Link href="/docs/theming" className="hover:text-foreground">Theming</Link>
-        <Link href="/r/registry.json" className="hover:text-foreground">registry.json</Link>
+        <Link href="/docs" className="hover:text-foreground transition-colors duration-(--glass-duration) ease-out">Docs</Link>
+        <Link href="/docs/theming" className="hover:text-foreground transition-colors duration-(--glass-duration) ease-out">Theming</Link>
+        <Link href="/r/registry.json" className="hover:text-foreground transition-colors duration-(--glass-duration) ease-out">registry.json</Link>
       </span>
     </footer>
   )

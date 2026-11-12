@@ -249,7 +249,7 @@ function DataTableColumnHeader<TData extends RowData, TValue extends CellData>({
               size="xs"
               data-sorted={sorted || undefined}
               onClick={column.getToggleSortingHandler()}
-              className="-mx-[calc(0.5rem*var(--glass-density))] px-[calc(0.5rem*var(--glass-density))] text-xs font-medium text-muted-foreground hover:text-foreground data-sorted:text-foreground"
+              className="-mx-[calc(0.5rem*var(--glass-density))] px-[calc(0.5rem*var(--glass-density))] text-xs font-medium text-muted-foreground hover:text-foreground data-sorted:text-foreground transition-colors duration-(--glass-duration) ease-out"
             >
               {title}
               <Icon aria-hidden className={cn("size-3.5", !sorted && "opacity-50")} />

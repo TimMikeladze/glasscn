@@ -273,7 +273,7 @@ function ChatFile({ className, url, mediaType, filename, ...props }: React.Compo
     )
   return (
     <div data-slot="chat-file" data-media-type={mediaType} className={cn("flex", className)} {...props}>
-      <a href={url} download={filename} className="glass-focus inline-flex max-w-64 items-center gap-2 rounded-control bg-fill px-3 py-2 text-sm hover:bg-fill-strong">
+      <a href={url} download={filename} className="glass-focus inline-flex max-w-64 items-center gap-2 rounded-control bg-fill px-3 py-2 text-sm hover:bg-fill-strong transition-colors duration-(--glass-duration) ease-out">
         <FileIcon aria-hidden className="size-4 shrink-0 text-muted-foreground" />
         <span className="truncate">{filename ?? mediaType}</span>
       </a>

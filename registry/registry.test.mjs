@@ -169,6 +169,17 @@ describe("component rules (docs/rules/components.md, tokens.md, accessibility.md
     }
     expect(failures).toEqual([])
   })
+  // tw-animate's duration-* also sets transition-duration, and the default transition-property is
+  // `all`: the sheet used to transition its backdrop-filter while it slid in
+  it("an element that animates in with a duration-* names its transition (or turns it off)", () => {
+    const failures = []
+    for (const f of files) {
+      for (const [, cls] of code(f).matchAll(/"([^"\n]*animate-in[^"\n]*)"/g)) {
+        if (/(?<![\w-])duration-/.test(cls) && !/(?<![\w:-])transition(?:-|\b)/.test(cls)) failures.push(`${f}: ${cls.slice(0, 80)}`)
+      }
+    }
+    expect(failures).toEqual([])
+  })
 })
 
 describe("primitives stay plain, and every variable a component uses exists (REG-02, REG-03)", () => {

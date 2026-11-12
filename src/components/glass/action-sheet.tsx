@@ -86,7 +86,7 @@ function ActionSheetContent({ className, children, ...props }: React.ComponentPr
           data-placement="source"
           data-glass-motion=""
           style={position}
-          className={cn("fixed z-50 outline-hidden duration-(--glass-duration) ease-glass data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 motion-reduce:[--tw-enter-scale:1]! motion-reduce:[--tw-exit-scale:1]!", className)}
+          className={cn("fixed z-50 outline-hidden transition-none duration-(--glass-duration) ease-glass data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 motion-reduce:[--tw-enter-scale:1]! motion-reduce:[--tw-exit-scale:1]!", className)}
           {...props}
         >
           <ActionSheetGroupFrame>{React.Children.toArray(children).filter((c) => !isCancel(c))}</ActionSheetGroupFrame>
@@ -107,7 +107,7 @@ function ActionSheetContent({ className, children, ...props }: React.ComponentPr
         }}
         className={cn(
           "fixed inset-0 z-50 flex flex-col justify-end gap-2 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] outline-hidden sm:items-center sm:justify-center",
-          "duration-[calc(var(--glass-duration)*1.5)] ease-glass data-morphing:animate-none! data-open:animate-in data-open:fade-in-0 data-open:slide-in-from-bottom-8 data-closed:animate-out data-closed:fade-out-0 data-closed:slide-out-to-bottom-8 sm:data-open:slide-in-from-bottom-0 sm:data-open:zoom-in-95 sm:data-closed:slide-out-to-bottom-0 sm:data-closed:zoom-out-95",
+          "transition-none duration-[calc(var(--glass-duration)*1.5)] ease-glass data-morphing:animate-none! data-open:animate-in data-open:fade-in-0 data-open:slide-in-from-bottom-8 data-closed:animate-out data-closed:fade-out-0 data-closed:slide-out-to-bottom-8 sm:data-open:slide-in-from-bottom-0 sm:data-open:zoom-in-95 sm:data-closed:slide-out-to-bottom-0 sm:data-closed:zoom-out-95",
           "motion-reduce:[--tw-enter-translate-y:0]! motion-reduce:[--tw-exit-translate-y:0]! motion-reduce:[--tw-enter-scale:1]! motion-reduce:[--tw-exit-scale:1]!",
           "*:w-full *:sm:max-w-sm",
           className

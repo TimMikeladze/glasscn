@@ -921,6 +921,29 @@
           "border-radius": "inherit",
           "overflow": "clip"
         },
+        "::view-transition-old(.glass-presentation-open), ::view-transition-new(.glass-presentation-close)": {
+          "width": "100%",
+          "height": "100%",
+          "object-fit": "none"
+        },
+        "::view-transition-old(.glass-presentation-open)": {
+          "animation-duration": "var(--glass-duration)",
+          "animation-timing-function": "ease-out"
+        },
+        "::view-transition-new(.glass-presentation-open)": {
+          "animation-delay": "calc(var(--glass-duration) * 0.5)",
+          "animation-duration": "calc(var(--glass-duration) * 1.5)",
+          "animation-timing-function": "ease-out"
+        },
+        "::view-transition-old(.glass-presentation-close)": {
+          "animation-duration": "calc(var(--glass-duration) * 1.25)",
+          "animation-timing-function": "ease-out"
+        },
+        "::view-transition-new(.glass-presentation-close)": {
+          "animation-delay": "calc(var(--glass-duration) * 0.5)",
+          "animation-duration": "calc(var(--glass-duration) * 1.5)",
+          "animation-timing-function": "ease-out"
+        },
         "@starting-style": {
           ".glass-morph-origin:is([data-state=open], [data-state=delayed-open], [data-state=instant-open])": {
             "clip-path": "inset(calc((100% - var(--glass-morph-h, 100%)) / 2) calc((100% - var(--glass-morph-w, 100%)) / 2) round var(--glass-radius-button))"

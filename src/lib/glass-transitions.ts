@@ -94,7 +94,8 @@ export function useGlassPresentation({ open: controlled, defaultOpen = false, on
     const mark = (element: HTMLElement) => {
       if (!previous.has(element)) previous.set(element, { name: element.style.viewTransitionName, group: element.style.getPropertyValue("view-transition-class") })
       element.style.viewTransitionName = name
-      element.style.setProperty("view-transition-class", "glass-presentation")
+      // the direction tells the stylesheet which snapshot is the trigger (old while opening, new while closing)
+      element.style.setProperty("view-transition-class", `glass-presentation glass-presentation-${next ? "open" : "close"}`)
     }
     const restore = () => {
       for (const [element, value] of previous) {

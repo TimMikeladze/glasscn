@@ -67,7 +67,7 @@ export function SiteHeader({ stars, nav }: { stars: number | null; nav: NavSecti
             </SheetHeader>
             <div className="px-3 pb-6">
               <nav aria-label="Site navigation" className="mb-5 grid gap-1 border-b border-glass-border pb-4">
-                {NAV.map((item) => <Link key={item.href} href={item.href} onClick={() => setMenu(false)} className="glass-focus rounded-control px-pad-sm py-2 text-sm font-medium hover:bg-fill">{item.label}</Link>)}
+                {NAV.map((item) => <Link key={item.href} href={item.href} onClick={() => setMenu(false)} className="glass-focus rounded-control px-pad-sm py-2 text-sm font-medium hover:bg-fill transition-colors duration-(--glass-duration) ease-out">{item.label}</Link>)}
               </nav>
               {/* palette and glass leave the bar first when it's narrow, so they're here too */}
               <section aria-label="Palette" className="mb-5 border-b border-glass-border pb-4">

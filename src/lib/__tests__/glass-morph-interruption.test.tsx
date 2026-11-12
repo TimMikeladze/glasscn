@@ -21,11 +21,14 @@ it("an interrupted opening cannot erase the next closing transition's source", a
   act(() => transitions[0].update())
   const identity = panel.style.viewTransitionName
   expect(identity).toMatch(/^glass-presentation-/)
+  // the direction picks the trigger's snapshot in the stylesheet
+  expect(panel.style.getPropertyValue("view-transition-class")).toBe("glass-presentation glass-presentation-open")
   act(() => result.current.setOpen(false))
   await act(async () => { await Promise.resolve(); await Promise.resolve() })
   expect(panel.style.viewTransitionName).toBe(identity)
   act(() => transitions[1].update())
   expect(trigger.style.viewTransitionName).toBe(identity)
+  expect(trigger.style.getPropertyValue("view-transition-class")).toBe("glass-presentation glass-presentation-close")
   await act(async () => transitions[1].finish())
   unmount()
   trigger.remove()
